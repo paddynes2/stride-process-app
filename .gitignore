@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — .env.local has secrets, .env.production has only NEXT_PUBLIC_ (safe to commit)
+.env.local
+.env.development.local
+.env.production.local
 
 # vercel
 .vercel
@@ -41,3 +43,5 @@ yarn-error.log*
 next-env.d.ts
 .env.local
 .supabase
+
+.vercel
