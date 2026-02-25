@@ -73,7 +73,7 @@ export function TabBar({ tabs, activeTabId, workspaceId, onTabSelect, onTabsChan
       className="flex items-center gap-1 px-3 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]"
       style={{ height: "var(--tab-bar-height)" }}
     >
-      {tabs
+      {[...tabs]
         .sort((a, b) => a.position - b.position)
         .map((tab) => (
           <div

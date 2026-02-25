@@ -62,7 +62,7 @@ interface FlowCanvasProps {
 }
 
 function buildNodes(sections: Section[], steps: Step[], selectedStepId: string | null, selectedSectionId: string | null): Node[] {
-  const sectionNodes: Node<SectionNodeData>[] = sections.map((section) => ({
+  const sectionNodes: Node<SectionNodeData>[] = (sections ?? []).filter(Boolean).map((section) => ({
     id: `section-${section.id}`,
     type: "section",
     position: { x: section.position_x, y: section.position_y },
@@ -71,7 +71,7 @@ function buildNodes(sections: Section[], steps: Step[], selectedStepId: string |
     selected: section.id === selectedSectionId,
   }));
 
-  const stepNodes: Node<StepNodeData>[] = steps.map((step) => ({
+  const stepNodes: Node<StepNodeData>[] = (steps ?? []).filter(Boolean).map((step) => ({
     id: `step-${step.id}`,
     type: "step",
     position: { x: step.position_x, y: step.position_y },
@@ -85,7 +85,7 @@ function buildNodes(sections: Section[], steps: Step[], selectedStepId: string |
 }
 
 function buildEdges(connections: Connection[]): Edge[] {
-  return connections.map((conn) => ({
+  return (connections ?? []).filter(Boolean).map((conn) => ({
     id: `edge-${conn.id}`,
     source: `step-${conn.source_step_id}`,
     target: `step-${conn.target_step_id}`,
