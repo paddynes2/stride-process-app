@@ -795,3 +795,27 @@
 - Efficiency (wasted actions?): 5 — Research → implement → verify, no wasted attempts.
 - Proactive observations: 0
 **Notes:** 832KB chunk split into 420KB (jspdf, export-only) + 356KB (tiptap, panel-only). Initial canvas page load reduced by ~832KB. Lighthouse criterion deferred — requires browser.
+
+## Iteration 28 — 2026-02-26
+**Task:** Regression pass — verify iterations 21-27 (cadence trigger)
+**Source:** Cadence trigger (minimum every 8th iteration, last regression iter 20)
+**Complexity:** M
+**Result:** completed (0 regressions found)
+**Changes:** None (read-only regression pass)
+**Research:** Reviewed all 28 source files changed across iterations 21-27. Checked shared components (button, sidebar, offline-banner, skeleton, error boundaries, toast-helpers), dynamic imports, and template seeding logic.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing, unchanged since iter 21)
+- Build: pass (37 routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None new (existing IMP-001, IMP-002 remain in backlog)
+**Self-score:**
+- Code quality: N/A — no code written
+- Test coverage of change: 3 — static verification only, no browser testing available
+- Confidence this won't regress: 5 — all changes 21-27 are additive, no regressions found
+- Efficiency (wasted actions?): 4 — thorough review but no browser testing possible
+- Proactive observations: 0
+**Notes:** Regression cadence triggered (8 iterations since last at iter 20). All Phase 1.5 changes (a11y fixes, empty states, loading/error states, performance pass) reviewed and verified clean. 5 pre-existing lint warnings noted as potential cleanup items. Next: FEAT-014 (IMPROVEMENTS.md backlog).

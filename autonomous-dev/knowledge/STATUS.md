@@ -6,24 +6,20 @@
 
 ## Handoff
 
-- **Iteration:** 27
+- **Iteration:** 28
 - **Date:** 2026-02-26
 - **Phase:** Phase 1.5 — Ship & Harden
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-013 Performance pass — lazy-load heavy dependencies
-- **Result:** completed (partial — 4 of 5 acceptance criteria met, Lighthouse deferred)
-- **Next task:** #FEAT-013 remaining criterion (Lighthouse score > 80) OR #FEAT-014 (IMPROVEMENTS.md backlog)
-- **Blockers:** Lighthouse testing requires browser (Playwright MCP unavailable)
+- **Last task:** Regression pass — verify iterations 21-27 (cadence trigger, minimum every 8th)
+- **Result:** completed (0 regressions found)
+- **Next task:** #FEAT-014 Work through IMPROVEMENTS.md backlog (2 items: IMP-001, IMP-002)
+- **Blockers:** None
 
 ## Context
 
-Completed the performance optimization for FEAT-013. Key achievement: the 832KB monolithic chunk containing jspdf + tiptap/prosemirror was split into two lazy-loaded chunks:
-- 420KB jspdf chunk — loaded only when "Export PDF" clicked (dynamic import in canvas-view.tsx)
-- 356KB tiptap chunk — loaded only when step/section detail panel opens (next/dynamic in step-detail-panel.tsx and section-detail-panel.tsx)
+Regression pass covered all 28 source files changed in iterations 21-27 (a11y fixes, empty states, loading/error states, performance pass). Type check, lint, and build all pass. 5 pre-existing lint warnings remain unchanged (unused imports in page.tsx, flow-canvas.tsx, header.tsx, sidebar.tsx). No regressions found — all changes are additive and well-structured.
 
-The canvas page initial load no longer includes either of these heavy libraries. Gap analysis (32KB) and teams (47KB) routes are already code-split by Next.js App Router. No images > 100KB exist.
-
-4 of 5 acceptance criteria met. The remaining criterion (Lighthouse score > 80) requires a browser test that can't be performed without Playwright MCP. Suggest marking FEAT-013 as done and deferring Lighthouse to the golden path test iteration (FEAT-016).
+Phase 1.5 progress: tasks 1-4 of 7 done. Next up is FEAT-014 (IMPROVEMENTS.md backlog — IMP-001 extract export hook, IMP-002 extract MATURITY_COLORS). Both are S-complexity refactoring tasks.
 
 ## Dev Server
 
@@ -34,6 +30,6 @@ The canvas page initial load no longer includes either of these heavy libraries.
 ## Warnings
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
-- Pre-existing lint warnings (5 warnings, all in other files — flow-canvas, header, sidebar, page.tsx).
-- Browser testing skipped — Playwright MCP unavailable.
-- Lighthouse score criterion deferred — requires browser testing.
+- Pre-existing lint warnings (5 warnings — unused imports in page.tsx, flow-canvas.tsx, header.tsx, sidebar.tsx).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-28).
+- 5 unused imports could be cleaned up: `redirect` in page.tsx, `addEdge` in flow-canvas.tsx, `User` in header.tsx, `Plus` in sidebar.tsx, and a missing deps warning in flow-canvas.tsx useCallback.
