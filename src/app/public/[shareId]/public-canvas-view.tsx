@@ -18,6 +18,7 @@ import { StepNode } from "@/components/canvas/step-node";
 import { SectionNode } from "@/components/canvas/section-node";
 import type { Step, Section } from "@/types/database";
 import type { StepNodeData, SectionNodeData } from "@/types/canvas";
+import { MATURITY_LEVELS } from "@/lib/maturity";
 
 const nodeTypes = {
   step: StepNode,
@@ -253,13 +254,7 @@ export function PublicCanvasView({ shareData }: PublicCanvasViewProps) {
                 <span className="text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide mr-1">
                   Maturity
                 </span>
-                {[
-                  { level: 1, color: "#EF4444", label: "Initial" },
-                  { level: 2, color: "#F97316", label: "Developing" },
-                  { level: 3, color: "#EAB308", label: "Defined" },
-                  { level: 4, color: "#84CC16", label: "Managed" },
-                  { level: 5, color: "#22C55E", label: "Optimized" },
-                ].map(({ level, color }) => (
+                {MATURITY_LEVELS.map(({ level, color }) => (
                   <div key={level} className="flex items-center gap-1">
                     <div
                       className="w-3 h-3 rounded-sm"

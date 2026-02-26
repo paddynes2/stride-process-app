@@ -5,6 +5,7 @@ import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { StepNodeData } from "@/types/canvas";
+import { MATURITY_COLORS, MATURITY_FALLBACK_COLOR } from "@/lib/maturity";
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -21,18 +22,10 @@ const EXECUTOR_ICONS: Record<string, string> = {
   empty: "",
 };
 
-const MATURITY_COLORS: Record<number, string> = {
-  1: "#EF4444",
-  2: "#F97316",
-  3: "#EAB308",
-  4: "#84CC16",
-  5: "#22C55E",
-};
-
 export function StepNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as StepNodeData;
   const { step, heatMapMode } = nodeData;
-  const maturityColor = step.maturity_score != null ? MATURITY_COLORS[step.maturity_score] ?? "#6B7280" : null;
+  const maturityColor = step.maturity_score != null ? MATURITY_COLORS[step.maturity_score] ?? MATURITY_FALLBACK_COLOR : null;
 
   return (
     <div
@@ -95,7 +88,7 @@ export function StepNode({ data, selected }: NodeProps) {
         {step.maturity_score != null && (
           <div
             className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-            style={{ backgroundColor: MATURITY_COLORS[step.maturity_score] ?? "#6B7280" }}
+            style={{ backgroundColor: MATURITY_COLORS[step.maturity_score] ?? MATURITY_FALLBACK_COLOR }}
             title={`Maturity: ${step.maturity_score}/5`}
           >
             {step.maturity_score}

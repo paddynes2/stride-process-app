@@ -4,20 +4,7 @@ import * as React from "react";
 import { type NodeProps, NodeResizer } from "@xyflow/react";
 import { cn } from "@/lib/utils";
 import type { SectionNodeData } from "@/types/canvas";
-
-const MATURITY_COLORS: Record<number, string> = {
-  1: "#EF4444",
-  2: "#F97316",
-  3: "#EAB308",
-  4: "#84CC16",
-  5: "#22C55E",
-};
-
-function getMaturityColor(score: number | null): string {
-  if (score == null) return "#6B7280";
-  const rounded = Math.round(score);
-  return MATURITY_COLORS[Math.max(1, Math.min(5, rounded))] ?? "#6B7280";
-}
+import { getMaturityColor } from "@/lib/maturity";
 
 export function SectionNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as SectionNodeData;

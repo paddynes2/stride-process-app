@@ -1,14 +1,7 @@
 import { jsPDF } from "jspdf";
 import { toPng } from "html-to-image";
 import type { Section, Step, Connection } from "@/types/database";
-
-const MATURITY_COLORS: Record<number, string> = {
-  1: "#EF4444",
-  2: "#F97316",
-  3: "#EAB308",
-  4: "#84CC16",
-  5: "#22C55E",
-};
+import { MATURITY_COLORS } from "@/lib/maturity";
 
 const GAP_COLORS: Record<number, string> = {
   0: "#6B7280",

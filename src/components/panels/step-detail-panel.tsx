@@ -38,6 +38,7 @@ import type { TeamWithRoles, StepRoleWithDetails } from "@/lib/api/client";
 import type { Step, StepStatus, ExecutorType } from "@/types/database";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
+import { MATURITY_LEVELS } from "@/lib/maturity";
 
 const STATUSES: { value: StepStatus; label: string }[] = [
   { value: "draft", label: "Draft" },
@@ -47,13 +48,11 @@ const STATUSES: { value: StepStatus; label: string }[] = [
   { value: "archived", label: "Archived" },
 ];
 
-const MATURITY_LEVELS = [
-  { value: 1, label: "1 — Initial", color: "#EF4444" },
-  { value: 2, label: "2 — Developing", color: "#F97316" },
-  { value: 3, label: "3 — Defined", color: "#EAB308" },
-  { value: 4, label: "4 — Managed", color: "#84CC16" },
-  { value: 5, label: "5 — Optimized", color: "#22C55E" },
-];
+const MATURITY_OPTIONS = MATURITY_LEVELS.map((m) => ({
+  value: m.level,
+  label: `${m.level} — ${m.label}`,
+  color: m.color,
+}));
 
 const EXECUTORS: { value: ExecutorType; label: string }[] = [
   { value: "person", label: "Person" },
@@ -360,7 +359,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
             Current Maturity
           </label>
           <div className="flex gap-1">
-            {MATURITY_LEVELS.map((m) => (
+            {MATURITY_OPTIONS.map((m) => (
               <button
                 key={m.value}
                 onClick={() => handleFieldUpdate("maturity_score", step.maturity_score === m.value ? null : m.value)}
@@ -378,7 +377,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
           </div>
           {step.maturity_score && (
             <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
-              {MATURITY_LEVELS.find((m) => m.value === step.maturity_score)?.label}
+              {MATURITY_OPTIONS.find((m) => m.value === step.maturity_score)?.label}
             </p>
           )}
         </div>
@@ -390,7 +389,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
             Target Maturity
           </label>
           <div className="flex gap-1">
-            {MATURITY_LEVELS.map((m) => (
+            {MATURITY_OPTIONS.map((m) => (
               <button
                 key={m.value}
                 onClick={() => handleFieldUpdate("target_maturity", step.target_maturity === m.value ? null : m.value)}
@@ -408,7 +407,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
           </div>
           {step.target_maturity && (
             <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
-              {MATURITY_LEVELS.find((m) => m.value === step.target_maturity)?.label}
+              {MATURITY_OPTIONS.find((m) => m.value === step.target_maturity)?.label}
             </p>
           )}
         </div>

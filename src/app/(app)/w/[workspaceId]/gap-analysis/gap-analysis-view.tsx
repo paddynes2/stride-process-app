@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUpDown, TrendingDown } from "lucide-react";
 import type { Step } from "@/types/database";
+import { MATURITY_LABELS } from "@/lib/maturity";
 
 interface GapAnalysisViewProps {
   workspaceId: string;
@@ -28,14 +29,6 @@ function getGapColor(gap: number): string {
   if (gap >= 5) return GAP_COLORS[5];
   return GAP_COLORS[gap] ?? GAP_COLORS[3];
 }
-
-const MATURITY_LABELS: Record<number, string> = {
-  1: "Initial",
-  2: "Developing",
-  3: "Defined",
-  4: "Managed",
-  5: "Optimised",
-};
 
 export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisViewProps) {
   const router = useRouter();

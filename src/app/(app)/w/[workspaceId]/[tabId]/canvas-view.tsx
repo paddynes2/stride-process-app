@@ -6,9 +6,7 @@ import { StepDetailPanel } from "@/components/panels/step-detail-panel";
 import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
 import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
-import { fetchStepRolesBatch } from "@/lib/api/client";
-import { toast } from "sonner";
-import { toastError } from "@/lib/api/toast-helpers";
+import { useCanvasExport } from "@/hooks/use-canvas-export";
 import type { Section, Step, Connection } from "@/types/database";
 
 interface CanvasViewProps {
@@ -87,46 +85,12 @@ export function CanvasView({
   };
 
   const { workspace } = useWorkspace();
-
-  const handleExportPdf = React.useCallback(
-    async (canvasElement: HTMLElement) => {
-      try {
-        const [{ exportWorkspacePdf }, stepIds] = await Promise.all([
-          import("@/lib/export/pdf"),
-          Promise.resolve(steps.map((s) => s.id)),
-        ]);
-        const stepRoles = stepIds.length > 0 ? await fetchStepRolesBatch(stepIds) : [];
-        await exportWorkspacePdf({
-          workspaceName: workspace.name,
-          sections,
-          steps,
-          connections,
-          canvasElement,
-          stepRoles,
-        });
-        toast.success("PDF exported successfully");
-      } catch (err) {
-        toastError("Failed to export PDF", { error: err });
-      }
-    },
-    [workspace.name, sections, steps, connections]
-  );
-
-  const handleExportPng = React.useCallback(
-    async (canvasElement: HTMLElement) => {
-      try {
-        const { exportCanvasPng } = await import("@/lib/export/png");
-        await exportCanvasPng({
-          canvasElement,
-          workspaceName: workspace.name,
-        });
-        toast.success("PNG exported successfully");
-      } catch (err) {
-        toastError("Failed to export PNG", { error: err });
-      }
-    },
-    [workspace.name]
-  );
+  const { handleExportPdf, handleExportPng } = useCanvasExport({
+    workspaceName: workspace.name,
+    sections,
+    steps,
+    connections,
+  });
 
   return (
     <div className="flex h-full">
