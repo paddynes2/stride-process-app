@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -411,4 +411,69 @@ export interface PublicShareData {
 
 export async function fetchPublicShareData(shareId: string): Promise<PublicShareData> {
   return apiFetch<PublicShareData>(`/api/v1/public/shares/${shareId}`);
+}
+
+// ---------------------------------------------------------------------------
+// Perspectives
+// ---------------------------------------------------------------------------
+
+export async function fetchPerspectives(workspaceId: string): Promise<Perspective[]> {
+  return apiFetch<Perspective[]>(`/api/v1/perspectives?workspace_id=${workspaceId}`);
+}
+
+export async function createPerspective(data: { workspace_id: string; name?: string; color?: string; icon?: string }): Promise<Perspective> {
+  return apiFetch<Perspective>("/api/v1/perspectives", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updatePerspective(id: string, data: Partial<Pick<Perspective, "name" | "color" | "icon">>): Promise<Perspective> {
+  return apiFetch<Perspective>(`/api/v1/perspectives/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deletePerspective(id: string): Promise<void> {
+  await apiFetch(`/api/v1/perspectives/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Perspective Annotations
+// ---------------------------------------------------------------------------
+
+export async function fetchAnnotations(perspectiveId: string, filters?: { annotatable_type?: AnnotatableType; annotatable_id?: string }): Promise<PerspectiveAnnotation[]> {
+  const params = new URLSearchParams({ perspective_id: perspectiveId });
+  if (filters?.annotatable_type) params.set("annotatable_type", filters.annotatable_type);
+  if (filters?.annotatable_id) params.set("annotatable_id", filters.annotatable_id);
+  return apiFetch<PerspectiveAnnotation[]>(`/api/v1/annotations?${params}`);
+}
+
+export async function createAnnotation(data: {
+  perspective_id: string;
+  annotatable_type: AnnotatableType;
+  annotatable_id: string;
+  content?: string;
+  rating?: number;
+}): Promise<PerspectiveAnnotation> {
+  return apiFetch<PerspectiveAnnotation>("/api/v1/annotations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateAnnotation(id: string, data: Partial<Pick<PerspectiveAnnotation, "content" | "rating">>): Promise<PerspectiveAnnotation> {
+  return apiFetch<PerspectiveAnnotation>(`/api/v1/annotations/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteAnnotation(id: string): Promise<void> {
+  await apiFetch(`/api/v1/annotations/${id}`, { method: "DELETE" });
 }
