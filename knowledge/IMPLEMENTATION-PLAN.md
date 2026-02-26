@@ -58,7 +58,7 @@
 Prioritized features:
 - [x] #FEAT-027 Dashboard / workspace overview page — DONE iteration 63
 - [ ] #FEAT-028 Search & filtering across all entity types
-- [ ] #FEAT-029 People page (flesh out stub)
+- [x] #FEAT-029 People page (flesh out stub) — DONE iteration 65
 - [ ] #FEAT-030 Tools page (flesh out stub)
 - [ ] #FEAT-031 Step list bulk actions
 - [ ] #FEAT-032 Workspace templates
@@ -75,3 +75,4 @@ Deferred to Phase 4+:
 - [2026-02-26] Iteration 57: Quality audit complete. 5 bugs + 5 improvements logged. Phase 2b fully done. P1 bugs should be fixed before Phase 3 features.
 - [2026-02-26] Iteration 62: All quality audit bugs resolved (BUG-012 through BUG-016). Phase 3 unblocked. Next iteration should prioritize Phase 3 candidate features.
 - [2026-02-26] Iteration 63: Phase 3 started. Dashboard page built as first feature. Candidate features prioritized and added to FEATURES.md. Versioning, collaboration, and advanced permissions deferred to Phase 4+.
+- [2026-02-26] Iteration 65: People page fleshed out. Flat table view with inline editing, role picker for adding people, delete confirmation. Sidebar stub badge removed.

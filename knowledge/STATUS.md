@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 64
-- **Date:** 2026-02-26 20:00
+- **Iteration:** 65
+- **Date:** 2026-02-26 21:00
 - **Phase:** Phase 3: Advanced Features
 - **Branch:** ralph/init-stride
-- **Last task:** Regression suite (cadence floor — every 8th iteration)
+- **Last task:** #FEAT-029 People page — flesh out stub with full CRUD UI
 - **Result:** completed
-- **Next task:** Continue Phase 3 features — next candidates: #FEAT-028 Search & filtering, #FEAT-029 People page, or #IMP-001 Color validation (quick win)
+- **Next task:** Continue Phase 3 features — next candidates: #FEAT-028 Search & filtering, #FEAT-030 Tools page, or #IMP-001 Color validation (quick win)
 - **Blockers:** None
 
 ## Context
 
-Ran full regression suite (19/19 checks pass). Static analysis of all critical paths (auth, canvas, journey, views, settings, export, sidebar, dashboard) confirmed no breakage. API auth guards verified via curl (401/405/not_found as expected). Build, type check, and lint all pass (5 pre-existing warnings unchanged). The new dashboard page from iteration 63 was specifically audited and looks solid. No regressions introduced by any recent work (iterations 58-63: bug fixes + dashboard feature).
+Replaced the People stub page with a fully functional CRUD view. Server component fetches teams with roles and people from Supabase (same query pattern as teams page). Client component `people-view.tsx` flattens the hierarchy into a sortable table showing name, email, role, and team for each person. Inline editing for name/email, delete with confirmation, and an "Add Person" button with a role picker dropdown. Summary cards show total people/roles/teams. Sidebar "Soon" badge removed. Follows teams-view.tsx patterns exactly.
 
 ## Dev Server
 

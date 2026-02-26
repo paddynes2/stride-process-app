@@ -38,7 +38,7 @@
 ## Phase 3: Advanced Features — IN PROGRESS
 - [x] #FEAT-027 Dashboard / workspace overview page — DONE iteration 63, 2026-02-26
 - [ ] #FEAT-028 Search & filtering across all entity types (steps, sections, stages, touchpoints) — Attempts: 0
-- [ ] #FEAT-029 People page (flesh out stub with people CRUD, role assignments) — Attempts: 0
+- [x] #FEAT-029 People page (flesh out stub with people CRUD, role assignments) — DONE iteration 65, 2026-02-26
 - [ ] #FEAT-030 Tools page (flesh out stub — define tools data model + CRUD) — Attempts: 0
 - [ ] #FEAT-031 Step list bulk actions (multi-select, bulk status change) — Attempts: 0
 - [ ] #FEAT-032 Workspace templates (starter templates for common process types) — Attempts: 0

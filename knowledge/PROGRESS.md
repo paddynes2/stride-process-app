@@ -286,3 +286,30 @@
 - Efficiency (wasted actions?): 5 — parallel agents + curl probing efficient
 - Proactive observations: 0
 **Notes:** All 19 regression checks pass. Dashboard from iter 63 specifically audited — looks solid. Next regression due at iteration 72 (or sooner if risk score >= 3).
+
+## Iteration 65 — 2026-02-26 21:00
+**Task:** #FEAT-029 People page — flesh out stub with full CRUD UI
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- `src/app/(app)/w/[workspaceId]/people/page.tsx` — replaced stub with server component (auth + data fetch)
+- `src/app/(app)/w/[workspaceId]/people/people-view.tsx` — new client view (flat table, inline editing, role picker, empty state)
+- `src/components/layout/sidebar.tsx` — removed `stub: true` from People nav item
+**Research:** Read teams-view.tsx (pattern reference), Person/Role/Team types, people API routes, API client functions, sidebar stub handling. Confirmed all CRUD API endpoints already exist.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 new — fixed aria-selected on role picker)
+- Build: pass (people route visible in build output)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright MCP unavailable — static verification only)
+- Canary test: skipped (Playwright unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 4 — follows teams-view patterns exactly, proper TypeScript, inline editing, delete confirmation, empty states. Deducted 1 because people are still tightly coupled to role_id (can't add a person without a role).
+- Test coverage of change: 2 — type check + lint + build only, no browser testing
+- Confidence this won't regress: 5 — purely additive new page, no existing behavior changed
+- Efficiency (wasted actions?): 5 — minimal research needed, clean implementation
+- Proactive observations: 0
+**Notes:** People page uses the same fetchTeams pattern as teams page and flattens the hierarchy. No new API routes needed. Risk score for next iteration: touched 3 files, no shared components/auth/migrations = 0.
