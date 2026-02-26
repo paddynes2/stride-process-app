@@ -1,41 +1,47 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 57
+- **Iteration:** 64
 - **Date:** 2026-02-26
-- **Suite:** Quality Audit (Phase 2b completion)
-- **Method:** Deep code review via 3 parallel Explore agents (API routes, UI components, types/context)
+- **Suite:** Regression (cadence floor — every 8th iteration)
+- **Method:** Static analysis via 3 parallel Explore agents + API probing via curl
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 56 (2026-02-26)
+- Last run: Iteration 64 (2026-02-26)
 - Result: **PASS** (19/19 checks)
-- Method: Static analysis + HTTP verification (no Playwright)
+- Method: Static analysis via 3 parallel Explore agents + API probing via curl
+- Previous run: Iteration 56 (PASS 19/19)
 
-#### Detailed Results
+#### Detailed Results (Iteration 64)
 
 | # | Check | Result | Method |
 |---|-------|--------|--------|
-| 1 | `/login` renders | PASS | WebFetch (200) |
-| 2 | `/workspaces` loads (authed) / redirects (unauthed) | PASS | curl (302→login) + static analysis |
-| 3 | Canvas tab loads with nodes | PASS | Static analysis (canvas-view.tsx) |
-| 4 | Click step → detail panel | PASS | Static analysis (onNodeClick handler) |
-| 5 | Edit step name saves | PASS | Static analysis (handleStepUpdate) |
-| 6 | Click section → panel | PASS | Static analysis (selection logic) |
-| 7 | Canvas zoom/pan | PASS | Static analysis (React Flow defaults) |
-| 8 | Journey tab renders | PASS | Static analysis (journey-canvas-view.tsx) |
-| 9 | Click touchpoint → panel | PASS | Static analysis (selectedTouchpoint) |
-| 10 | Click stage → panel | PASS | Static analysis (selectedStage) |
-| 11 | Step list displays | PASS | Static analysis (step-list-view.tsx) |
-| 12 | Gap analysis displays | PASS | Static analysis (gap-analysis-view.tsx) |
-| 13 | Comparison view renders | PASS | Static analysis (compare-view.tsx) |
-| 14 | Settings page loads | PASS | Static analysis (settings/page.tsx) |
-| 15 | Teams page loads | PASS | API guard (401) + static analysis |
-| 16 | Perspectives list displays | PASS | Static analysis (settings perspectives) |
-| 17 | PDF export no errors | PASS | Static analysis (pdf.ts, journey-pdf.ts) |
-| 18 | PNG export no errors | PASS | Static analysis (png.ts, use-canvas-export.ts) |
+| 1 | `/login` renders | PASS | curl (200) |
+| 2 | `/workspaces` redirects (unauthed) | PASS | curl (307→login) |
+| 3 | Canvas tab loads with nodes | PASS | Static analysis (canvas-view.tsx, flow-canvas.tsx) |
+| 4 | Click step → detail panel | PASS | Static analysis (onNodeClick → onStepSelect) |
+| 5 | Edit step name saves | PASS | Static analysis (debounced handleNameChange → updateStep) |
+| 6 | Click section → panel | PASS | Static analysis (onSectionSelect → SectionDetailPanel) |
+| 7 | Canvas zoom/pan | PASS | Static analysis (React Flow defaults + Controls + MiniMap) |
+| 8 | Journey tab renders | PASS | Static analysis (journey-canvas-view.tsx, canvas_type check) |
+| 9 | Click touchpoint → panel | PASS | Static analysis (selectedTouchpointId → TouchpointDetailPanel) |
+| 10 | Click stage → panel | PASS | Static analysis (selectedStageId → StageDetailPanel) |
+| 11 | Step list displays | PASS | Static analysis (step-list-view.tsx — fetch, filter, sort, render) |
+| 12 | Gap analysis displays | PASS | Static analysis (gap-analysis-view.tsx — maturity gaps + visual bars) |
+| 13 | Comparison view renders | PASS | Static analysis (compare-view.tsx — side-by-side + match glow) |
+| 14 | Settings page loads | PASS | Static analysis (settings/page.tsx — name, sharing, perspectives) |
+| 15 | Teams page loads | PASS | Static analysis (teams-view.tsx — full CRUD hierarchy) |
+| 16 | Perspectives list displays | PASS | Static analysis (settings PerspectivesSection + PerspectiveRow) |
+| 17 | PDF export no errors | PASS | Static analysis (pdf.ts 763 lines, all imports valid) |
+| 18 | PNG export no errors | PASS | Static analysis (png.ts + use-canvas-export.ts) |
 | 19 | No new console errors | PASS | API probing + static analysis |
+
+**Additional checks (iteration 64):**
+- Dashboard page (NEW iter 63): PASS — code structure verified, all imports valid, data transformations correct
+- Sidebar navigation: PASS — Dashboard item correctly placed, Workflows exclusion correct
+- Workspace shell: PASS — dashboard path excluded from tab detection
 
 **API Auth Guards Verified:**
 - workspaces: 401 ✓

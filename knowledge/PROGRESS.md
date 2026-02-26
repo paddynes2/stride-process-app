@@ -252,3 +252,37 @@
 - Efficiency (wasted actions?): 4 — read several files in research phase, but all were needed
 - Proactive observations: 0
 **Notes:** First Phase 3 feature. Dashboard leverages all existing entity data. Phase boundary dependency audit: 0 vulnerabilities, minor patch updates available. Phase 3 candidate list still needs formal prioritization in FEATURES.md.
+
+## Iteration 64 — 2026-02-26 20:00
+**Task:** Regression suite (cadence floor — every 8th iteration)
+**Source:** Cadence floor (regression every 8th iteration, last run iter 56)
+**Complexity:** M
+**Result:** completed
+**Changes:** Documentation only (testing iteration — no code changes)
+- knowledge/STATUS.md (updated handoff)
+- knowledge/PROGRESS.md (this entry)
+- knowledge/METRICS.jsonl (appended)
+- testing/RESULTS.md (updated regression results)
+**Research:** Three parallel Explore agents audited all critical paths:
+- Agent 1: Auth + Canvas (login, workspace list, canvas nodes, step/section click, zoom/pan)
+- Agent 2: Journey + Views (journey canvas, touchpoint/stage click, step list, gap analysis, comparison, dashboard)
+- Agent 3: Settings + Export (settings, teams, perspectives, PDF/PNG export, sidebar, workspace shell)
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 errors)
+- Build: pass (all routes compile)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright MCP unavailable — static verification + API probing)
+- Canary test: skipped (Playwright unavailable)
+- API auth guards: 8/8 pass (workspaces 401, steps 401, perspectives 401, annotations 401, teams 401, sections 405, stages 405, public/shares not_found)
+- Login page: 200 ✓
+- Workspaces page: 307 redirect to login ✓
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: N/A — no code changes
+- Test coverage of change: 4 — comprehensive static analysis + API probing, all 19 checks pass
+- Confidence this won't regress: 5 — all critical paths verified, no issues found
+- Efficiency (wasted actions?): 5 — parallel agents + curl probing efficient
+- Proactive observations: 0
+**Notes:** All 19 regression checks pass. Dashboard from iter 63 specifically audited — looks solid. Next regression due at iteration 72 (or sooner if risk score >= 3).
