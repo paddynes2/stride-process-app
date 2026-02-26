@@ -1219,3 +1219,28 @@
 - Efficiency (wasted actions?): 5 — focused review, no wasted actions
 - Proactive observations: 0 (unused imports addEdge/Plus noted in STATUS.md warnings)
 **Notes:** Regression cadence floor triggered (iter 34 + 8 = 42). Static-only regression due to Playwright MCP unavailability. All 16 changed files reviewed. Journey canvas integration verified: types ↔ API ↔ components ↔ pages are consistent. Comparison view data fetching pattern mirrors gap-analysis page. No debug artifacts, no new warnings, no regressions.
+
+## Iteration 43 — 2026-02-26
+**Task:** #FEAT-021 [2/3] Read-only React Flow canvases in comparison view
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Modified: `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` (replaced stats-only view with dual React Flow canvases)
+**Research:** Read flow-canvas.tsx (buildNodes/buildEdges patterns), journey-canvas-view.tsx (buildJourneyNodes/buildJourneyEdges patterns), step-node.tsx, section-node.tsx, stage-node.tsx, touchpoint-node.tsx (node type components), canvas.ts (StepNodeData, SectionNodeData, StageNodeData, TouchpointNodeData types).
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 6 pre-existing warnings)
+- Build: pass (44 routes — compare route present)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Reused all existing node types and patterns. Build functions mirror existing ones exactly. Read-only props are clean.
+- Test coverage of change: 2 — No runtime verification. Type check + build verify compilation.
+- Confidence this won't regress: 5 — All changes within compare-view.tsx only. No shared code modified. Additive React Flow usage.
+- Efficiency (wasted actions?): 5 — Completed in single pass. Thorough research upfront paid off.
+- Proactive observations: 0
+**Notes:** Replaced ProcessSummary/JourneySummary stat components with actual ReactFlow instances. Each side has its own ReactFlowProvider. Stats are shown as compact Panel overlays. Empty states handled. The file went from 415 lines to 393 lines despite adding canvas rendering — removed redundant list views.
