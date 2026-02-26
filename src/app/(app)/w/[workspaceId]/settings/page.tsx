@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Link, Copy, Check } from "lucide-react";
+import { Trash2, Link, Copy, Check, Plus, Eye, Pencil } from "lucide-react";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,10 +13,14 @@ import {
   fetchShares,
   createShare,
   updateShare,
+  fetchPerspectives,
+  createPerspective,
+  updatePerspective,
+  deletePerspective,
 } from "@/lib/api/client";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
-import type { PublicShare } from "@/types/database";
+import type { PublicShare, Perspective } from "@/types/database";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -31,9 +35,14 @@ export default function SettingsPage() {
   const [shareToggling, setShareToggling] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
 
+  // Perspectives state
+  const [perspectives, setPerspectives] = React.useState<Perspective[]>([]);
+  const [perspectivesLoading, setPerspectivesLoading] = React.useState(true);
+
   React.useEffect(() => {
     let cancelled = false;
-    async function loadShare() {
+    async function loadSettings() {
+      // Load shares
       try {
         const shares = await fetchShares(workspace.id);
         if (!cancelled) setShare(shares[0] ?? null);
@@ -42,8 +51,17 @@ export default function SettingsPage() {
       } finally {
         if (!cancelled) setShareLoading(false);
       }
+      // Load perspectives
+      try {
+        const data = await fetchPerspectives(workspace.id);
+        if (!cancelled) setPerspectives(data);
+      } catch (err) {
+        if (!cancelled) toastError("Failed to load perspectives", { error: err });
+      } finally {
+        if (!cancelled) setPerspectivesLoading(false);
+      }
     }
-    loadShare();
+    loadSettings();
     return () => { cancelled = true; };
   }, [workspace.id]);
 
@@ -126,7 +144,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-8">
+    <div className="h-full overflow-y-auto"><div className="max-w-xl mx-auto p-8">
       <h1 className="text-[18px] font-semibold text-[var(--text-primary)] mb-6">Workspace Settings</h1>
 
       <form onSubmit={handleSave} className="space-y-4">
@@ -184,6 +202,16 @@ export default function SettingsPage() {
 
       <Separator className="my-8" />
 
+      {/* Perspectives */}
+      <PerspectivesSection
+        workspaceId={workspace.id}
+        perspectives={perspectives}
+        setPerspectives={setPerspectives}
+        loading={perspectivesLoading}
+      />
+
+      <Separator className="my-8" />
+
       <div>
         <h2 className="text-[14px] font-semibold text-[var(--error)] mb-2">Danger Zone</h2>
         <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
@@ -194,6 +222,246 @@ export default function SettingsPage() {
           Delete Workspace
         </Button>
       </div>
+    </div></div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Perspective color presets
+// ---------------------------------------------------------------------------
+
+const PERSPECTIVE_COLORS = [
+  "#3B82F6", // blue
+  "#14B8A6", // teal
+  "#A855F7", // purple
+  "#EC4899", // pink
+  "#F97316", // orange
+  "#EAB308", // yellow
+  "#EF4444", // red
+  "#22C55E", // green
+];
+
+// ---------------------------------------------------------------------------
+// Perspectives Section
+// ---------------------------------------------------------------------------
+
+interface PerspectivesSectionProps {
+  workspaceId: string;
+  perspectives: Perspective[];
+  setPerspectives: React.Dispatch<React.SetStateAction<Perspective[]>>;
+  loading: boolean;
+}
+
+function PerspectivesSection({ workspaceId, perspectives, setPerspectives, loading }: PerspectivesSectionProps) {
+  const [adding, setAdding] = React.useState(false);
+
+  const handleAdd = async () => {
+    setAdding(true);
+    try {
+      const color = PERSPECTIVE_COLORS[perspectives.length % PERSPECTIVE_COLORS.length];
+      const created = await createPerspective({ workspace_id: workspaceId, name: "New Perspective", color });
+      setPerspectives((prev) => [...prev, created]);
+      toast.success("Perspective created");
+    } catch (err) {
+      toastError("Failed to create perspective", { error: err });
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleUpdate = async (id: string, data: Partial<Pick<Perspective, "name" | "color" | "icon">>) => {
+    try {
+      const updated = await updatePerspective(id, data);
+      setPerspectives((prev) => prev.map((p) => (p.id === id ? updated : p)));
+    } catch (err) {
+      toastError("Failed to update perspective", { error: err });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deletePerspective(id);
+      setPerspectives((prev) => prev.filter((p) => p.id !== id));
+      toast.success("Perspective deleted");
+    } catch (err) {
+      toastError("Failed to delete perspective", { error: err });
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-[14px] font-semibold text-[var(--text-primary)]">Perspectives</h2>
+        <Button onClick={handleAdd} disabled={adding} size="sm">
+          <Plus className="h-3.5 w-3.5" />
+          Add Perspective
+        </Button>
+      </div>
+      <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+        Define stakeholder viewpoints to annotate process and journey elements from different perspectives.
+      </p>
+
+      {loading ? (
+        <div className="space-y-2">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-12 rounded-[var(--radius-md)] bg-[var(--bg-surface)] animate-pulse" />
+          ))}
+        </div>
+      ) : perspectives.length === 0 ? (
+        <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-center">
+          <Eye className="h-6 w-6 text-[var(--text-tertiary)] mx-auto mb-2" />
+          <p className="text-[13px] text-[var(--text-secondary)] mb-1">No perspectives yet</p>
+          <p className="text-[12px] text-[var(--text-tertiary)] mb-3">
+            Add perspectives like &quot;Customer&quot;, &quot;Operations Manager&quot;, or &quot;IT&quot; to capture different stakeholder viewpoints.
+          </p>
+          <Button onClick={handleAdd} disabled={adding} size="sm">
+            <Plus className="h-3.5 w-3.5" />
+            Add Perspective
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {perspectives.map((p) => (
+            <PerspectiveRow
+              key={p.id}
+              perspective={p}
+              onUpdate={(data) => handleUpdate(p.id, data)}
+              onDelete={() => handleDelete(p.id)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Perspective Row
+// ---------------------------------------------------------------------------
+
+interface PerspectiveRowProps {
+  perspective: Perspective;
+  onUpdate: (data: Partial<Pick<Perspective, "name" | "color" | "icon">>) => void;
+  onDelete: () => void;
+}
+
+function PerspectiveRow({ perspective, onUpdate, onDelete }: PerspectiveRowProps) {
+  const [editingName, setEditingName] = React.useState(false);
+  const [nameValue, setNameValue] = React.useState(perspective.name);
+  const [showColorPicker, setShowColorPicker] = React.useState(false);
+  const nameRef = React.useRef<HTMLInputElement>(null);
+  const colorRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    setNameValue(perspective.name);
+  }, [perspective.name]);
+
+  React.useEffect(() => {
+    if (editingName && nameRef.current) {
+      nameRef.current.focus();
+      nameRef.current.select();
+    }
+  }, [editingName]);
+
+  // Close color picker on outside click
+  React.useEffect(() => {
+    if (!showColorPicker) return;
+    function handleClick(e: MouseEvent) {
+      if (colorRef.current && !colorRef.current.contains(e.target as Node)) {
+        setShowColorPicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showColorPicker]);
+
+  const commitName = () => {
+    setEditingName(false);
+    if (nameValue.trim() && nameValue.trim() !== perspective.name) {
+      onUpdate({ name: nameValue.trim() });
+    } else {
+      setNameValue(perspective.name);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2.5">
+      {/* Color swatch */}
+      <div className="relative" ref={colorRef}>
+        <button
+          onClick={() => setShowColorPicker(!showColorPicker)}
+          className="h-6 w-6 rounded-full border-2 border-[var(--border-subtle)] shrink-0 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)]"
+          style={{ backgroundColor: perspective.color }}
+          aria-label={`Change color for ${perspective.name}`}
+        />
+        {showColorPicker && (
+          <div className="absolute top-8 left-0 z-10 flex gap-1 p-2 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg">
+            {PERSPECTIVE_COLORS.map((color) => (
+              <button
+                key={color}
+                onClick={() => {
+                  onUpdate({ color });
+                  setShowColorPicker(false);
+                }}
+                className="h-6 w-6 rounded-full border-2 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)]"
+                style={{
+                  backgroundColor: color,
+                  borderColor: color === perspective.color ? "var(--text-primary)" : "transparent",
+                }}
+                aria-label={`Select color ${color}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Name */}
+      {editingName ? (
+        <Input
+          ref={nameRef}
+          value={nameValue}
+          onChange={(e) => setNameValue(e.target.value)}
+          onBlur={commitName}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commitName();
+            if (e.key === "Escape") {
+              setNameValue(perspective.name);
+              setEditingName(false);
+            }
+          }}
+          className="h-7 flex-1 text-[13px]"
+          aria-label="Perspective name"
+        />
+      ) : (
+        <button
+          onClick={() => setEditingName(true)}
+          className="flex-1 text-left text-[13px] font-medium text-[var(--text-primary)] hover:text-[var(--accent-blue)] transition-colors truncate"
+        >
+          {perspective.name}
+        </button>
+      )}
+
+      {/* Edit / Delete actions */}
+      {!editingName && (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => setEditingName(true)}
+          className="text-[var(--text-quaternary)] hover:text-[var(--text-secondary)]"
+          aria-label={`Edit ${perspective.name}`}
+        >
+          <Pencil className="h-3 w-3" />
+        </Button>
+      )}
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onDelete}
+        className="text-[var(--text-quaternary)] hover:text-[var(--error)]"
+        aria-label={`Delete ${perspective.name}`}
+      >
+        <Trash2 className="h-3 w-3" />
+      </Button>
     </div>
   );
 }
