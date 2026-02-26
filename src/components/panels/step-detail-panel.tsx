@@ -1,14 +1,30 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, Clock, Repeat, Gauge, Target } from "lucide-react";
+import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { RichTextEditor } from "./rich-text-editor";
 import { VideoEmbed } from "./video-embed";
-import { updateStep, deleteStep as apiDeleteStep } from "@/lib/api/client";
+import {
+  updateStep,
+  deleteStep as apiDeleteStep,
+  fetchTeams,
+  fetchStepRoles,
+  createStepRole,
+  deleteStepRole,
+} from "@/lib/api/client";
+import type { TeamWithRoles, StepRoleWithDetails } from "@/lib/api/client";
 import type { Step, StepStatus, ExecutorType } from "@/types/database";
 import { toast } from "sonner";
 
@@ -37,18 +53,59 @@ const EXECUTORS: { value: ExecutorType; label: string }[] = [
 
 interface StepDetailPanelProps {
   step: Step;
+  workspaceId: string;
   onUpdate: (step: Step) => void;
   onDelete: (id: string) => void;
   onClose: () => void;
 }
 
-export function StepDetailPanel({ step, onUpdate, onDelete, onClose }: StepDetailPanelProps) {
+export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose }: StepDetailPanelProps) {
   const [name, setName] = React.useState(step.name);
   const nameTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [stepRoles, setStepRoles] = React.useState<StepRoleWithDetails[]>([]);
+  const [teams, setTeams] = React.useState<TeamWithRoles[]>([]);
 
   React.useEffect(() => {
     setName(step.name);
   }, [step.id, step.name]);
+
+  // Fetch assigned roles when step changes
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchStepRoles(step.id)
+      .then((roles) => { if (!cancelled) setStepRoles(roles); })
+      .catch(() => { /* silently fail — roles section just stays empty */ });
+    return () => { cancelled = true; };
+  }, [step.id]);
+
+  // Fetch all teams+roles for the dropdown
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchTeams(workspaceId)
+      .then((t) => { if (!cancelled) setTeams(t); })
+      .catch(() => { /* silently fail — dropdown stays empty */ });
+    return () => { cancelled = true; };
+  }, [workspaceId]);
+
+  const assignedRoleIds = new Set(stepRoles.map((sr) => sr.role_id));
+
+  const handleAssignRole = async (roleId: string) => {
+    try {
+      const created = await createStepRole({ step_id: step.id, role_id: roleId });
+      setStepRoles((prev) => [...prev, created]);
+    } catch {
+      toast.error("Failed to assign role");
+    }
+  };
+
+  const handleRemoveRole = async (stepRoleId: string) => {
+    try {
+      await deleteStepRole(stepRoleId);
+      setStepRoles((prev) => prev.filter((sr) => sr.id !== stepRoleId));
+    } catch {
+      toast.error("Failed to remove role");
+    }
+  };
 
   const handleFieldUpdate = async (field: string, value: unknown) => {
     try {
@@ -157,6 +214,76 @@ export function StepDetailPanel({ step, onUpdate, onDelete, onClose }: StepDetai
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Assigned Roles */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <Users className="h-3 w-3" />
+            Assigned Roles
+          </label>
+          {stepRoles.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {stepRoles.map((sr) => (
+                <Badge key={sr.id} variant="outline" className="gap-1 max-w-none">
+                  <span className="truncate">{sr.role.name}</span>
+                  <span className="text-[var(--text-quaternary)]">·</span>
+                  <span className="text-[var(--text-quaternary)] truncate">{sr.role.team.name}</span>
+                  <button
+                    onClick={() => handleRemoveRole(sr.id)}
+                    className="ml-0.5 hover:text-[var(--error)] transition-colors"
+                    aria-label={`Remove ${sr.role.name} role`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
+              >
+                <Plus className="h-3 w-3" />
+                Assign Role
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
+              {teams.length === 0 && (
+                <DropdownMenuLabel>No teams — create teams first</DropdownMenuLabel>
+              )}
+              {teams.map((team, teamIdx) => (
+                <React.Fragment key={team.id}>
+                  {teamIdx > 0 && <DropdownMenuSeparator />}
+                  <DropdownMenuLabel>{team.name}</DropdownMenuLabel>
+                  {team.roles.length === 0 && (
+                    <DropdownMenuItem disabled>No roles in this team</DropdownMenuItem>
+                  )}
+                  {team.roles.map((role) => {
+                    const isAssigned = assignedRoleIds.has(role.id);
+                    return (
+                      <DropdownMenuItem
+                        key={role.id}
+                        disabled={isAssigned}
+                        onSelect={() => { if (!isAssigned) handleAssignRole(role.id); }}
+                      >
+                        <span className="flex-1 truncate">{role.name}</span>
+                        {role.hourly_rate != null && (
+                          <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
+                            ${role.hourly_rate}/hr
+                          </span>
+                        )}
+                        {isAssigned && (
+                          <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
+                        )}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <Separator />

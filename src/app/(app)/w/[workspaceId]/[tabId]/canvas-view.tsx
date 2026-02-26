@@ -118,6 +118,7 @@ export function CanvasView({
           {selectedStep && (
             <StepDetailPanel
               step={selectedStep}
+              workspaceId={workspaceId}
               onUpdate={handleStepUpdate}
               onDelete={handleStepDelete}
               onClose={() => setSelectedStepId(null)}
