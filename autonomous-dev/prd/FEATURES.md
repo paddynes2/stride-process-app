@@ -380,19 +380,19 @@
 ### #FEAT-023 Perspectives data model and UI shell
 **Phase:** 2b
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** IN PROGRESS
 **Acceptance criteria:**
-- [ ] New `perspectives` table: id, workspace_id, name (e.g., "Customer", "Operations Manager", "IT"), color (hex), icon (text), created_at, updated_at
-- [ ] New `perspective_annotations` table: id, perspective_id, annotatable_type (enum: 'step', 'section', 'touchpoint', 'stage'), annotatable_id (UUID), content (text — the annotation), rating (integer 1-5 nullable), created_at, updated_at
-- [ ] RLS policies using `can_access_workspace()` via perspectives.workspace_id
-- [ ] TypeScript types: `Perspective`, `PerspectiveAnnotation`, `AnnotatableType`
+- [x] New `perspectives` table: id, workspace_id, name (e.g., "Customer", "Operations Manager", "IT"), color (hex), icon (text), created_at, updated_at — DONE iteration 49
+- [x] New `perspective_annotations` table: id, perspective_id, annotatable_type (enum: 'step', 'section', 'touchpoint', 'stage'), annotatable_id (UUID), content (text — the annotation), rating (integer 1-5 nullable), created_at, updated_at — DONE iteration 49
+- [x] RLS policies using `can_access_workspace()` via perspectives.workspace_id — DONE iteration 49
+- [x] TypeScript types: `Perspective`, `PerspectiveAnnotation`, `AnnotatableType` — DONE iteration 49
 - [ ] API routes: GET/POST perspectives, PATCH/DELETE perspectives/[id], GET/POST/PATCH/DELETE annotations
 - [ ] Client wrappers in `lib/api/client.ts`
-- [ ] Migration file pushed to Supabase
+- [x] Migration file pushed to Supabase — DONE iteration 49
 **Notes:** Perspectives are overlays on existing canvas elements, NOT separate canvases. A perspective is like a "lens" — the consultant switches to "Customer" perspective and adds annotations to existing steps/touchpoints. The annotatable_type + annotatable_id pattern allows annotations on any entity (polymorphic). Rating is optional — used for sentiment/importance scoring per perspective.
 **Sub-tasks:**
-- [ ] [1/3] Database migration, enums, TypeScript types
+- [x] [1/3] Database migration, enums, TypeScript types — DONE iteration 49
 - [ ] [2/3] API routes + client wrappers
 - [ ] [3/3] Basic perspectives management UI (create/edit/delete perspectives in workspace settings or a dedicated panel)
 

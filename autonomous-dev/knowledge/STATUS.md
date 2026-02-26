@@ -6,20 +6,20 @@
 
 ## Handoff
 
-- **Iteration:** 48
+- **Iteration:** 49
 - **Date:** 2026-02-26
-- **Phase:** Phase 2a COMPLETE → Phase 2b starting next iteration
+- **Phase:** Phase 2b — Analysis & Intelligence (started this iteration)
 - **Branch:** ralph/init-stride
-- **Last task:** Phase 2a completion quality audit — golden-paths + regression
+- **Last task:** #FEAT-023 [1/3] Perspectives data model (migration, enums, TypeScript types)
 - **Result:** completed
-- **Next task:** #FEAT-023 [1/3] Perspectives data model (database migration, enums, TypeScript types) — first task of Phase 2b
+- **Next task:** #FEAT-023 [2/3] API routes + client wrappers (GET/POST perspectives, PATCH/DELETE perspectives/[id], GET/POST/PATCH/DELETE annotations)
 - **Blockers:** None
 
 ## Context
 
-Ran Phase 2a golden-path static verification using 3 parallel agents. Verified all journey mapping features: data model (migration 011, stages/touchpoints/touchpoint_connections tables, canvas_type enum), API routes (9 endpoints across stages/touchpoints/touchpoint-connections, all using envelope pattern with EDITABLE_FIELDS), UI components (journey-canvas-view, stage-node, touchpoint-node, stage-detail-panel, touchpoint-detail-panel, pain.ts), comparison view (side-by-side React Flow canvases with alignment hints), and export (journey-pdf.ts, comparison-pdf.ts). No gaps found — Phase 2a is verified complete.
+Created migration 012_perspectives.sql with two new tables: `perspectives` (workspace-scoped, has name/color/icon) and `perspective_annotations` (polymorphic via annotatable_type enum + annotatable_id UUID, with content text and optional 1-5 rating). UNIQUE constraint on (perspective_id, annotatable_type, annotatable_id) prevents duplicate annotations per element per perspective. RLS on perspectives uses can_access_workspace(workspace_id) directly; annotations use EXISTS join to perspectives table. TypeScript types added to `src/types/database.ts`: Perspective, PerspectiveAnnotation, AnnotatableType.
 
-Type-check (0 errors), lint (0 errors, 6 pre-existing warnings), build (all routes) all pass. Codebase is clean and ready for Phase 2b.
+Next iteration builds API routes following the existing pattern in `src/app/api/v1/` — entity routes with `route.ts` (list/create) and `[id]/route.ts` (get/update/delete), plus client wrappers in `src/lib/api/client.ts`.
 
 ## Dev Server
 
@@ -31,6 +31,6 @@ Type-check (0 errors), lint (0 errors, 6 pre-existing warnings), build (all rout
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (6 warnings — unchanged since iter 20).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-48).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-49).
 - Unused import `addEdge` in flow-canvas.tsx and `Plus` in sidebar.tsx — minor cleanup opportunity.
-- Note: stages and touchpoint-connections API routes lack GET endpoints (may be intentional — data fetched through tab/workspace queries).
+- RISK_SCORE 3 from this iteration (schema change) — next iteration should run regression if risk accumulates.

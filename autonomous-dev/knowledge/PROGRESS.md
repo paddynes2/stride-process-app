@@ -1376,3 +1376,29 @@
 - Efficiency (wasted actions?): 5 — parallel agents completed verification in single round
 - Proactive observations: 0
 **Notes:** Phase 2a verified COMPLETE. All 6 features (FEAT-017 through FEAT-022) and 2 bugs (BUG-010, BUG-011) confirmed implemented and passing. Ready for Phase 2b. Note: stages and touchpoint-connections lack GET endpoints — may need them for Phase 2b perspectives feature (fetching annotations by entity).
+
+## Iteration 49 — 2026-02-26
+**Task:** #FEAT-023 [1/3] Perspectives data model (migration, enums, TypeScript types)
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: `supabase/migrations/012_perspectives.sql` (88 lines — perspectives table, perspective_annotations table, annotatable_type enum, RLS, indexes, triggers)
+- Modified: `src/types/database.ts` (+27 lines — Perspective, PerspectiveAnnotation, AnnotatableType)
+**Research:** Read migration 011 (pattern), database.ts (type patterns), 005_rls_policies.sql (RLS helper functions). Confirmed can_access_workspace() exists for workspace-scoped policies and EXISTS join pattern for child tables (matches roles/people RLS approach).
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 6 pre-existing warnings)
+- Build: pass (all routes)
+- Unit tests: N/A
+- Browser test: skipped (no UI changes — data model only)
+- Canary test: skipped (no UI changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean migration following established patterns exactly. UNIQUE constraint prevents data corruption. Polymorphic pattern is well-suited.
+- Test coverage of change: 3 — Migration pushed to Supabase successfully. Types compile. No runtime test possible without API routes.
+- Confidence this won't regress: 5 — Additive schema change, no existing tables modified, no existing code affected.
+- Efficiency (wasted actions?): 5 — Minimal research, clean execution, no wasted actions.
+- Proactive observations: 0
+**Notes:** Phase 2b officially started. Migration 012 pushed to remote Supabase. Risk score 3 (schema change) — monitor for next iteration.

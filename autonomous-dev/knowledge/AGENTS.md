@@ -113,7 +113,7 @@ src/
 
 ### Data Model
 
-<!-- Updated: iter-32, 2026-02-26 -->
+<!-- Updated: iter-49, 2026-02-26 -->
 
 Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges from DB records.
 
@@ -123,16 +123,18 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `workspaces` → `teams` → `roles` → `people` (team hierarchy for costing)
 - `step_roles` junction table: `steps` ↔ `roles` (many-to-many for cost calculation)
 - `public_shares`: workspace_id + share_id (32-char hex) + is_active toggle. `get_public_share_data()` SECURITY DEFINER returns full workspace data for unauthenticated access.
+- `perspectives`: workspace-scoped stakeholder viewpoints (name, color, icon). `perspective_annotations`: polymorphic annotations on canvas elements via `annotatable_type` enum ('step'|'section'|'touchpoint'|'stage') + `annotatable_id` UUID. UNIQUE constraint on (perspective_id, annotatable_type, annotatable_id).
 - `organization_members` links users to orgs with roles
 - RLS via `is_org_member()` / `can_access_workspace()` helper functions
 - Roles/people RLS: EXISTS join back to teams.workspace_id → can_access_workspace()
+- Annotations RLS: EXISTS join back to perspectives.workspace_id → can_access_workspace()
 - `bootstrap_workspace()` RPC creates org + membership + workspace + first tab atomically (SECURITY DEFINER)
 
 ### Database Migrations
 
-<!-- Updated: iter-32, 2026-02-26 -->
+<!-- Updated: iter-49, 2026-02-26 -->
 
-11 migration files in `supabase/migrations/`:
+12 migration files in `supabase/migrations/`:
 1. `001_extensions.sql` — uuid-ossp, pg_trgm
 2. `002_enums.sql` — step_status, executor_type, workspace_role
 3. `003_core_tables.sql` — users, organizations, organization_members, workspaces
@@ -144,6 +146,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 9. `009_step_roles.sql` — step_roles junction table (step_id, role_id) + RLS via step→workspace
 10. `010_public_shares.sql` — public_shares table (share_id, is_active) + RLS + get_public_share_data() SECURITY DEFINER
 11. `011_journey_canvas.sql` — canvas_type enum on tabs, stages table, touchpoints table, touchpoint_connections table + RLS policies
+12. `012_perspectives.sql` — annotatable_type enum, perspectives table (workspace-scoped), perspective_annotations table (polymorphic) + RLS policies
 
 ## Color System (for accessibility fixes)
 
@@ -235,7 +238,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/lib/export/png.ts` — PNG export utility (html-to-image toPng at 2x)
 - `src/lib/export/journey-pdf.ts` — Journey-specific PDF export (jspdf + html-to-image, title page + canvas snapshot + touchpoint table + pain ranking + stage breakdown)
 - `src/lib/export/comparison-pdf.ts` — Comparison view PDF export (jspdf + html-to-image, side-by-side stats, dual canvas snapshots, alignment analysis table)
-- `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection)
+- `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType)
 - `src/components/ui/skeleton.tsx` — Skeleton primitive (animated pulse block for loading states)
 - `src/components/ui/offline-banner.tsx` — Network offline/online banner (useSyncExternalStore)
 - `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` — Journey canvas with React Flow (stages as group nodes, touchpoints as individual nodes, CRUD + keyboard shortcuts)
