@@ -768,3 +768,30 @@
 - Efficiency (wasted actions?): 5 — Thorough verification completed efficiently, found the one gap and fixed it.
 - Proactive observations: 0
 **Notes:** FEAT-012 is now fully DONE. All 4 acceptance criteria met. Phase 1.5 task 3 of 7 complete. Next: FEAT-013 (performance pass).
+
+## Iteration 27 — 2026-02-26
+**Task:** #FEAT-013 Performance pass — lazy-load heavy dependencies (jspdf, tiptap)
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed (4/5 criteria met — Lighthouse deferred, needs browser)
+**Changes:**
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` (dynamic import for pdf/png exports)
+- Modified: `src/components/panels/step-detail-panel.tsx` (dynamic import for RichTextEditor)
+- Modified: `src/components/panels/section-detail-panel.tsx` (dynamic import for RichTextEditor)
+**Research:** Analyzed production build chunks. Found 832KB monolith containing jspdf + tiptap/prosemirror. Identified that React Flow (174KB) is core and can't be deferred. Gap analysis (32KB) and teams (47KB) already code-split by App Router. All images < 100KB.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing)
+- Build: pass (37 routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Minimal, targeted changes. Dynamic imports are idiomatic Next.js patterns.
+- Test coverage of change: 2 — Static verification only. Dynamic import behavior needs browser testing.
+- Confidence this won't regress: 5 — No behavior change. Same code runs, just loaded later. Loading skeleton during RichTextEditor chunk load.
+- Efficiency (wasted actions?): 5 — Research → implement → verify, no wasted attempts.
+- Proactive observations: 0
+**Notes:** 832KB chunk split into 420KB (jspdf, export-only) + 356KB (tiptap, panel-only). Initial canvas page load reduced by ~832KB. Lighthouse criterion deferred — requires browser.

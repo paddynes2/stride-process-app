@@ -6,26 +6,24 @@
 
 ## Handoff
 
-- **Iteration:** 26
+- **Iteration:** 27
 - **Date:** 2026-02-26
 - **Phase:** Phase 1.5 — Ship & Harden
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-012 [3/3] Polish — verify all loading/error states, add missing loading.tsx
-- **Result:** completed
-- **Next task:** #FEAT-013 Performance pass (bundle analysis, lazy loading, Lighthouse)
-- **Blockers:** None
+- **Last task:** #FEAT-013 Performance pass — lazy-load heavy dependencies
+- **Result:** completed (partial — 4 of 5 acceptance criteria met, Lighthouse deferred)
+- **Next task:** #FEAT-013 remaining criterion (Lighthouse score > 80) OR #FEAT-014 (IMPROVEMENTS.md backlog)
+- **Blockers:** Lighthouse testing requires browser (Playwright MCP unavailable)
 
 ## Context
 
-Completed FEAT-012 [3/3] — final polish of loading & error states. Verified:
-- All 7 app routes have loading.tsx skeletons (workspaces, canvas, list, gap-analysis, teams, settings, public/[shareId])
-- 2 error boundaries (app-level, workspace-level) with recovery UIs
-- OfflineBanner in root layout.tsx using useSyncExternalStore
-- toastError utility used across 8 files (23 API call sites), 2 remaining bare toast.error are non-API (clipboard + validation — correct)
-- CSS variables (--warning-subtle, --success-subtle, --elevated) all defined in globals.css
-- Added loading.tsx for /public/[shareId] — the only data-fetching route that was missing one
+Completed the performance optimization for FEAT-013. Key achievement: the 832KB monolithic chunk containing jspdf + tiptap/prosemirror was split into two lazy-loaded chunks:
+- 420KB jspdf chunk — loaded only when "Export PDF" clicked (dynamic import in canvas-view.tsx)
+- 356KB tiptap chunk — loaded only when step/section detail panel opens (next/dynamic in step-detail-panel.tsx and section-detail-panel.tsx)
 
-FEAT-012 is now DONE. All 4 acceptance criteria met. Phase 1.5 task 3 of 7 complete.
+The canvas page initial load no longer includes either of these heavy libraries. Gap analysis (32KB) and teams (47KB) routes are already code-split by Next.js App Router. No images > 100KB exist.
+
+4 of 5 acceptance criteria met. The remaining criterion (Lighthouse score > 80) requires a browser test that can't be performed without Playwright MCP. Suggest marking FEAT-013 as done and deferring Lighthouse to the golden path test iteration (FEAT-016).
 
 ## Dev Server
 
@@ -37,6 +35,5 @@ FEAT-012 is now DONE. All 4 acceptance criteria met. Phase 1.5 task 3 of 7 compl
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (5 warnings, all in other files — flow-canvas, header, sidebar, page.tsx).
-- Browser testing skipped — Playwright MCP unavailable. Verified via static checks only (type-check + lint + build).
-- Performance testing cadence (iter 20) still deferred. FEAT-013 (performance pass) is the next task — aligns with deferred cadence.
-- UX sweep cadence (iter 20) also deferred. Run after performance testing.
+- Browser testing skipped — Playwright MCP unavailable.
+- Lighthouse score criterion deferred — requires browser testing.
