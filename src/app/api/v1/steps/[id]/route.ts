@@ -15,6 +15,8 @@ const EDITABLE_FIELDS = [
   "attributes",
   "time_minutes",
   "frequency_per_month",
+  "maturity_score",
+  "target_maturity",
 ] as const;
 
 export async function PATCH(

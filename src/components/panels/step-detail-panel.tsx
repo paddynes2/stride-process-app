@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, Clock, Repeat } from "lucide-react";
+import { X, Trash2, Clock, Repeat, Gauge, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,14 @@ const STATUSES: { value: StepStatus; label: string }[] = [
   { value: "testing", label: "Testing" },
   { value: "live", label: "Live" },
   { value: "archived", label: "Archived" },
+];
+
+const MATURITY_LEVELS = [
+  { value: 1, label: "1 — Initial", color: "#EF4444" },
+  { value: 2, label: "2 — Developing", color: "#F97316" },
+  { value: 3, label: "3 — Defined", color: "#EAB308" },
+  { value: 4, label: "4 — Managed", color: "#84CC16" },
+  { value: 5, label: "5 — Optimized", color: "#22C55E" },
 ];
 
 const EXECUTORS: { value: ExecutorType; label: string }[] = [
@@ -188,6 +196,78 @@ export function StepDetailPanel({ step, onUpdate, onDelete, onClose }: StepDetai
             Monthly cost: <strong className="text-[var(--text-secondary)]">{((step.time_minutes * step.frequency_per_month) / 60).toFixed(1)}h</strong> / month
           </div>
         ) : null}
+
+        <Separator />
+
+        {/* Maturity Score */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <Gauge className="h-3 w-3" />
+            Current Maturity
+          </label>
+          <div className="flex gap-1">
+            {MATURITY_LEVELS.map((m) => (
+              <button
+                key={m.value}
+                onClick={() => handleFieldUpdate("maturity_score", step.maturity_score === m.value ? null : m.value)}
+                title={m.label}
+                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                  step.maturity_score === m.value
+                    ? "border-[var(--border-default)] text-white"
+                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                }`}
+                style={step.maturity_score === m.value ? { backgroundColor: m.color } : undefined}
+              >
+                {m.value}
+              </button>
+            ))}
+          </div>
+          {step.maturity_score && (
+            <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
+              {MATURITY_LEVELS.find((m) => m.value === step.maturity_score)?.label}
+            </p>
+          )}
+        </div>
+
+        {/* Target Maturity */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <Target className="h-3 w-3" />
+            Target Maturity
+          </label>
+          <div className="flex gap-1">
+            {MATURITY_LEVELS.map((m) => (
+              <button
+                key={m.value}
+                onClick={() => handleFieldUpdate("target_maturity", step.target_maturity === m.value ? null : m.value)}
+                title={m.label}
+                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                  step.target_maturity === m.value
+                    ? "border-[var(--border-default)] text-white"
+                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                }`}
+                style={step.target_maturity === m.value ? { backgroundColor: m.color } : undefined}
+              >
+                {m.value}
+              </button>
+            ))}
+          </div>
+          {step.target_maturity && (
+            <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
+              {MATURITY_LEVELS.find((m) => m.value === step.target_maturity)?.label}
+            </p>
+          )}
+        </div>
+
+        {/* Gap indicator */}
+        {step.maturity_score && step.target_maturity && (
+          <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2">
+            Gap: <strong className={step.target_maturity - step.maturity_score > 0 ? "text-[#F97316]" : "text-[#22C55E]"}>
+              {step.target_maturity - step.maturity_score > 0 ? `+${step.target_maturity - step.maturity_score}` : step.target_maturity - step.maturity_score === 0 ? "On target" : String(step.target_maturity - step.maturity_score)}
+            </strong>
+            {step.target_maturity - step.maturity_score > 0 && " levels to improve"}
+          </div>
+        )}
 
         <Separator />
 

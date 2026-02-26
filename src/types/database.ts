@@ -85,6 +85,8 @@ export interface Step {
   attributes: Record<string, unknown>;
   time_minutes: number | null;
   frequency_per_month: number | null;
+  maturity_score: number | null;
+  target_maturity: number | null;
   created_at: string;
   updated_at: string;
 }
