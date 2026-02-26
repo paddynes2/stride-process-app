@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole, PublicShare } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -304,6 +304,94 @@ export async function updateShare(id: string, data: { is_active: boolean }): Pro
 
 export async function deleteShare(id: string): Promise<void> {
   await apiFetch(`/api/v1/shares/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Stages (journey canvas)
+// ---------------------------------------------------------------------------
+
+export async function createStage(data: {
+  workspace_id: string;
+  tab_id: string;
+  name?: string;
+  position_x?: number;
+  position_y?: number;
+}): Promise<Stage> {
+  return apiFetch<Stage>("/api/v1/stages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateStage(id: string, data: Partial<Omit<Stage, "id" | "workspace_id" | "tab_id" | "created_at" | "updated_at">>): Promise<Stage> {
+  return apiFetch<Stage>(`/api/v1/stages/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStage(id: string): Promise<void> {
+  await apiFetch(`/api/v1/stages/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Touchpoints (journey canvas)
+// ---------------------------------------------------------------------------
+
+export async function fetchTouchpoints(workspaceId: string, tabId?: string): Promise<Touchpoint[]> {
+  const params = new URLSearchParams({ workspace_id: workspaceId });
+  if (tabId) params.set("tab_id", tabId);
+  return apiFetch<Touchpoint[]>(`/api/v1/touchpoints?${params}`);
+}
+
+export async function createTouchpoint(data: {
+  workspace_id: string;
+  tab_id: string;
+  stage_id?: string | null;
+  name?: string;
+  position_x?: number;
+  position_y?: number;
+}): Promise<Touchpoint> {
+  return apiFetch<Touchpoint>("/api/v1/touchpoints", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateTouchpoint(id: string, data: Partial<Omit<Touchpoint, "id" | "workspace_id" | "tab_id" | "created_at" | "updated_at">>): Promise<Touchpoint> {
+  return apiFetch<Touchpoint>(`/api/v1/touchpoints/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTouchpoint(id: string): Promise<void> {
+  await apiFetch(`/api/v1/touchpoints/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Touchpoint Connections (journey canvas)
+// ---------------------------------------------------------------------------
+
+export async function createTouchpointConnection(data: {
+  workspace_id: string;
+  tab_id: string;
+  source_touchpoint_id: string;
+  target_touchpoint_id: string;
+}): Promise<TouchpointConnection> {
+  return apiFetch<TouchpointConnection>("/api/v1/touchpoint-connections", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTouchpointConnection(id: string): Promise<void> {
+  await apiFetch(`/api/v1/touchpoint-connections/${id}`, { method: "DELETE" });
 }
 
 // Public data (no auth required)
