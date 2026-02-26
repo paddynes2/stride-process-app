@@ -344,3 +344,30 @@
 - Efficiency (wasted actions?): 5 — clean execution, no wasted actions
 - Proactive observations: 0
 **Notes:** Decomposed #FEAT-030 into [1/2] data layer (this iteration) and [2/2] UI (next iteration). Risk score for next iteration: touched schema/migration (+3), >5 files (+0, was exactly 5), no shared components = 3. Next iteration should prioritize the UI sub-task, not regression (risk 3 triggers regression the iteration AFTER next).
+
+## Iteration 67 — 2026-02-26 22:00
+**Task:** #FEAT-030 [2/2] Tools page UI — CRUD view with inline editing
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- `src/app/(app)/w/[workspaceId]/tools/tools-view.tsx` — new client view (flat table, inline editing, summary cards, empty state)
+- `src/app/(app)/w/[workspaceId]/tools/page.tsx` — replaced stub with server page (auth guard, Supabase fetch, renders ToolsView)
+- `src/components/layout/sidebar.tsx` — removed `stub: true` from Tools nav item, cleaned up unused stub rendering code
+**Research:** Read people-view.tsx (pattern reference), Tool type in database.ts, client API functions, sidebar stub handling. Confirmed all CRUD API endpoints already exist from iteration 66.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 new — fixed unused Globe import)
+- Build: pass (tools route visible as dynamic in build output)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright MCP unavailable — static verification only)
+- Canary test: skipped (Playwright unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 4 — follows people-view patterns exactly, proper TypeScript, inline editing, delete confirmation, empty states, summary cards with computed values. Deducted 1 because URL field in Tool type not exposed in table (kept simple with 4 columns).
+- Test coverage of change: 2 — type check + lint + build only, no browser testing
+- Confidence this won't regress: 5 — purely additive new page, no existing behavior changed
+- Efficiency (wasted actions?): 5 — clean execution, minimal research needed
+- Proactive observations: 0
+**Notes:** #FEAT-030 fully complete (both sub-tasks). Risk score for next iteration: touched 3 files, no shared components/auth/migrations = 0. Next task should be #FEAT-028 (search & filtering) or #FEAT-031 (bulk actions).

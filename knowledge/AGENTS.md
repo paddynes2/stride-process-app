@@ -43,7 +43,7 @@ npx supabase db push     # Push migrations
 | `/w/.../gap-analysis` | `src/app/(app)/w/[workspaceId]/gap-analysis/page.tsx` | Gap analysis |
 | `/w/.../teams` | `src/app/(app)/w/[workspaceId]/teams/page.tsx` | Teams management |
 | `/w/.../people` | `src/app/(app)/w/[workspaceId]/people/page.tsx` | People management (flat table CRUD) |
-| `/w/.../tools` | `src/app/(app)/w/[workspaceId]/tools/page.tsx` | Tools (stub) |
+| `/w/.../tools` | `src/app/(app)/w/[workspaceId]/tools/page.tsx` | Tools management (flat table CRUD) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 
