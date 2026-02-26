@@ -8,12 +8,12 @@
 
 ## Last Smoke Test
 
-- **Iteration:** 43
+- **Iteration:** 44
 - **Date:** 2026-02-26
 - **Result:** pass (static only — Playwright MCP unavailable)
 - **Pages checked:** 0 (browser testing skipped)
 - **Errors found:** 0
-- **Note:** FEAT-021 [2/3] read-only canvases. Type-check (0 errors), lint (0 errors, 6 warnings), build (44 routes) all pass. 1 file modified (compare-view.tsx).
+- **Note:** FEAT-021 [3/3] alignment hints. Type-check (0 errors, run twice), lint (0 errors, 6 pre-existing warnings), build (43 routes) all pass. 1 file modified (compare-view.tsx).
 
 ## Last Navigation Suite
 

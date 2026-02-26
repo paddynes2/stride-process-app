@@ -6,20 +6,20 @@
 
 ## Handoff
 
-- **Iteration:** 43
+- **Iteration:** 44
 - **Date:** 2026-02-26
 - **Phase:** Phase 2a — Journey Mapping
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-021 [2/3] Read-only React Flow canvases in comparison view
+- **Last task:** #FEAT-021 [3/3] Visual alignment hints in comparison view
 - **Result:** completed
-- **Next task:** #FEAT-021 [3/3] Visual alignment hints between stages/sections with matching names
+- **Next task:** #FEAT-022 Journey export (journey-specific PDF) — or fix BUG-010/BUG-011 first (P2 a11y)
 - **Blockers:** None
 
 ## Context
 
-Replaced the stats-only comparison view with actual React Flow canvas rendering. compare-view.tsx now renders two ReactFlow instances side-by-side: process canvas (left) with sections/steps/connections and journey canvas (right) with stages/touchpoints/connections. Both are fully read-only (nodesDraggable=false, nodesConnectable=false, elementsSelectable=false). Compact stats overlays show section/step/maturity counts on the process side and stage/touchpoint/pain counts plus sentiment distribution on the journey side. The existing node types (StepNode, SectionNode, StageNode, TouchpointNode) are reused directly.
+FEAT-021 is now fully complete (all 3/3 sub-tasks done). The comparison view at /w/[workspaceId]/compare now renders side-by-side React Flow canvases with visual alignment hints. `computeNameMatches()` in compare-view.tsx pairs sections and stages by case-insensitive name matching. Matched nodes get a teal glow (`boxShadow` with `--brand` color) on the React Flow wrapper, and an alignment bar above the canvases shows the match count and paired names as teal pills. Only compare-view.tsx was modified — no shared components touched.
 
-Next iteration should proceed with FEAT-021 [3/3]: adding visual alignment hints. This means highlighting stages and sections that share names or are linked, showing matching relationships between the process and journey canvases.
+Phase 2a has 2 remaining tasks: FEAT-022 (journey export PDF) and 2 P2 bugs (BUG-010, BUG-011 — text-quaternary used for functional content). Next iteration should either fix the P2 bugs (quick wins) or start FEAT-022.
 
 ## Dev Server
 
@@ -31,7 +31,6 @@ Next iteration should proceed with FEAT-021 [3/3]: adding visual alignment hints
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (6 warnings — 3 in journey-canvas-view, 1 in flow-canvas, 1 in header, 1 in sidebar).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-43).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-44).
 - 2 open P2 a11y bugs (BUG-010, BUG-011) — text-quaternary used for functional content.
-- Human edits to autonomous-dev files (Phase 2b/2c/3 specs) pending in working directory — not committed by ralph.
 - Unused import `addEdge` in flow-canvas.tsx and `Plus` in sidebar.tsx — minor cleanup opportunity.

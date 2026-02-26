@@ -1244,3 +1244,28 @@
 - Efficiency (wasted actions?): 5 — Completed in single pass. Thorough research upfront paid off.
 - Proactive observations: 0
 **Notes:** Replaced ProcessSummary/JourneySummary stat components with actual ReactFlow instances. Each side has its own ReactFlowProvider. Stats are shown as compact Panel overlays. Empty states handled. The file went from 415 lines to 393 lines despite adding canvas rendering — removed redundant list views.
+
+## Iteration 44 — 2026-02-26
+**Task:** #FEAT-021 [3/3] Visual alignment hints in comparison view
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Modified: `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` (added name matching, teal glow highlighting, alignment bar)
+**Research:** Read compare-view.tsx (current state), section-node.tsx and stage-node.tsx (rendering patterns), canvas.ts (node data types), database.ts (Section.name, Stage.name fields). Confirmed name-based matching is sufficient — both entities have `name` field.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 6 pre-existing warnings)
+- Build: pass (43 routes — compare route present)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean implementation. computeNameMatches is pure, memoized. Glow applied via React Flow node style (no shared component modifications). Alignment bar is conditional.
+- Test coverage of change: 2 — No runtime verification. Type check + build verify compilation.
+- Confidence this won't regress: 5 — All changes within compare-view.tsx. No shared code modified. Additive only.
+- Efficiency (wasted actions?): 5 — Completed in single pass with targeted research.
+- Proactive observations: 0
+**Notes:** FEAT-021 is now fully DONE (all 3/3 sub-tasks complete across iterations 41, 43, 44). The comparison view is feature-complete: side-by-side React Flow canvases with read-only display, stats overlays, and alignment hints. Phase 2a remaining: FEAT-022 (journey export) + BUG-010/BUG-011 (P2 a11y).

@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-021 [2/3] DONE iter 43, [3/3] alignment hints next)
+## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-021 DONE iter 44, FEAT-022 journey export next)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -263,8 +263,8 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 | 2c | Tools & Enhanced Export | Tool mapping, professional reports | 20-25 | Phase 2b | Not started |
 | 3 | Living Playbook | Executable processes | 30-40 | Phase 2c | Not started |
 
-**Completed iterations:** 40 (Phase 1: 19, Phase 1.5: 12, Phase 2a: 9 so far)
-**Remaining iterations (est.):** 75-100 (Phase 2a remainder: ~5, Phase 2b: 20-25, Phase 2c: 20-25, Phase 3: 30-40)
+**Completed iterations:** 41 (Phase 1: 19, Phase 1.5: 12, Phase 2a: 10 so far)
+**Remaining iterations (est.):** 73-98 (Phase 2a remainder: ~3, Phase 2b: 20-25, Phase 2c: 20-25, Phase 3: 30-40)
 **Total features:** 47 (FEAT-001 through FEAT-047)
 
 ---
@@ -314,3 +314,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 40: UX sweep (cadence trigger). Reviewed 4 pages + 2 comparison pages. Found 2 P2 a11y bugs (BUG-010, BUG-011: text-quaternary used for functional content) and 6 improvements (IMP-003 through IMP-008). Retrospective completed. Next: FEAT-021 or BUG-010/011.
 - [2026-02-26] Iteration 41: FEAT-021 [1/3] complete (comparison view shell). New /compare route, sidebar nav, side-by-side layout with stats summaries, server-side data fetching for both canvas types. Decomposed into 3 sub-tasks. [2/3] read-only canvases and [3/3] alignment hints remain. Human added Phase 2b/2c/3 detailed specs to FEATURES.md and IMPLEMENTATION-PLAN.md.
 - [2026-02-26] Iteration 43: FEAT-021 [2/3] complete (read-only React Flow canvases). Replaced stats summaries with dual ReactFlow instances in compare-view.tsx. Process canvas left, journey canvas right. Reused all 4 existing node types. Only [3/3] alignment hints remain.
+- [2026-02-26] Iteration 44: **FEAT-021 DONE** (all 3/3 sub-tasks complete). Visual alignment hints: case-insensitive name matching between sections and stages, teal glow on matched nodes, alignment bar with match count/names. 4 iterations total (iter 41-44 with regression pass at 42). Phase 2a: only FEAT-022 (journey export) + 2 P2 bugs remain.

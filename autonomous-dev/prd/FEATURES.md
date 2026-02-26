@@ -336,21 +336,21 @@
 - [x] Heat map legend explains the color scale
 **Notes:** Created src/lib/pain.ts with inverted color scale (1=green, 5=red). Mirrors process canvas heat map pattern exactly: toggle button, colored backgrounds, stage roll-up badges, legend panel.
 
-### #FEAT-021 Process vs journey comparison view
+### #FEAT-021 Process vs journey comparison view — DONE iteration 44, 2026-02-26
 **Phase:** 2a
 **Priority:** P1 (important)
-**Attempts:** 2
-**Status:** in-progress
+**Attempts:** 3
+**Status:** done
 **Acceptance criteria:**
 - [x] New "Compare" view accessible from workspace navigation (only when workspace has both process and journey tabs)
 - [x] Side-by-side layout: process canvas on left, journey canvas on right
 - [x] Both canvases are read-only in comparison mode (click to navigate to full canvas)
-- [ ] Visual alignment hints: stages and sections that share names or are linked are highlighted
-**Notes:** This is the killer feature of journey mapping. The comparison reveals gaps between what the company does internally and what the customer experiences. The linking mechanism (stage ↔ section) can be manual or name-based.
+- [x] Visual alignment hints: stages and sections that share names or are linked are highlighted
+**Notes:** This is the killer feature of journey mapping. The comparison reveals gaps between what the company does internally and what the customer experiences. The linking mechanism (stage ↔ section) can be manual or name-based. Alignment uses case-insensitive exact name matching with teal glow highlighting.
 **Sub-tasks:**
 - [x] [1/3] Route + sidebar nav + side-by-side shell with data fetching + stats summary — DONE iteration 41
 - [x] [2/3] Read-only React Flow canvas rendering (process left, journey right) — DONE iteration 43
-- [ ] [3/3] Visual alignment hints between stages/sections with matching names
+- [x] [3/3] Visual alignment hints between stages/sections with matching names — DONE iteration 44
 
 ### #FEAT-022 Journey export
 **Phase:** 2a
