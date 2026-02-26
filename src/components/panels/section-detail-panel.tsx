@@ -7,7 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { RichTextEditor } from "./rich-text-editor";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(
+  () => import("./rich-text-editor").then((mod) => ({ default: mod.RichTextEditor })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="min-h-[120px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] animate-pulse" />
+    ),
+  }
+);
 import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch } from "@/lib/api/client";
 import type { StepRoleWithDetails } from "@/lib/api/client";
 import type { Section, Step } from "@/types/database";

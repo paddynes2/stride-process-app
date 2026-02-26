@@ -14,7 +14,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { RichTextEditor } from "./rich-text-editor";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(
+  () => import("./rich-text-editor").then((mod) => ({ default: mod.RichTextEditor })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="min-h-[120px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] animate-pulse" />
+    ),
+  }
+);
 import { VideoEmbed } from "./video-embed";
 import {
   updateStep,

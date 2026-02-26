@@ -6,8 +6,6 @@ import { StepDetailPanel } from "@/components/panels/step-detail-panel";
 import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
 import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
-import { exportWorkspacePdf } from "@/lib/export/pdf";
-import { exportCanvasPng } from "@/lib/export/png";
 import { fetchStepRolesBatch } from "@/lib/api/client";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
@@ -93,7 +91,10 @@ export function CanvasView({
   const handleExportPdf = React.useCallback(
     async (canvasElement: HTMLElement) => {
       try {
-        const stepIds = steps.map((s) => s.id);
+        const [{ exportWorkspacePdf }, stepIds] = await Promise.all([
+          import("@/lib/export/pdf"),
+          Promise.resolve(steps.map((s) => s.id)),
+        ]);
         const stepRoles = stepIds.length > 0 ? await fetchStepRolesBatch(stepIds) : [];
         await exportWorkspacePdf({
           workspaceName: workspace.name,
@@ -114,6 +115,7 @@ export function CanvasView({
   const handleExportPng = React.useCallback(
     async (canvasElement: HTMLElement) => {
       try {
+        const { exportCanvasPng } = await import("@/lib/export/png");
         await exportCanvasPng({
           canvasElement,
           workspaceName: workspace.name,
