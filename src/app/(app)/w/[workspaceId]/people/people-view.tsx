@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { User, Plus, Trash2, Mail, Briefcase, Users } from "lucide-react";
+import { User, Plus, Trash2, Mail, Briefcase, Users, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -55,10 +55,36 @@ export function PeopleView({ workspaceId, initialTeams }: PeopleViewProps) {
   const [teams, setTeams] = React.useState<TeamWithRoles[]>(initialTeams);
   const [loading, setLoading] = React.useState(false);
   const [addingToRole, setAddingToRole] = React.useState<string | null>(null);
+  const [search, setSearch] = React.useState("");
+  const [roleFilter, setRoleFilter] = React.useState<string | null>(null);
+  const [teamFilter, setTeamFilter] = React.useState<string | null>(null);
 
   const people = React.useMemo(() => flattenPeople(teams), [teams]);
   const roles = React.useMemo(() => getRoles(teams), [teams]);
   const teamCount = new Set(people.map((p) => p.teamName)).size;
+  const uniqueTeamNames = React.useMemo(
+    () => [...new Set(people.map((p) => p.teamName))].sort(),
+    [people]
+  );
+
+  const filtered = React.useMemo(() => {
+    let result = [...people];
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.email ?? "").toLowerCase().includes(q)
+      );
+    }
+    if (roleFilter) {
+      result = result.filter((p) => p.roleName === roleFilter);
+    }
+    if (teamFilter) {
+      result = result.filter((p) => p.teamName === teamFilter);
+    }
+    return result;
+  }, [people, search, roleFilter, teamFilter]);
 
   const refresh = React.useCallback(async () => {
     const data = await fetchTeams(workspaceId);
@@ -132,6 +158,45 @@ export function PeopleView({ workspaceId, initialTeams }: PeopleViewProps) {
           <SummaryCard label="Teams" value={teamCount} />
         </div>
 
+        {/* Filters */}
+        {people.length > 0 && (
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 max-w-xs">
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search people..."
+                leftElement={<Search className="h-3.5 w-3.5" />}
+                aria-label="Search people"
+              />
+            </div>
+            <select
+              value={roleFilter ?? ""}
+              onChange={(e) => setRoleFilter(e.target.value || null)}
+              className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+              aria-label="Filter by role"
+            >
+              <option value="">All Roles</option>
+              {roles.map((r) => (
+                <option key={r.id} value={r.name}>
+                  {r.name} ({r.teamName})
+                </option>
+              ))}
+            </select>
+            <select
+              value={teamFilter ?? ""}
+              onChange={(e) => setTeamFilter(e.target.value || null)}
+              className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+              aria-label="Filter by team"
+            >
+              <option value="">All Teams</option>
+              {uniqueTeamNames.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* People table */}
         {people.length === 0 ? (
           <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center">
@@ -174,15 +239,21 @@ export function PeopleView({ workspaceId, initialTeams }: PeopleViewProps) {
               <span>Team</span>
               <span />
             </div>
-            {people.map((person) => (
-              <PersonRow
-                key={person.id}
-                person={person}
-                onUpdateName={(name) => handleUpdateName(person.id, name)}
-                onUpdateEmail={(email) => handleUpdateEmail(person.id, email)}
-                onDelete={() => handleDelete(person.id)}
-              />
-            ))}
+            {filtered.length === 0 ? (
+              <div className="px-4 py-6 text-center text-[13px] text-[var(--text-tertiary)]">
+                No people match your filters
+              </div>
+            ) : (
+              filtered.map((person) => (
+                <PersonRow
+                  key={person.id}
+                  person={person}
+                  onUpdateName={(name) => handleUpdateName(person.id, name)}
+                  onUpdateEmail={(email) => handleUpdateEmail(person.id, email)}
+                  onDelete={() => handleDelete(person.id)}
+                />
+              ))
+            )}
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Wrench, Plus, Trash2, DollarSign, Tag, Building2 } from "lucide-react";
+import { Wrench, Plus, Trash2, DollarSign, Tag, Building2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,9 +20,16 @@ interface ToolsViewProps {
 export function ToolsView({ workspaceId, initialTools }: ToolsViewProps) {
   const [tools, setTools] = React.useState<Tool[]>(initialTools);
   const [loading, setLoading] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const [categoryFilter, setCategoryFilter] = React.useState<string | null>(null);
 
   const sortedTools = React.useMemo(
     () => [...tools].sort((a, b) => a.name.localeCompare(b.name)),
+    [tools]
+  );
+
+  const uniqueCategories = React.useMemo(
+    () => [...new Set(tools.map((t) => t.category).filter(Boolean))].sort() as string[],
     [tools]
   );
 
@@ -30,6 +37,23 @@ export function ToolsView({ workspaceId, initialTools }: ToolsViewProps) {
     () => new Set(tools.map((t) => t.category).filter(Boolean)).size,
     [tools]
   );
+
+  const filtered = React.useMemo(() => {
+    let result = [...sortedTools];
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.name.toLowerCase().includes(q) ||
+          (t.category ?? "").toLowerCase().includes(q) ||
+          (t.vendor ?? "").toLowerCase().includes(q)
+      );
+    }
+    if (categoryFilter) {
+      result = result.filter((t) => t.category === categoryFilter);
+    }
+    return result;
+  }, [sortedTools, search, categoryFilter]);
 
   const totalCost = React.useMemo(
     () => tools.reduce((sum, t) => sum + (t.cost_per_month ?? 0), 0),
@@ -86,8 +110,36 @@ export function ToolsView({ workspaceId, initialTools }: ToolsViewProps) {
           <SummaryCard label="Monthly Cost" value={totalCost > 0 ? `$${totalCost.toLocaleString()}` : "$0"} />
         </div>
 
+        {/* Filters */}
+        {tools.length > 0 && (
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 max-w-xs">
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search tools..."
+                leftElement={<Search className="h-3.5 w-3.5" />}
+                aria-label="Search tools"
+              />
+            </div>
+            {uniqueCategories.length > 0 && (
+              <select
+                value={categoryFilter ?? ""}
+                onChange={(e) => setCategoryFilter(e.target.value || null)}
+                className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+                aria-label="Filter by category"
+              >
+                <option value="">All Categories</option>
+                {uniqueCategories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
         {/* Tools table */}
-        {sortedTools.length === 0 ? (
+        {tools.length === 0 ? (
           <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center">
             <Wrench className="h-8 w-8 text-[var(--text-quaternary)] mx-auto mb-3" />
             <p className="text-[14px] text-[var(--text-secondary)] mb-1">
@@ -111,14 +163,20 @@ export function ToolsView({ workspaceId, initialTools }: ToolsViewProps) {
               <span>Cost/mo</span>
               <span />
             </div>
-            {sortedTools.map((tool) => (
-              <ToolRow
-                key={tool.id}
-                tool={tool}
-                onUpdate={(data) => handleUpdate(tool.id, data)}
-                onDelete={() => handleDelete(tool.id)}
-              />
-            ))}
+            {filtered.length === 0 ? (
+              <div className="px-4 py-6 text-center text-[13px] text-[var(--text-tertiary)]">
+                No tools match your filters
+              </div>
+            ) : (
+              filtered.map((tool) => (
+                <ToolRow
+                  key={tool.id}
+                  tool={tool}
+                  onUpdate={(data) => handleUpdate(tool.id, data)}
+                  onDelete={() => handleDelete(tool.id)}
+                />
+              ))
+            )}
           </div>
         )}
       </div>
