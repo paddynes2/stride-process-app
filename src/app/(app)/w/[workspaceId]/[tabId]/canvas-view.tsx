@@ -7,6 +7,7 @@ import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
 import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { exportWorkspacePdf } from "@/lib/export/pdf";
+import { exportCanvasPng } from "@/lib/export/png";
 import { fetchStepRolesBatch } from "@/lib/api/client";
 import { toast } from "sonner";
 import type { Section, Step, Connection } from "@/types/database";
@@ -109,6 +110,21 @@ export function CanvasView({
     [workspace.name, sections, steps, connections]
   );
 
+  const handleExportPng = React.useCallback(
+    async (canvasElement: HTMLElement) => {
+      try {
+        await exportCanvasPng({
+          canvasElement,
+          workspaceName: workspace.name,
+        });
+        toast.success("PNG exported successfully");
+      } catch {
+        toast.error("Failed to export PNG");
+      }
+    },
+    [workspace.name]
+  );
+
   return (
     <div className="flex h-full">
       {/* Canvas */}
@@ -132,6 +148,7 @@ export function CanvasView({
           onConnectionCreate={handleConnectionCreate}
           onConnectionDelete={handleConnectionDelete}
           onExportPdf={handleExportPdf}
+          onExportPng={handleExportPng}
         />
       </div>
 

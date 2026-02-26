@@ -9,6 +9,7 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  useReactFlow,
   type Connection as FlowConnection,
   type NodeChange,
   type EdgeChange,
@@ -18,7 +19,7 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Plus, Square, Thermometer, FileDown, Loader2 } from "lucide-react";
+import { Plus, Square, Thermometer, FileDown, ImageDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNode } from "./step-node";
 import { SectionNode } from "./section-node";
@@ -60,6 +61,7 @@ interface FlowCanvasProps {
   onConnectionCreate: (conn: Connection) => void;
   onConnectionDelete: (id: string) => void;
   onExportPdf?: (canvasElement: HTMLElement) => void;
+  onExportPng?: (canvasElement: HTMLElement) => Promise<void>;
 }
 
 function computeSectionMaturity(sectionId: string, steps: Step[]): { avg: number | null; avgTarget: number | null } {
@@ -110,6 +112,54 @@ function buildEdges(connections: Connection[]): Edge[] {
   }));
 }
 
+function PngExportButton({
+  wrapperRef,
+  onExportPng,
+}: {
+  wrapperRef: React.RefObject<HTMLDivElement | null>;
+  onExportPng: (el: HTMLElement) => Promise<void>;
+}) {
+  const { fitView, getViewport, setViewport } = useReactFlow();
+  const [exporting, setExporting] = React.useState(false);
+
+  const handleClick = React.useCallback(async () => {
+    if (!wrapperRef.current || exporting) return;
+    setExporting(true);
+
+    const viewport = getViewport();
+    fitView({ padding: 0.1 });
+
+    // Wait for render to settle after fitView
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    );
+
+    try {
+      await onExportPng(wrapperRef.current);
+    } finally {
+      setViewport(viewport);
+      setExporting(false);
+    }
+  }, [wrapperRef, onExportPng, exporting, fitView, getViewport, setViewport]);
+
+  return (
+    <Button
+      variant="secondary"
+      size="sm"
+      onClick={handleClick}
+      disabled={exporting}
+      title="Export canvas as PNG"
+    >
+      {exporting ? (
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+      ) : (
+        <ImageDown className="h-3.5 w-3.5" />
+      )}
+      {exporting ? "Exporting\u2026" : "Export PNG"}
+    </Button>
+  );
+}
+
 export function FlowCanvas({
   workspaceId,
   tabId,
@@ -129,6 +179,7 @@ export function FlowCanvas({
   onConnectionCreate,
   onConnectionDelete,
   onExportPdf,
+  onExportPng,
 }: FlowCanvasProps) {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const [heatMapMode, setHeatMapMode] = React.useState(false);
@@ -391,6 +442,9 @@ export function FlowCanvas({
             )}
             {exporting ? "Exporting…" : "Export PDF"}
           </Button>
+        )}
+        {onExportPng && (
+          <PngExportButton wrapperRef={wrapperRef} onExportPng={onExportPng} />
         )}
       </Panel>
 
