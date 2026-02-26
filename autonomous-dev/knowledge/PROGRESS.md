@@ -1296,3 +1296,30 @@
 - Efficiency (wasted actions?): 5 — Clean research → build → verify flow. 3 files changed, all first-pass.
 - Proactive observations: 0
 **Notes:** FEAT-022 decomposed into [1/2] journey PDF/PNG and [2/2] comparison PDF. Journey PDF includes: title page (stats + sentiment distribution bar), canvas snapshot, touchpoint details table (sorted by stage then name), pain point ranking (sorted by pain desc with visual bars), stage breakdown (channel, owner, count, avg pain, sentiment mini-bars). PngExportButton is separate component (needs useReactFlow() from ReactFlow context). fitView saves/restores viewport so user sees no flash.
+
+## Iteration 46 — 2026-02-26
+**Task:** #FEAT-022 [2/2] Comparison view PDF export
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: `src/lib/export/comparison-pdf.ts` (~400 lines — comparison-specific PDF export)
+- Modified: `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` (added Export PDF button, wrapper refs on canvas containers, handleExportPdf with dynamic import, loading state)
+- Modified: `src/app/(app)/w/[workspaceId]/compare/page.tsx` (fetch workspace name, pass as prop)
+**Research:** Read compare-view.tsx (current state with side-by-side canvases + alignment hints), journey-pdf.ts (full PDF export pattern — ~530 lines), pdf.ts (process PDF export pattern), png.ts (canvas capture pattern), page.tsx (server data fetching).
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 6 pre-existing warnings)
+- Build: pass (all routes including /compare)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Follows existing pdf.ts and journey-pdf.ts patterns exactly. Title page with side-by-side stats, dual canvas snapshots, alignment analysis with maturity/pain cross-reference. Dynamic import for lazy loading. Clean error handling.
+- Test coverage of change: 2 — Static verification only (type-check + lint + build). No browser test due to missing Playwright.
+- Confidence this won't regress: 5 — Pure additive (1 new file + 2 modified with additive changes only). No existing behavior modified. Uses proven patterns.
+- Efficiency (wasted actions?): 5 — Clean research → build → verify flow. Completed in single pass.
+- Proactive observations: 0
+**Notes:** FEAT-022 is now fully DONE (both sub-tasks). Phase 2a remaining: BUG-010, BUG-011 (P2 a11y — text-quaternary). After those, Phase 2a is complete.

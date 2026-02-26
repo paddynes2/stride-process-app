@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-022 [1/2] DONE iter 45, [2/2] comparison PDF next)
+## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-022 DONE iter 46, BUG-010/BUG-011 P2 a11y remain)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -316,3 +316,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 43: FEAT-021 [2/3] complete (read-only React Flow canvases). Replaced stats summaries with dual ReactFlow instances in compare-view.tsx. Process canvas left, journey canvas right. Reused all 4 existing node types. Only [3/3] alignment hints remain.
 - [2026-02-26] Iteration 44: **FEAT-021 DONE** (all 3/3 sub-tasks complete). Visual alignment hints: case-insensitive name matching between sections and stages, teal glow on matched nodes, alignment bar with match count/names. 4 iterations total (iter 41-44 with regression pass at 42). Phase 2a: only FEAT-022 (journey export) + 2 P2 bugs remain.
 - [2026-02-26] Iteration 45: FEAT-022 [1/2] complete (journey canvas PDF + PNG export). Created journey-pdf.ts (~530 lines) with 5 PDF sections + PNG export button. Decomposed FEAT-022 into 2 sub-tasks. [2/2] comparison view PDF export remains.
+- [2026-02-26] Iteration 46: **FEAT-022 DONE** (all 2/2 sub-tasks complete). Comparison view PDF export with title page (side-by-side stats), dual canvas snapshots, alignment analysis table. All 6 Phase 2a features complete. Only BUG-010/BUG-011 (P2 a11y) remain before Phase 2a exit.
