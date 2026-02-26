@@ -128,3 +128,27 @@
 - Efficiency (wasted actions?): 5 — minimal actions for a trivial fix
 - Proactive observations: 0
 **Notes:** Minimal fix. Same confirm() pattern used by workspace deletion handler. Message warns about cascading annotation deletion.
+
+## Iteration 59 — 2026-02-26 22:00
+**Task:** #BUG-013 Detect RLS-denied mutations in perspective/annotation API routes
+**Source:** prd/BUGS.md
+**Complexity:** M
+**Result:** completed
+**Changes:** src/app/api/v1/perspectives/route.ts, perspectives/[id]/route.ts, annotations/route.ts, annotations/[id]/route.ts
+**Research:** Read all 4 affected API route files. Checked for existing permission-denied patterns (none existed). Verified response.ts envelope helpers.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 errors)
+- Build: pass (all routes compile)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright MCP unavailable — static verification only)
+- Canary test: skipped (Playwright unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — consistent pattern across all 4 files, minimal changes, handles both PGRST116 and defensive null checks
+- Test coverage of change: 2 — no browser test, verified via type check + lint + build only
+- Confidence this won't regress: 5 — additive guards only, no existing behavior changed for valid mutations
+- Efficiency (wasted actions?): 4 — had to fix lint warnings from unused destructured vars (minor)
+- Proactive observations: 0
+**Notes:** PGRST116 is PostgREST's error code for ".single() with 0 rows". INSERT routes return 403 (RLS blocked creation). PATCH/DELETE return 404 (not found or not accessible — avoids information leakage about resource existence). DELETE routes now chain .select().single() to make 0-row deletes detectable.

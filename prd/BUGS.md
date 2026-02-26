@@ -18,12 +18,10 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — PerspectiveRow delete handler
   - **Fix applied:** Added `confirm()` guard before `deletePerspective()` call in `handleDelete` (line 282)
 
-- [ ] #BUG-013 API routes return success on RLS-denied mutations — Attempts: 0
+- [x] #BUG-013 API routes return success on RLS-denied mutations — DONE iteration 59, 2026-02-26
   - **Found:** Iteration 57 (quality audit)
   - **Where:** All perspective + annotation API routes (POST/PATCH/DELETE)
-  - **Impact:** If a user somehow submits a request with a workspace_id they don't own, RLS silently filters the INSERT (0 rows affected). API returns 201/200 but no data persists. Client thinks operation succeeded.
-  - **Fix:** After INSERT/UPDATE/DELETE, check if `data` is null/empty. If so, return 403 with "You don't have permission" error.
-  - **Note:** Low probability in normal usage (UI only shows owned workspaces), but represents a correctness gap.
+  - **Fix applied:** Added PGRST116 detection in all mutation handlers. POST→403, PATCH/DELETE→404. DELETE routes now use `.select().single()` to detect 0-row deletes.
 
 - [ ] #BUG-014 No `annotatable_type` enum validation in annotation API routes — Attempts: 0
   - **Found:** Iteration 57 (quality audit)
