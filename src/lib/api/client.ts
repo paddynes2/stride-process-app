@@ -66,7 +66,7 @@ export async function deleteWorkspace(id: string): Promise<void> {
 // Tabs
 // ---------------------------------------------------------------------------
 
-export async function createTab(data: { workspace_id: string; name?: string }): Promise<Tab> {
+export async function createTab(data: { workspace_id: string; name?: string; canvas_type?: "process" | "journey" }): Promise<Tab> {
   return apiFetch<Tab>("/api/v1/tabs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -316,6 +316,8 @@ export async function createStage(data: {
   name?: string;
   position_x?: number;
   position_y?: number;
+  width?: number;
+  height?: number;
 }): Promise<Stage> {
   return apiFetch<Stage>("/api/v1/stages", {
     method: "POST",

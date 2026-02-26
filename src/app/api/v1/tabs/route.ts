@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { workspace_id, name } = body;
+  const { workspace_id, name, canvas_type } = body;
 
   if (!workspace_id) {
     return errorResponse("validation", "workspace_id is required", 400);
@@ -20,6 +20,9 @@ export async function POST(request: NextRequest) {
   if (!name?.trim()) {
     return errorResponse("validation", "Tab name is required", 400);
   }
+
+  const validCanvasTypes = ["process", "journey"];
+  const resolvedCanvasType = validCanvasTypes.includes(canvas_type) ? canvas_type : "process";
 
   // Get the next position for this workspace
   const { data: existing } = await supabase
@@ -33,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   const { data: tab, error } = await supabase
     .from("tabs")
-    .insert({ workspace_id, name: name.trim(), position: nextPosition })
+    .insert({ workspace_id, name: name.trim(), position: nextPosition, canvas_type: resolvedCanvasType })
     .select()
     .single();
 

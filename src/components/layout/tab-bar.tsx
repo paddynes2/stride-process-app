@@ -1,11 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Workflow, Route } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { createTab, deleteTab, updateTab } from "@/lib/api/client";
-import type { Tab } from "@/types/database";
+import type { Tab, CanvasType } from "@/types/database";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
 
@@ -17,20 +23,27 @@ interface TabBarProps {
   onTabsChange: () => void;
 }
 
+const CANVAS_TYPE_ICON: Record<CanvasType, React.ElementType> = {
+  process: Workflow,
+  journey: Route,
+};
+
 export function TabBar({ tabs, activeTabId, workspaceId, onTabSelect, onTabsChange }: TabBarProps) {
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editName, setEditName] = React.useState("");
 
-  const handleAddTab = async () => {
+  const handleAddTab = async (canvasType: CanvasType) => {
+    const label = canvasType === "journey" ? "Journey" : "Process";
     try {
       const tab = await createTab({
         workspace_id: workspaceId,
-        name: `Tab ${tabs.length + 1}`,
+        name: `${label} ${tabs.filter((t) => t.canvas_type === canvasType).length + 1}`,
+        canvas_type: canvasType,
       });
       onTabsChange();
       onTabSelect(tab.id);
     } catch (err) {
-      toastError("Failed to create tab", { error: err, retry: handleAddTab });
+      toastError("Failed to create tab", { error: err, retry: () => handleAddTab(canvasType) });
     }
   };
 
@@ -76,48 +89,66 @@ export function TabBar({ tabs, activeTabId, workspaceId, onTabSelect, onTabsChan
     >
       {[...tabs]
         .sort((a, b) => a.position - b.position)
-        .map((tab) => (
-          <div
-            key={tab.id}
-            onClick={() => onTabSelect(tab.id)}
-            onDoubleClick={() => handleDoubleClick(tab)}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1 rounded-[var(--radius-sm)] cursor-pointer",
-              "text-[var(--text-sm)] font-medium transition-colors group",
-              tab.id === activeTabId
-                ? "bg-[var(--bg-surface-active)] text-[var(--text-primary)]"
-                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
-            )}
-          >
-            {editingId === tab.id ? (
-              <input
-                autoFocus
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                onBlur={() => handleRename(tab.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleRename(tab.id);
-                  if (e.key === "Escape") setEditingId(null);
-                }}
-                className="bg-transparent outline-none text-[var(--text-primary)] w-20 text-[var(--text-sm)]"
-              />
-            ) : (
-              <span>{tab.name}</span>
-            )}
-            {tabs.length > 1 && (
-              <button
-                onClick={(e) => handleDeleteTab(e, tab.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-[var(--bg-surface-active)]"
-                aria-label={`Close ${tab.name} tab`}
-              >
-                <X className="h-3 w-3" />
-              </button>
-            )}
-          </div>
-        ))}
-      <Button variant="ghost" size="icon-sm" onClick={handleAddTab} className="ml-1" aria-label="Add new tab">
-        <Plus className="h-3.5 w-3.5" />
-      </Button>
+        .map((tab) => {
+          const Icon = CANVAS_TYPE_ICON[tab.canvas_type] ?? Workflow;
+          return (
+            <div
+              key={tab.id}
+              onClick={() => onTabSelect(tab.id)}
+              onDoubleClick={() => handleDoubleClick(tab)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1 rounded-[var(--radius-sm)] cursor-pointer",
+                "text-[var(--text-sm)] font-medium transition-colors group",
+                tab.id === activeTabId
+                  ? "bg-[var(--bg-surface-active)] text-[var(--text-primary)]"
+                  : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
+              )}
+            >
+              <Icon className="h-3 w-3 shrink-0" />
+              {editingId === tab.id ? (
+                <input
+                  autoFocus
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onBlur={() => handleRename(tab.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleRename(tab.id);
+                    if (e.key === "Escape") setEditingId(null);
+                  }}
+                  className="bg-transparent outline-none text-[var(--text-primary)] w-20 text-[var(--text-sm)]"
+                />
+              ) : (
+                <span>{tab.name}</span>
+              )}
+              {tabs.length > 1 && (
+                <button
+                  onClick={(e) => handleDeleteTab(e, tab.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-[var(--bg-surface-active)]"
+                  aria-label={`Close ${tab.name} tab`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+          );
+        })}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon-sm" className="ml-1" aria-label="Add new tab">
+            <Plus className="h-3.5 w-3.5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" side="top">
+          <DropdownMenuItem onClick={() => handleAddTab("process")}>
+            <Workflow className="h-4 w-4" />
+            Process tab
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleAddTab("journey")}>
+            <Route className="h-4 w-4" />
+            Journey tab
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
