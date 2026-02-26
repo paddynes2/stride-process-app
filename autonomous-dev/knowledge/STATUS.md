@@ -6,20 +6,20 @@
 
 ## Handoff
 
-- **Iteration:** 49
+- **Iteration:** 50
 - **Date:** 2026-02-26
-- **Phase:** Phase 2b — Analysis & Intelligence (started this iteration)
+- **Phase:** Phase 2b — Analysis & Intelligence
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-023 [1/3] Perspectives data model (migration, enums, TypeScript types)
+- **Last task:** #FEAT-023 [2/3] Perspectives API routes + client wrappers
 - **Result:** completed
-- **Next task:** #FEAT-023 [2/3] API routes + client wrappers (GET/POST perspectives, PATCH/DELETE perspectives/[id], GET/POST/PATCH/DELETE annotations)
+- **Next task:** #FEAT-023 [3/3] Basic perspectives management UI (create/edit/delete perspectives in workspace settings or dedicated panel)
 - **Blockers:** None
 
 ## Context
 
-Created migration 012_perspectives.sql with two new tables: `perspectives` (workspace-scoped, has name/color/icon) and `perspective_annotations` (polymorphic via annotatable_type enum + annotatable_id UUID, with content text and optional 1-5 rating). UNIQUE constraint on (perspective_id, annotatable_type, annotatable_id) prevents duplicate annotations per element per perspective. RLS on perspectives uses can_access_workspace(workspace_id) directly; annotations use EXISTS join to perspectives table. TypeScript types added to `src/types/database.ts`: Perspective, PerspectiveAnnotation, AnnotatableType.
+Created 4 new API route files: `src/app/api/v1/perspectives/route.ts` (GET list + POST create), `src/app/api/v1/perspectives/[id]/route.ts` (PATCH update + DELETE), `src/app/api/v1/annotations/route.ts` (GET list + POST create with optional type/id filters), `src/app/api/v1/annotations/[id]/route.ts` (PATCH update + DELETE). Added 8 client wrapper functions to `src/lib/api/client.ts`: fetchPerspectives, createPerspective, updatePerspective, deletePerspective, fetchAnnotations, createAnnotation, updateAnnotation, deleteAnnotation. All follow existing codebase patterns exactly.
 
-Next iteration builds API routes following the existing pattern in `src/app/api/v1/` — entity routes with `route.ts` (list/create) and `[id]/route.ts` (get/update/delete), plus client wrappers in `src/lib/api/client.ts`.
+Next iteration builds the perspectives management UI — likely in workspace settings or a dedicated perspectives panel where users can create, edit, and delete perspective lenses.
 
 ## Dev Server
 
@@ -31,6 +31,5 @@ Next iteration builds API routes following the existing pattern in `src/app/api/
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (6 warnings — unchanged since iter 20).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-49).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-50).
 - Unused import `addEdge` in flow-canvas.tsx and `Plus` in sidebar.tsx — minor cleanup opportunity.
-- RISK_SCORE 3 from this iteration (schema change) — next iteration should run regression if risk accumulates.

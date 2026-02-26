@@ -202,3 +202,55 @@ No file at 5+ iterations — hotspot concern from iter 20 retro addressed by hoo
 2. **IMP-004 (silent error swallowing) should be addressed before FEAT-021** — it's a medium-effort fix that improves data reliability across both canvases.
 3. **journey-canvas-view.tsx hotspot expected** — it's in the same growth phase as canvas-view.tsx was in iter 11-20. Will naturally stabilize as Phase 2a wraps up.
 4. **Schedule next regression by iter 48** (8-iteration cadence from iter 40).
+
+## Retrospective — Iteration 50 (2026-02-26)
+
+### Metrics Summary (Iterations 41-50)
+- **Success rate:** 10/10 (100%) — 50/50 all-time
+- **Task breakdown:** 5 build (FEAT-021×3, FEAT-022×2), 1 bugfix (BUG-010+011), 1 audit (phase-2a), 1 regression (iter 42), 1 UX sweep (iter 40 carried), 1 build (FEAT-023×2)
+- **Failed tasks:** 0
+- **Bugs found:** 0 (BUG-010/011 fixed in iter 47)
+- **Improvements found:** 0
+- **Reverts:** 0
+
+### Hotspot Files (top 3 by modification frequency, iter 41-50)
+1. `compare-view.tsx` — 3 iterations (41, 43, 46) — built across 3 sub-tasks
+2. `src/types/database.ts` — 2 iterations (49, 50 via client.ts) — type additions
+3. `src/lib/api/client.ts` — 1 iteration (50) — new API wrappers
+
+No file at 5+ iterations — healthy distribution.
+
+### Self-Score Trends
+| Metric | Iter 41-43 avg | Iter 44-46 avg | Iter 47-50 avg | Trend |
+|--------|----------------|----------------|----------------|-------|
+| Code quality | 3.3* | 5.0 | 3.8* | Stable (testing iters skew) |
+| Test coverage | 2.0 | 2.0 | 3.3 | Slight improvement |
+| Confidence | 5.0 | 5.0 | 5.0 | Stable/High |
+| Efficiency | 5.0 | 5.0 | 5.0 | Stable |
+
+*Iterations with 0 scores (regression/audit) skew averages.
+
+### Velocity
+- Phase 2a completed in 16 iterations (estimated 20-25) — 20-36% under budget
+- Phase 2b started iter 49 — 2 of 3 FEAT-023 sub-tasks complete (data model + API routes)
+- FEAT-021 (comparison view) took 4 iterations with 3 sub-tasks — appropriate for complex feature
+- FEAT-022 (journey export) completed in 2 iterations — efficient
+
+### Patterns
+- **Pattern mirroring continues to excel:** All API routes (iter 50) built in single iteration by following established teams/stages route patterns exactly.
+- **Phase 2a finished 20-36% under budget:** Same pattern as Phase 1 (24-46% under). Estimates are conservative, which is acceptable.
+- **Test coverage slightly improved:** Phase completion audit (iter 48) provided thorough static verification. Schema changes in iter 49 properly flagged for monitoring.
+- **Playwright MCP still unavailable (30+ consecutive iterations).** Accepted as permanent constraint per iter 30 retro.
+
+### Comparison Across All Retrospectives
+| Metric | Iter 1-10 | Iter 11-20 | Iter 21-30 | Iter 31-40 | Iter 41-50 | Trend |
+|--------|-----------|------------|------------|------------|------------|-------|
+| Success rate | 100% | 100% | 100% | 100% | 100% | Consistent |
+| Bugs found | 9 | 0 | 0 | 2 | 0 | Low (stable) |
+| Feature velocity | 80% | 90% | 80% | 70% | 80% | Stable |
+| Efficiency avg | 4.5 | 4.9 | 4.5 | 4.8 | 5.0 | Improving |
+
+### Actions
+1. No process changes needed — velocity, quality, and efficiency are all strong at iteration 50.
+2. Phase 2b is off to a clean start with data model + API routes done in 2 iterations.
+3. Next regression should be around iter 56-58 (8-iteration cadence from audit at iter 48).

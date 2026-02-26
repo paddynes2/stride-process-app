@@ -92,7 +92,9 @@ src/
 │   │   ├── public/shares/   — GET by shareId (unauthenticated, calls SECURITY DEFINER RPC)
 │   │   ├── stages/          — POST create, PATCH/DELETE by id (journey canvas)
 │   │   ├── touchpoints/     — GET list, POST create, PATCH/DELETE by id (journey canvas)
-│   │   └── touchpoint-connections/ — POST create, DELETE by id (journey canvas)
+│   │   ├── touchpoint-connections/ — POST create, DELETE by id (journey canvas)
+│   │   ├── perspectives/    — GET list, POST create, PATCH/DELETE by id (workspace-scoped)
+│   │   └── annotations/     — GET list (filterable), POST create, PATCH/DELETE by id (perspective annotations)
 │   └── auth/callback/       — OAuth callback route
 ├── components/
 │   ├── ui/                  — button, input, badge, dialog, dropdown-menu, separator, tabs, textarea

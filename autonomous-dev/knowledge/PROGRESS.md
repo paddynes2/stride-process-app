@@ -1402,3 +1402,32 @@
 - Efficiency (wasted actions?): 5 — Minimal research, clean execution, no wasted actions.
 - Proactive observations: 0
 **Notes:** Phase 2b officially started. Migration 012 pushed to remote Supabase. Risk score 3 (schema change) — monitor for next iteration.
+
+## Iteration 50 — 2026-02-26
+**Task:** #FEAT-023 [2/3] Perspectives API routes + client wrappers
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: `src/app/api/v1/perspectives/route.ts` (65 lines — GET list + POST create)
+- Created: `src/app/api/v1/perspectives/[id]/route.ts` (68 lines — PATCH update + DELETE)
+- Created: `src/app/api/v1/annotations/route.ts` (87 lines — GET list + POST create, filterable)
+- Created: `src/app/api/v1/annotations/[id]/route.ts` (68 lines — PATCH update + DELETE)
+- Modified: `src/lib/api/client.ts` (+66 lines — 8 client wrapper functions)
+**Research:** Read teams route.ts pattern (workspace-scoped GET/POST), teams/[id] route.ts pattern (EDITABLE_FIELDS + PATCH/DELETE), stages routes (for secondary pattern), client.ts (full file), response.ts (envelope helpers), database.ts (Perspective/PerspectiveAnnotation types), migration 012 (schema reference).
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 6 pre-existing warnings)
+- Build: pass (all routes)
+- Unit tests: N/A
+- Browser test: skipped (no UI changes — API routes + client wrappers only)
+- Canary test: skipped (no UI changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — All 4 route files follow existing patterns exactly. EDITABLE_FIELDS used for PATCH. Annotations GET supports optional filters.
+- Test coverage of change: 3 — Type check, lint, build pass. No runtime test possible without UI or integration tests.
+- Confidence this won't regress: 5 — Purely additive code. No existing files modified except client.ts (import + new functions appended).
+- Efficiency (wasted actions?): 5 — Clean execution with parallel research agent, no wasted actions.
+- Proactive observations: 0
+**Notes:** Iteration 50 = retrospective trigger. Retrospective analysis completed (see RETROSPECTIVES.md).
