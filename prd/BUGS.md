@@ -30,11 +30,10 @@
 
 ### P2 (Degraded UX)
 
-- [ ] #BUG-015 No rating range validation before DB insert (annotations) — Attempts: 0
+- [x] #BUG-015 No rating range validation before DB insert (annotations) — DONE iteration 61, 2026-02-26
   - **Found:** Iteration 57 (quality audit)
   - **Where:** `src/app/api/v1/annotations/route.ts` POST, `src/app/api/v1/annotations/[id]/route.ts` PATCH
-  - **Impact:** Sending `rating: 99` or `rating: -1` results in DB CHECK constraint failure, surfaced as opaque 500 error. Should return 400 with clear message.
-  - **Fix:** Add `if (rating !== undefined && (rating < 1 || rating > 5)) return errorResponse("validation", "Rating must be between 1 and 5", 400);`
+  - **Fix applied:** Added guard clause in both POST and PATCH: validates `rating` is a number between 1-5, returns 400 with descriptive message if invalid. Prevents DB CHECK constraint from surfacing as opaque 500.
 
 - [ ] #BUG-016 Silent error swallowing on annotation fetch failure — Attempts: 0
   - **Found:** Iteration 57 (quality audit)

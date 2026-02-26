@@ -1,1 +1,1 @@
-CONTINUE: Fix #BUG-015 No rating range validation before DB insert (annotations)
+CONTINUE: Fix #BUG-016 Silent error swallowing on annotation fetch failure

@@ -176,3 +176,27 @@
 - Efficiency (wasted actions?): 5 — minimal research needed, single-file fix
 - Proactive observations: 0
 **Notes:** All P1 bugs (BUG-012, 013, 014) now resolved. Only P2 bugs remain (BUG-015, BUG-016). Accessibility cadence (iter 60) deferred due to Playwright unavailability.
+
+## Iteration 61 — 2026-02-26 23:30
+**Task:** #BUG-015 Add rating range validation (1-5) in annotation POST and PATCH routes
+**Source:** prd/BUGS.md
+**Complexity:** S
+**Result:** completed
+**Changes:** src/app/api/v1/annotations/route.ts, src/app/api/v1/annotations/[id]/route.ts
+**Research:** Skipped (S complexity). Read both route files and migration 012 to confirm DB CHECK constraint range (1-5).
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 errors)
+- Build: pass (all routes compile)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (no UI changes — pure API validation)
+- Canary test: skipped (no UI changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — minimal guard clauses matching existing validation pattern, includes type check for non-numeric values
+- Test coverage of change: 2 — no browser test, verified via type check + lint + build only
+- Confidence this won't regress: 5 — additive guard clauses only, no existing behavior changed for valid inputs
+- Efficiency (wasted actions?): 5 — direct fix, minimal research needed
+- Proactive observations: 0
+**Notes:** Both POST and PATCH now reject non-numeric and out-of-range ratings with 400 before reaching DB. Only BUG-016 remains as P2.
