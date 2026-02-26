@@ -29,11 +29,11 @@
 - [x] #FEAT-021 Comparison view — DONE (3 sub-tasks)
 - [x] #FEAT-022 Journey canvas export (PDF + PNG) — DONE (2 sub-tasks)
 
-## Phase 2b: Perspectives — features DONE, completion testing needed
+## Phase 2b: Perspectives — DONE (features + completion testing complete)
 - [x] #FEAT-023 Perspectives data model + API + management UI — DONE (3 sub-tasks)
 - [x] #FEAT-024 Perspective annotations + canvas indicators — DONE (3 sub-tasks)
 - [x] #FEAT-025 Phase 2b completion testing: regression suite — DONE iteration 56, 2026-02-26
-- [ ] #FEAT-026 Phase 2b completion testing: quality audit — Attempts: 0
+- [x] #FEAT-026 Phase 2b completion testing: quality audit — DONE iteration 57, 2026-02-26
 
 ## Phase 3: Advanced Features — PLANNED
 <!-- Features to be added when Phase 2b completion testing passes -->

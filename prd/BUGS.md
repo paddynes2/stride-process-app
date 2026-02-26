@@ -12,7 +12,37 @@
 <!-- None known -->
 
 ### P1 (Broken features)
-<!-- None known -->
+
+- [ ] #BUG-012 Perspective deletion has no confirmation dialog — Attempts: 0
+  - **Found:** Iteration 57 (quality audit)
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — PerspectiveRow delete handler
+  - **Impact:** Deleting a perspective cascades to ALL its annotations. One accidental click = data loss.
+  - **Steps to reproduce:** Go to Settings → Perspectives → Click delete icon on any perspective → Immediately deleted, no confirmation
+  - **Fix:** Add `if (!confirm("Delete this perspective? All annotations will be permanently removed.")) return;` before `deletePerspective()` call
+
+- [ ] #BUG-013 API routes return success on RLS-denied mutations — Attempts: 0
+  - **Found:** Iteration 57 (quality audit)
+  - **Where:** All perspective + annotation API routes (POST/PATCH/DELETE)
+  - **Impact:** If a user somehow submits a request with a workspace_id they don't own, RLS silently filters the INSERT (0 rows affected). API returns 201/200 but no data persists. Client thinks operation succeeded.
+  - **Fix:** After INSERT/UPDATE/DELETE, check if `data` is null/empty. If so, return 403 with "You don't have permission" error.
+  - **Note:** Low probability in normal usage (UI only shows owned workspaces), but represents a correctness gap.
+
+- [ ] #BUG-014 No `annotatable_type` enum validation in annotation API routes — Attempts: 0
+  - **Found:** Iteration 57 (quality audit)
+  - **Where:** `src/app/api/v1/annotations/route.ts` POST handler
+  - **Impact:** API accepts any string for `annotatable_type` (e.g., "banana"). DB has a PostgreSQL enum constraint, so the INSERT will fail with an opaque 500 error instead of a helpful 400 validation error.
+  - **Fix:** Add validation: `const VALID_TYPES = ["step", "section", "touchpoint", "stage"]; if (!VALID_TYPES.includes(annotatable_type)) return errorResponse("validation", "Invalid annotatable_type", 400);`
 
 ### P2 (Degraded UX)
-<!-- None known -->
+
+- [ ] #BUG-015 No rating range validation before DB insert (annotations) — Attempts: 0
+  - **Found:** Iteration 57 (quality audit)
+  - **Where:** `src/app/api/v1/annotations/route.ts` POST, `src/app/api/v1/annotations/[id]/route.ts` PATCH
+  - **Impact:** Sending `rating: 99` or `rating: -1` results in DB CHECK constraint failure, surfaced as opaque 500 error. Should return 400 with clear message.
+  - **Fix:** Add `if (rating !== undefined && (rating < 1 || rating > 5)) return errorResponse("validation", "Rating must be between 1 and 5", 400);`
+
+- [ ] #BUG-016 Silent error swallowing on annotation fetch failure — Attempts: 0
+  - **Found:** Iteration 57 (quality audit)
+  - **Where:** `src/components/panels/annotation-panel.tsx` line ~63-64
+  - **Impact:** If annotation fetch fails (network error, server error), the `.catch()` block silently sets `loading=false` with no user feedback. User sees empty panel and doesn't know the fetch failed.
+  - **Fix:** Add `toastError("Failed to load annotation")` in the catch block.

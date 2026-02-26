@@ -19,6 +19,9 @@
 - **Polymorphic annotations:** Using `(annotatable_type, annotatable_id)` pairs allows perspectives to work across all entity types without separate junction tables.
 - **Canvas type discrimination:** Single `flow-canvas.tsx` handles both process and journey by switching on `tab.canvas_type`.
 
+- **Supabase RLS silent mutations:** INSERT/UPDATE/DELETE filtered by RLS don't throw errors — they affect 0 rows silently. API routes must check if `data` is null after mutations and return 403 explicitly. Otherwise clients think operations succeeded when they didn't.
+- **Polymorphic FK limitation:** `annotatable_id` in `perspective_annotations` has no FK constraint because it points to different tables depending on `annotatable_type`. Orphaned annotations accumulate when parent entities are deleted. Consider a cleanup trigger or periodic sweep.
+
 ## Meta
 
 - **Pre-existing lint warnings:** 5 warnings in flow-canvas.tsx (unused import, missing hook deps) and sidebar.tsx (unused import). These are known and acceptable.
