@@ -819,3 +819,37 @@
 - Efficiency (wasted actions?): 4 — thorough review but no browser testing possible
 - Proactive observations: 0
 **Notes:** Regression cadence triggered (8 iterations since last at iter 20). All Phase 1.5 changes (a11y fixes, empty states, loading/error states, performance pass) reviewed and verified clean. 5 pre-existing lint warnings noted as potential cleanup items. Next: FEAT-014 (IMPROVEMENTS.md backlog).
+
+## Iteration 29 — 2026-02-26
+**Task:** #FEAT-014 Extract shared maturity constants and canvas export hook (IMP-001 + IMP-002)
+**Source:** prd/FEATURES.md + prd/IMPROVEMENTS.md
+**Complexity:** S
+**Result:** completed
+**Changes:**
+- Created: `src/lib/maturity.ts` (shared MATURITY_COLORS, MATURITY_LABELS, MATURITY_LEVELS, getMaturityColor)
+- Created: `src/hooks/use-canvas-export.ts` (useCanvasExport hook with handleExportPdf/Png)
+- Modified: `src/components/canvas/step-node.tsx` (import from maturity.ts)
+- Modified: `src/components/canvas/section-node.tsx` (import from maturity.ts, removed local getMaturityColor)
+- Modified: `src/components/canvas/flow-canvas.tsx` (import MATURITY_LEVELS for legend)
+- Modified: `src/app/public/[shareId]/public-canvas-view.tsx` (import MATURITY_LEVELS for legend)
+- Modified: `src/components/panels/step-detail-panel.tsx` (import MATURITY_LEVELS, derive MATURITY_OPTIONS)
+- Modified: `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx` (import MATURITY_LABELS)
+- Modified: `src/lib/export/pdf.ts` (import MATURITY_COLORS)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` (use useCanvasExport hook)
+**Research:** Grep found maturity color duplication in 7 files (3 MATURITY_COLORS maps, 3 inline legend arrays, 1 MATURITY_LABELS map). Also found British spelling inconsistency "Optimised" vs "Optimized" in gap-analysis-view.tsx.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing)
+- Build: pass (37 routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean extraction, single source of truth, net -81 lines
+- Test coverage of change: 2 — Static verification only, no browser testing
+- Confidence this won't regress: 5 — Pure refactoring, no behavior change, all imports verified by type checker
+- Efficiency (wasted actions?): 5 — Targeted research → implement → verify, no wasted attempts
+- Proactive observations: 0
+**Notes:** Both IMP-001 and IMP-002 completed in single iteration. Fixed British spelling "Optimised" → "Optimized" in gap-analysis-view.tsx for consistency. Phase 1.5 task 5 of 7 complete. Next: FEAT-015 (responsive sanity check).

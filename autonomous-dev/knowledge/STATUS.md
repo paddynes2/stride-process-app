@@ -6,20 +6,20 @@
 
 ## Handoff
 
-- **Iteration:** 28
+- **Iteration:** 29
 - **Date:** 2026-02-26
 - **Phase:** Phase 1.5 — Ship & Harden
 - **Branch:** ralph/init-stride
-- **Last task:** Regression pass — verify iterations 21-27 (cadence trigger, minimum every 8th)
-- **Result:** completed (0 regressions found)
-- **Next task:** #FEAT-014 Work through IMPROVEMENTS.md backlog (2 items: IMP-001, IMP-002)
+- **Last task:** #FEAT-014 Extract shared maturity constants and canvas export hook (IMP-001 + IMP-002)
+- **Result:** completed
+- **Next task:** #FEAT-015 Responsive sanity check — key flows work on tablet (1024px)
 - **Blockers:** None
 
 ## Context
 
-Regression pass covered all 28 source files changed in iterations 21-27 (a11y fixes, empty states, loading/error states, performance pass). Type check, lint, and build all pass. 5 pre-existing lint warnings remain unchanged (unused imports in page.tsx, flow-canvas.tsx, header.tsx, sidebar.tsx). No regressions found — all changes are additive and well-structured.
+Completed both IMPROVEMENTS.md items in a single iteration. Created `src/lib/maturity.ts` as single source of truth for MATURITY_COLORS, MATURITY_LABELS, MATURITY_LEVELS, getMaturityColor() — replacing duplicated definitions in 7 files. Created `src/hooks/use-canvas-export.ts` extracting PDF/PNG export callbacks from canvas-view.tsx. Net -81 lines. Also fixed British spelling inconsistency ("Optimised" → "Optimized" in gap-analysis-view.tsx).
 
-Phase 1.5 progress: tasks 1-4 of 7 done. Next up is FEAT-014 (IMPROVEMENTS.md backlog — IMP-001 extract export hook, IMP-002 extract MATURITY_COLORS). Both are S-complexity refactoring tasks.
+Phase 1.5 progress: tasks 1-5 of 7 done. Next up is FEAT-015 (responsive sanity check at 1024px) then FEAT-016 (end-to-end golden path test).
 
 ## Dev Server
 
@@ -31,5 +31,4 @@ Phase 1.5 progress: tasks 1-4 of 7 done. Next up is FEAT-014 (IMPROVEMENTS.md ba
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (5 warnings — unused imports in page.tsx, flow-canvas.tsx, header.tsx, sidebar.tsx).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-28).
-- 5 unused imports could be cleaned up: `redirect` in page.tsx, `addEdge` in flow-canvas.tsx, `User` in header.tsx, `Plus` in sidebar.tsx, and a missing deps warning in flow-canvas.tsx useCallback.
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-29).

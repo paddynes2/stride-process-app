@@ -93,7 +93,7 @@ Tasks (in priority order):
 2. [x] Empty states & onboarding — first workspace experience, helpful empty states on canvas/gap/teams/list views, "getting started" guidance — DONE iteration 23
 3. [x] Loading & error states — skeleton loaders on all data-fetching pages, error boundaries, retry affordances — DONE iteration 26
 4. [x] Performance pass — bundle analysis, lazy loading for heavy deps (jspdf, tiptap), image check — DONE iteration 27
-5. [ ] Work through IMPROVEMENTS.md backlog — agent-discovered UX wins from Phase 1 testing
+5. [x] Work through IMPROVEMENTS.md backlog — agent-discovered UX wins from Phase 1 testing — DONE iteration 29
 6. [ ] Responsive sanity check — key flows work on tablet (1024px). Not mobile-first, but not broken.
 7. [ ] End-to-end golden path test — full consultant workflow: create workspace → map process → score maturity → assign roles → export PDF → share link
 
@@ -274,3 +274,4 @@ Tasks:
 - [2026-02-26] Iteration 25: FEAT-012 [2/3] complete (offline banner + retry toasts). OfflineBanner component (useSyncExternalStore), toastError utility with retry action buttons. 23 of 24 toast.error calls updated across 8 files. All 4 acceptance criteria now met. Sub-task [3/3] polish remains.
 - [2026-02-26] Iteration 26: FEAT-012 [3/3] complete (polish + verification). Added loading.tsx for /public/[shareId]. Verified all 7 loading.tsx files, 2 error boundaries, offline banner, toast helpers. FEAT-012 fully DONE. Phase 1.5 task 3 of 7 complete.
 - [2026-02-26] Iteration 27: FEAT-013 complete (performance pass). Lazy-loaded jspdf (420KB) and tiptap/prosemirror (356KB) via dynamic imports. 832KB removed from initial canvas page load. Gap analysis and teams already code-split by App Router. All images < 100KB. Lighthouse criterion deferred (needs browser). Phase 1.5 task 4 of 7 complete.
+- [2026-02-26] Iteration 29: FEAT-014 complete (IMPROVEMENTS.md backlog). Both IMP-001 (export hook extraction) and IMP-002 (maturity constants extraction) done in single iteration. Created `src/lib/maturity.ts` and `src/hooks/use-canvas-export.ts`. Phase 1.5 task 5 of 7 complete.

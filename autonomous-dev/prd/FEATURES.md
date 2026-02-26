@@ -246,12 +246,12 @@
 ### #FEAT-014 IMPROVEMENTS.md backlog
 **Phase:** 1.5
 **Priority:** P2 (nice to have)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done — DONE iteration 29, 2026-02-26
 **Acceptance criteria:**
-- [ ] All items in IMPROVEMENTS.md are either implemented, moved to FEATURES.md, or documented as won't-do with reason
-- [ ] Fewer than 3 items remain in IMPROVEMENTS.md
-**Notes:** Work through whatever the agent discovered during Phase 1. These are UX polish items, not features.
+- [x] All items in IMPROVEMENTS.md are either implemented, moved to FEATURES.md, or documented as won't-do with reason
+- [x] Fewer than 3 items remain in IMPROVEMENTS.md (0 items remain — both IMP-001 and IMP-002 done)
+**Notes:** IMP-001: Extracted export logic to `src/hooks/use-canvas-export.ts`. IMP-002: Extracted maturity constants to `src/lib/maturity.ts` (replaced duplication in 7 files).
 
 ### #FEAT-015 Responsive sanity check
 **Phase:** 1.5

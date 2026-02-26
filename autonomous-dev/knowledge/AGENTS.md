@@ -200,8 +200,10 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 
 ## Key Files
 
-<!-- Updated: iter-25, 2026-02-26 -->
+<!-- Updated: iter-29, 2026-02-26 -->
 
+- `src/lib/maturity.ts` — Shared maturity constants (MATURITY_COLORS, MATURITY_LABELS, MATURITY_LEVELS, getMaturityColor)
+- `src/hooks/use-canvas-export.ts` — Canvas export hook (handleExportPdf, handleExportPng with dynamic imports)
 - `src/app/(app)/w/[workspaceId]/workspace-shell.tsx` — Main workspace client layout (sidebar, header, tab bar)
 - `src/components/canvas/flow-canvas.tsx` — React Flow canvas with custom nodes
 - `src/components/canvas/step-node.tsx` — Custom step node rendering
