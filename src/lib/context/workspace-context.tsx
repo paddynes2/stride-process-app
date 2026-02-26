@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import type { User, Organization, Workspace, Tab } from "@/types/database";
+import type { User, Organization, Workspace, Tab, Perspective } from "@/types/database";
+import { fetchPerspectives } from "@/lib/api/client";
 
 interface WorkspaceContextValue {
   user: User;
@@ -12,6 +13,10 @@ interface WorkspaceContextValue {
   activeTabId: string | null;
   setActiveTabId: (id: string) => void;
   refreshTabs: () => Promise<void>;
+  perspectives: Perspective[];
+  activePerspective: Perspective | null;
+  setActivePerspectiveId: (id: string | null) => void;
+  refreshPerspectives: () => Promise<void>;
 }
 
 const WorkspaceContext = React.createContext<WorkspaceContextValue | null>(null);
@@ -29,6 +34,7 @@ interface WorkspaceProviderProps {
   workspaces: Workspace[];
   initialTabs: Tab[];
   initialTabId: string | null;
+  initialPerspectives: Perspective[];
   children: React.ReactNode;
 }
 
@@ -39,10 +45,18 @@ export function WorkspaceProvider({
   workspaces,
   initialTabs,
   initialTabId,
+  initialPerspectives,
   children,
 }: WorkspaceProviderProps) {
   const [tabs, setTabs] = React.useState<Tab[]>(initialTabs);
   const [activeTabId, setActiveTabId] = React.useState<string | null>(initialTabId);
+  const [perspectives, setPerspectives] = React.useState<Perspective[]>(initialPerspectives);
+  const [activePerspectiveId, setActivePerspectiveId] = React.useState<string | null>(null);
+
+  const activePerspective = React.useMemo(
+    () => perspectives.find((p) => p.id === activePerspectiveId) ?? null,
+    [perspectives, activePerspectiveId]
+  );
 
   const refreshTabs = React.useCallback(async () => {
     const res = await fetch(`/api/v1/workspaces/${workspace.id}`);
@@ -50,6 +64,15 @@ export function WorkspaceProvider({
     const json = await res.json();
     if (json.data?.tabs) {
       setTabs(json.data.tabs);
+    }
+  }, [workspace.id]);
+
+  const refreshPerspectives = React.useCallback(async () => {
+    try {
+      const data = await fetchPerspectives(workspace.id);
+      setPerspectives(data);
+    } catch {
+      // Silently fail — perspectives will refresh on navigation
     }
   }, [workspace.id]);
 
@@ -64,6 +87,10 @@ export function WorkspaceProvider({
         activeTabId,
         setActiveTabId,
         refreshTabs,
+        perspectives,
+        activePerspective,
+        setActivePerspectiveId,
+        refreshPerspectives,
       }}
     >
       {children}

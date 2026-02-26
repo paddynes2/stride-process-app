@@ -55,6 +55,13 @@ export default async function WorkspaceLayout({
     .eq("workspace_id", workspaceId)
     .order("position");
 
+  // Fetch perspectives
+  const { data: perspectives } = await supabase
+    .from("perspectives")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .order("created_at");
+
   return (
     <WorkspaceShell
       user={profile ?? { id: user.id, email: user.email ?? "", name: null, avatar_url: null, settings: {}, created_at: "", updated_at: "" }}
@@ -62,6 +69,7 @@ export default async function WorkspaceLayout({
       workspace={workspace}
       workspaces={workspaces ?? []}
       tabs={tabs ?? []}
+      perspectives={perspectives ?? []}
     >
       {children}
     </WorkspaceShell>

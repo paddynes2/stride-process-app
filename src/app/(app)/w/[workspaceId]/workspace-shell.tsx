@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { TabBar } from "@/components/layout/tab-bar";
 import { WorkspaceProvider } from "@/lib/context/workspace-context";
-import type { User, Organization, Workspace, Tab } from "@/types/database";
+import type { User, Organization, Workspace, Tab, Perspective } from "@/types/database";
 
 interface WorkspaceShellProps {
   user: User;
@@ -14,6 +14,7 @@ interface WorkspaceShellProps {
   workspace: Workspace;
   workspaces: Workspace[];
   tabs: Tab[];
+  perspectives: Perspective[];
   children: React.ReactNode;
 }
 
@@ -23,6 +24,7 @@ export function WorkspaceShell({
   workspace,
   workspaces,
   tabs: initialTabs,
+  perspectives,
   children,
 }: WorkspaceShellProps) {
   const router = useRouter();
@@ -77,6 +79,7 @@ export function WorkspaceShell({
       workspaces={workspaces}
       initialTabs={tabs}
       initialTabId={activeTabId}
+      initialPerspectives={perspectives}
     >
       <div className="flex h-screen overflow-hidden bg-[var(--bg-app)]">
         <Sidebar
