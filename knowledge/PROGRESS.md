@@ -313,3 +313,34 @@
 - Efficiency (wasted actions?): 5 — minimal research needed, clean implementation
 - Proactive observations: 0
 **Notes:** People page uses the same fetchTeams pattern as teams page and flattens the hierarchy. No new API routes needed. Risk score for next iteration: touched 3 files, no shared components/auth/migrations = 0.
+
+## Iteration 66 — 2026-02-26 21:30
+**Task:** #FEAT-030 [1/2] Tools data model + API routes + client functions
+**Source:** prd/FEATURES.md
+**Complexity:** L (decomposed — sub-task 1 of 2)
+**Result:** completed
+**Changes:**
+- `supabase/migrations/013_tools.sql` — new migration (tools table, RLS, indexes, updated_at trigger)
+- `src/types/database.ts` — added Tool interface
+- `src/app/api/v1/tools/route.ts` — GET list + POST create
+- `src/app/api/v1/tools/[id]/route.ts` — PATCH update + DELETE
+- `src/lib/api/client.ts` — added fetchTools, createTool, updateTool, deleteTool + Tool import
+**Research:** Read teams API routes (pattern reference), 008_teams_roles_people.sql (migration pattern), database.ts types, client.ts API helpers, sidebar stub badge. Confirmed tools table doesn't exist, no prior Tool type.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 new)
+- Build: pass (tools routes visible in build output)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (backend-only changes, no UI)
+- Canary test: skipped (no UI changes)
+- API probe: tools endpoint returns 401 for unauthenticated requests ✓
+- Supabase migration: pushed successfully ✓
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — follows teams pattern exactly, proper auth guards, input validation, RLS policies
+- Test coverage of change: 3 — type check + lint + build + API probe, but no integration test with auth
+- Confidence this won't regress: 5 — purely additive (new table, new routes, new type), no existing behavior changed
+- Efficiency (wasted actions?): 5 — clean execution, no wasted actions
+- Proactive observations: 0
+**Notes:** Decomposed #FEAT-030 into [1/2] data layer (this iteration) and [2/2] UI (next iteration). Risk score for next iteration: touched schema/migration (+3), >5 files (+0, was exactly 5), no shared components = 3. Next iteration should prioritize the UI sub-task, not regression (risk 3 triggers regression the iteration AFTER next).

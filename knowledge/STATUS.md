@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 65
-- **Date:** 2026-02-26 21:00
+- **Iteration:** 66
+- **Date:** 2026-02-26 21:30
 - **Phase:** Phase 3: Advanced Features
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-029 People page — flesh out stub with full CRUD UI
+- **Last task:** #FEAT-030 [1/2] Tools data model + API routes + client functions
 - **Result:** completed
-- **Next task:** Continue Phase 3 features — next candidates: #FEAT-028 Search & filtering, #FEAT-030 Tools page, or #IMP-001 Color validation (quick win)
+- **Next task:** #FEAT-030 [2/2] Tools page UI (flesh out stub with CRUD view, remove sidebar stub badge)
 - **Blockers:** None
 
 ## Context
 
-Replaced the People stub page with a fully functional CRUD view. Server component fetches teams with roles and people from Supabase (same query pattern as teams page). Client component `people-view.tsx` flattens the hierarchy into a sortable table showing name, email, role, and team for each person. Inline editing for name/email, delete with confirmation, and an "Add Person" button with a role picker dropdown. Summary cards show total people/roles/teams. Sidebar "Soon" badge removed. Follows teams-view.tsx patterns exactly.
+Created tools data layer: migration 013_tools.sql with table, RLS policies, index, and updated_at trigger (already pushed to Supabase). Added Tool interface to database.ts. Created /api/v1/tools (GET + POST) and /api/v1/tools/[id] (PATCH + DELETE) following teams API pattern exactly. Added fetchTools, createTool, updateTool, deleteTool to client.ts. The stub UI at `/w/[workspaceId]/tools/page.tsx` still shows placeholder text — next iteration replaces it with full CRUD view following teams-view.tsx / people-view.tsx patterns.
 
 ## Dev Server
 

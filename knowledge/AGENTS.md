@@ -61,6 +61,7 @@ npx supabase db push     # Push migrations
 - `teams/route.ts` + `[id]/route.ts` — CRUD
 - `roles/route.ts` + `[id]/route.ts` — CRUD
 - `people/route.ts` + `[id]/route.ts` — CRUD
+- `tools/route.ts` + `[id]/route.ts` — CRUD (GET list, POST create, PATCH, DELETE)
 - `step-roles/route.ts` + `[id]/route.ts` — POST, GET, DELETE
 - `shares/route.ts` + `[id]/route.ts` — CRUD
 - `perspectives/route.ts` + `[id]/route.ts` — CRUD
@@ -120,6 +121,7 @@ npx supabase db push     # Push migrations
 | 010 | Public shares table |
 | 011 | Journey canvas (canvas_type, stages, touchpoints, touchpoint_connections) |
 | 012 | Perspectives + perspective_annotations |
+| 013 | Tools table + RLS policies |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->
