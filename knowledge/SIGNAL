@@ -1,1 +1,1 @@
-CONTINUE: #FEAT-026 Phase 2b completion testing: quality audit
+CONTINUE: Fix #BUG-013 API routes return success on RLS-denied mutations

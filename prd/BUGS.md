@@ -13,12 +13,10 @@
 
 ### P1 (Broken features)
 
-- [ ] #BUG-012 Perspective deletion has no confirmation dialog — Attempts: 0
+- [x] #BUG-012 Perspective deletion has no confirmation dialog — DONE iteration 58, 2026-02-26
   - **Found:** Iteration 57 (quality audit)
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — PerspectiveRow delete handler
-  - **Impact:** Deleting a perspective cascades to ALL its annotations. One accidental click = data loss.
-  - **Steps to reproduce:** Go to Settings → Perspectives → Click delete icon on any perspective → Immediately deleted, no confirmation
-  - **Fix:** Add `if (!confirm("Delete this perspective? All annotations will be permanently removed.")) return;` before `deletePerspective()` call
+  - **Fix applied:** Added `confirm()` guard before `deletePerspective()` call in `handleDelete` (line 282)
 
 - [ ] #BUG-013 API routes return success on RLS-denied mutations — Attempts: 0
   - **Found:** Iteration 57 (quality audit)

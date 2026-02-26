@@ -279,6 +279,7 @@ function PerspectivesSection({ workspaceId, perspectives, setPerspectives, loadi
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm("Delete this perspective? All annotations will be permanently removed.")) return;
     try {
       await deletePerspective(id);
       setPerspectives((prev) => prev.filter((p) => p.id !== id));
