@@ -39,7 +39,7 @@ const NAV_ITEMS = [
   { label: "Compare", icon: Split, href: "/compare" },
   { label: "Teams", icon: Users, href: "/teams" },
   { label: "People", icon: User, href: "/people" },
-  { label: "Tools", icon: Wrench, href: "/tools", stub: true },
+  { label: "Tools", icon: Wrench, href: "/tools" },
   { label: "Settings", icon: Settings, href: "/settings" },
 ];
 
@@ -99,14 +99,7 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
               )}
             >
               <item.icon className={cn("h-4 w-4 shrink-0", isActive && "text-[var(--brand)]")} />
-              {!collapsed && (
-                <>
-                  <span>{item.label}</span>
-                  {item.stub && (
-                    <span className="ml-auto text-[9px] font-medium text-[var(--text-quaternary)] uppercase">Soon</span>
-                  )}
-                </>
-              )}
+              {!collapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
