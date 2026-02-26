@@ -202,18 +202,7 @@ export async function exportWorkspacePdf({
       { label: "Hrs/mo", width: 22 },
     ];
 
-    pdf.setFillColor(20, 20, 21);
-    pdf.rect(margin, y, contentWidth, 7, "F");
-
-    let colX = margin + 2;
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7);
-    pdf.setTextColor(255, 255, 255, 76);
-    for (const col of cols) {
-      pdf.text(col.label.toUpperCase(), colX, y + 4.5);
-      colX += col.width;
-    }
-    y += 7;
+    y = drawTableHeader(pdf, cols, margin, contentWidth, y);
 
     // Sort steps by section, then name
     const sortedSteps = [...steps].sort((a, b) => {
@@ -230,10 +219,7 @@ export async function exportWorkspacePdf({
       const step = sortedSteps[rowIndex];
 
       if (y > pageHeight - margin - 5) {
-        pdf.addPage("a4", "landscape");
-        y = margin;
-        pdf.setFillColor(10, 10, 11);
-        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+        y = newTablePage(pdf, "Step Details", cols, margin, contentWidth, pageWidth, pageHeight);
       }
 
       // Alternate row background
@@ -242,7 +228,7 @@ export async function exportWorkspacePdf({
         pdf.rect(margin, y - 1, contentWidth, 6, "F");
       }
 
-      colX = margin + 2;
+      let colX = margin + 2;
       pdf.setTextColor(255, 255, 255);
       pdf.text(truncate(step.name, 35), colX, y + 3);
       colX += cols[0].width;
@@ -384,18 +370,7 @@ export async function exportWorkspacePdf({
       { label: "", width: contentWidth - 70 - 60 - 30 - 30 - 25 }, // bar area
     ];
 
-    pdf.setFillColor(20, 20, 21);
-    pdf.rect(margin, y, contentWidth, 7, "F");
-
-    let colX = margin + 2;
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7);
-    pdf.setTextColor(255, 255, 255, 76);
-    for (const col of gapCols) {
-      if (col.label) pdf.text(col.label.toUpperCase(), colX, y + 4.5);
-      colX += col.width;
-    }
-    y += 7;
+    y = drawTableHeader(pdf, gapCols, margin, contentWidth, y);
 
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(7);
@@ -404,10 +379,7 @@ export async function exportWorkspacePdf({
       const step = gapSteps[rowIndex];
 
       if (y > pageHeight - margin - 5) {
-        pdf.addPage("a4", "landscape");
-        y = margin;
-        pdf.setFillColor(10, 10, 11);
-        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+        y = newTablePage(pdf, "Gap Analysis", gapCols, margin, contentWidth, pageWidth, pageHeight);
       }
 
       if (rowIndex % 2 === 0) {
@@ -415,7 +387,7 @@ export async function exportWorkspacePdf({
         pdf.rect(margin, y - 1, contentWidth, 6, "F");
       }
 
-      colX = margin + 2;
+      let colX = margin + 2;
 
       // Step name
       pdf.setTextColor(255, 255, 255);
@@ -544,18 +516,7 @@ export async function exportWorkspacePdf({
         { label: "", width: contentWidth - 80 - 30 - 40 - 50 }, // bar area
       ];
 
-      pdf.setFillColor(20, 20, 21);
-      pdf.rect(margin, y, contentWidth, 7, "F");
-
-      let colX = margin + 2;
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(7);
-      pdf.setTextColor(255, 255, 255, 76);
-      for (const col of costCols) {
-        if (col.label) pdf.text(col.label.toUpperCase(), colX, y + 4.5);
-        colX += col.width;
-      }
-      y += 7;
+      y = drawTableHeader(pdf, costCols, margin, contentWidth, y);
 
       // Sort sections by cost descending (or hours if no cost)
       const sortedSectionCosts = [...sectionCosts].sort((a, b) => {
@@ -572,10 +533,7 @@ export async function exportWorkspacePdf({
         const sec = sortedSectionCosts[rowIndex];
 
         if (y > pageHeight - margin - 5) {
-          pdf.addPage("a4", "landscape");
-          y = margin;
-          pdf.setFillColor(10, 10, 11);
-          pdf.rect(0, 0, pageWidth, pageHeight, "F");
+          y = newTablePage(pdf, "Cost Summary — By Section", costCols, margin, contentWidth, pageWidth, pageHeight);
         }
 
         if (rowIndex % 2 === 0) {
@@ -583,7 +541,7 @@ export async function exportWorkspacePdf({
           pdf.rect(margin, y - 1, contentWidth, 6, "F");
         }
 
-        colX = margin + 2;
+        let colX = margin + 2;
 
         pdf.setTextColor(255, 255, 255);
         pdf.text(truncate(sec.name, 45), colX, y + 3);
@@ -649,10 +607,6 @@ export async function exportWorkspacePdf({
       pdf.text("Top 5 Costliest Steps", margin, y);
       y += 6;
 
-      pdf.setFillColor(20, 20, 21);
-      pdf.rect(margin, y, contentWidth, 7, "F");
-
-      let colX = margin + 2;
       const topCols = [
         { label: "Step", width: 80 },
         { label: "Section", width: 60 },
@@ -660,14 +614,7 @@ export async function exportWorkspacePdf({
         { label: "Cost/month", width: 50 },
       ];
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(7);
-      pdf.setTextColor(255, 255, 255, 76);
-      for (const col of topCols) {
-        pdf.text(col.label.toUpperCase(), colX, y + 4.5);
-        colX += col.width;
-      }
-      y += 7;
+      y = drawTableHeader(pdf, topCols, margin, contentWidth, y);
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(7);
@@ -680,7 +627,7 @@ export async function exportWorkspacePdf({
           pdf.rect(margin, y - 1, contentWidth, 6, "F");
         }
 
-        colX = margin + 2;
+        let colX = margin + 2;
 
         pdf.setTextColor(255, 255, 255);
         pdf.text(truncate(sc.name, 45), colX, y + 3);
@@ -754,6 +701,52 @@ function getGapColor(gap: number): string {
   if (gap <= 0) return GAP_COLORS[0];
   if (gap >= 5) return GAP_COLORS[5];
   return GAP_COLORS[gap] ?? GAP_COLORS[3];
+}
+
+function drawTableHeader(
+  pdf: jsPDF,
+  cols: { label: string; width: number }[],
+  margin: number,
+  contentWidth: number,
+  y: number,
+): number {
+  pdf.setFillColor(20, 20, 21);
+  pdf.rect(margin, y, contentWidth, 7, "F");
+  let hX = margin + 2;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(7);
+  pdf.setTextColor(255, 255, 255, 76);
+  for (const col of cols) {
+    if (col.label) pdf.text(col.label.toUpperCase(), hX, y + 4.5);
+    hX += col.width;
+  }
+  return y + 7;
+}
+
+function newTablePage(
+  pdf: jsPDF,
+  title: string,
+  cols: { label: string; width: number }[],
+  margin: number,
+  contentWidth: number,
+  pageWidth: number,
+  pageHeight: number,
+): number {
+  pdf.addPage("a4", "landscape");
+  let y = margin;
+  pdf.setFillColor(10, 10, 11);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.setTextColor(255, 255, 255, 100);
+  pdf.text(`${title} (continued)`, margin, y);
+  y += 5;
+
+  y = drawTableHeader(pdf, cols, margin, contentWidth, y);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7);
+  return y;
 }
 
 function truncate(str: string, maxLen: number): string {
