@@ -37,6 +37,9 @@ export async function PATCH(
     .single();
 
   if (error) {
+    if (error.code === "PGRST116") {
+      return errorResponse("not_found", "Perspective not found or not accessible", 404);
+    }
     return errorResponse("update_failed", error.message, 500);
   }
 
@@ -58,9 +61,14 @@ export async function DELETE(
   const { error } = await supabase
     .from("perspectives")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .select()
+    .single();
 
   if (error) {
+    if (error.code === "PGRST116") {
+      return errorResponse("not_found", "Perspective not found or not accessible", 404);
+    }
     return errorResponse("delete_failed", error.message, 500);
   }
 

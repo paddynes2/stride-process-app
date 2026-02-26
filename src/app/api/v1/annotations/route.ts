@@ -80,7 +80,14 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
+    if (error.code === "PGRST116") {
+      return errorResponse("forbidden", "Permission denied", 403);
+    }
     return errorResponse("create_failed", error.message, 500);
+  }
+
+  if (!annotation) {
+    return errorResponse("forbidden", "Permission denied", 403);
   }
 
   return successResponse(annotation, 201);
