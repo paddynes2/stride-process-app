@@ -24,13 +24,13 @@ const EXECUTOR_ICONS: Record<string, string> = {
 
 export function StepNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as StepNodeData;
-  const { step, heatMapMode } = nodeData;
+  const { step, heatMapMode, annotationColor } = nodeData;
   const maturityColor = step.maturity_score != null ? MATURITY_COLORS[step.maturity_score] ?? MATURITY_FALLBACK_COLOR : null;
 
   return (
     <div
       className={cn(
-        "px-3 py-2.5 rounded-[var(--radius-md)] border min-w-[180px] max-w-[240px]",
+        "relative px-3 py-2.5 rounded-[var(--radius-md)] border min-w-[180px] max-w-[240px]",
         "shadow-[var(--shadow-sm)]",
         "transition-all duration-[var(--duration-fast)]",
         "hover:shadow-[var(--shadow-md)] hover:border-[var(--border-default)]",
@@ -44,6 +44,15 @@ export function StepNode({ data, selected }: NodeProps) {
           : { backgroundColor: "var(--bg-surface)" }
       }
     >
+      {/* Perspective annotation indicator */}
+      {annotationColor && (
+        <div
+          className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-[var(--bg-surface)]"
+          style={{ backgroundColor: annotationColor }}
+          title="Has perspective annotation"
+        />
+      )}
+
       {/* Handles */}
       <Handle
         type="target"

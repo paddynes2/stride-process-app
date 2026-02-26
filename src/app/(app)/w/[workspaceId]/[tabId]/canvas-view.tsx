@@ -8,6 +8,7 @@ import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-pan
 import { AnnotationPanel } from "@/components/panels/annotation-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
+import { fetchAnnotations } from "@/lib/api/client";
 import type { Section, Step, Connection } from "@/types/database";
 
 interface CanvasViewProps {
@@ -93,6 +94,25 @@ export function CanvasView({
     connections,
   });
 
+  // Fetch annotated element IDs for the active perspective
+  const [annotatedIds, setAnnotatedIds] = React.useState<Set<string>>(new Set());
+  const refreshAnnotatedIds = React.useCallback(() => {
+    if (!activePerspective) return;
+    fetchAnnotations(activePerspective.id)
+      .then((annotations) => {
+        setAnnotatedIds(new Set(annotations.map((a) => a.annotatable_id)));
+      })
+      .catch(() => {});
+  }, [activePerspective]);
+
+  React.useEffect(() => {
+    if (!activePerspective) {
+      setAnnotatedIds(new Set());
+      return;
+    }
+    refreshAnnotatedIds();
+  }, [activePerspective, refreshAnnotatedIds]);
+
   return (
     <div className="flex h-full">
       {/* Canvas */}
@@ -105,6 +125,8 @@ export function CanvasView({
           connections={connections}
           selectedStepId={selectedStepId}
           selectedSectionId={selectedSectionId}
+          annotatedIds={activePerspective ? annotatedIds : undefined}
+          annotationColor={activePerspective?.color}
           onStepSelect={handleStepSelect}
           onSectionSelect={handleSectionSelect}
           onStepCreate={handleStepCreate}
@@ -159,6 +181,7 @@ export function CanvasView({
             perspectiveColor={activePerspective.color}
             annotatableType="step"
             annotatableId={selectedStep.id}
+            onAnnotationChange={refreshAnnotatedIds}
           />
         )}
         {activePerspective && selectedSection && !selectedStep && (
@@ -168,6 +191,7 @@ export function CanvasView({
             perspectiveColor={activePerspective.color}
             annotatableType="section"
             annotatableId={selectedSection.id}
+            onAnnotationChange={refreshAnnotatedIds}
           />
         )}
       </div>

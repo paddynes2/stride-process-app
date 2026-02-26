@@ -8,7 +8,7 @@ import { getMaturityColor } from "@/lib/maturity";
 
 export function SectionNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as SectionNodeData;
-  const { section, averageMaturity, averageTargetMaturity, heatMapMode } = nodeData;
+  const { section, averageMaturity, averageTargetMaturity, heatMapMode, annotationColor } = nodeData;
   const maturityColor = getMaturityColor(averageMaturity);
 
   return (
@@ -22,7 +22,7 @@ export function SectionNode({ data, selected }: NodeProps) {
       />
       <div
         className={cn(
-          "w-full h-full rounded-[var(--radius-lg)] border p-3",
+          "relative w-full h-full rounded-[var(--radius-lg)] border p-3",
           "transition-all duration-[var(--duration-fast)]",
           selected
             ? "border-[var(--accent-blue)]"
@@ -39,6 +39,15 @@ export function SectionNode({ data, selected }: NodeProps) {
               }
         }
       >
+        {/* Perspective annotation indicator */}
+        {annotationColor && (
+          <div
+            className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full border-2 border-[var(--bg-app)]"
+            style={{ backgroundColor: annotationColor }}
+            title="Has perspective annotation"
+          />
+        )}
+
         {/* Section label */}
         <div className="flex items-center gap-2 mb-2">
           <span

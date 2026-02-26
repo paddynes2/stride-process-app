@@ -30,6 +30,7 @@ interface AnnotationPanelProps {
   perspectiveColor: string;
   annotatableType: AnnotatableType;
   annotatableId: string;
+  onAnnotationChange?: () => void;
 }
 
 export function AnnotationPanel({
@@ -38,6 +39,7 @@ export function AnnotationPanel({
   perspectiveColor,
   annotatableType,
   annotatableId,
+  onAnnotationChange,
 }: AnnotationPanelProps) {
   const [annotation, setAnnotation] = React.useState<PerspectiveAnnotation | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -88,6 +90,7 @@ export function AnnotationPanel({
             content: html,
           });
           setAnnotation(created);
+          onAnnotationChange?.();
         }
       } catch (err) {
         toastError("Failed to save annotation", { error: err });
@@ -109,6 +112,7 @@ export function AnnotationPanel({
           rating: newRating ?? undefined,
         });
         setAnnotation(created);
+        onAnnotationChange?.();
       }
     } catch (err) {
       toastError("Failed to save rating", { error: err });
@@ -121,6 +125,7 @@ export function AnnotationPanel({
       await apiDeleteAnnotation(annotation.id);
       setAnnotation(null);
       toast.success("Annotation removed");
+      onAnnotationChange?.();
     } catch (err) {
       toastError("Failed to delete annotation", { error: err });
     }

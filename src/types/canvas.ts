@@ -6,6 +6,7 @@ export interface StepNodeData extends Record<string, unknown> {
   step: Step;
   selected?: boolean;
   heatMapMode?: boolean;
+  annotationColor?: string | null;
 }
 
 export interface SectionNodeData extends Record<string, unknown> {
@@ -13,6 +14,7 @@ export interface SectionNodeData extends Record<string, unknown> {
   averageMaturity: number | null;
   averageTargetMaturity: number | null;
   heatMapMode?: boolean;
+  annotationColor?: string | null;
 }
 
 export type StepNode = Node<StepNodeData, "step">;
@@ -25,12 +27,14 @@ export interface StageNodeData extends Record<string, unknown> {
   stage: Stage;
   averagePainScore: number | null;
   heatMapMode?: boolean;
+  annotationColor?: string | null;
 }
 
 export interface TouchpointNodeData extends Record<string, unknown> {
   touchpoint: Touchpoint;
   selected?: boolean;
   heatMapMode?: boolean;
+  annotationColor?: string | null;
 }
 
 export type StageNode = Node<StageNodeData, "stage">;

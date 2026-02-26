@@ -37,6 +37,7 @@ import {
   deleteTouchpoint,
   createTouchpointConnection,
   deleteTouchpointConnection,
+  fetchAnnotations,
 } from "@/lib/api/client";
 import type { Stage, Touchpoint, TouchpointConnection } from "@/types/database";
 import type { StageNodeData, TouchpointNodeData } from "@/types/canvas";
@@ -69,13 +70,15 @@ function buildJourneyNodes(
   touchpoints: Touchpoint[],
   selectedStageId: string | null,
   selectedTouchpointId: string | null,
-  heatMapMode: boolean
+  heatMapMode: boolean,
+  annotatedIds?: Set<string>,
+  annotationColor?: string | null
 ): Node[] {
   const stageNodes: Node<StageNodeData>[] = (stages ?? []).filter(Boolean).map((stage) => ({
     id: `stage-${stage.id}`,
     type: "stage",
     position: { x: stage.position_x, y: stage.position_y },
-    data: { stage, averagePainScore: computeStagePainScore(stage.id, touchpoints), heatMapMode },
+    data: { stage, averagePainScore: computeStagePainScore(stage.id, touchpoints), heatMapMode, annotationColor: annotatedIds?.has(stage.id) ? annotationColor : null },
     style: { width: stage.width, height: stage.height },
     selected: stage.id === selectedStageId,
   }));
@@ -84,7 +87,7 @@ function buildJourneyNodes(
     id: `tp-${tp.id}`,
     type: "touchpoint",
     position: { x: tp.position_x, y: tp.position_y },
-    data: { touchpoint: tp, selected: tp.id === selectedTouchpointId, heatMapMode },
+    data: { touchpoint: tp, selected: tp.id === selectedTouchpointId, heatMapMode, annotationColor: annotatedIds?.has(tp.id) ? annotationColor : null },
     parentId: tp.stage_id ? `stage-${tp.stage_id}` : undefined,
     extent: tp.stage_id ? "parent" as const : undefined,
     selected: tp.id === selectedTouchpointId,
@@ -157,6 +160,25 @@ export function JourneyCanvasView({
   const [exporting, setExporting] = React.useState(false);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
+  // Fetch annotated element IDs for the active perspective
+  const [annotatedIds, setAnnotatedIds] = React.useState<Set<string>>(new Set());
+  const refreshAnnotatedIds = React.useCallback(() => {
+    if (!activePerspective) return;
+    fetchAnnotations(activePerspective.id)
+      .then((annotations) => {
+        setAnnotatedIds(new Set(annotations.map((a) => a.annotatable_id)));
+      })
+      .catch(() => {});
+  }, [activePerspective]);
+
+  React.useEffect(() => {
+    if (!activePerspective) {
+      setAnnotatedIds(new Set());
+      return;
+    }
+    refreshAnnotatedIds();
+  }, [activePerspective, refreshAnnotatedIds]);
+
   const handleExportPdf = React.useCallback(async () => {
     if (!wrapperRef.current || exporting) return;
     setExporting(true);
@@ -178,9 +200,12 @@ export function JourneyCanvasView({
     }
   }, [workspaceName, tabName, stages, touchpoints, connections, exporting]);
 
+  const journeyAnnotatedIds = activePerspective ? annotatedIds : undefined;
+  const journeyAnnotationColor = activePerspective?.color;
+
   const initialNodes = React.useMemo(
-    () => buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode),
-    [stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode]
+    () => buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode, journeyAnnotatedIds, journeyAnnotationColor),
+    [stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode, journeyAnnotatedIds, journeyAnnotationColor]
   );
   const initialEdges = React.useMemo(() => buildJourneyEdges(connections), [connections]);
 
@@ -189,8 +214,8 @@ export function JourneyCanvasView({
 
   // Sync external state → React Flow state
   React.useEffect(() => {
-    setNodes(buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode));
-  }, [stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode, setNodes]);
+    setNodes(buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode, journeyAnnotatedIds, journeyAnnotationColor));
+  }, [stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode, journeyAnnotatedIds, journeyAnnotationColor, setNodes]);
 
   React.useEffect(() => {
     setEdges(buildJourneyEdges(connections));
@@ -574,6 +599,7 @@ export function JourneyCanvasView({
             perspectiveColor={activePerspective.color}
             annotatableType="stage"
             annotatableId={selectedStage.id}
+            onAnnotationChange={refreshAnnotatedIds}
           />
         )}
         {activePerspective && selectedTouchpoint && !selectedStage && (
@@ -583,6 +609,7 @@ export function JourneyCanvasView({
             perspectiveColor={activePerspective.color}
             annotatableType="touchpoint"
             annotatableId={selectedTouchpoint.id}
+            onAnnotationChange={refreshAnnotatedIds}
           />
         )}
       </div>

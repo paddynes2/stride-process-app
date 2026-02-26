@@ -51,6 +51,8 @@ interface FlowCanvasProps {
   connections: Connection[];
   selectedStepId: string | null;
   selectedSectionId: string | null;
+  annotatedIds?: Set<string>;
+  annotationColor?: string | null;
   onStepSelect: (id: string | null) => void;
   onSectionSelect: (id: string | null) => void;
   onStepCreate: (step: Step) => void;
@@ -78,14 +80,14 @@ function computeSectionMaturity(sectionId: string, steps: Step[]): { avg: number
   return { avg, avgTarget };
 }
 
-function buildNodes(sections: Section[], steps: Step[], selectedStepId: string | null, selectedSectionId: string | null, heatMapMode: boolean): Node[] {
+function buildNodes(sections: Section[], steps: Step[], selectedStepId: string | null, selectedSectionId: string | null, heatMapMode: boolean, annotatedIds?: Set<string>, annotationColor?: string | null): Node[] {
   const sectionNodes: Node<SectionNodeData>[] = (sections ?? []).filter(Boolean).map((section) => {
     const { avg, avgTarget } = computeSectionMaturity(section.id, steps);
     return {
       id: `section-${section.id}`,
       type: "section",
       position: { x: section.position_x, y: section.position_y },
-      data: { section, averageMaturity: avg, averageTargetMaturity: avgTarget, heatMapMode },
+      data: { section, averageMaturity: avg, averageTargetMaturity: avgTarget, heatMapMode, annotationColor: annotatedIds?.has(section.id) ? annotationColor : null },
       style: { width: section.width, height: section.height },
       selected: section.id === selectedSectionId,
     };
@@ -95,7 +97,7 @@ function buildNodes(sections: Section[], steps: Step[], selectedStepId: string |
     id: `step-${step.id}`,
     type: "step",
     position: { x: step.position_x, y: step.position_y },
-    data: { step, selected: step.id === selectedStepId, heatMapMode },
+    data: { step, selected: step.id === selectedStepId, heatMapMode, annotationColor: annotatedIds?.has(step.id) ? annotationColor : null },
     parentId: step.section_id ? `section-${step.section_id}` : undefined,
     extent: step.section_id ? "parent" as const : undefined,
     selected: step.id === selectedStepId,
@@ -169,6 +171,8 @@ export function FlowCanvas({
   connections,
   selectedStepId,
   selectedSectionId,
+  annotatedIds,
+  annotationColor,
   onStepSelect,
   onSectionSelect,
   onStepCreate,
@@ -187,8 +191,8 @@ export function FlowCanvas({
   const [exporting, setExporting] = React.useState(false);
 
   const initialNodes = React.useMemo(
-    () => buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode),
-    [sections, steps, selectedStepId, selectedSectionId, heatMapMode]
+    () => buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode, annotatedIds, annotationColor),
+    [sections, steps, selectedStepId, selectedSectionId, heatMapMode, annotatedIds, annotationColor]
   );
   const initialEdges = React.useMemo(() => buildEdges(connections), [connections]);
 
@@ -197,8 +201,8 @@ export function FlowCanvas({
 
   // Sync external state → React Flow state
   React.useEffect(() => {
-    setNodes(buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode));
-  }, [sections, steps, selectedStepId, selectedSectionId, heatMapMode, setNodes]);
+    setNodes(buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode, annotatedIds, annotationColor));
+  }, [sections, steps, selectedStepId, selectedSectionId, heatMapMode, annotatedIds, annotationColor, setNodes]);
 
   React.useEffect(() => {
     setEdges(buildEdges(connections));

@@ -16,7 +16,7 @@ const CHANNEL_ICONS: Record<string, string> = {
 
 export function StageNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as StageNodeData;
-  const { stage, averagePainScore, heatMapMode } = nodeData;
+  const { stage, averagePainScore, heatMapMode, annotationColor } = nodeData;
   const channelIcon = stage.channel ? CHANNEL_ICONS[stage.channel] ?? "📋" : null;
   const painColor = getPainColor(averagePainScore);
 
@@ -31,7 +31,7 @@ export function StageNode({ data, selected }: NodeProps) {
       />
       <div
         className={cn(
-          "w-full h-full rounded-[var(--radius-lg)] border p-3",
+          "relative w-full h-full rounded-[var(--radius-lg)] border p-3",
           "transition-all duration-[var(--duration-fast)]",
           selected
             ? "border-[var(--accent-blue)]"
@@ -48,6 +48,15 @@ export function StageNode({ data, selected }: NodeProps) {
               }
         }
       >
+        {/* Perspective annotation indicator */}
+        {annotationColor && (
+          <div
+            className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full border-2 border-[var(--bg-app)]"
+            style={{ backgroundColor: annotationColor }}
+            title="Has perspective annotation"
+          />
+        )}
+
         {/* Stage label */}
         <div className="flex items-center gap-2 mb-2">
           {channelIcon && (
