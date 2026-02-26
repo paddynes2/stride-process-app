@@ -18,6 +18,7 @@ import {
   Route,
   Layers,
   ArrowRight,
+  Link2,
 } from "lucide-react";
 import { StepNode } from "@/components/canvas/step-node";
 import { SectionNode } from "@/components/canvas/section-node";
@@ -54,7 +55,7 @@ const journeyNodeTypes = {
 /* Node/edge builders (read-only — no selection, no heat map)                  */
 /* -------------------------------------------------------------------------- */
 
-function buildProcessNodes(sections: Section[], steps: Step[]): Node[] {
+function buildProcessNodes(sections: Section[], steps: Step[], matchedSectionIds: Set<string>): Node[] {
   const sectionNodes: Node<SectionNodeData>[] = (sections ?? []).filter(Boolean).map((section) => {
     const sectionSteps = steps.filter((s) => s.section_id === section.id);
     const scored = sectionSteps.filter((s) => s.maturity_score != null);
@@ -65,12 +66,17 @@ function buildProcessNodes(sections: Section[], steps: Step[]): Node[] {
     const avgTarget = withTarget.length > 0
       ? withTarget.reduce((sum, s) => sum + s.target_maturity!, 0) / withTarget.length
       : null;
+    const isMatched = matchedSectionIds.has(section.id);
     return {
       id: `section-${section.id}`,
       type: "section" as const,
       position: { x: section.position_x, y: section.position_y },
       data: { section, averageMaturity: avg, averageTargetMaturity: avgTarget, heatMapMode: false },
-      style: { width: section.width, height: section.height },
+      style: {
+        width: section.width,
+        height: section.height,
+        ...(isMatched ? { boxShadow: MATCH_GLOW, borderRadius: "var(--radius-lg)" } : {}),
+      },
     };
   });
 
@@ -95,19 +101,24 @@ function buildProcessEdges(connections: Connection[]): Edge[] {
   }));
 }
 
-function buildJourneyCanvasNodes(stages: Stage[], touchpoints: Touchpoint[]): Node[] {
+function buildJourneyCanvasNodes(stages: Stage[], touchpoints: Touchpoint[], matchedStageIds: Set<string>): Node[] {
   const stageNodes: Node<StageNodeData>[] = (stages ?? []).filter(Boolean).map((stage) => {
     const stageTps = touchpoints.filter((t) => t.stage_id === stage.id);
     const withPain = stageTps.filter((t) => t.pain_score != null);
     const avgPain = withPain.length > 0
       ? withPain.reduce((sum, t) => sum + t.pain_score!, 0) / withPain.length
       : null;
+    const isMatched = matchedStageIds.has(stage.id);
     return {
       id: `stage-${stage.id}`,
       type: "stage" as const,
       position: { x: stage.position_x, y: stage.position_y },
       data: { stage, averagePainScore: avgPain, heatMapMode: false },
-      style: { width: stage.width, height: stage.height },
+      style: {
+        width: stage.width,
+        height: stage.height,
+        ...(isMatched ? { boxShadow: MATCH_GLOW, borderRadius: "var(--radius-lg)" } : {}),
+      },
     };
   });
 
@@ -131,6 +142,48 @@ function buildJourneyCanvasEdges(connections: TouchpointConnection[]): Edge[] {
     type: "default",
   }));
 }
+
+/* -------------------------------------------------------------------------- */
+/* Name matching — case-insensitive alignment between sections and stages      */
+/* -------------------------------------------------------------------------- */
+
+interface NameMatch {
+  sectionId: string;
+  sectionName: string;
+  stageId: string;
+  stageName: string;
+}
+
+function computeNameMatches(sections: Section[], stages: Stage[]): NameMatch[] {
+  const matches: NameMatch[] = [];
+  const usedStageIds = new Set<string>();
+
+  for (const section of sections) {
+    const sectionNorm = section.name.trim().toLowerCase();
+    if (!sectionNorm) continue;
+
+    for (const stage of stages) {
+      if (usedStageIds.has(stage.id)) continue;
+      const stageNorm = stage.name.trim().toLowerCase();
+      if (!stageNorm) continue;
+
+      if (sectionNorm === stageNorm) {
+        matches.push({
+          sectionId: section.id,
+          sectionName: section.name,
+          stageId: stage.id,
+          stageName: stage.name,
+        });
+        usedStageIds.add(stage.id);
+        break; // one match per section
+      }
+    }
+  }
+
+  return matches;
+}
+
+const MATCH_GLOW = "0 0 0 2px var(--brand), 0 0 12px rgba(20,184,166,0.25)";
 
 /* -------------------------------------------------------------------------- */
 /* Stats helpers                                                               */
@@ -211,6 +264,18 @@ export function CompareView({
     () => computeJourneyStats(journeyStages, journeyTouchpoints),
     [journeyStages, journeyTouchpoints]
   );
+  const nameMatches = React.useMemo(
+    () => computeNameMatches(processSections, journeyStages),
+    [processSections, journeyStages]
+  );
+  const matchedSectionIds = React.useMemo(
+    () => new Set(nameMatches.map((m) => m.sectionId)),
+    [nameMatches]
+  );
+  const matchedStageIds = React.useMemo(
+    () => new Set(nameMatches.map((m) => m.stageId)),
+    [nameMatches]
+  );
 
   if (!hasBoth) {
     return (
@@ -243,6 +308,28 @@ export function CompareView({
         </h1>
       </div>
 
+      {/* Alignment matches bar */}
+      {nameMatches.length > 0 && (
+        <div className="flex items-center gap-3 px-6 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+          <div className="flex items-center gap-1.5 text-[var(--brand)]">
+            <Link2 className="h-3.5 w-3.5" />
+            <span className="text-xs font-medium">
+              {nameMatches.length} alignment{nameMatches.length !== 1 ? "s" : ""} found
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {nameMatches.map((m) => (
+              <span
+                key={m.sectionId}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-[var(--text-primary)] bg-[rgba(20,184,166,0.12)] border border-[rgba(20,184,166,0.25)]"
+              >
+                {m.sectionName}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Side-by-side canvases */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Process side */}
@@ -261,6 +348,7 @@ export function CompareView({
               steps={processSteps}
               connections={processConnections}
               stats={processStats}
+              matchedSectionIds={matchedSectionIds}
             />
           </div>
         </div>
@@ -281,6 +369,7 @@ export function CompareView({
               touchpoints={journeyTouchpoints}
               connections={journeyConnections}
               stats={journeyStats}
+              matchedStageIds={matchedStageIds}
             />
           </div>
         </div>
@@ -298,13 +387,15 @@ function ReadOnlyProcessCanvas({
   steps,
   connections,
   stats,
+  matchedSectionIds,
 }: {
   sections: Section[];
   steps: Step[];
   connections: Connection[];
   stats: ReturnType<typeof computeProcessStats>;
+  matchedSectionIds: Set<string>;
 }) {
-  const nodes = React.useMemo(() => buildProcessNodes(sections, steps), [sections, steps]);
+  const nodes = React.useMemo(() => buildProcessNodes(sections, steps, matchedSectionIds), [sections, steps, matchedSectionIds]);
   const edges = React.useMemo(() => buildProcessEdges(connections), [connections]);
 
   const isEmpty = sections.length === 0 && steps.length === 0;
@@ -364,13 +455,15 @@ function ReadOnlyJourneyCanvas({
   touchpoints,
   connections,
   stats,
+  matchedStageIds,
 }: {
   stages: Stage[];
   touchpoints: Touchpoint[];
   connections: TouchpointConnection[];
   stats: ReturnType<typeof computeJourneyStats>;
+  matchedStageIds: Set<string>;
 }) {
-  const nodes = React.useMemo(() => buildJourneyCanvasNodes(stages, touchpoints), [stages, touchpoints]);
+  const nodes = React.useMemo(() => buildJourneyCanvasNodes(stages, touchpoints, matchedStageIds), [stages, touchpoints, matchedStageIds]);
   const edges = React.useMemo(() => buildJourneyCanvasEdges(connections), [connections]);
 
   const isEmpty = stages.length === 0 && touchpoints.length === 0;
