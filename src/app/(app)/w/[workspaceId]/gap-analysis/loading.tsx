@@ -6,7 +6,7 @@ export default function GapAnalysisLoading() {
       {/* Header */}
       <Skeleton className="h-7 w-36 mb-6" />
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}

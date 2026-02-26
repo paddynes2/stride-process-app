@@ -149,7 +149,7 @@ export function TeamsView({ workspaceId, initialTeams }: TeamsViewProps) {
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <SummaryCard label="Teams" value={teams.length} />
           <SummaryCard label="Roles" value={totalRoles} />
           <SummaryCard

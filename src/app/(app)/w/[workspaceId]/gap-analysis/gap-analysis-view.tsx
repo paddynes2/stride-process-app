@@ -120,7 +120,7 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
             <div className="text-[11px] font-medium uppercase tracking-wide text-[var(--text-tertiary)] mb-1">
               Steps Scored
@@ -177,8 +177,8 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
             </p>
           </div>
         ) : (
-          <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] overflow-hidden">
-            <table className="w-full">
+          <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] overflow-x-auto">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="bg-[var(--bg-surface)]">
                   <GapSortHeader label="Step" field="name" current={sortField} dir={sortDir} onSort={toggleSort} />

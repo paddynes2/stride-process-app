@@ -30,6 +30,15 @@ export function WorkspaceShell({
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [tabs, setTabs] = React.useState(initialTabs);
 
+  // Auto-collapse sidebar on narrow viewports (tablet / small laptop)
+  React.useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1280px)");
+    if (mq.matches) setSidebarCollapsed(true);
+    const handler = (e: MediaQueryListEvent) => setSidebarCollapsed(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   // Derive active tab from URL
   const pathParts = pathname.split("/");
   // /w/{workspaceId}/{tabId} → tabId is at index 3
