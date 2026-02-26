@@ -191,3 +191,30 @@ export interface TouchpointConnection {
   target_touchpoint_id: string;
   created_at: string;
 }
+
+// =============================================================================
+// Perspectives — stakeholder viewpoints on canvas elements
+// =============================================================================
+
+export type AnnotatableType = "step" | "section" | "touchpoint" | "stage";
+
+export interface Perspective {
+  id: string;
+  workspace_id: string;
+  name: string;
+  color: string;
+  icon: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PerspectiveAnnotation {
+  id: string;
+  perspective_id: string;
+  annotatable_type: AnnotatableType;
+  annotatable_id: string;
+  content: string | null;
+  rating: number | null;
+  created_at: string;
+  updated_at: string;
+}
