@@ -284,7 +284,8 @@ function TeamCard({
       <div className="flex items-center gap-2 px-4 py-3">
         <button
           onClick={onToggle}
-          className="flex items-center justify-center h-5 w-5 text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+          aria-label={`${expanded ? "Collapse" : "Expand"} ${team.name}`}
+          className="flex items-center justify-center h-6 w-6 text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)] rounded-[var(--radius-sm)]"
         >
           <ChevronRight
             className="h-4 w-4 transition-transform"
@@ -306,6 +307,7 @@ function TeamCard({
               }
             }}
             className="h-7 max-w-[200px] text-[14px]"
+            aria-label="Team name"
           />
         ) : (
           <button
@@ -331,6 +333,7 @@ function TeamCard({
           size="icon-sm"
           onClick={onDelete}
           className="text-[var(--text-quaternary)] hover:text-[var(--error)]"
+          aria-label={`Delete ${team.name} team`}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
@@ -457,7 +460,8 @@ function RoleRow({ role, onUpdateName, onUpdateRate, onDelete, onAddPerson, onDe
         <div className="pl-6 flex items-center gap-2">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center justify-center h-4 w-4 text-[var(--text-quaternary)] hover:text-[var(--text-tertiary)] transition-colors shrink-0"
+            aria-label={`${expanded ? "Collapse" : "Expand"} ${role.name}`}
+            className="flex items-center justify-center h-6 w-6 text-[var(--text-quaternary)] hover:text-[var(--text-tertiary)] transition-colors shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)] rounded-[var(--radius-sm)]"
           >
             <ChevronRight
               className="h-3 w-3 transition-transform"
@@ -505,6 +509,7 @@ function RoleRow({ role, onUpdateName, onUpdateRate, onDelete, onAddPerson, onDe
             min="0"
             step="0.01"
             className="h-6 w-[90px] text-[12px]"
+            aria-label={`Hourly rate for ${role.name}`}
           />
         </div>
 
@@ -522,6 +527,7 @@ function RoleRow({ role, onUpdateName, onUpdateRate, onDelete, onAddPerson, onDe
           size="icon-sm"
           onClick={onDelete}
           className="h-6 w-6 text-[var(--text-quaternary)] hover:text-[var(--error)]"
+          aria-label={`Delete ${role.name} role`}
         >
           <Trash2 className="h-3 w-3" />
         </Button>
@@ -657,6 +663,7 @@ function PersonRow({ person, onUpdateName, onUpdateEmail, onDelete }: PersonRowP
         placeholder="email@example.com"
         type="email"
         className="h-6 text-[12px]"
+        aria-label={`Email for ${person.name}`}
       />
 
       {/* Delete */}
@@ -664,7 +671,8 @@ function PersonRow({ person, onUpdateName, onUpdateEmail, onDelete }: PersonRowP
         variant="ghost"
         size="icon-sm"
         onClick={onDelete}
-        className="h-5 w-5 text-[var(--text-quaternary)] hover:text-[var(--error)]"
+        className="h-6 w-6 text-[var(--text-quaternary)] hover:text-[var(--error)]"
+        aria-label={`Delete ${person.name}`}
       >
         <Trash2 className="h-3 w-3" />
       </Button>

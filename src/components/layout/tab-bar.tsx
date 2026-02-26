@@ -107,13 +107,14 @@ export function TabBar({ tabs, activeTabId, workspaceId, onTabSelect, onTabsChan
               <button
                 onClick={(e) => handleDeleteTab(e, tab.id)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-[var(--bg-surface-active)]"
+                aria-label={`Close ${tab.name} tab`}
               >
                 <X className="h-3 w-3" />
               </button>
             )}
           </div>
         ))}
-      <Button variant="ghost" size="icon-sm" onClick={handleAddTab} className="ml-1">
+      <Button variant="ghost" size="icon-sm" onClick={handleAddTab} className="ml-1" aria-label="Add new tab">
         <Plus className="h-3.5 w-3.5" />
       </Button>
     </div>

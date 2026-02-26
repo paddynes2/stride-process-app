@@ -125,6 +125,7 @@ export function StepListView({ workspaceId, steps, sections, tabs }: StepListVie
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search steps..."
               leftElement={<Search className="h-3.5 w-3.5" />}
+              aria-label="Search steps"
             />
           </div>
 
@@ -133,6 +134,7 @@ export function StepListView({ workspaceId, steps, sections, tabs }: StepListVie
             value={statusFilter ?? ""}
             onChange={(e) => setStatusFilter(e.target.value || null)}
             className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+            aria-label="Filter by status"
           >
             <option value="">All Statuses</option>
             {uniqueStatuses.map((s) => (
@@ -145,6 +147,7 @@ export function StepListView({ workspaceId, steps, sections, tabs }: StepListVie
             value={executorFilter ?? ""}
             onChange={(e) => setExecutorFilter(e.target.value || null)}
             className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+            aria-label="Filter by executor"
           >
             <option value="">All Executors</option>
             {uniqueExecutors.map((e) => (

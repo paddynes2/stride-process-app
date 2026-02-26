@@ -94,7 +94,7 @@ export function WorkspaceList({ workspaces: initialWorkspaces }: WorkspaceListPr
                   </div>
                   <ArrowRight className="h-4 w-4 text-[var(--text-quaternary)] group-hover:text-[var(--text-tertiary)] transition-colors" />
                 </div>
-                <h3 className="text-[14px] font-semibold text-[var(--text-primary)] mb-1">{ws.name}</h3>
+                <h2 className="text-[14px] font-semibold text-[var(--text-primary)] mb-1">{ws.name}</h2>
                 <p className="text-[11px] text-[var(--text-quaternary)]">
                   Created {new Date(ws.created_at).toLocaleDateString()}
                 </p>

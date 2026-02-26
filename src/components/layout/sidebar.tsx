@@ -68,7 +68,7 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
           )}
         </Link>
         {!collapsed && (
-          <Button variant="ghost" size="icon-sm" onClick={onToggle}>
+          <Button variant="ghost" size="icon-sm" onClick={onToggle} aria-label="Toggle sidebar">
             <ChevronLeft className="h-3.5 w-3.5" />
           </Button>
         )}
@@ -90,7 +90,7 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
                 "flex items-center gap-2 px-2 py-1.5 rounded-[var(--radius-sm)]",
                 "text-[var(--text-sm)] font-medium transition-colors",
                 isActive
-                  ? "bg-[var(--bg-surface-active)] text-[var(--text-primary)]"
+                  ? "bg-[var(--signal-subtle)] text-[var(--text-primary)]"
                   : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
               )}
             >

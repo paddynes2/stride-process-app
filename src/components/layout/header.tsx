@@ -41,7 +41,7 @@ export function Header({ userName, userEmail }: HeaderProps) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" className="rounded-full">
+          <Button variant="ghost" size="icon-sm" className="rounded-full" aria-label="User menu">
             <div
               className="flex items-center justify-center rounded-full"
               style={{

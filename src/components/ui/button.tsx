@@ -13,8 +13,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: `bg-[var(--signal)] text-white shadow-[var(--shadow-glow-sm)]
-                  hover:bg-[var(--signal-hover)] hover:shadow-[var(--shadow-glow)] hover:-translate-y-[0.5px]`,
+        default: `bg-[#2563EB] text-white shadow-[var(--shadow-glow-sm)]
+                  hover:bg-[#3B82F6] hover:shadow-[var(--shadow-glow)] hover:-translate-y-[0.5px]`,
         secondary: `bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border-subtle)]
                     hover:bg-[var(--elevated)] hover:border-[var(--border-default)]`,
         outline: `bg-transparent text-[var(--text-secondary)] border border-[var(--border-subtle)]

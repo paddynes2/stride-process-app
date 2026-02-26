@@ -141,7 +141,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
         <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
           Step Details
         </span>
-        <Button variant="ghost" size="icon-sm" onClick={onClose}>
+        <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close panel">
           <X className="h-4 w-4" />
         </Button>
       </div>

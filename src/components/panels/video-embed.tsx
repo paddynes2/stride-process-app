@@ -62,7 +62,7 @@ export function VideoEmbed({ url, onChange }: VideoEmbedProps) {
           leftElement={<Video className="h-3.5 w-3.5" />}
         />
         {url && (
-          <Button variant="ghost" size="icon-sm" onClick={handleClear}>
+          <Button variant="ghost" size="icon-sm" onClick={handleClear} aria-label="Remove video">
             <X className="h-3.5 w-3.5" />
           </Button>
         )}

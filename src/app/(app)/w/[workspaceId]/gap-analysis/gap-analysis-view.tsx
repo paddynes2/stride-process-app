@@ -164,6 +164,7 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
               value={sectionFilter ?? ""}
               onChange={(e) => setSectionFilter(e.target.value || null)}
               className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+              aria-label="Filter by section"
             >
               <option value="">All Sections</option>
               {filterableSections.map((s) => (
@@ -229,10 +230,9 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
                       </td>
                       <td className="px-3 py-2">
                         <span
-                          className="inline-flex items-center justify-center h-6 w-8 rounded-[2px] text-[13px] font-bold"
+                          className="inline-flex items-center justify-center h-6 w-8 rounded-[2px] text-[13px] font-bold bg-[var(--bg-surface)]"
                           style={{
                             color: getGapColor(gap),
-                            backgroundColor: `${getGapColor(gap)}15`,
                           }}
                         >
                           {gap > 0 ? `+${gap}` : gap}
