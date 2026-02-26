@@ -35,5 +35,10 @@
 - [x] #FEAT-025 Phase 2b completion testing: regression suite — DONE iteration 56, 2026-02-26
 - [x] #FEAT-026 Phase 2b completion testing: quality audit — DONE iteration 57, 2026-02-26
 
-## Phase 3: Advanced Features — PLANNED
-<!-- Features to be added when Phase 2b completion testing passes -->
+## Phase 3: Advanced Features — IN PROGRESS
+- [x] #FEAT-027 Dashboard / workspace overview page — DONE iteration 63, 2026-02-26
+- [ ] #FEAT-028 Search & filtering across all entity types (steps, sections, stages, touchpoints) — Attempts: 0
+- [ ] #FEAT-029 People page (flesh out stub with people CRUD, role assignments) — Attempts: 0
+- [ ] #FEAT-030 Tools page (flesh out stub — define tools data model + CRUD) — Attempts: 0
+- [ ] #FEAT-031 Step list bulk actions (multi-select, bulk status change) — Attempts: 0
+- [ ] #FEAT-032 Workspace templates (starter templates for common process types) — Attempts: 0

@@ -51,19 +51,22 @@
 - [x] Phase 2b completion testing: regression suite — DONE iteration 56
 - [x] Phase 2b completion testing: quality audit — DONE iteration 57 (5 bugs, 5 improvements logged)
 
-## Phase 3: Advanced Features — PLANNED
+## Phase 3: Advanced Features — IN PROGRESS
 **Target iterations:** 63+
 **Depends on:** All bugs resolved (BUG-012 through BUG-016 fixed in iterations 58-62)
 
-Candidate features (to be prioritized):
-- [ ] Search & filtering across steps/touchpoints
-- [ ] Versioning / snapshot history for canvases
-- [ ] Collaboration (real-time or async comments)
-- [ ] Dashboard / analytics overview
-- [ ] Step list view enhancements (sorting, grouping, bulk actions)
-- [ ] People & tools pages (currently stubs)
-- [ ] Workspace templates
-- [ ] Advanced permissions (workspace-level roles beyond org member)
+Prioritized features:
+- [x] #FEAT-027 Dashboard / workspace overview page — DONE iteration 63
+- [ ] #FEAT-028 Search & filtering across all entity types
+- [ ] #FEAT-029 People page (flesh out stub)
+- [ ] #FEAT-030 Tools page (flesh out stub)
+- [ ] #FEAT-031 Step list bulk actions
+- [ ] #FEAT-032 Workspace templates
+
+Deferred to Phase 4+:
+- Versioning / snapshot history for canvases
+- Collaboration (real-time or async comments)
+- Advanced permissions (workspace-level roles beyond org member)
 
 ## Amendments
 
@@ -71,3 +74,4 @@ Candidate features (to be prioritized):
 - [2026-02-26] Iteration 56: Regression suite passed (19/19 checks via static analysis + API probing). Quality audit remaining.
 - [2026-02-26] Iteration 57: Quality audit complete. 5 bugs + 5 improvements logged. Phase 2b fully done. P1 bugs should be fixed before Phase 3 features.
 - [2026-02-26] Iteration 62: All quality audit bugs resolved (BUG-012 through BUG-016). Phase 3 unblocked. Next iteration should prioritize Phase 3 candidate features.
+- [2026-02-26] Iteration 63: Phase 3 started. Dashboard page built as first feature. Candidate features prioritized and added to FEATURES.md. Versioning, collaboration, and advanced permissions deferred to Phase 4+.

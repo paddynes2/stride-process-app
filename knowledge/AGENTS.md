@@ -39,6 +39,7 @@ npx supabase db push     # Push migrations
 | `/w/.../[tabId]` | `src/app/(app)/w/[workspaceId]/[tabId]/page.tsx` | Canvas view |
 | `/w/.../list` | `src/app/(app)/w/[workspaceId]/list/page.tsx` | Step list view |
 | `/w/.../compare` | `src/app/(app)/w/[workspaceId]/compare/page.tsx` | Comparison view |
+| `/w/.../dashboard` | `src/app/(app)/w/[workspaceId]/dashboard/page.tsx` | Workspace dashboard overview |
 | `/w/.../gap-analysis` | `src/app/(app)/w/[workspaceId]/gap-analysis/page.tsx` | Gap analysis |
 | `/w/.../teams` | `src/app/(app)/w/[workspaceId]/teams/page.tsx` | Teams management |
 | `/w/.../people` | `src/app/(app)/w/[workspaceId]/people/page.tsx` | People (stub) |
