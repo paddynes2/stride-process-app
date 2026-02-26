@@ -117,7 +117,7 @@ Consistency (Nielsen's Heuristic #4) — identical data should always look ident
 **Priority:** High (significant UX win)
 **Effort:** Medium (1 iteration)
 **Attempts:** 0
-**Status:** proposed
+**Status:** done — Covered by FEAT-022 (iteration 45-46)
 
 **What I noticed:**
 The process canvas toolbar has Export PDF and Export PNG buttons, but the journey canvas toolbar only has Add Touchpoint, Add Stage, and Heat Map toggle. A consultant switching between process and journey tabs would expect the same export capabilities on both.
@@ -236,3 +236,24 @@ Add a confirmation dialog (using existing Radix Dialog) for: (1) keyboard delete
 
 **Design principle:**
 Nielsen #3 (User control and freedom) — support undo/confirmation. Nielsen #5 (Error prevention) — prevent accidental destruction. Shneiderman #6 (Permit easy reversal of actions).
+
+### #IMP-009 Audit remaining text-quaternary usage for borderline cases
+**Category:** Accessibility
+**Discovered:** Iteration 47 — 2026-02-26
+**Page:** Multiple (step-detail-panel, gap-analysis-view, teams-view, workspace-list, step-list-view, section-detail-panel)
+**Priority:** Low (nice-to-have)
+**Effort:** Medium (1 iteration — ~20 instances across ~10 files)
+**Attempts:** 0
+**Status:** proposed
+
+**What I noticed:**
+After fixing BUG-010/BUG-011, grep found ~30 remaining `text-quaternary` instances. Most are genuinely decorative (placeholders, icons, separators, hover-interactive elements), but some borderline cases exist: secondary info text in step-detail-panel (team names, avg rates, helper text), section names in table columns, role/people counts in teams-view, workspace creation dates. These are readable but at ~2:1 contrast — below WCAG AA.
+
+**Why it matters:**
+While these secondary texts are intentionally de-emphasized, users with low vision may struggle. A full audit would categorize each as truly decorative (keep quaternary) or upgrade to tertiary.
+
+**Suggested approach:**
+Read each instance in context. Upgrade to `--text-tertiary` where the text carries meaning a user needs. Leave quaternary for placeholders, separators, and decorative icons.
+
+**Design principle:**
+WCAG 1.4.3 (Minimum Contrast) — text that conveys information must meet 4.5:1 contrast.

@@ -1323,3 +1323,32 @@
 - Efficiency (wasted actions?): 5 — Clean research → build → verify flow. Completed in single pass.
 - Proactive observations: 0
 **Notes:** FEAT-022 is now fully DONE (both sub-tasks). Phase 2a remaining: BUG-010, BUG-011 (P2 a11y — text-quaternary). After those, Phase 2a is complete.
+
+## Iteration 47 — 2026-02-26
+**Task:** #BUG-010 + #BUG-011 Fix text-quaternary on functional content (WCAG AA)
+**Source:** prd/BUGS.md
+**Complexity:** S
+**Result:** completed
+**Changes:**
+- Modified: `src/components/panels/touchpoint-detail-panel.tsx` (2 lines — pain/gain helper text quaternary → tertiary)
+- Modified: `src/components/canvas/stage-node.tsx` (1 line — description text quaternary → tertiary)
+- Modified: `src/components/canvas/section-node.tsx` (1 line — summary text quaternary → tertiary, mirror of BUG-011)
+- Modified: `src/components/panels/stage-detail-panel.tsx` (1 line — "No touchpoints" empty text quaternary → tertiary)
+- Modified: `src/components/panels/section-detail-panel.tsx` (1 line — "No steps" empty text quaternary → tertiary)
+**Research:** Skipped (S complexity). Grepped all text-quaternary usage (40+ instances across 15 files). Categorized: 6 functional content instances (fixed), rest are decorative (placeholders, icons, separators, hover-interactive).
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 6 pre-existing warnings)
+- Build: pass (all routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** IMP-009 (audit remaining text-quaternary usage for borderline cases)
+**Self-score:**
+- Code quality: 5 — Simple, targeted CSS class changes. Follows AGENTS.md color system guidance exactly.
+- Test coverage of change: 2 — Static verification only. No browser test due to missing Playwright.
+- Confidence this won't regress: 5 — Pure CSS class substitution, no logic change, no side effects.
+- Efficiency (wasted actions?): 5 — Single-pass grep → fix → verify → commit.
+- Proactive observations: 1 (IMP-009 logged)
+**Notes:** Phase 2a is now COMPLETE — all 6 features and 2 bugs done. Next: phase completion quality audit.

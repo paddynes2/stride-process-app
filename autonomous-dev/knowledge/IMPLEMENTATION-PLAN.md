@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-022 DONE iter 46, BUG-010/BUG-011 P2 a11y remain)
+## Current Phase: Phase 2a COMPLETE (iter 47). Next: Phase 2a completion audit, then Phase 2b — Analysis & Intelligence
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -117,9 +117,10 @@ Tasks (in priority order):
 ---
 
 ### Phase 2a: Journey Mapping
-**Status:** IN PROGRESS (started iteration 32)
+**Status:** DONE (iterations 32-47, 16 iterations)
 **Depends on:** Phase 1.5 (DONE)
 **Estimated iterations:** 20-25
+**Actual iterations:** 16 (iterations 32-47)
 **Goal:** Add customer journey mapping alongside process mapping. Consultants can now map both internal processes AND customer experiences.
 
 **Why journey mapping first:** It's the highest-value addition — consultants already sell journey mapping as a separate deliverable. This doubles the use cases Stride can handle. Everything else in Phase 2 builds on top of journey data.
@@ -258,13 +259,13 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 |-------|------|------|-----------------|------------|--------|
 | 1 | Consulting Deliverable | Scored, exportable process audit | 25-35 | Phase 0 (DONE) | **DONE** (19 iters) |
 | 1.5 | Ship & Harden | Production quality, zero P1 bugs | 10-15 | Phase 1 | **DONE** (12 iters) |
-| 2a | Journey Mapping | Customer experience mapping | 20-25 | Phase 1.5 | **IN PROGRESS** |
+| 2a | Journey Mapping | Customer experience mapping | 20-25 | Phase 1.5 | **DONE** (16 iters) |
 | 2b | Analysis & Intelligence | Perspectives, prioritization, AI | 20-25 | Phase 2a | Not started |
 | 2c | Tools & Enhanced Export | Tool mapping, professional reports | 20-25 | Phase 2b | Not started |
 | 3 | Living Playbook | Executable processes | 30-40 | Phase 2c | Not started |
 
-**Completed iterations:** 42 (Phase 1: 19, Phase 1.5: 12, Phase 2a: 11 so far)
-**Remaining iterations (est.):** 72-97 (Phase 2a remainder: ~2, Phase 2b: 20-25, Phase 2c: 20-25, Phase 3: 30-40)
+**Completed iterations:** 47 (Phase 1: 19, Phase 1.5: 12, Phase 2a: 16)
+**Remaining iterations (est.):** 70-90 (Phase 2b: 20-25, Phase 2c: 20-25, Phase 3: 30-40)
 **Total features:** 47 (FEAT-001 through FEAT-047)
 
 ---
@@ -317,3 +318,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 44: **FEAT-021 DONE** (all 3/3 sub-tasks complete). Visual alignment hints: case-insensitive name matching between sections and stages, teal glow on matched nodes, alignment bar with match count/names. 4 iterations total (iter 41-44 with regression pass at 42). Phase 2a: only FEAT-022 (journey export) + 2 P2 bugs remain.
 - [2026-02-26] Iteration 45: FEAT-022 [1/2] complete (journey canvas PDF + PNG export). Created journey-pdf.ts (~530 lines) with 5 PDF sections + PNG export button. Decomposed FEAT-022 into 2 sub-tasks. [2/2] comparison view PDF export remains.
 - [2026-02-26] Iteration 46: **FEAT-022 DONE** (all 2/2 sub-tasks complete). Comparison view PDF export with title page (side-by-side stats), dual canvas snapshots, alignment analysis table. All 6 Phase 2a features complete. Only BUG-010/BUG-011 (P2 a11y) remain before Phase 2a exit.
+- [2026-02-26] Iteration 47: **PHASE 2a COMPLETE.** BUG-010 + BUG-011 fixed (text-quaternary → text-tertiary on 6 functional content instances across 5 files). Also fixed 3 mirror instances (section-node.tsx, stage-detail-panel.tsx, section-detail-panel.tsx). 16 iterations total for Phase 2a (estimated 20-25). Next: phase completion quality audit, then Phase 2b.
