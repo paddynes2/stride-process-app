@@ -159,7 +159,7 @@ Tasks (in priority order):
 **Goal:** Layer analysis tools on top of process and journey data. Move from "document what exists" to "reveal what's broken and where perceptions diverge." Introduce AI where it adds clear consulting value.
 
 Tasks (in priority order — detailed specs in FEATURES.md):
-1. [ ] Perspectives data model + UI shell (FEAT-023) — perspectives table, annotations table, types, API, management UI
+1. [x] Perspectives data model + UI shell (FEAT-023) — perspectives table, annotations table, types, API, management UI — DONE iteration 51
 2. [ ] Perspective annotation UI (FEAT-024) — perspective switcher, annotation panel on elements, visual indicators
 3. [ ] Perspective comparison view (FEAT-025) — side-by-side table, divergence highlighting, summary stats
 4. [ ] Prioritization matrix (FEAT-026) — effort/impact scores on steps/touchpoints, quadrant visualization
@@ -322,3 +322,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 48: Phase 2a completion quality audit passed. Golden-path verification of all 6 journey mapping features (data model, API routes, UI, comparison, export) — no gaps found. Type-check + lint + build pass. Phase 2b starting next iteration with FEAT-023 (perspectives data model).
 - [2026-02-26] Iteration 49: **Phase 2b started.** FEAT-023 [1/3] complete (data model + types). Migration 012 pushed: perspectives table, perspective_annotations table (polymorphic), annotatable_type enum. TypeScript types added. Sub-tasks [2/3] API routes and [3/3] management UI remain.
 - [2026-02-26] Iteration 50: FEAT-023 [2/3] complete (API routes + client wrappers). 4 route files (perspectives CRUD + annotations CRUD), 8 client functions. Sub-task [3/3] management UI remains.
+- [2026-02-26] Iteration 51: **FEAT-023 DONE** (all 3/3 sub-tasks complete). Management UI added to workspace settings page — create, inline rename, color picker (8 presets), delete. 3 iterations total for FEAT-023 (iter 49-51). Next: FEAT-024 perspective annotation UI.

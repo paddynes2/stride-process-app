@@ -377,11 +377,11 @@
 
 ## Phase 2b: Analysis & Intelligence
 
-### #FEAT-023 Perspectives data model and UI shell
+### #FEAT-023 Perspectives data model and UI shell — DONE iteration 51, 2026-02-26
 **Phase:** 2b
 **Priority:** P0 (critical path)
-**Attempts:** 2
-**Status:** IN PROGRESS
+**Attempts:** 3
+**Status:** done
 **Acceptance criteria:**
 - [x] New `perspectives` table: id, workspace_id, name (e.g., "Customer", "Operations Manager", "IT"), color (hex), icon (text), created_at, updated_at — DONE iteration 49
 - [x] New `perspective_annotations` table: id, perspective_id, annotatable_type (enum: 'step', 'section', 'touchpoint', 'stage'), annotatable_id (UUID), content (text — the annotation), rating (integer 1-5 nullable), created_at, updated_at — DONE iteration 49
@@ -394,7 +394,7 @@
 **Sub-tasks:**
 - [x] [1/3] Database migration, enums, TypeScript types — DONE iteration 49
 - [x] [2/3] API routes + client wrappers — DONE iteration 50
-- [ ] [3/3] Basic perspectives management UI (create/edit/delete perspectives in workspace settings or a dedicated panel)
+- [x] [3/3] Basic perspectives management UI (create/edit/delete perspectives in workspace settings) — DONE iteration 51
 
 ### #FEAT-024 Perspective annotation UI
 **Phase:** 2b
