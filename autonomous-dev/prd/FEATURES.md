@@ -300,17 +300,17 @@
 - [x] [3/4] Tab type UI — canvas_type selector on tab creation, routing by canvas_type — DONE iteration 35
 - [x] [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections — DONE iteration 36
 
-### #FEAT-018 Stage detail panel
+### #FEAT-018 Stage detail panel — DONE iteration 37, 2026-02-26
 **Phase:** 2a
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] Clicking a stage on journey canvas opens stage detail panel
-- [ ] Stage detail shows: name (editable), description (rich text), channel selector (web/phone/email/in-person/other), owner (text field)
-- [ ] Changes persist to database
-- [ ] Stage node on canvas shows name and channel icon
-**Notes:** Stages are the journey equivalent of sections. Channel is important for journey mapping — it shows how the customer interacts at each stage.
+- [x] Clicking a stage on journey canvas opens stage detail panel
+- [x] Stage detail shows: name (editable), description (rich text), channel selector (web/phone/email/in-person/other), owner (text field)
+- [x] Changes persist to database
+- [x] Stage node on canvas shows name and channel icon (already implemented in FEAT-017)
+**Notes:** Mirrors section-detail-panel.tsx pattern. Debounced name + owner inputs, native <select> for channel, TipTap rich text for description. Touchpoint sentiment summary, delete with orphan handling. Integrated into journey-canvas-view.tsx with conditional panel rendering.
 
 ### #FEAT-019 Touchpoint detail panel
 **Phase:** 2a

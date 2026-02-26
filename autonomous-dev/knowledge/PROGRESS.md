@@ -1057,3 +1057,29 @@
 - Efficiency (wasted actions?): 4 — React Compiler lint errors required 2 rounds of fixes (Math.random purity, handleKeyDown deps). Could have anticipated from LEARNINGS.md.
 - Proactive observations: 0
 **Notes:** FEAT-017 is now fully DONE (all 4/4 sub-tasks). Journey canvas mirrors process canvas patterns: stage-node ≈ section-node, touchpoint-node ≈ step-node. Sentiment colors (green/gray/red) replace maturity colors. React Compiler lint is stricter in app/ directory files vs components/ directory — Math.random() flagged as impure, self-referential retry flagged. Used deterministic positioning (grid offset) instead of random. Next: FEAT-018 stage detail panel.
+
+## Iteration 37 — 2026-02-26
+**Task:** #FEAT-018 Stage detail panel — click stage → edit name, description, channel, owner
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: src/components/panels/stage-detail-panel.tsx (stage detail panel with name, channel, owner, description, touchpoint summary, delete)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx (import StageDetailPanel, conditional panel rendering, stage update/delete handlers)
+**Research:** Read section-detail-panel.tsx (pattern to mirror), journey-canvas-view.tsx (integration target), stages API route (EDITABLE_FIELDS), Stage type (database.ts), canvas.ts types, existing <select> usage patterns in step-list-view.tsx.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 6 warnings — all pre-existing)
+- Build: pass (all routes present)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Exact mirror of section-detail-panel pattern (debounced inputs, rich text, toast errors, delete with confirmation)
+- Test coverage of change: 2 — No runtime verification (Playwright unavailable). Type check + build verify compilation.
+- Confidence this won't regress: 5 — Process canvas code unchanged. New panel is additive. Journey canvas panel switching is simple conditional.
+- Efficiency (wasted actions?): 5 — Completed in single pass, no rework needed. Research was targeted.
+- Proactive observations: 0
+**Notes:** Stage detail panel follows section-detail-panel.tsx exactly. Channel uses native <select> (matching step-list-view filter pattern). Owner is debounced text input (same as name). TipTap for description (matching section notes). Next: FEAT-019 touchpoint detail panel.
