@@ -917,3 +917,31 @@
 - Efficiency (wasted actions?): 5 — parallel exploration agents maximized coverage in one iteration
 - Proactive observations: 0
 **Notes:** Phase 1.5 task 7 of 7 complete. PHASE 1.5 COMPLETE — all tasks done. Next: phase completion testing or Phase 2a.
+
+## Iteration 32 — 2026-02-26
+**Task:** #FEAT-017 [1/4] Journey canvas data model — migration 011 + types
+**Source:** prd/FEATURES.md
+**Complexity:** L (decomposed into 4 sub-tasks)
+**Result:** completed
+**Changes:**
+- Created: supabase/migrations/011_journey_canvas.sql (new enums, 3 tables, RLS, indexes, triggers)
+- Modified: src/types/database.ts (+49 lines — CanvasType, TouchpointSentiment, Tab.canvas_type, Stage, Touchpoint, TouchpointConnection)
+- Created: autonomous-dev/knowledge/DECISIONS.md (D-001: parallel tables decision)
+**Research:** Read migrations 002, 004, 005, 008, 010 for enum/table/RLS/function patterns. Read database.ts and canvas.ts for type patterns. Checked types/index.ts barrel export. Verified canvas_type field has DB default so existing tabs unaffected.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing)
+- Build: pass (37 routes — unchanged)
+- Unit tests: N/A
+- Browser test: skipped (no UI changes this sub-task)
+- Canary test: skipped (no UI changes)
+- Migration push: pass (Supabase db push succeeded)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean migration following exact patterns of 004/008. Types mirror schema precisely.
+- Test coverage of change: 3 — Migration pushed and verified, types compile, but no runtime verification of new tables yet (that comes with API routes in sub-task 2)
+- Confidence this won't regress: 5 — Purely additive change. canvas_type default='process' ensures backward compatibility. No existing code modified except Tab type (which gains a field the DB always returns).
+- Efficiency (wasted actions?): 5 — Research was targeted, no wasted attempts
+- Proactive observations: 0
+**Notes:** First iteration of Phase 2a. FEAT-017 decomposed into 4 sub-tasks. Decision D-001 logged. FEAT-010 status in FEATURES.md needs correction (shows 'pending' but was done iter 21).

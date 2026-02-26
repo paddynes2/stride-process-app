@@ -109,9 +109,13 @@ src/
 
 ### Data Model
 
+<!-- Updated: iter-32, 2026-02-26 -->
+
 Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges from DB records.
 
-- `organizations` → `workspaces` → `tabs` → `sections` + `steps` + `connections`
+- `organizations` → `workspaces` → `tabs` → `sections` + `steps` + `connections` (process canvas)
+- `tabs.canvas_type` discriminator: `'process'` (default) or `'journey'`
+- Journey canvas: `tabs` → `stages` + `touchpoints` + `touchpoint_connections` (parallel to sections/steps/connections)
 - `workspaces` → `teams` → `roles` → `people` (team hierarchy for costing)
 - `step_roles` junction table: `steps` ↔ `roles` (many-to-many for cost calculation)
 - `public_shares`: workspace_id + share_id (32-char hex) + is_active toggle. `get_public_share_data()` SECURITY DEFINER returns full workspace data for unauthenticated access.
@@ -122,7 +126,9 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 
 ### Database Migrations
 
-10 migration files in `supabase/migrations/`:
+<!-- Updated: iter-32, 2026-02-26 -->
+
+11 migration files in `supabase/migrations/`:
 1. `001_extensions.sql` — uuid-ossp, pg_trgm
 2. `002_enums.sql` — step_status, executor_type, workspace_role
 3. `003_core_tables.sql` — users, organizations, organization_members, workspaces
@@ -133,6 +139,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 8. `008_teams_roles_people.sql` — teams, roles (hourly_rate), people + RLS policies
 9. `009_step_roles.sql` — step_roles junction table (step_id, role_id) + RLS via step→workspace
 10. `010_public_shares.sql` — public_shares table (share_id, is_active) + RLS + get_public_share_data() SECURITY DEFINER
+11. `011_journey_canvas.sql` — canvas_type enum on tabs, stages table, touchpoints table, touchpoint_connections table + RLS policies
 
 ## Color System (for accessibility fixes)
 
@@ -222,7 +229,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/lib/supabase/server.ts` — Server-side Supabase client
 - `src/lib/export/pdf.ts` — PDF export utility (jspdf + html-to-image)
 - `src/lib/export/png.ts` — PNG export utility (html-to-image toPng at 2x)
-- `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare)
+- `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection)
 - `src/components/ui/skeleton.tsx` — Skeleton primitive (animated pulse block for loading states)
 - `src/components/ui/offline-banner.tsx` — Network offline/online banner (useSyncExternalStore)
 - `src/app/(app)/error.tsx` — App-level error boundary (catches component crashes)

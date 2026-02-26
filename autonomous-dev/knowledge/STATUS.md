@@ -6,20 +6,24 @@
 
 ## Handoff
 
-- **Iteration:** 31
+- **Iteration:** 32
 - **Date:** 2026-02-26
-- **Phase:** Phase 1.5 — Ship & Harden
+- **Phase:** Phase 2a — Journey Mapping
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-016 End-to-end golden path test — full consultant workflow
+- **Last task:** #FEAT-017 [1/4] Journey canvas data model — migration 011 + types
 - **Result:** completed
-- **Next task:** Phase 1.5 COMPLETE — proceed to Phase 2a (Journey Mapping) or run phase completion testing
+- **Next task:** #FEAT-017 [2/4] API routes + client wrappers for stages, touchpoints, and touchpoint connections
 - **Blockers:** None
 
 ## Context
 
-Iteration 31 was a pure verification/testing iteration — no code changes. Traced the entire golden path (10 steps) through the codebase using 3 parallel exploration agents. All 10 steps verified: create workspace → add section → add steps → score maturity → set targets → view gap analysis → assign roles → view cost → export PDF → share link. Every API route, client wrapper, UI component, and type is correctly wired. Build, type-check, and lint all pass.
+First iteration of Phase 2a. Created migration 011 with 3 new tables (stages, touchpoints, touchpoint_connections), 2 new enums (canvas_type, touchpoint_sentiment), and added canvas_type column to tabs. All RLS policies follow existing can_access_workspace pattern. TypeScript types added: CanvasType, TouchpointSentiment, Stage, Touchpoint, TouchpointConnection. Tab interface updated with canvas_type field. Decision D-001 logged: chose parallel tables over discriminator approach.
 
-Phase 1.5 is now COMPLETE: all 7 tasks done (FEAT-010 through FEAT-016). The next iteration should either run phase completion testing (golden-paths → data-integrity → responsive → accessibility → security → visual-consistency → content-quality → performance) or begin Phase 2a.
+FEAT-017 decomposed into 4 sub-tasks:
+- [1/4] Data model + types (DONE this iteration)
+- [2/4] API routes + client wrappers (next)
+- [3/4] Tab type UI — canvas_type selector on tab creation
+- [4/4] Journey canvas rendering — stage nodes, touchpoint nodes
 
 ## Dev Server
 
@@ -31,5 +35,4 @@ Phase 1.5 is now COMPLETE: all 7 tasks done (FEAT-010 through FEAT-016). The nex
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (5 warnings — unchanged since iter 21).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-31).
-- Phase completion testing not yet done — required before shipping Phase 1.5.
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-32).

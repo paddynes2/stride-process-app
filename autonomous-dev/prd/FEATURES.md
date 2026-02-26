@@ -182,21 +182,21 @@
 
 ## Phase 1.5: Ship & Harden
 
-### #FEAT-010 Fix accessibility bugs (BUG-002 through BUG-009)
+### #FEAT-010 Fix accessibility bugs (BUG-002 through BUG-009) — DONE iteration 21, 2026-02-26
 **Phase:** 1.5
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] BUG-002: Active sidebar link has >= 4.5:1 contrast ratio (was 1:1)
-- [ ] BUG-003: Primary action buttons have >= 4.5:1 contrast ratio (was 3.68:1)
-- [ ] BUG-004: All icon-only buttons have aria-label (sidebar toggle, teams expand/collapse, delete)
-- [ ] BUG-005: All form inputs have associated labels (teams hourly rate, list search/filters, settings name)
-- [ ] BUG-006: Gap analysis badge text has >= 4.5:1 contrast (was 1:1)
-- [ ] BUG-007: All interactive elements are >= 24x24 CSS pixels
-- [ ] BUG-008: No heading level skips (h1 → h2 → h3, not h1 → h3)
-- [ ] BUG-009: Focus indicators have >= 3:1 contrast against adjacent colors
-**Notes:** 8 bugs found in iteration 10 accessibility audit. Fix in severity order: P1 first (002-006), then P2 (007-009). Agent should decompose into sub-tasks if needed.
+- [x] BUG-002: Active sidebar link has >= 4.5:1 contrast ratio (was 1:1)
+- [x] BUG-003: Primary action buttons have >= 4.5:1 contrast ratio (was 3.68:1)
+- [x] BUG-004: All icon-only buttons have aria-label (sidebar toggle, teams expand/collapse, delete)
+- [x] BUG-005: All form inputs have associated labels (teams hourly rate, list search/filters, settings name)
+- [x] BUG-006: Gap analysis badge text has >= 4.5:1 contrast (was 1:1)
+- [x] BUG-007: All interactive elements are >= 24x24 CSS pixels
+- [x] BUG-008: No heading level skips (h1 → h2 → h3, not h1 → h3)
+- [x] BUG-009: Focus indicators have >= 3:1 contrast against adjacent colors
+**Notes:** All 8 bugs fixed in iteration 21. 11 files changed across button, sidebar, header, tab-bar, panels, gap-analysis, teams, list, and workspaces.
 
 ### #FEAT-011 Empty states and onboarding — DONE iteration 23, 2026-02-26
 **Phase:** 1.5
@@ -284,16 +284,21 @@
 ### #FEAT-017 Journey canvas type
 **Phase:** 2a
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in-progress
 **Acceptance criteria:**
-- [ ] New "Journey" tab type in workspace (alongside existing "Process" canvas)
-- [ ] Journey canvas has stages (horizontal swim lanes) instead of sections
-- [ ] Journey canvas has touchpoints (nodes within stages) instead of steps
-- [ ] Data model: `canvas_type` discriminator on tabs OR new `journeys`/`stages`/`touchpoints` tables
+- [x] Data model: `canvas_type` discriminator on tabs + new `stages`/`touchpoints`/`touchpoint_connections` tables (Decision D-001: parallel tables)
+- [x] TypeScript types updated (CanvasType, TouchpointSentiment, Stage, Touchpoint, TouchpointConnection, Tab.canvas_type)
+- [ ] API routes for stages, touchpoints, touchpoint_connections (CRUD + client wrappers)
 - [ ] Creating a new tab allows choosing "Process" or "Journey" type
-- [ ] TypeScript types updated
-**Notes:** Core data model decision: extend existing tables with discriminator OR create parallel tables. Discriminator is simpler but mixes concerns. Parallel tables are cleaner but duplicate CRUD logic. Agent should evaluate and document the choice in DECISIONS.md.
+- [ ] Journey canvas has stages (group nodes) instead of sections
+- [ ] Journey canvas has touchpoints (step nodes) instead of steps
+**Notes:** Decision D-001: Parallel tables chosen over discriminator. Migration 011 pushed. Decomposed into 4 sub-tasks.
+**Sub-tasks:**
+- [x] [1/4] Data model: migration 011 (enums, tables, RLS), TypeScript types — DONE iteration 32
+- [ ] [2/4] API routes + client wrappers for stages, touchpoints, touchpoint_connections
+- [ ] [3/4] Tab type UI — canvas_type selector on tab creation, routing by canvas_type
+- [ ] [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections
 
 ### #FEAT-018 Stage detail panel
 **Phase:** 2a
