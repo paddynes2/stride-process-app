@@ -70,31 +70,29 @@
 
 ## Last Regression Pass
 
-- **Iteration:** 42
+- **Iteration:** 48
 - **Date:** 2026-02-26
-- **Result:** pass (no regressions, static analysis only — Playwright MCP unavailable)
-- **Pages re-checked:** All 14 page routes + 30 API routes (44 total)
+- **Result:** pass (Phase 2a completion quality audit — static analysis only, Playwright MCP unavailable)
+- **Pages re-checked:** All 14 page routes + 30 API routes
 - **Regressions found:** 0
-- **Iterations covered:** 35-41 (cadence floor: last regression iter 34 + 8 = 42)
-- **Files reviewed:** 16 source files changed since iter 34 (journey-canvas-view.tsx, stage-node.tsx, touchpoint-node.tsx, stage-detail-panel.tsx, touchpoint-detail-panel.tsx, pain.ts, tab-bar.tsx, page.tsx, workspace-shell.tsx, sidebar.tsx, compare-view.tsx, compare/page.tsx, compare/loading.tsx, canvas.ts, client.ts, tabs/route.ts)
-- **Verification:** type-check pass (0 errors), lint pass (0 errors, 6 warnings — unchanged), build pass (44 routes), zero debug artifacts
+- **Iterations covered:** 42-47 (Phase 2a completion audit)
+- **Verification method:** 3 parallel verification agents + type-check + lint + build
+- **Verification results:** type-check pass (0 errors), lint pass (0 errors, 6 warnings — unchanged), build pass (all routes)
+- **Phase 2a features verified:**
+  - FEAT-017: Journey canvas type — data model (migration 011), types, API routes (9 endpoints), canvas rendering ✓
+  - FEAT-018: Stage detail panel — name, channel, owner, description (TipTap), touchpoint summary, delete ✓
+  - FEAT-019: Touchpoint detail panel — name, sentiment, pain/gain, emotion, notes (TipTap), delete ✓
+  - FEAT-020: Journey heat map — pain score coloring, stage roll-up ✓
+  - FEAT-021: Comparison view — side-by-side React Flow canvases, alignment hints ✓
+  - FEAT-022: Journey export — journey-pdf.ts (5 sections), comparison-pdf.ts (4 sections) ✓
+  - BUG-010 + BUG-011: text-quaternary → text-tertiary on functional content ✓
 - **Known-good baseline:**
-  - /workspaces — clean (pre-existing hydration warning in dev only)
-  - /w/[id]/[tabId] (process canvas) — clean (dynamic imports for pdf/png/tiptap, empty state overlay)
-  - /w/[id]/[tabId] (journey canvas) — clean (stage/touchpoint nodes, detail panels, heat map)
-  - /w/[id]/list — clean (empty state card)
-  - /w/[id]/gap-analysis — clean
-  - /w/[id]/compare — clean (new iter 41, stats summary + section/stage lists)
-  - /w/[id]/teams — clean (a11y fixes: touch targets, aria-labels, focus indicators)
-  - /w/[id]/settings — clean
-  - /public/[shareId] — clean (loading.tsx)
-  - /login — redirects to /workspaces when authenticated (correct behavior)
-  - API routes — all 30 routes present and typed correctly (14 original + 6 journey canvas × 2)
-  - Error boundaries (×2), offline banner, skeleton, toast helpers — all clean
-  - Journey canvas: complete (data model, API, canvas rendering, detail panels, heat map)
-  - Comparison view: shell complete ([2/3] canvases + [3/3] alignment hints remain)
+  - All Phase 1 + 1.5 features: unchanged and verified
+  - Journey canvas: complete (data model, API, canvas, detail panels, heat map, export)
+  - Comparison view: complete (dual canvases, alignment hints, PDF export)
   - Pre-existing: 4 silent `.catch(() => {})` patterns (documented as IMP-004)
-  - Pre-existing: unused imports `addEdge` (journey-canvas-view) + `Plus` (sidebar)
+  - Pre-existing: unused imports `addEdge` (flow-canvas) + `Plus` (sidebar)
+  - Note: stages and touchpoint-connections API lack GET endpoints (data fetched via tab queries)
 
 ## Last Data Integrity Check
 

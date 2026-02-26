@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a COMPLETE (iter 47). Next: Phase 2a completion audit, then Phase 2b — Analysis & Intelligence
+## Current Phase: Phase 2b — Analysis & Intelligence (starting iter 49, audit passed iter 48)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -153,8 +153,8 @@ Tasks (in priority order):
      ═══════════════════════════════════════════════════════════════════════ -->
 
 ### Phase 2b: Analysis & Intelligence
-**Status:** Not started
-**Depends on:** Phase 2a
+**Status:** IN PROGRESS (starting iteration 49)
+**Depends on:** Phase 2a (DONE)
 **Estimated iterations:** 20-25
 **Goal:** Layer analysis tools on top of process and journey data. Move from "document what exists" to "reveal what's broken and where perceptions diverge." Introduce AI where it adds clear consulting value.
 
@@ -319,3 +319,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 45: FEAT-022 [1/2] complete (journey canvas PDF + PNG export). Created journey-pdf.ts (~530 lines) with 5 PDF sections + PNG export button. Decomposed FEAT-022 into 2 sub-tasks. [2/2] comparison view PDF export remains.
 - [2026-02-26] Iteration 46: **FEAT-022 DONE** (all 2/2 sub-tasks complete). Comparison view PDF export with title page (side-by-side stats), dual canvas snapshots, alignment analysis table. All 6 Phase 2a features complete. Only BUG-010/BUG-011 (P2 a11y) remain before Phase 2a exit.
 - [2026-02-26] Iteration 47: **PHASE 2a COMPLETE.** BUG-010 + BUG-011 fixed (text-quaternary → text-tertiary on 6 functional content instances across 5 files). Also fixed 3 mirror instances (section-node.tsx, stage-detail-panel.tsx, section-detail-panel.tsx). 16 iterations total for Phase 2a (estimated 20-25). Next: phase completion quality audit, then Phase 2b.
+- [2026-02-26] Iteration 48: Phase 2a completion quality audit passed. Golden-path verification of all 6 journey mapping features (data model, API routes, UI, comparison, export) — no gaps found. Type-check + lint + build pass. Phase 2b starting next iteration with FEAT-023 (perspectives data model).
