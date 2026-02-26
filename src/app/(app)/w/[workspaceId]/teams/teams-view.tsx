@@ -8,6 +8,7 @@ import {
   ChevronRight,
   DollarSign,
   Briefcase,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,24 @@ export function TeamsView({ workspaceId, initialTeams }: TeamsViewProps) {
     () => new Set(initialTeams.map((t) => t.id))
   );
   const [loading, setLoading] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+
+  const filtered = React.useMemo(() => {
+    if (!search) return teams;
+    const q = search.toLowerCase();
+    return teams.filter((team) => {
+      if (team.name.toLowerCase().includes(q)) return true;
+      return team.roles.some(
+        (role) =>
+          role.name.toLowerCase().includes(q) ||
+          role.people.some(
+            (p) =>
+              p.name.toLowerCase().includes(q) ||
+              (p.email ?? "").toLowerCase().includes(q)
+          )
+      );
+    });
+  }, [teams, search]);
 
   const refresh = React.useCallback(async () => {
     const data = await fetchTeams(workspaceId);
@@ -158,6 +177,21 @@ export function TeamsView({ workspaceId, initialTeams }: TeamsViewProps) {
           />
         </div>
 
+        {/* Search */}
+        {teams.length > 0 && (
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 max-w-xs">
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search teams, roles, or people..."
+                leftElement={<Search className="h-3.5 w-3.5" />}
+                aria-label="Search teams"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Team list */}
         {teams.length === 0 ? (
           <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center">
@@ -174,26 +208,32 @@ export function TeamsView({ workspaceId, initialTeams }: TeamsViewProps) {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {teams.map((team) => (
-              <TeamCard
-                key={team.id}
-                team={team}
-                expanded={expandedTeams.has(team.id)}
-                onToggle={() => toggleExpand(team.id)}
-                onUpdateName={(name) => handleUpdateTeamName(team.id, name)}
-                onDelete={() => handleDeleteTeam(team.id)}
-                onAddRole={() => handleAddRole(team.id)}
-                onDeleteRole={handleDeleteRole}
-                onUpdateRoleName={handleUpdateRoleName}
-                onUpdateRoleRate={handleUpdateRoleRate}
-                onAddPerson={handleAddPerson}
-                onDeletePerson={handleDeletePerson}
-                onUpdatePersonName={handleUpdatePersonName}
-                onUpdatePersonEmail={handleUpdatePersonEmail}
-              />
-            ))}
-          </div>
+          filtered.length === 0 ? (
+            <div className="px-4 py-6 text-center text-[13px] text-[var(--text-tertiary)]">
+              No teams match your search
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filtered.map((team) => (
+                <TeamCard
+                  key={team.id}
+                  team={team}
+                  expanded={expandedTeams.has(team.id)}
+                  onToggle={() => toggleExpand(team.id)}
+                  onUpdateName={(name) => handleUpdateTeamName(team.id, name)}
+                  onDelete={() => handleDeleteTeam(team.id)}
+                  onAddRole={() => handleAddRole(team.id)}
+                  onDeleteRole={handleDeleteRole}
+                  onUpdateRoleName={handleUpdateRoleName}
+                  onUpdateRoleRate={handleUpdateRoleRate}
+                  onAddPerson={handleAddPerson}
+                  onDeletePerson={handleDeletePerson}
+                  onUpdatePersonName={handleUpdatePersonName}
+                  onUpdatePersonEmail={handleUpdatePersonEmail}
+                />
+              ))}
+            </div>
+          )
         )}
       </div>
     </div>
