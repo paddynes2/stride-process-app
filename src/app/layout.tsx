@@ -30,6 +30,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${plusJakarta.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__testErrors=[];const _ce=console.error;console.error=function(){window.__testErrors.push([Date.now(),...arguments]);_ce.apply(console,arguments)};window.addEventListener('error',function(e){window.__testErrors.push([Date.now(),e.message,e.filename,e.lineno])});window.addEventListener('unhandledrejection',function(e){window.__testErrors.push([Date.now(),'UnhandledRejection',String(e.reason)])});`,
+          }}
+        />
         {children}
         <Toaster
           theme="dark"
