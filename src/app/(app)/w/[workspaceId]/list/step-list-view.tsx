@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search, ArrowUpDown } from "lucide-react";
+import { Search, ArrowUpDown, LayoutList } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { Step } from "@/types/database";
@@ -117,106 +117,118 @@ export function StepListView({ workspaceId, steps, sections, tabs }: StepListVie
           </h1>
         </div>
 
-        {/* Filters */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 max-w-xs">
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search steps..."
-              leftElement={<Search className="h-3.5 w-3.5" />}
-              aria-label="Search steps"
-            />
+        {steps.length === 0 ? (
+          <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center">
+            <LayoutList className="h-8 w-8 text-[var(--text-quaternary)] mx-auto mb-3" />
+            <p className="text-[14px] text-[var(--text-secondary)] mb-1">No steps yet</p>
+            <p className="text-[12px] text-[var(--text-tertiary)]">
+              Add steps to your process canvas to see them listed here
+            </p>
           </div>
+        ) : (
+          <>
+            {/* Filters */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-1 max-w-xs">
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search steps..."
+                  leftElement={<Search className="h-3.5 w-3.5" />}
+                  aria-label="Search steps"
+                />
+              </div>
 
-          {/* Status filter */}
-          <select
-            value={statusFilter ?? ""}
-            onChange={(e) => setStatusFilter(e.target.value || null)}
-            className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
-            aria-label="Filter by status"
-          >
-            <option value="">All Statuses</option>
-            {uniqueStatuses.map((s) => (
-              <option key={s} value={s}>{STATUS_LABELS[s] ?? s}</option>
-            ))}
-          </select>
+              {/* Status filter */}
+              <select
+                value={statusFilter ?? ""}
+                onChange={(e) => setStatusFilter(e.target.value || null)}
+                className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+                aria-label="Filter by status"
+              >
+                <option value="">All Statuses</option>
+                {uniqueStatuses.map((s) => (
+                  <option key={s} value={s}>{STATUS_LABELS[s] ?? s}</option>
+                ))}
+              </select>
 
-          {/* Executor filter */}
-          <select
-            value={executorFilter ?? ""}
-            onChange={(e) => setExecutorFilter(e.target.value || null)}
-            className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
-            aria-label="Filter by executor"
-          >
-            <option value="">All Executors</option>
-            {uniqueExecutors.map((e) => (
-              <option key={e} value={e}>{e.replace("_", " ")}</option>
-            ))}
-          </select>
-        </div>
+              {/* Executor filter */}
+              <select
+                value={executorFilter ?? ""}
+                onChange={(e) => setExecutorFilter(e.target.value || null)}
+                className="h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
+                aria-label="Filter by executor"
+              >
+                <option value="">All Executors</option>
+                {uniqueExecutors.map((e) => (
+                  <option key={e} value={e}>{e.replace("_", " ")}</option>
+                ))}
+              </select>
+            </div>
 
-        {/* Table */}
-        <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-[var(--bg-surface)]">
-                <SortHeader label="Name" field="name" current={sortField} dir={sortDir} onSort={toggleSort} />
-                <SortHeader label="Section" field="section" current={sortField} dir={sortDir} onSort={toggleSort} />
-                <SortHeader label="Tab" field="tab" current={sortField} dir={sortDir} onSort={toggleSort} />
-                <SortHeader label="Status" field="status" current={sortField} dir={sortDir} onSort={toggleSort} />
-                <SortHeader label="Executor" field="executor" current={sortField} dir={sortDir} onSort={toggleSort} />
-                <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
-                  Cost/mo
-                </th>
-                <SortHeader label="Created" field="created_at" current={sortField} dir={sortDir} onSort={toggleSort} />
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-3 py-8 text-center text-[13px] text-[var(--text-tertiary)]">
-                    {search || statusFilter || executorFilter ? "No steps match your filters" : "No steps yet"}
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((step) => (
-                  <tr
-                    key={step.id}
-                    onClick={() => handleRowClick(step)}
-                    className="border-t border-[var(--border-subtle)] hover:bg-[var(--bg-row-hover)] cursor-pointer transition-colors"
-                  >
-                    <td className="px-3 py-2 text-[13px] font-medium text-[var(--text-primary)] max-w-[200px] truncate">
-                      {step.name}
-                    </td>
-                    <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)]">
-                      {step.section_id ? sectionMap.get(step.section_id) ?? "—" : "—"}
-                    </td>
-                    <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)]">
-                      {tabMap.get(step.tab_id) ?? "—"}
-                    </td>
-                    <td className="px-3 py-2">
-                      <Badge variant={step.status as "draft" | "in_progress" | "testing" | "live" | "archived"}>
-                        {STATUS_LABELS[step.status] ?? step.status}
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)] capitalize">
-                      {step.executor === "empty" ? "—" : step.executor.replace("_", " ")}
-                    </td>
-                    <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)]">
-                      {step.time_minutes && step.frequency_per_month
-                        ? `${((step.time_minutes * step.frequency_per_month) / 60).toFixed(1)}h`
-                        : "—"}
-                    </td>
-                    <td className="px-3 py-2 text-[11px] text-[var(--text-quaternary)]">
-                      {new Date(step.created_at).toLocaleDateString()}
-                    </td>
+            {/* Table */}
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-[var(--bg-surface)]">
+                    <SortHeader label="Name" field="name" current={sortField} dir={sortDir} onSort={toggleSort} />
+                    <SortHeader label="Section" field="section" current={sortField} dir={sortDir} onSort={toggleSort} />
+                    <SortHeader label="Tab" field="tab" current={sortField} dir={sortDir} onSort={toggleSort} />
+                    <SortHeader label="Status" field="status" current={sortField} dir={sortDir} onSort={toggleSort} />
+                    <SortHeader label="Executor" field="executor" current={sortField} dir={sortDir} onSort={toggleSort} />
+                    <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+                      Cost/mo
+                    </th>
+                    <SortHeader label="Created" field="created_at" current={sortField} dir={sortDir} onSort={toggleSort} />
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-3 py-8 text-center text-[13px] text-[var(--text-tertiary)]">
+                        No steps match your filters
+                      </td>
+                    </tr>
+                  ) : (
+                    filtered.map((step) => (
+                      <tr
+                        key={step.id}
+                        onClick={() => handleRowClick(step)}
+                        className="border-t border-[var(--border-subtle)] hover:bg-[var(--bg-row-hover)] cursor-pointer transition-colors"
+                      >
+                        <td className="px-3 py-2 text-[13px] font-medium text-[var(--text-primary)] max-w-[200px] truncate">
+                          {step.name}
+                        </td>
+                        <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)]">
+                          {step.section_id ? sectionMap.get(step.section_id) ?? "—" : "—"}
+                        </td>
+                        <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)]">
+                          {tabMap.get(step.tab_id) ?? "—"}
+                        </td>
+                        <td className="px-3 py-2">
+                          <Badge variant={step.status as "draft" | "in_progress" | "testing" | "live" | "archived"}>
+                            {STATUS_LABELS[step.status] ?? step.status}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)] capitalize">
+                          {step.executor === "empty" ? "—" : step.executor.replace("_", " ")}
+                        </td>
+                        <td className="px-3 py-2 text-[12px] text-[var(--text-tertiary)]">
+                          {step.time_minutes && step.frequency_per_month
+                            ? `${((step.time_minutes * step.frequency_per_month) / 60).toFixed(1)}h`
+                            : "—"}
+                        </td>
+                        <td className="px-3 py-2 text-[11px] text-[var(--text-quaternary)]">
+                          {new Date(step.created_at).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -379,7 +379,7 @@ export function FlowCanvas({
   }, [onExportPdf, exporting]);
 
   return (
-    <div ref={wrapperRef} className="w-full h-full">
+    <div ref={wrapperRef} className="w-full h-full relative">
     <ReactFlow
       nodes={nodes}
       edges={edges}
@@ -469,6 +469,31 @@ export function FlowCanvas({
         </Panel>
       )}
     </ReactFlow>
+
+    {/* Empty state overlay */}
+    {sections.length === 0 && steps.length === 0 && (
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+        <div className="pointer-events-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center max-w-sm">
+          <Square className="h-8 w-8 text-[var(--text-quaternary)] mx-auto mb-3" />
+          <p className="text-[14px] text-[var(--text-secondary)] mb-1">
+            Your canvas is empty
+          </p>
+          <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+            Add a section to group related steps, or add a step to start mapping your process
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <Button size="sm" onClick={handleAddSection}>
+              <Square className="h-3.5 w-3.5" />
+              Add Section
+            </Button>
+            <Button variant="secondary" size="sm" onClick={handleAddStep}>
+              <Plus className="h-3.5 w-3.5" />
+              Add Step
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
