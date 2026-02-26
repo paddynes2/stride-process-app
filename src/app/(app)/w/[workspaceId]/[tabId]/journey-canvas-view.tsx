@@ -17,7 +17,9 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Plus, Layers, Route, Thermometer } from "lucide-react";
+import { Plus, Layers, Route, Thermometer, FileDown, ImageIcon } from "lucide-react";
+import { toast } from "sonner";
+import { useReactFlow } from "@xyflow/react";
 import { PAIN_LEVELS } from "@/lib/pain";
 import { Button } from "@/components/ui/button";
 import { StageNode } from "@/components/canvas/stage-node";
@@ -46,6 +48,8 @@ const nodeTypes = {
 interface JourneyCanvasViewProps {
   workspaceId: string;
   tabId: string;
+  tabName: string;
+  workspaceName: string;
   initialStages: Stage[];
   initialTouchpoints: Touchpoint[];
   initialConnections: TouchpointConnection[];
@@ -96,9 +100,47 @@ function buildJourneyEdges(connections: TouchpointConnection[]): Edge[] {
   }));
 }
 
+function PngExportButton({
+  wrapperRef,
+  workspaceName,
+}: {
+  wrapperRef: React.RefObject<HTMLDivElement | null>;
+  workspaceName: string;
+}) {
+  const [exporting, setExporting] = React.useState(false);
+  const { fitView, getViewport, setViewport } = useReactFlow();
+
+  const handleExport = React.useCallback(async () => {
+    if (!wrapperRef.current || exporting) return;
+    setExporting(true);
+    const savedViewport = getViewport();
+    try {
+      fitView({ padding: 0.1, duration: 0 });
+      await new Promise((r) => setTimeout(r, 100));
+      const { exportCanvasPng } = await import("@/lib/export/png");
+      await exportCanvasPng({ canvasElement: wrapperRef.current, workspaceName });
+      toast.success("PNG exported successfully");
+    } catch (err) {
+      toastError("Failed to export PNG", { error: err });
+    } finally {
+      setViewport(savedViewport, { duration: 0 });
+      setExporting(false);
+    }
+  }, [wrapperRef, workspaceName, exporting, fitView, getViewport, setViewport]);
+
+  return (
+    <Button variant="secondary" size="sm" onClick={handleExport} disabled={exporting} aria-label="Export journey as PNG">
+      <ImageIcon className="h-3.5 w-3.5" />
+      PNG
+    </Button>
+  );
+}
+
 export function JourneyCanvasView({
   workspaceId,
   tabId,
+  tabName,
+  workspaceName,
   initialStages,
   initialTouchpoints,
   initialConnections,
@@ -109,6 +151,29 @@ export function JourneyCanvasView({
   const [selectedStageId, setSelectedStageId] = React.useState<string | null>(null);
   const [selectedTouchpointId, setSelectedTouchpointId] = React.useState<string | null>(null);
   const [heatMapMode, setHeatMapMode] = React.useState(false);
+  const [exporting, setExporting] = React.useState(false);
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+
+  const handleExportPdf = React.useCallback(async () => {
+    if (!wrapperRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const { exportJourneyPdf } = await import("@/lib/export/journey-pdf");
+      await exportJourneyPdf({
+        workspaceName,
+        tabName,
+        stages,
+        touchpoints,
+        connections,
+        canvasElement: wrapperRef.current,
+      });
+      toast.success("PDF exported successfully");
+    } catch (err) {
+      toastError("Failed to export PDF", { error: err });
+    } finally {
+      setExporting(false);
+    }
+  }, [workspaceName, tabName, stages, touchpoints, connections, exporting]);
 
   const initialNodes = React.useMemo(
     () => buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode),
@@ -360,7 +425,7 @@ export function JourneyCanvasView({
   return (
     <div className="flex h-full">
       <div className="flex-1 relative">
-        <div className="w-full h-full relative">
+        <div ref={wrapperRef} className="w-full h-full relative">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -408,6 +473,11 @@ export function JourneyCanvasView({
                 <Thermometer className="h-3.5 w-3.5" />
                 Heat Map
               </Button>
+              <Button variant="secondary" size="sm" onClick={handleExportPdf} disabled={exporting} aria-label="Export journey as PDF">
+                <FileDown className="h-3.5 w-3.5" />
+                PDF
+              </Button>
+              <PngExportButton wrapperRef={wrapperRef} workspaceName={workspaceName} />
             </Panel>
 
             {/* Heat map legend */}

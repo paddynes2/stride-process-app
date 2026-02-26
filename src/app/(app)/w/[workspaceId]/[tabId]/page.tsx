@@ -14,7 +14,7 @@ export default async function TabPage({
   // Fetch the tab record to determine canvas type
   const { data: tab } = await supabase
     .from("tabs")
-    .select("canvas_type")
+    .select("canvas_type, name")
     .eq("id", tabId)
     .single();
 
@@ -23,17 +23,20 @@ export default async function TabPage({
   }
 
   if (tab.canvas_type === "journey") {
-    // Fetch journey-specific data
-    const [stagesRes, touchpointsRes, connectionsRes] = await Promise.all([
+    // Fetch journey-specific data + workspace name for export
+    const [stagesRes, touchpointsRes, connectionsRes, workspaceRes] = await Promise.all([
       supabase.from("stages").select("*").eq("tab_id", tabId).order("created_at"),
       supabase.from("touchpoints").select("*").eq("tab_id", tabId).order("created_at"),
       supabase.from("touchpoint_connections").select("*").eq("tab_id", tabId),
+      supabase.from("workspaces").select("name").eq("id", workspaceId).single(),
     ]);
 
     return (
       <JourneyCanvasView
         workspaceId={workspaceId}
         tabId={tabId}
+        tabName={tab.name}
+        workspaceName={workspaceRes.data?.name ?? "Workspace"}
         initialStages={stagesRes.data ?? []}
         initialTouchpoints={touchpointsRes.data ?? []}
         initialConnections={connectionsRes.data ?? []}
