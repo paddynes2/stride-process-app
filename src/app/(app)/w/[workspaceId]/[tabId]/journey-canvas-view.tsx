@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { StageNode } from "@/components/canvas/stage-node";
 import { TouchpointNode } from "@/components/canvas/touchpoint-node";
 import { StageDetailPanel } from "@/components/panels/stage-detail-panel";
+import { TouchpointDetailPanel } from "@/components/panels/touchpoint-detail-panel";
 import {
   createStage,
   updateStage,
@@ -328,6 +329,24 @@ export function JourneyCanvasView({
     setSelectedStageId(null);
   };
 
+  const selectedTouchpoint = selectedTouchpointId
+    ? touchpoints.find((t) => t.id === selectedTouchpointId) ?? null
+    : null;
+
+  const handleTouchpointUpdate = (updated: Touchpoint) => {
+    setTouchpoints((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+  };
+
+  const handleTouchpointDelete = (id: string) => {
+    setTouchpoints((prev) => prev.filter((t) => t.id !== id));
+    setConnections((prev) =>
+      prev.filter(
+        (c) => c.source_touchpoint_id !== id && c.target_touchpoint_id !== id
+      )
+    );
+    setSelectedTouchpointId(null);
+  };
+
   return (
     <div className="flex h-full">
       <div className="flex-1 relative">
@@ -412,6 +431,13 @@ export function JourneyCanvasView({
             onUpdate={handleStageUpdate}
             onDelete={handleStageDelete}
             onClose={() => setSelectedStageId(null)}
+          />
+        ) : selectedTouchpoint ? (
+          <TouchpointDetailPanel
+            touchpoint={selectedTouchpoint}
+            onUpdate={handleTouchpointUpdate}
+            onDelete={handleTouchpointDelete}
+            onClose={() => setSelectedTouchpointId(null)}
           />
         ) : (
           <div className="overflow-y-auto p-4 h-full">
