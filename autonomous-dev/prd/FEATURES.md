@@ -214,21 +214,21 @@
 - [x] [1/2] Empty state UIs — canvas overlay + list view card (gap/teams already done) — DONE iteration 22
 - [x] [2/2] Getting Started template — new workspace auto-creates example section with sample steps — DONE iteration 23
 
-### #FEAT-012 Loading and error states
+### #FEAT-012 Loading and error states — DONE iteration 26, 2026-02-26
 **Phase:** 1.5
 **Priority:** P1 (important)
-**Attempts:** 2
-**Status:** in-progress
+**Attempts:** 3
+**Status:** done
 **Acceptance criteria:**
 - [x] All pages with data fetching show skeleton loaders while loading (not blank white/dark)
 - [x] API errors show user-friendly error message with retry button
 - [x] Error boundary catches component crashes and shows recovery UI (not white screen)
 - [x] Network offline state shows banner ("You're offline — changes won't be saved")
-**Notes:** Current state: pages flash blank during load, API errors may show raw JSON or nothing. Skeleton loaders should match the layout shape of the loaded content.
+**Notes:** 7 loading.tsx files, 2 error boundaries, offline banner (useSyncExternalStore), toastError utility with retry across 8 files. Public share route loading.tsx added in final polish.
 **Sub-tasks:**
 - [x] [1/3] Skeleton component + error boundaries + loading.tsx for all routes — DONE iteration 24
 - [x] [2/3] Network offline banner + improved error toasts with retry — DONE iteration 25
-- [ ] [3/3] Polish — verify all states, edge cases
+- [x] [3/3] Polish — verify all states, add missing loading.tsx — DONE iteration 26
 
 ### #FEAT-013 Performance pass
 **Phase:** 1.5

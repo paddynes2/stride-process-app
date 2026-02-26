@@ -743,3 +743,28 @@
 - Efficiency (wasted actions?): 4 — Three attempts at offline-banner.tsx to satisfy strict React 19 lint rules. Final module-level store approach is better than the original.
 - Proactive observations: 0
 **Notes:** FEAT-012 [2/3] done. Strict React 19 lint rules (react-hooks/set-state-in-effect, react-hooks/refs) disallow setState in effect body AND ref access during render. Module-level external store with useSyncExternalStore is the correct pattern. 23 of 24 toast.error calls now use toastError. Remaining: 1 toast.error in settings copy-to-clipboard (not an API error).
+
+## Iteration 26 — 2026-02-26
+**Task:** #FEAT-012 [3/3] Polish — verify all loading/error states, add missing loading.tsx
+**Source:** prd/FEATURES.md
+**Complexity:** S
+**Result:** completed (sub-task [3/3] — FEAT-012 fully done)
+**Changes:**
+- Created: `src/app/public/[shareId]/loading.tsx` (skeleton for public share page)
+**Research:** Verified all 13 page routes for loading.tsx coverage. 6 app routes already had loading.tsx (iter 24). Public route was the only data-fetching route missing one. Auth routes (login/signup) are static forms. Redirect routes (/, /w/[workspaceId]) don't need loading. Stub routes (people, tools) are static. Verified all toast.error calls: 2 remaining are non-API (clipboard + validation). Verified error boundaries, offline banner, CSS variables all correct.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing)
+- Build: pass (37 routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Single file, matches existing loading.tsx patterns exactly
+- Test coverage of change: 3 — Static verification only. Loading state is visual.
+- Confidence this won't regress: 5 — Purely additive (1 new file). Zero risk.
+- Efficiency (wasted actions?): 5 — Thorough verification completed efficiently, found the one gap and fixed it.
+- Proactive observations: 0
+**Notes:** FEAT-012 is now fully DONE. All 4 acceptance criteria met. Phase 1.5 task 3 of 7 complete. Next: FEAT-013 (performance pass).

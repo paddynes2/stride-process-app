@@ -91,7 +91,7 @@ Tasks (in priority order):
 Tasks (in priority order):
 1. [x] Fix all 8 open accessibility bugs (BUG-002 through BUG-009) — contrast, labels, touch targets, headings, focus indicators
 2. [x] Empty states & onboarding — first workspace experience, helpful empty states on canvas/gap/teams/list views, "getting started" guidance — DONE iteration 23
-3. [ ] Loading & error states — skeleton loaders on all data-fetching pages, error boundaries, retry affordances
+3. [x] Loading & error states — skeleton loaders on all data-fetching pages, error boundaries, retry affordances — DONE iteration 26
 4. [ ] Performance pass — bundle analysis, lazy loading for heavy routes (gap analysis, teams), image optimization
 5. [ ] Work through IMPROVEMENTS.md backlog — agent-discovered UX wins from Phase 1 testing
 6. [ ] Responsive sanity check — key flows work on tablet (1024px). Not mobile-first, but not broken.
@@ -272,3 +272,4 @@ Tasks:
 - [2026-02-26] Iteration 23: FEAT-011 [2/2] complete (Getting Started template). New workspaces auto-seed a section with 3 connected example steps via POST /api/v1/workspaces. Phase 1.5 task 2 of 7 fully done.
 - [2026-02-26] Iteration 24: FEAT-012 [1/3] complete (skeleton + error boundaries + loading.tsx). Decomposed FEAT-012 into 3 sub-tasks. Created Skeleton component, 2 error boundaries, and 6 loading.tsx files. Phase 1.5 task 3 in progress.
 - [2026-02-26] Iteration 25: FEAT-012 [2/3] complete (offline banner + retry toasts). OfflineBanner component (useSyncExternalStore), toastError utility with retry action buttons. 23 of 24 toast.error calls updated across 8 files. All 4 acceptance criteria now met. Sub-task [3/3] polish remains.
+- [2026-02-26] Iteration 26: FEAT-012 [3/3] complete (polish + verification). Added loading.tsx for /public/[shareId]. Verified all 7 loading.tsx files, 2 error boundaries, offline banner, toast helpers. FEAT-012 fully DONE. Phase 1.5 task 3 of 7 complete.
