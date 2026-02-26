@@ -132,3 +132,13 @@ export interface StepRole {
   role_id: string;
   created_at: string;
 }
+
+export interface PublicShare {
+  id: string;
+  workspace_id: string;
+  share_id: string;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}

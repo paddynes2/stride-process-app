@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole, PublicShare } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -276,4 +276,49 @@ export async function createStepRole(data: { step_id: string; role_id: string })
 
 export async function deleteStepRole(id: string): Promise<void> {
   await apiFetch(`/api/v1/step-roles/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Public Shares
+// ---------------------------------------------------------------------------
+
+export async function fetchShares(workspaceId: string): Promise<PublicShare[]> {
+  return apiFetch<PublicShare[]>(`/api/v1/shares?workspace_id=${workspaceId}`);
+}
+
+export async function createShare(data: { workspace_id: string }): Promise<PublicShare> {
+  return apiFetch<PublicShare>("/api/v1/shares", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateShare(id: string, data: { is_active: boolean }): Promise<PublicShare> {
+  return apiFetch<PublicShare>(`/api/v1/shares/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteShare(id: string): Promise<void> {
+  await apiFetch(`/api/v1/shares/${id}`, { method: "DELETE" });
+}
+
+// Public data (no auth required)
+export interface PublicShareData {
+  workspace: { id: string; name: string };
+  tabs: Array<{
+    id: string;
+    name: string;
+    position: number;
+    sections: Section[];
+    steps: Step[];
+    connections: Connection[];
+  }>;
+}
+
+export async function fetchPublicShareData(shareId: string): Promise<PublicShareData> {
+  return apiFetch<PublicShareData>(`/api/v1/public/shares/${shareId}`);
 }
