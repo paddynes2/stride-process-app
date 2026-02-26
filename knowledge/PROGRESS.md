@@ -397,3 +397,28 @@
 - Efficiency (wasted actions?): 5 — clean execution, minimal research needed
 - Proactive observations: 0
 **Notes:** #FEAT-028 decomposed into [1/2] flat tables (People + Tools, done) and [2/2] hierarchical (Teams, next). Risk score for next iteration: touched 2 files, no shared components/auth/migrations = 0.
+
+## Iteration 69 — 2026-02-26 23:00
+**Task:** #FEAT-028 [2/2] Search & filter for Teams view
+**Source:** prd/FEATURES.md
+**Complexity:** S
+**Result:** completed
+**Changes:**
+- `src/app/(app)/w/[workspaceId]/teams/teams-view.tsx` — added search state, useMemo filtered computation with hierarchical matching (team→role→person), search input with Search icon, no-results state
+**Research:** Read teams-view.tsx, people-view.tsx (pattern reference). Confirmed same useState + useMemo + Input leftElement pattern.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 new)
+- Build: pass
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright MCP unavailable — static verification only)
+- Canary test: skipped (Playwright unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — follows established pattern exactly, hierarchical search is clean and readable, proper ARIA label
+- Test coverage of change: 2 — type check + lint + build only, no browser testing
+- Confidence this won't regress: 5 — purely additive (new state + UI), team cards render same data when no search active
+- Efficiency (wasted actions?): 5 — clean execution, minimal research needed
+- Proactive observations: 0
+**Notes:** #FEAT-028 fully complete (both sub-tasks). Risk score for next iteration: touched 1 file, no shared components/auth/migrations = 0.

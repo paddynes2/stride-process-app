@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 68
-- **Date:** 2026-02-26 22:30
+- **Iteration:** 69
+- **Date:** 2026-02-26 23:00
 - **Phase:** Phase 3: Advanced Features
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-028 [1/2] Search & filter for People and Tools views
+- **Last task:** #FEAT-028 [2/2] Search & filter for Teams view
 - **Result:** completed
-- **Next task:** #FEAT-028 [2/2] Search & filter for Teams view
+- **Next task:** #FEAT-031 Step list bulk actions
 - **Blockers:** None
 
 ## Context
 
-Added search & filtering to People view (`people-view.tsx`) and Tools view (`tools-view.tsx`). Both follow the exact step-list-view pattern: `React.useState` for search/filter state, `React.useMemo` for filtered computation, `Input` with `Search` icon via `leftElement`, native `<select>` elements for dropdown filters. People has search (name/email), role filter, team filter. Tools has search (name/category/vendor), category filter (only shown when categories exist). Both show "No X match your filters" when filtered list is empty. #FEAT-028 is decomposed: [1/2] done (flat tables), [2/2] remaining (Teams hierarchical view).
+Completed #FEAT-028 fully — search & filter now exists across all three entity views: People (search name/email, filter by role/team), Tools (search name/category/vendor, filter by category), and Teams (search team/role/person name/email, hierarchical matching). Teams uses `useMemo` with deep search: if any nested role or person matches, the entire team card is shown. Same `Input` + `Search` icon + `leftElement` pattern as other views. No dropdown filters for Teams since the search already traverses the full hierarchy.
 
 ## Dev Server
 
