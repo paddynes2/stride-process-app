@@ -14,6 +14,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const debounceRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [3] },
