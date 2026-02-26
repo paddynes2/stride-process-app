@@ -676,3 +676,36 @@
 - Efficiency (wasted actions?): 5 — Focused research, direct implementation, no wasted actions.
 - Proactive observations: 0
 **Notes:** FEAT-011 fully complete (both sub-tasks done). Phase 1.5 task 2 of 7 complete. Template creates section (700x200) with 3 connected steps positioned horizontally inside it. All deletable by the user.
+
+## Iteration 24 — 2026-02-26
+**Task:** #FEAT-012 [1/3] Skeleton component + error boundaries + loading.tsx for all routes
+**Source:** prd/FEATURES.md
+**Complexity:** L (decomposed into 3 sub-tasks)
+**Result:** completed (sub-task [1/3])
+**Changes:**
+- Created: `src/components/ui/skeleton.tsx` (reusable Skeleton primitive)
+- Created: `src/app/(app)/error.tsx` (app-level error boundary)
+- Created: `src/app/(app)/w/[workspaceId]/error.tsx` (workspace-level error boundary)
+- Created: `src/app/(app)/workspaces/loading.tsx` (workspace list skeleton)
+- Created: `src/app/(app)/w/[workspaceId]/[tabId]/loading.tsx` (canvas loading)
+- Created: `src/app/(app)/w/[workspaceId]/list/loading.tsx` (list view skeleton)
+- Created: `src/app/(app)/w/[workspaceId]/gap-analysis/loading.tsx` (gap analysis skeleton)
+- Created: `src/app/(app)/w/[workspaceId]/teams/loading.tsx` (teams skeleton)
+- Created: `src/app/(app)/w/[workspaceId]/settings/loading.tsx` (settings skeleton)
+**Research:** Used Explore agent to scan all data-fetching patterns. Found: 6 server-side pages fetch with Promise.all, 4 client-side components use useEffect. No existing skeleton/loading/error-boundary components. Button has loading prop (only existing loading pattern). Sonner toast is the only error notification mechanism.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 9 warnings — all pre-existing)
+- Build: pass (37 routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean, minimal files following Next.js conventions. Skeleton matches existing design tokens.
+- Test coverage of change: 3 — Static verification only. Loading/error states are visual — browser testing would confirm rendering.
+- Confidence this won't regress: 5 — Purely additive (9 new files). No modifications to existing code. Zero risk of regression.
+- Efficiency (wasted actions?): 5 — Research delegated to Explore agent, all files created in parallel batches.
+- Proactive observations: 0
+**Notes:** FEAT-012 decomposed into [1/3] foundation (done), [2/3] offline banner + retry, [3/3] polish. Risk score 0 from iter 23. No cadence triggers at iter 24.

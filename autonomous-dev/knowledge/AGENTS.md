@@ -200,7 +200,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 
 ## Key Files
 
-<!-- Updated: iter-19, 2026-02-26 -->
+<!-- Updated: iter-24, 2026-02-26 -->
 
 - `src/app/(app)/w/[workspaceId]/workspace-shell.tsx` — Main workspace client layout (sidebar, header, tab bar)
 - `src/components/canvas/flow-canvas.tsx` — React Flow canvas with custom nodes
@@ -220,6 +220,9 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/lib/export/pdf.ts` — PDF export utility (jspdf + html-to-image)
 - `src/lib/export/png.ts` — PNG export utility (html-to-image toPng at 2x)
 - `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare)
+- `src/components/ui/skeleton.tsx` — Skeleton primitive (animated pulse block for loading states)
+- `src/app/(app)/error.tsx` — App-level error boundary (catches component crashes)
+- `src/app/(app)/w/[workspaceId]/error.tsx` — Workspace-level error boundary
 
 ## Patterns
 

@@ -6,22 +6,33 @@
 
 ## Handoff
 
-- **Iteration:** 23
+- **Iteration:** 24
 - **Date:** 2026-02-26
 - **Phase:** Phase 1.5 — Ship & Harden
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-011 [2/2] Getting Started template — new workspace auto-creates example section with sample steps
+- **Last task:** #FEAT-012 [1/3] Skeleton component + error boundaries + loading.tsx files for all routes
 - **Result:** completed
-- **Next task:** #FEAT-012 Loading and error states (or deferred performance/UX sweep cadence)
+- **Next task:** #FEAT-012 [2/3] Network offline banner + improved error handling with retry
 - **Blockers:** None
 
 ## Context
 
-Completed FEAT-011 [2/2] by adding template seeding to `src/app/api/v1/workspaces/route.ts`. After `bootstrap_workspace` RPC creates the workspace and first tab, the POST handler now creates a "Getting Started" section (700x200, positioned at 100,80) containing 3 example steps ("Document the process", "Score maturity", "Identify gaps") connected in sequence. Template seeding is best-effort — wrapped in try/catch so it won't fail workspace creation. Steps are positioned inside the section at y=50, spaced horizontally. This completes FEAT-011 (empty states + onboarding). Phase 1.5 task 2 of 7 done. Next up: FEAT-012 (loading & error states) unless cadence overrides.
+Completed FEAT-012 [1/3]. Created 9 new files establishing loading/error patterns for the app:
+- `src/components/ui/skeleton.tsx` — reusable Skeleton primitive (animated pulse, uses --elevated bg)
+- `src/app/(app)/error.tsx` — app-level error boundary with retry + "Go to workspaces" buttons
+- `src/app/(app)/w/[workspaceId]/error.tsx` — workspace-level error boundary with retry + back nav
+- 6 `loading.tsx` files: workspaces (card grid), canvas (centered spinner), list (table rows), gap-analysis (summary cards + table), teams (team cards), settings (form sections)
+
+Each loading skeleton matches the page's content shape. Error boundaries use AlertTriangle icon, dark theme styling, and provide both "Try again" (reset) and navigation escape hatch. All purely additive — no existing code modified.
+
+FEAT-012 decomposed into 3 sub-tasks:
+- [1/3] Skeleton + error boundaries + loading.tsx (DONE this iteration)
+- [2/3] Network offline banner + improved error toasts with retry
+- [3/3] Polish — verify all states work, edge cases
 
 ## Dev Server
 
-- **Status:** running (started this iteration)
+- **Status:** assumed running
 - **Port:** 3000
 - **Command:** npm run dev
 
@@ -30,5 +41,5 @@ Completed FEAT-011 [2/2] by adding template seeding to `src/app/api/v1/workspace
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (9 warnings, all in other files — flow-canvas, header, sidebar, tab-bar, workspace-list, page.tsx).
 - Browser testing skipped — Playwright MCP unavailable. Verified via static checks only (type-check + lint + build).
-- Performance testing cadence triggered (iter 20) but deferred. Run next available iteration.
-- UX sweep cadence triggered (iter 20) but deferred per collision rules. Run next available iteration after performance.
+- Performance testing cadence triggered (iter 20) but deferred. Consider running after FEAT-012 completes.
+- UX sweep cadence triggered (iter 20) but deferred per collision rules. Run after performance testing.

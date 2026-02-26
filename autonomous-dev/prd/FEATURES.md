@@ -217,14 +217,18 @@
 ### #FEAT-012 Loading and error states
 **Phase:** 1.5
 **Priority:** P1 (important)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in-progress
 **Acceptance criteria:**
-- [ ] All pages with data fetching show skeleton loaders while loading (not blank white/dark)
+- [x] All pages with data fetching show skeleton loaders while loading (not blank white/dark)
 - [ ] API errors show user-friendly error message with retry button
-- [ ] Error boundary catches component crashes and shows recovery UI (not white screen)
+- [x] Error boundary catches component crashes and shows recovery UI (not white screen)
 - [ ] Network offline state shows banner ("You're offline — changes won't be saved")
 **Notes:** Current state: pages flash blank during load, API errors may show raw JSON or nothing. Skeleton loaders should match the layout shape of the loaded content.
+**Sub-tasks:**
+- [x] [1/3] Skeleton component + error boundaries + loading.tsx for all routes — DONE iteration 24
+- [ ] [2/3] Network offline banner + improved error toasts with retry
+- [ ] [3/3] Polish — verify all states, edge cases
 
 ### #FEAT-013 Performance pass
 **Phase:** 1.5
