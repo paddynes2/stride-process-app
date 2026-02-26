@@ -200,3 +200,27 @@
 - Efficiency (wasted actions?): 5 — direct fix, minimal research needed
 - Proactive observations: 0
 **Notes:** Both POST and PATCH now reject non-numeric and out-of-range ratings with 400 before reaching DB. Only BUG-016 remains as P2.
+
+## Iteration 62 — 2026-02-26 23:50
+**Task:** #BUG-016 Show toast on annotation fetch failure instead of swallowing silently
+**Source:** prd/BUGS.md
+**Complexity:** S
+**Result:** completed
+**Changes:** src/components/panels/annotation-panel.tsx (3 lines added, 2 removed)
+**Research:** Skipped (S complexity). Read annotation-panel.tsx and toast-helpers.ts — toastError already imported and used in other catch blocks in the same file.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 errors)
+- Build: pass (all routes compile)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright MCP unavailable — static verification only)
+- Canary test: skipped (Playwright unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — follows identical pattern used in handleContentChange, handleRatingChange, handleDelete catch blocks in the same file
+- Test coverage of change: 2 — no browser test, verified via type check + lint + build only
+- Confidence this won't regress: 5 — additive change in catch block, no existing behavior changed for successful fetches
+- Efficiency (wasted actions?): 5 — minimal research, single-line change
+- Proactive observations: 0
+**Notes:** All bugs (BUG-001 through BUG-016) now resolved. Bug fix backlog from Phase 2b quality audit is complete. Next iteration should begin Phase 3 feature work.

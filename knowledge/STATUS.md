@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 61
-- **Date:** 2026-02-26 23:30
+- **Iteration:** 62
+- **Date:** 2026-02-26 23:50
 - **Phase:** Bug fixes before Phase 3
 - **Branch:** ralph/init-stride
-- **Last task:** #BUG-015 Add rating range validation (1-5) in annotation POST and PATCH routes
+- **Last task:** #BUG-016 Show toast on annotation fetch failure instead of swallowing silently
 - **Result:** completed
-- **Next task:** Fix #BUG-016 (silent error swallowing on annotation fetch failure) — last P2 bug
+- **Next task:** All bugs resolved (P0, P1, P2). Begin Phase 3 feature work — prioritize from FEATURES.md Phase 3 candidates.
 - **Blockers:** None
 
 ## Context
 
-Added rating validation guard clauses to both annotation API routes: `src/app/api/v1/annotations/route.ts` (POST) and `src/app/api/v1/annotations/[id]/route.ts` (PATCH). Both now reject non-numeric or out-of-range (< 1 or > 5) ratings with a 400 before reaching the DB. This prevents the DB CHECK constraint from surfacing as an opaque 500. All P1 bugs resolved. One P2 bug remains: BUG-016 (silent annotation fetch error in annotation-panel.tsx).
+Fixed the last remaining bug (BUG-016) in `src/components/panels/annotation-panel.tsx`. The `.catch()` block in the `fetchAnnotations` effect (line 63) was silently setting `loading=false` without user feedback. Now calls `toastError("Failed to load annotation", { error: err })` which also triggers network error detection. All bugs (BUG-001 through BUG-016) are now resolved. The bug fix backlog from the Phase 2b quality audit is complete. Phase 3 feature candidates need to be prioritized and added to FEATURES.md.
 
 ## Dev Server
 
@@ -24,4 +24,4 @@ Added rating validation guard clauses to both annotation API routes: `src/app/ap
 - 5 pre-existing lint warnings in flow-canvas.tsx, journey-canvas-view.tsx, sidebar.tsx (unchanged)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation) — static verification only
-- 1 P2 bug remaining: BUG-016
+- Phase 3 features not yet prioritized — next iteration should add concrete tasks to FEATURES.md

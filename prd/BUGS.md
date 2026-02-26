@@ -35,8 +35,7 @@
   - **Where:** `src/app/api/v1/annotations/route.ts` POST, `src/app/api/v1/annotations/[id]/route.ts` PATCH
   - **Fix applied:** Added guard clause in both POST and PATCH: validates `rating` is a number between 1-5, returns 400 with descriptive message if invalid. Prevents DB CHECK constraint from surfacing as opaque 500.
 
-- [ ] #BUG-016 Silent error swallowing on annotation fetch failure — Attempts: 0
+- [x] #BUG-016 Silent error swallowing on annotation fetch failure — DONE iteration 62, 2026-02-26
   - **Found:** Iteration 57 (quality audit)
   - **Where:** `src/components/panels/annotation-panel.tsx` line ~63-64
-  - **Impact:** If annotation fetch fails (network error, server error), the `.catch()` block silently sets `loading=false` with no user feedback. User sees empty panel and doesn't know the fetch failed.
-  - **Fix:** Add `toastError("Failed to load annotation")` in the catch block.
+  - **Fix applied:** Added `toastError("Failed to load annotation", { error: err })` in the `.catch()` block before `setLoading(false)`. Passes error object for network error detection.
