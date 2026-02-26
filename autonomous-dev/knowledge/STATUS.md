@@ -6,20 +6,23 @@
 
 ## Handoff
 
-- **Iteration:** 51
+- **Iteration:** 52
 - **Date:** 2026-02-26
 - **Phase:** Phase 2b — Analysis & Intelligence
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-023 [3/3] Perspectives management UI in workspace settings
+- **Last task:** #FEAT-024 [1/3] Perspective switcher + active perspective context state
 - **Result:** completed
-- **Next task:** #FEAT-024 Perspective annotation UI (perspective switcher, annotation panel on elements, visual indicators)
+- **Next task:** #FEAT-024 [2/3] Shared annotation panel component + wire into all 4 detail panels
 - **Blockers:** None
 
 ## Context
 
-Added Perspectives section to `src/app/(app)/w/[workspaceId]/settings/page.tsx`. The section sits between Public Sharing and Danger Zone. Users can create perspectives (auto-assigned color from 8-preset palette), inline-edit names, change colors via swatch picker, and delete. Added scrollable wrapper to settings page. All CRUD uses the existing fetchPerspectives/createPerspective/updatePerspective/deletePerspective client wrappers from iteration 50.
+Added active perspective state management to `WorkspaceContext` (`src/lib/context/workspace-context.tsx`): `perspectives`, `activePerspective`, `setActivePerspectiveId`, `refreshPerspectives`. Perspectives are fetched server-side in `layout.tsx` and passed through `WorkspaceShell` → `WorkspaceProvider`. A `PerspectiveSwitcher` dropdown was added to the header (`src/components/layout/header.tsx`) — it shows an eye icon with perspective name/color pill, dropdown lists all perspectives + "None" default, and an X button to clear selection.
 
-FEAT-023 is now fully complete (all 3/3 sub-tasks done). Next: FEAT-024 (perspective annotation UI) — adds perspective switcher to canvas toolbar, annotation panel on element detail panels, visual indicators on canvas nodes.
+FEAT-024 decomposed into 3 sub-tasks:
+- [x] [1/3] Perspective switcher + context state (this iteration)
+- [ ] [2/3] Shared annotation panel component + wire into all 4 detail panels
+- [ ] [3/3] Visual indicators on all 4 canvas node types
 
 ## Dev Server
 
@@ -30,6 +33,6 @@ FEAT-023 is now fully complete (all 3/3 sub-tasks done). Next: FEAT-024 (perspec
 ## Warnings
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
-- Pre-existing lint warnings (6 warnings — unchanged since iter 20).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-51).
+- Pre-existing lint warnings (5 warnings — unchanged since iter 20).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-52).
 - Unused import `addEdge` in flow-canvas.tsx and `Plus` in sidebar.tsx — minor cleanup opportunity.

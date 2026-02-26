@@ -1456,3 +1456,31 @@
 - Efficiency (wasted actions?): 5 — Clean research, clean execution, no wasted actions.
 - Proactive observations: 0
 **Notes:** FEAT-023 fully complete (all 3/3 sub-tasks). Phase 2b progressing well.
+
+## Iteration 52 — 2026-02-26
+**Task:** #FEAT-024 [1/3] Perspective switcher + active perspective context state
+**Source:** prd/FEATURES.md
+**Complexity:** L (decomposed into 3 sub-tasks)
+**Result:** completed
+**Changes:**
+- Modified: `src/lib/context/workspace-context.tsx` (+29 lines — perspectives, activePerspective, setActivePerspectiveId, refreshPerspectives)
+- Modified: `src/app/(app)/w/[workspaceId]/layout.tsx` (+8 lines — server-side perspectives fetch)
+- Modified: `src/app/(app)/w/[workspaceId]/workspace-shell.tsx` (+5 lines — perspectives prop threading)
+- Modified: `src/components/layout/header.tsx` (+90 lines — PerspectiveSwitcher component, useWorkspace integration)
+**Research:** Read workspace-context.tsx (context pattern), header.tsx (existing dropdown pattern), workspace-shell.tsx (prop threading), layout.tsx (server-side data fetching), dropdown-menu.tsx (Radix UI components), database.ts (Perspective type), client.ts (fetchPerspectives wrapper), settings/page.tsx (PERSPECTIVE_COLORS for consistency).
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 5 pre-existing warnings)
+- Build: pass (all routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Follows existing context/header/dropdown patterns exactly. Aria-labels on all interactive elements. Clean separation of PerspectiveSwitcher as local component.
+- Test coverage of change: 2 — Static verification only (typecheck + lint + build). No runtime test possible without browser.
+- Confidence this won't regress: 5 — Purely additive. Context adds new fields (existing consumers unaffected). Header adds conditional UI (only shows when perspectives exist). Layout adds one more Supabase query.
+- Efficiency (wasted actions?): 5 — Clean research, clean implementation, no wasted actions.
+- Proactive observations: 0
+**Notes:** FEAT-024 decomposed into 3 sub-tasks. [1/3] complete. Perspectives are fetched server-side for SSR. Active perspective state is client-side only (not persisted to URL or DB — resets on navigation). Switcher only renders when workspace has perspectives.

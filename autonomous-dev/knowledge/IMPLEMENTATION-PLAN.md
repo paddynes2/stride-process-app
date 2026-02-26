@@ -153,7 +153,7 @@ Tasks (in priority order):
      ═══════════════════════════════════════════════════════════════════════ -->
 
 ### Phase 2b: Analysis & Intelligence
-**Status:** IN PROGRESS (starting iteration 49)
+**Status:** IN PROGRESS (starting iteration 49, FEAT-024 in progress)
 **Depends on:** Phase 2a (DONE)
 **Estimated iterations:** 20-25
 **Goal:** Layer analysis tools on top of process and journey data. Move from "document what exists" to "reveal what's broken and where perceptions diverge." Introduce AI where it adds clear consulting value.
@@ -323,3 +323,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 49: **Phase 2b started.** FEAT-023 [1/3] complete (data model + types). Migration 012 pushed: perspectives table, perspective_annotations table (polymorphic), annotatable_type enum. TypeScript types added. Sub-tasks [2/3] API routes and [3/3] management UI remain.
 - [2026-02-26] Iteration 50: FEAT-023 [2/3] complete (API routes + client wrappers). 4 route files (perspectives CRUD + annotations CRUD), 8 client functions. Sub-task [3/3] management UI remains.
 - [2026-02-26] Iteration 51: **FEAT-023 DONE** (all 3/3 sub-tasks complete). Management UI added to workspace settings page — create, inline rename, color picker (8 presets), delete. 3 iterations total for FEAT-023 (iter 49-51). Next: FEAT-024 perspective annotation UI.
+- [2026-02-26] Iteration 52: FEAT-024 [1/3] complete (perspective switcher + context state). Active perspective state in WorkspaceContext, PerspectiveSwitcher dropdown in header, server-side perspective fetching. Decomposed FEAT-024 into 3 sub-tasks. Sub-tasks [2/3] annotation panel and [3/3] visual indicators remain.
