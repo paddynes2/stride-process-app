@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -245,4 +245,30 @@ export async function updatePerson(id: string, data: Partial<Pick<Person, "name"
 
 export async function deletePerson(id: string): Promise<void> {
   await apiFetch(`/api/v1/people/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Step-Roles (junction: step ↔ role assignment)
+// ---------------------------------------------------------------------------
+
+export type StepRoleWithDetails = StepRole & {
+  role: Pick<Role, "id" | "name" | "hourly_rate"> & {
+    team: Pick<Team, "id" | "name">;
+  };
+};
+
+export async function fetchStepRoles(stepId: string): Promise<StepRoleWithDetails[]> {
+  return apiFetch<StepRoleWithDetails[]>(`/api/v1/step-roles?step_id=${stepId}`);
+}
+
+export async function createStepRole(data: { step_id: string; role_id: string }): Promise<StepRoleWithDetails> {
+  return apiFetch<StepRoleWithDetails>("/api/v1/step-roles", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStepRole(id: string): Promise<void> {
+  await apiFetch(`/api/v1/step-roles/${id}`, { method: "DELETE" });
 }

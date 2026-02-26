@@ -125,3 +125,10 @@ export interface Person {
   created_at: string;
   updated_at: string;
 }
+
+export interface StepRole {
+  id: string;
+  step_id: string;
+  role_id: string;
+  created_at: string;
+}
