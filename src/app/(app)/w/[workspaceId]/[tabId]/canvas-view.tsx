@@ -82,8 +82,6 @@ export function CanvasView({
     setConnections((prev) => prev.filter((c) => c.id !== connectionId));
   };
 
-  const showPanel = selectedStep || selectedSection;
-
   return (
     <div className="flex h-full">
       {/* Canvas */}
@@ -109,32 +107,37 @@ export function CanvasView({
         />
       </div>
 
-      {/* Detail Panel */}
-      {showPanel && (
-        <div
-          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-y-auto"
-          style={{ width: "var(--panel-width)" }}
-        >
-          {selectedStep && (
-            <StepDetailPanel
-              step={selectedStep}
-              workspaceId={workspaceId}
-              onUpdate={handleStepUpdate}
-              onDelete={handleStepDelete}
-              onClose={() => setSelectedStepId(null)}
-            />
-          )}
-          {selectedSection && !selectedStep && (
-            <SectionDetailPanel
-              section={selectedSection}
-              steps={steps.filter((s) => s.section_id === selectedSection.id)}
-              onUpdate={handleSectionUpdate}
-              onDelete={handleSectionDelete}
-              onClose={() => setSelectedSectionId(null)}
-            />
-          )}
-        </div>
-      )}
+      {/* Detail Panel / Summary Panel */}
+      <div
+        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-y-auto"
+        style={{ width: "var(--panel-width)" }}
+      >
+        {selectedStep && (
+          <StepDetailPanel
+            step={selectedStep}
+            workspaceId={workspaceId}
+            onUpdate={handleStepUpdate}
+            onDelete={handleStepDelete}
+            onClose={() => setSelectedStepId(null)}
+          />
+        )}
+        {selectedSection && !selectedStep && (
+          <SectionDetailPanel
+            section={selectedSection}
+            steps={steps.filter((s) => s.section_id === selectedSection.id)}
+            onUpdate={handleSectionUpdate}
+            onDelete={handleSectionDelete}
+            onClose={() => setSelectedSectionId(null)}
+          />
+        )}
+        {!selectedStep && !selectedSection && (
+          <WorkspaceSummaryPanel
+            sections={sections}
+            steps={steps}
+            connections={connections}
+          />
+        )}
+      </div>
     </div>
   );
 }

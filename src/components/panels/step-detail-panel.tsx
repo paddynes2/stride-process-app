@@ -318,11 +318,27 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
           </div>
         </div>
 
-        {step.time_minutes && step.frequency_per_month ? (
-          <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2">
-            Monthly cost: <strong className="text-[var(--text-secondary)]">{((step.time_minutes * step.frequency_per_month) / 60).toFixed(1)}h</strong> / month
-          </div>
-        ) : null}
+        {step.time_minutes && step.frequency_per_month ? (() => {
+          const monthlyHours = (step.time_minutes * step.frequency_per_month) / 60;
+          const rolesWithRate = stepRoles.filter((sr) => sr.role.hourly_rate != null);
+          const avgRate = rolesWithRate.length > 0
+            ? rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length
+            : null;
+          const monthlyCost = avgRate != null ? monthlyHours * avgRate : null;
+          return (
+            <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2 space-y-1">
+              <div>
+                Monthly time: <strong className="text-[var(--text-secondary)]">{monthlyHours.toFixed(1)}h</strong> / month
+              </div>
+              {monthlyCost != null && (
+                <div>
+                  Monthly cost: <strong className="text-[var(--text-secondary)]">${monthlyCost.toFixed(2)}</strong> / month
+                  <span className="text-[var(--text-quaternary)] ml-1">(avg ${avgRate!.toFixed(2)}/hr)</span>
+                </div>
+              )}
+            </div>
+          );
+        })() : null}
 
         <Separator />
 

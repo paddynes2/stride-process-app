@@ -11,16 +11,28 @@ export async function GET(request: NextRequest) {
   }
 
   const stepId = request.nextUrl.searchParams.get("step_id");
+  const stepIds = request.nextUrl.searchParams.get("step_ids");
 
-  if (!stepId) {
-    return errorResponse("validation", "step_id query parameter is required", 400);
+  if (!stepId && !stepIds) {
+    return errorResponse("validation", "step_id or step_ids query parameter is required", 400);
   }
 
-  const { data: stepRoles, error } = await supabase
+  let query = supabase
     .from("step_roles")
     .select("*, role:roles(id, name, hourly_rate, team:teams(id, name))")
-    .eq("step_id", stepId)
     .order("created_at", { ascending: true });
+
+  if (stepId) {
+    query = query.eq("step_id", stepId);
+  } else if (stepIds) {
+    const ids = stepIds.split(",").filter(Boolean);
+    if (ids.length === 0) {
+      return successResponse([]);
+    }
+    query = query.in("step_id", ids);
+  }
+
+  const { data: stepRoles, error } = await query;
 
   if (error) {
     return errorResponse("fetch_failed", error.message, 500);

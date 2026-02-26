@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { RichTextEditor } from "./rich-text-editor";
-import { updateSection, deleteSection as apiDeleteSection } from "@/lib/api/client";
+import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch } from "@/lib/api/client";
+import type { StepRoleWithDetails } from "@/lib/api/client";
 import type { Section, Step } from "@/types/database";
 import { toast } from "sonner";
 
@@ -23,10 +24,33 @@ interface SectionDetailPanelProps {
 export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose }: SectionDetailPanelProps) {
   const [name, setName] = React.useState(section.name);
   const nameTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [stepRolesMap, setStepRolesMap] = React.useState<Record<string, StepRoleWithDetails[]>>({});
 
   React.useEffect(() => {
     setName(section.name);
   }, [section.id, section.name]);
+
+  // Fetch step roles for cost calculation
+  React.useEffect(() => {
+    let cancelled = false;
+    const stepIds = steps.map((s) => s.id);
+    if (stepIds.length === 0) {
+      setStepRolesMap({});
+      return;
+    }
+    fetchStepRolesBatch(stepIds)
+      .then((roles) => {
+        if (cancelled) return;
+        const map: Record<string, StepRoleWithDetails[]> = {};
+        for (const sr of roles) {
+          if (!map[sr.step_id]) map[sr.step_id] = [];
+          map[sr.step_id].push(sr);
+        }
+        setStepRolesMap(map);
+      })
+      .catch(() => { /* silently fail — cost section stays hidden */ });
+    return () => { cancelled = true; };
+  }, [section.id, steps]);
 
   const handleFieldUpdate = async (field: string, value: unknown) => {
     try {
@@ -74,6 +98,22 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
     ? stepsWithTarget.reduce((sum, s) => sum + s.target_maturity!, 0) / stepsWithTarget.length
     : null;
   const maturityGap = avgMaturity != null && avgTarget != null ? avgTarget - avgMaturity : null;
+
+  // Section cost: sum of step costs
+  const sectionCost = steps.reduce((total, s) => {
+    if (!s.time_minutes || !s.frequency_per_month) return total;
+    const monthlyHours = (s.time_minutes * s.frequency_per_month) / 60;
+    const roles = stepRolesMap[s.id] ?? [];
+    const rolesWithRate = roles.filter((sr) => sr.role.hourly_rate != null);
+    if (rolesWithRate.length === 0) return total;
+    const avgRate = rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length;
+    return total + monthlyHours * avgRate;
+  }, 0);
+
+  const totalMonthlyHours = steps.reduce((sum, s) => {
+    if (!s.time_minutes || !s.frequency_per_month) return sum;
+    return sum + (s.time_minutes * s.frequency_per_month) / 60;
+  }, 0);
 
   return (
     <div className="flex flex-col h-full">
@@ -167,6 +207,34 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
                 <p className="text-[10px] text-[var(--text-quaternary)]">
                   Based on {stepsWithMaturity.length} of {steps.length} steps scored
                 </p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Section cost */}
+        {(totalMonthlyHours > 0 || sectionCost > 0) && (
+          <>
+            <Separator />
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-2">
+                Cost
+              </label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-[var(--text-secondary)]">Monthly Time</span>
+                  <span className="text-[12px] font-semibold text-[var(--text-primary)]">
+                    {totalMonthlyHours.toFixed(1)}h
+                  </span>
+                </div>
+                {sectionCost > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-[var(--text-secondary)]">Monthly Cost</span>
+                    <span className="text-[12px] font-semibold text-[var(--text-primary)]">
+                      ${sectionCost.toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </>

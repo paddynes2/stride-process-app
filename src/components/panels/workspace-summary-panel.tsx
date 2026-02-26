@@ -1,5 +1,8 @@
 "use client";
 
+import * as React from "react";
+import { fetchStepRolesBatch } from "@/lib/api/client";
+import type { StepRoleWithDetails } from "@/lib/api/client";
 import type { Section, Step, Connection } from "@/types/database";
 
 interface WorkspaceSummaryPanelProps {
@@ -9,6 +12,30 @@ interface WorkspaceSummaryPanelProps {
 }
 
 export function WorkspaceSummaryPanel({ sections, steps, connections }: WorkspaceSummaryPanelProps) {
+  const [stepRolesMap, setStepRolesMap] = React.useState<Record<string, StepRoleWithDetails[]>>({});
+
+  // Fetch all step roles for cost calculation
+  React.useEffect(() => {
+    let cancelled = false;
+    const stepIds = steps.map((s) => s.id);
+    if (stepIds.length === 0) {
+      setStepRolesMap({});
+      return;
+    }
+    fetchStepRolesBatch(stepIds)
+      .then((roles) => {
+        if (cancelled) return;
+        const map: Record<string, StepRoleWithDetails[]> = {};
+        for (const sr of roles) {
+          if (!map[sr.step_id]) map[sr.step_id] = [];
+          map[sr.step_id].push(sr);
+        }
+        setStepRolesMap(map);
+      })
+      .catch(() => { /* silently fail */ });
+    return () => { cancelled = true; };
+  }, [steps]);
+
   const statusCounts = steps.reduce(
     (acc, s) => {
       acc[s.status] = (acc[s.status] || 0) + 1;
@@ -25,11 +52,21 @@ export function WorkspaceSummaryPanel({ sections, steps, connections }: Workspac
     {} as Record<string, number>
   );
 
-  const totalMinutes = steps.reduce((sum, s) => {
+  const totalMonthlyHours = steps.reduce((sum, s) => {
     if (s.time_minutes && s.frequency_per_month) {
-      return sum + s.time_minutes * s.frequency_per_month;
+      return sum + (s.time_minutes * s.frequency_per_month) / 60;
     }
     return sum;
+  }, 0);
+
+  const totalMonthlyCost = steps.reduce((total, s) => {
+    if (!s.time_minutes || !s.frequency_per_month) return total;
+    const monthlyHours = (s.time_minutes * s.frequency_per_month) / 60;
+    const roles = stepRolesMap[s.id] ?? [];
+    const rolesWithRate = roles.filter((sr) => sr.role.hourly_rate != null);
+    if (rolesWithRate.length === 0) return total;
+    const avgRate = rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length;
+    return total + monthlyHours * avgRate;
   }, 0);
 
   return (
@@ -46,12 +83,22 @@ export function WorkspaceSummaryPanel({ sections, steps, connections }: Workspac
         <StatCard label="Connections" value={connections.length} />
       </div>
 
-      {totalMinutes > 0 && (
-        <div className="bg-[var(--bg-surface-hover)] rounded-[var(--radius-md)] p-3">
-          <div className="text-[11px] text-[var(--text-tertiary)] mb-1">Monthly Cost</div>
-          <div className="text-[16px] font-semibold text-[var(--text-primary)]">
-            {(totalMinutes / 60).toFixed(1)}h
+      {(totalMonthlyHours > 0 || totalMonthlyCost > 0) && (
+        <div className="bg-[var(--bg-surface-hover)] rounded-[var(--radius-md)] p-3 space-y-2">
+          <div>
+            <div className="text-[11px] text-[var(--text-tertiary)] mb-0.5">Monthly Time</div>
+            <div className="text-[16px] font-semibold text-[var(--text-primary)]">
+              {totalMonthlyHours.toFixed(1)}h
+            </div>
           </div>
+          {totalMonthlyCost > 0 && (
+            <div className="pt-2 border-t border-[var(--border-subtle)]">
+              <div className="text-[11px] text-[var(--text-tertiary)] mb-0.5">Monthly Cost</div>
+              <div className="text-[16px] font-semibold text-[var(--text-primary)]">
+                ${totalMonthlyCost.toFixed(2)}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

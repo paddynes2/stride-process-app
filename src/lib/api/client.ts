@@ -261,6 +261,11 @@ export async function fetchStepRoles(stepId: string): Promise<StepRoleWithDetail
   return apiFetch<StepRoleWithDetails[]>(`/api/v1/step-roles?step_id=${stepId}`);
 }
 
+export async function fetchStepRolesBatch(stepIds: string[]): Promise<StepRoleWithDetails[]> {
+  if (stepIds.length === 0) return [];
+  return apiFetch<StepRoleWithDetails[]>(`/api/v1/step-roles?step_ids=${stepIds.join(",")}`);
+}
+
 export async function createStepRole(data: { step_id: string; role_id: string }): Promise<StepRoleWithDetails> {
   return apiFetch<StepRoleWithDetails>("/api/v1/step-roles", {
     method: "POST",
