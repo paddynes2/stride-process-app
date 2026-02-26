@@ -145,101 +145,127 @@ Tasks (in priority order):
 
 ---
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PHASE 2b/2c/3 DETAILED SPECS BELOW — Added by human.
+     Agent: DO NOT delete or rewrite these sections. Only update task checkboxes
+     and status fields as you complete work. The detailed FEAT entries are in FEATURES.md.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
 ### Phase 2b: Analysis & Intelligence
 **Status:** Not started
 **Depends on:** Phase 2a
 **Estimated iterations:** 20-25
-**Goal:** Layer analysis tools on top of process and journey data. Move from "document what exists" to "recommend what to change." Introduce AI where it adds clear value.
+**Goal:** Layer analysis tools on top of process and journey data. Move from "document what exists" to "reveal what's broken and where perceptions diverge." Introduce AI where it adds clear consulting value.
 
-Tasks (in priority order):
-1. [ ] Perspectives / lenses — define stakeholder perspectives (e.g., "Customer", "Operations Manager", "IT"), annotate steps/touchpoints per perspective, toggle between views
-2. [ ] Perspective comparison — divergence highlighting between perspectives, exportable report showing where stakeholders disagree
-3. [ ] Prioritization matrix — effort vs strategic alignment quadrant visualization, linked to steps/touchpoints, drag to reposition
-4. [ ] Improvement ideas — create improvement proposals from any step/section/touchpoint, status lifecycle (proposed → approved → in-progress → done), link to affected process elements
-5. [ ] AI: Process analysis — given a mapped process, generate: bottleneck identification, redundancy detection, automation candidates, maturity recommendations. Uses existing step data (time, frequency, maturity, cost).
-6. [ ] AI: Gap narrative — given gap analysis data, generate a written summary suitable for a consulting report. "Your onboarding process has 3 steps scoring below target maturity..."
-7. [ ] AI: Improvement suggestions — based on low-maturity steps and high-cost areas, suggest specific improvements with estimated impact
+Tasks (in priority order — detailed specs in FEATURES.md):
+1. [ ] Perspectives data model + UI shell (FEAT-023) — perspectives table, annotations table, types, API, management UI
+2. [ ] Perspective annotation UI (FEAT-024) — perspective switcher, annotation panel on elements, visual indicators
+3. [ ] Perspective comparison view (FEAT-025) — side-by-side table, divergence highlighting, summary stats
+4. [ ] Prioritization matrix (FEAT-026) — effort/impact scores on steps/touchpoints, quadrant visualization
+5. [ ] Improvement ideas tracker (FEAT-027) — improvement_ideas table, CRUD, kanban view, link to source elements
+6. [ ] AI process analysis (FEAT-028) — Anthropic API integration, structured analysis from workspace data, result cards UI
+7. [ ] AI gap narrative (FEAT-029) — generate consulting-quality gap summary text, copy-to-clipboard, PDF inclusion
+8. [ ] AI improvement suggestions (FEAT-030) — AI-generated suggestions → create as improvement ideas
+9. [ ] Phase 2b quality pass (FEAT-031) — full regression + new feature verification
 
 **Exit criteria:**
 - Multiple stakeholder perspectives can be captured and compared on the same process map
+- Divergence between perspectives is highlighted and quantified
 - Prioritization matrix helps consultants rank recommendations by effort and impact
-- AI analysis produces useful (not generic) insights from actual process data
+- AI analysis produces useful (not generic) insights grounded in actual process data
 - Improvement ideas can be created, tracked, and linked to process elements
+- Type check, lint, build pass. No console errors on new pages.
 
 **Notes:**
-- AI features use the Claude API (Anthropic). Stride already uses Supabase — store API keys server-side.
-- AI prompts should be grounded in the actual process data (steps, scores, costs, gaps), not generic advice.
-- Start with AI as "suggested analysis" (consultant reviews and edits), not autonomous action.
-- Perspectives are annotations on existing elements, not new canvases — keeps the data model simple.
+- AI features use Claude API via fetch() to `https://api.anthropic.com/v1/messages`. Use `claude-sonnet-4-5-20250514` for cost efficiency. ANTHROPIC_API_KEY stored server-side in .env.local.
+- Perspectives are annotations on existing elements, NOT separate canvases — polymorphic via annotatable_type + annotatable_id.
+- The perspective comparison view is the key insight from the consultant transcript — reveals where leaders and teams disagree.
+- Prioritization matrix position is computed from scores, not drag-to-reposition.
 
 ---
 
 ### Phase 2c: Tools Canvas & Enhanced Export
 **Status:** Not started
-**Depends on:** Phase 2b (can start after 2a if 2b is blocked)
-**Estimated iterations:** 15-20
-**Goal:** Complete the consulting toolkit with tools/technology mapping and professional multi-section exports.
+**Depends on:** Phase 2b
+**Estimated iterations:** 20-25
+**Goal:** Complete the consulting toolkit with technology mapping and professional multi-section exports. After this phase, all data capture and analysis tools are in place.
 
-Tasks (in priority order):
-1. [ ] Tools canvas — tool cards (name, vendor, cost/month, category), tool-step linking (which tools support which steps)
-2. [ ] Tool overlap analysis — identify steps served by multiple tools, tools with no linked steps, coverage gaps
-3. [ ] Enhanced PDF export — multi-section report: executive summary, process map, gap analysis, cost analysis, journey map, perspective comparison, tool landscape, AI insights, recommendations
-4. [ ] Export templates — "Full Audit" (everything), "Executive Summary" (1-page overview), "Gap Report" (gaps + recommendations only)
-5. [ ] Batch export — export all workspaces in an org as a single report
+Tasks (in priority order — detailed specs in FEATURES.md):
+1. [ ] Tools data model (FEAT-032) — tools, tool_sections, step_tools tables, enums, types, API routes
+2. [ ] Tools canvas page (FEAT-033) — React Flow canvas with tool nodes, tool section nodes, cost summary
+3. [ ] Tool detail panel (FEAT-034) — editable fields, step usage backlinks, cost display
+4. [ ] Step-tool assignment (FEAT-035) — tools section on step detail panel, tool badges, cost integration
+5. [ ] Tool overlap and gap analysis (FEAT-036) — overlapping tools, unused tools, coverage gaps, spend summary
+6. [ ] Enhanced PDF export (FEAT-037) — export dialog with section toggles, 12 report sections, presets (Full Audit, Executive Summary, Gap Report)
+7. [ ] Phase 2c quality pass (FEAT-038) — full regression + tools + PDF verification
 
 **Exit criteria:**
-- Tools can be mapped to process steps with cost tracking
-- Tool overlap/gap analysis helps consultants recommend technology changes
-- PDF export produces a complete, professional consulting deliverable with all analysis sections
-- Multiple export templates available for different audiences
+- Tools can be mapped on a dedicated canvas with cost tracking
+- Tools can be assigned to process steps, with tool costs factored into step cost calculations
+- Tool overlap/gap analysis identifies redundancies and coverage gaps
+- Enhanced PDF export produces a complete, professional multi-section consulting deliverable
+- Export presets available for different audiences (full audit, executive summary, gap report)
+- Type check, lint, build pass. No console errors on new pages.
 
 **Notes:**
-- Tools canvas is the last data-capture canvas type. After this, all input types are covered.
-- Enhanced export is the crown jewel — this is what consultants actually hand to clients.
-- Tool cost data combined with process cost data gives total cost-of-process-ownership.
+- Tools canvas is a single canvas per workspace (not tab-based like process/journey).
+- Tool cost aggregation: monthly costs roll up directly, annual costs ÷ 12 for monthly view, one-time excluded from recurring totals.
+- Enhanced PDF is the "crown jewel" — what consultants hand to clients. Builds on existing jspdf infrastructure with modular render functions per section.
+- Step cost = labor cost + sum of tool monthly costs for assigned tools.
 
 ---
 
 ### Phase 3: The Living Playbook
-**Status:** Deferred
-**Depends on:** Phase 2c + user demand signal
-**Estimated iterations:** 35-50
-**Goal:** Process map becomes executable. Consultant's client becomes a paying user.
+**Status:** Not started
+**Depends on:** Phase 2c
+**Estimated iterations:** 30-40
+**Goal:** Process map becomes executable. Consultant's client becomes a paying user. Shift from "analyze and report" to "execute and track."
 
-**Why deferred:** This is a fundamentally different product mode — shifting from "analyze and report" to "execute and track." It requires different UX patterns (checklists, assignments, notifications), different users (ops teams, not consultants), and possibly different pricing. Build this only when Phase 2 users are asking for it.
-
-Tasks:
-1. [ ] Runbook instances — launch section as checklist, assign to users, track completion
-2. [ ] Playbook mode — simplified linear view for daily execution
-3. [ ] Step → task conversion — activate step as assigned task, completion flows back
-4. [ ] Multi-instance support — same section for different clients/projects
-5. [ ] Activity log — audit trail of changes
-6. [ ] Version history — snapshot + compare workflow state
-7. [ ] Team collaboration — multiple editors, presence indicators
-8. [ ] Comments & threading — on steps/sections, @mentions
-9. [ ] Integrations (Zapier/Make) — import automation data into step metadata
+Tasks (in priority order — detailed specs in FEATURES.md):
+1. [ ] Comments system (FEAT-039) — comments table with categories (note/decision/pain_point/idea/question), threading, resolve, comment panel on detail panels, workspace aggregation view
+2. [ ] Tasks system (FEAT-040) — step-level checklists, completion toggle, drag-to-reorder, section rollup, canvas count indicator
+3. [ ] Runbook instances (FEAT-041) — launch section as executable checklist, runbook_steps table, linear view, progress tracking, "Run as Checklist" button
+4. [ ] Playbook mode (FEAT-042) — distraction-free step-by-step execution view, "Mark Complete & Next", mobile-responsive, URL-shareable
+5. [ ] Activity log (FEAT-043) — activity_log table, logActivity() utility called from API routes, chronological list with filtering/pagination
+6. [ ] Workspace cloning (FEAT-044) — deep copy via SECURITY DEFINER RPC, preserves internal relationships, new UUIDs
+7. [ ] Conditional step coloring (FEAT-045) — coloring_rules table, rule evaluation engine, paintbrush panel, real-time canvas tinting
+8. [ ] Section templates (FEAT-046) — save section as JSONB snapshot, template browser, deploy template to new section, pre-built starters
+9. [ ] Phase 3 quality pass (FEAT-047) — full regression across all phases + new feature verification
 
 **Exit criteria:**
 - Consultant delivers engagement → client runs playbooks → completion data flows back
+- Comments enable collaboration during consulting workshops
+- Tasks provide actionable checklists at the step level
+- Runbooks turn static process maps into executable workflows
+- Activity log provides full audit trail
+- Workspace cloning enables consultant framework reuse
+- Conditional coloring provides at-a-glance visual analysis
+- Templates accelerate new engagement setup
+- Type check, lint, build pass. No console errors on any page.
 
-**Activation signal:**
-- 5+ paying users requesting execution/tracking features
-- OR consultant feedback indicating clients want to "live in" Stride after the engagement
+**Notes:**
+- Comments/tasks are the collaboration backbone — keep them simple (no @mentions or notifications until Phase 4).
+- Runbook steps are snapshots copied from the section at creation time — they don't change if the process map is updated.
+- Playbook mode is the upsell from Consultant tier to Team tier (per ROADMAP.md pricing).
+- Workspace cloning uses a Supabase RPC function for atomicity (map old IDs → new IDs in a single transaction).
+- Templates store JSONB snapshots; role/tool assignments matched by name on deploy (not by ID).
 
 ---
 
 ## Phase Summary
 
-| Phase | Name | Goal | Est. Iterations | Depends On |
-|-------|------|------|-----------------|------------|
-| 1 | Consulting Deliverable | Scored, exportable process audit | 25-35 | Phase 0 (DONE) |
-| 1.5 | Ship & Harden | Production quality, zero P1 bugs | 10-15 | Phase 1 |
-| 2a | Journey Mapping | Customer experience mapping | 20-25 | Phase 1.5 |
-| 2b | Analysis & Intelligence | Perspectives, prioritization, AI | 20-25 | Phase 2a |
-| 2c | Tools & Enhanced Export | Tool mapping, professional reports | 15-20 | Phase 2b |
-| 3 | Living Playbook | Executable processes (deferred) | 35-50 | Phase 2c + demand |
+| Phase | Name | Goal | Est. Iterations | Depends On | Status |
+|-------|------|------|-----------------|------------|--------|
+| 1 | Consulting Deliverable | Scored, exportable process audit | 25-35 | Phase 0 (DONE) | **DONE** (19 iters) |
+| 1.5 | Ship & Harden | Production quality, zero P1 bugs | 10-15 | Phase 1 | **DONE** (12 iters) |
+| 2a | Journey Mapping | Customer experience mapping | 20-25 | Phase 1.5 | **IN PROGRESS** |
+| 2b | Analysis & Intelligence | Perspectives, prioritization, AI | 20-25 | Phase 2a | Not started |
+| 2c | Tools & Enhanced Export | Tool mapping, professional reports | 20-25 | Phase 2b | Not started |
+| 3 | Living Playbook | Executable processes | 30-40 | Phase 2c | Not started |
 
-**Total estimated iterations to full consulting platform (through 2c):** 90-120
+**Completed iterations:** 40 (Phase 1: 19, Phase 1.5: 12, Phase 2a: 9 so far)
+**Remaining iterations (est.):** 75-100 (Phase 2a remainder: ~5, Phase 2b: 20-25, Phase 2c: 20-25, Phase 3: 30-40)
+**Total features:** 47 (FEAT-001 through FEAT-047)
 
 ---
 

@@ -359,3 +359,504 @@
 - [ ] Pain point ranking: touchpoints sorted by pain score descending
 - [ ] Comparison view exportable as PDF (side-by-side snapshot)
 **Notes:** Extends the existing PDF export infrastructure from FEAT-007. Journey PDF follows same visual style.
+
+---
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PHASE 2b/2c/3 FEATURES BELOW — Added by human (not agent-generated).
+     Agent: DO NOT delete these sections. They are the roadmap for future phases.
+     Only modify individual task entries (mark done, add sub-tasks, increment attempts).
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+## Phase 2b: Analysis & Intelligence
+
+### #FEAT-023 Perspectives data model and UI shell
+**Phase:** 2b
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `perspectives` table: id, workspace_id, name (e.g., "Customer", "Operations Manager", "IT"), color (hex), icon (text), created_at, updated_at
+- [ ] New `perspective_annotations` table: id, perspective_id, annotatable_type (enum: 'step', 'section', 'touchpoint', 'stage'), annotatable_id (UUID), content (text — the annotation), rating (integer 1-5 nullable), created_at, updated_at
+- [ ] RLS policies using `can_access_workspace()` via perspectives.workspace_id
+- [ ] TypeScript types: `Perspective`, `PerspectiveAnnotation`, `AnnotatableType`
+- [ ] API routes: GET/POST perspectives, PATCH/DELETE perspectives/[id], GET/POST/PATCH/DELETE annotations
+- [ ] Client wrappers in `lib/api/client.ts`
+- [ ] Migration file pushed to Supabase
+**Notes:** Perspectives are overlays on existing canvas elements, NOT separate canvases. A perspective is like a "lens" — the consultant switches to "Customer" perspective and adds annotations to existing steps/touchpoints. The annotatable_type + annotatable_id pattern allows annotations on any entity (polymorphic). Rating is optional — used for sentiment/importance scoring per perspective.
+**Sub-tasks:**
+- [ ] [1/3] Database migration, enums, TypeScript types
+- [ ] [2/3] API routes + client wrappers
+- [ ] [3/3] Basic perspectives management UI (create/edit/delete perspectives in workspace settings or a dedicated panel)
+
+### #FEAT-024 Perspective annotation UI
+**Phase:** 2b
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Perspective switcher dropdown in workspace header or canvas toolbar — lists all perspectives + "None" default
+- [ ] When a perspective is active, clicking a step/section/touchpoint/stage shows an annotation panel alongside the normal detail panel
+- [ ] Annotation panel has: text area (rich text via TipTap), optional rating (1-5 stars/score), save/delete buttons
+- [ ] Existing annotations for the active perspective are loaded and displayed when viewing an element
+- [ ] Visual indicator on canvas nodes that have annotations in the active perspective (e.g., small colored dot matching perspective color)
+- [ ] Annotations persist to database and survive page reload
+- [ ] Switching perspective reloads annotations for the new perspective
+**Notes:** The perspective switcher should be prominent but not intrusive. Consider a colored badge/pill showing the active perspective name. When no perspective is active, the app works exactly as before — perspectives are purely additive. Don't modify existing step-detail-panel or section-detail-panel — create a separate annotation overlay/section within them.
+
+### #FEAT-025 Perspective comparison view
+**Phase:** 2b
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New "Compare Perspectives" view accessible from workspace navigation (only visible when workspace has 2+ perspectives with annotations)
+- [ ] Select 2 perspectives to compare via dropdown selectors at the top
+- [ ] Side-by-side table layout: rows are annotated elements (steps/sections/touchpoints), columns show each perspective's annotation text and rating
+- [ ] Divergence highlighting: rows where ratings differ by 2+ points are highlighted (e.g., amber background)
+- [ ] Summary statistics at top: total annotations per perspective, average rating per perspective, divergence count, top 3 most divergent elements
+- [ ] Clicking an element name navigates to that element on the canvas
+- [ ] Export comparison as section in PDF (button) — adds a "Perspective Comparison" page to existing PDF export
+**Notes:** This is the insight generator from the Further Context transcript — leaders think everything is great, teams say it's broken. The comparison surface reveals that divergence. Keep the layout clean: no canvas rendering in this view, just a structured table/card layout. The divergence threshold (2+ point difference) should be a constant, not hardcoded.
+
+### #FEAT-026 Prioritization matrix
+**Phase:** 2b
+**Priority:** P1 (important)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New columns on `steps` table: `effort_score` (integer 1-5, nullable), `impact_score` (integer 1-5, nullable) — via migration
+- [ ] Same columns on `touchpoints` table: `effort_score`, `impact_score`
+- [ ] Step detail panel and touchpoint detail panel show effort and impact score selectors (1-5 scale, similar UI to maturity scoring)
+- [ ] New "Prioritization" view accessible from workspace navigation
+- [ ] Quadrant visualization: X-axis = effort (1-5), Y-axis = impact (1-5), items plotted as dots/cards
+- [ ] Four quadrants labeled: "Quick Wins" (low effort, high impact), "Major Projects" (high effort, high impact), "Fill-Ins" (low effort, low impact), "Deprioritize" (high effort, low impact)
+- [ ] Each dot shows step/touchpoint name, hover shows full details
+- [ ] Dots are colored by gap size (if maturity data exists) or by section/stage
+- [ ] Clicking a dot navigates to the element on canvas
+- [ ] Filter by tab, section/stage, or score threshold
+- [ ] TypeScript types updated for new columns
+**Notes:** The prioritization matrix is a standard consulting deliverable. The effort x impact quadrant is universal. Keep it simple — no drag-to-reposition (that implies persistent position data we don't need). Position is computed from the scores. The matrix reuses existing scoring UI patterns from maturity scoring (FEAT-001).
+
+### #FEAT-027 Improvement ideas tracker
+**Phase:** 2b
+**Priority:** P1 (important)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `improvement_ideas` table: id, workspace_id, title (text), description (text), status (enum: 'proposed', 'approved', 'in_progress', 'completed', 'rejected'), priority (enum: 'low', 'medium', 'high', 'critical'), linked_step_id (UUID nullable, FK steps), linked_touchpoint_id (UUID nullable, FK touchpoints), linked_section_id (UUID nullable, FK sections), created_by (UUID FK users), created_at, updated_at
+- [ ] RLS policies via `can_access_workspace()`
+- [ ] TypeScript types: `ImprovementIdea`, `IdeaStatus`, `IdeaPriority`
+- [ ] API routes: GET list (filterable by status/priority), POST create, PATCH update, DELETE
+- [ ] Client wrappers in `lib/api/client.ts`
+- [ ] "Add Improvement" button on step detail panel, section detail panel, and touchpoint detail panel — opens a dialog with title, description, priority fields. Pre-fills the linked entity.
+- [ ] New "Improvements" view accessible from workspace navigation — shows all improvement ideas as a filterable list/kanban by status
+- [ ] Each idea card shows: title, status badge, priority badge, linked element name (clickable), description preview
+- [ ] Status can be changed inline (dropdown) or via drag in kanban view
+- [ ] Count badge on navigation item showing number of open (non-completed/rejected) ideas
+**Notes:** This replaces sticky notes and spreadsheets that consultants currently use to track recommendations. The link back to source element (step/touchpoint/section) provides traceability. Status lifecycle: proposed → approved → in_progress → completed (or → rejected at any point). Keep kanban simple — 4 columns matching the non-rejected statuses.
+**Sub-tasks:**
+- [ ] [1/3] Data model: migration, enums, types, API routes, client wrappers
+- [ ] [2/3] "Add Improvement" dialogs on step/section/touchpoint panels + improvements list view
+- [ ] [3/3] Kanban view with drag-to-change-status + filtering + count badge
+
+### #FEAT-028 AI process analysis
+**Phase:** 2b
+**Priority:** P1 (important)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New API route: POST `/api/v1/ai/analyze-process` — accepts workspace_id, returns structured analysis
+- [ ] Server-side Claude API call (Anthropic SDK) using `ANTHROPIC_API_KEY` env var (stored in `.env.local`, added to Vercel)
+- [ ] Analysis prompt includes: all steps with maturity scores, time, frequency, cost, roles, gaps — structured as JSON context
+- [ ] Response is structured JSON with sections: `bottlenecks` (steps with high cost + low maturity), `redundancies` (steps with similar names/roles that could be consolidated), `automation_candidates` (steps with executor=person, high frequency, low complexity), `maturity_recommendations` (steps below target with specific suggestions)
+- [ ] New "AI Analysis" panel/page accessible from workspace navigation
+- [ ] Analysis results displayed as categorized cards with severity indicators
+- [ ] Each recommendation links back to the source step(s)
+- [ ] "Regenerate" button to re-run analysis
+- [ ] Loading state while analysis runs (can take 5-15 seconds)
+- [ ] Results cached in `workspace.settings` JSONB field (key: `last_analysis`) with timestamp — avoids re-running on every page visit
+- [ ] Error handling: if API key missing, show setup instructions; if API fails, show retry with error message
+**Notes:** This is NOT a generic "analyze my business" feature. The prompt must be grounded in actual data. The agent constructs a structured prompt from the workspace's real steps, scores, costs, and gaps. The model returns structured JSON that maps directly to UI cards. Use `claude-sonnet-4-5-20250514` for cost efficiency (not opus). Temperature 0.3 for consistency. Max tokens 4096. Rate limit: 1 analysis per workspace per 5 minutes (check cached timestamp). Do NOT install new dependencies — use fetch() to call the Anthropic API directly (REST endpoint: `https://api.anthropic.com/v1/messages`).
+**Sub-tasks:**
+- [ ] [1/3] API route with Anthropic API integration, prompt construction from workspace data, structured response parsing
+- [ ] [2/3] AI Analysis page UI: categorized result cards, loading state, regenerate button, link-to-step navigation
+- [ ] [3/3] Caching in workspace settings, rate limiting, error states (missing API key, API failure, empty workspace)
+
+### #FEAT-029 AI gap narrative generator
+**Phase:** 2b
+**Priority:** P2 (nice to have)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New API route: POST `/api/v1/ai/gap-narrative` — accepts workspace_id, returns written narrative text
+- [ ] Prompt includes gap analysis data: steps with current vs target maturity, section names, gap sizes, cost implications
+- [ ] Response is a professional consulting narrative (2-4 paragraphs) suitable for inclusion in a client report
+- [ ] "Generate Summary" button on gap analysis view — appears above the gap table
+- [ ] Generated narrative displayed in a styled card above the table with copy-to-clipboard button
+- [ ] "Regenerate" button to get a fresh narrative
+- [ ] Narrative can be included in PDF export (optional toggle on export dialog)
+- [ ] Loading state while generating
+**Notes:** This directly addresses the consultant use case — they need to write gap analysis summaries for client reports. The AI generates a first draft they can edit. Output should sound like a senior consultant wrote it: specific, data-grounded, action-oriented. No generic business platitudes. The narrative references actual step names, section names, and maturity numbers from the data. Same Anthropic API pattern as FEAT-028. Cache result in localStorage (simpler than DB for a text blob).
+
+### #FEAT-030 AI improvement suggestions
+**Phase:** 2b
+**Priority:** P2 (nice to have)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New API route: POST `/api/v1/ai/suggest-improvements` — accepts workspace_id, returns array of improvement suggestions
+- [ ] Prompt includes: low-maturity steps (below target), high-cost steps, high-frequency manual steps, gap analysis data
+- [ ] Each suggestion has: title, description, affected_step_ids, estimated_impact (text), category (process, technology, people, governance)
+- [ ] "AI Suggestions" button on the Improvements view (FEAT-027) — generates suggestions and offers to create improvement ideas from them
+- [ ] Each suggestion has an "Add as Improvement" button that pre-fills the improvement idea creation dialog
+- [ ] Loading state, error handling (same pattern as FEAT-028)
+**Notes:** This bridges AI analysis (FEAT-028) and the improvement tracker (FEAT-027). AI suggests, human reviews and approves. Suggestions should be specific and actionable, not generic. "Consider automating the 'Manual Data Entry' step (currently 45 min x 20/month = $1,500/month in labor) using a Zapier integration" is good. "Improve your processes" is bad. Depends on FEAT-027 being complete (needs the improvement ideas table).
+
+### #FEAT-031 Phase 2b regression and quality pass
+**Phase:** 2b
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Full regression pass: all existing features (canvas, scoring, gap analysis, costing, teams, export, sharing) still work
+- [ ] Perspectives CRUD works end-to-end: create perspective → annotate steps → switch perspectives → compare
+- [ ] Prioritization matrix renders correctly with test data
+- [ ] Improvement ideas lifecycle works: create → approve → complete
+- [ ] AI analysis returns structured results (requires ANTHROPIC_API_KEY in env)
+- [ ] All new pages have loading states and error boundaries
+- [ ] All new interactive elements have aria-labels
+- [ ] Type check, lint, and build all pass
+- [ ] No console errors on any new page
+**Notes:** This is a dedicated testing iteration, not a feature build. Run after all Phase 2b features are complete. If AI features can't be tested (no API key in CI), test the UI states (loading, error, empty) and mark AI integration testing as deferred.
+
+---
+
+## Phase 2c: Tools Canvas & Enhanced Export
+
+### #FEAT-032 Tools data model
+**Phase:** 2c
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `tools` table: id, workspace_id, name (text), vendor (text nullable), url (text nullable), icon_url (text nullable), status (enum: 'active', 'considering', 'cancelled'), cost_type (enum: 'monthly', 'annual', 'one_time'), cost_amount (numeric 10,2 nullable), renewal_date (date nullable), notes (text nullable), category (text nullable), position_x (float), position_y (float), created_at, updated_at
+- [ ] New `tool_sections` table: id, workspace_id, name, position_x, position_y, width, height, created_at, updated_at — groups tools visually on canvas (like sections group steps)
+- [ ] New `step_tools` junction table: id, step_id (FK steps), tool_id (FK tools), created_at — many-to-many linking steps to tools
+- [ ] New enums: `tool_status` ('active', 'considering', 'cancelled'), `tool_cost_type` ('monthly', 'annual', 'one_time')
+- [ ] RLS policies via `can_access_workspace()`
+- [ ] TypeScript types: `Tool`, `ToolSection`, `StepTool`, `ToolStatus`, `ToolCostType`
+- [ ] API routes: tools (GET list, POST create, PATCH/DELETE by id), tool-sections (POST create, PATCH/DELETE by id), step-tools (GET by step_id, POST create, DELETE by id)
+- [ ] Client wrappers in `lib/api/client.ts`
+- [ ] Migration file pushed to Supabase
+**Notes:** Tools are workspace-scoped. The position_x/y fields support canvas rendering (tools as draggable cards on a dedicated canvas). cost_type determines how cost is displayed and aggregated: monthly costs roll up directly, annual costs are divided by 12 for monthly view, one_time costs are excluded from recurring totals (Puzzle spec requirement). renewal_date is only relevant for monthly/annual costs. icon_url can be auto-fetched from favicon later, but start with manual entry or null.
+**Sub-tasks:**
+- [ ] [1/2] Database migration, enums, TypeScript types
+- [ ] [2/2] API routes + client wrappers for tools, tool-sections, step-tools
+
+### #FEAT-033 Tools canvas page
+**Phase:** 2c
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Tools page at `/w/[workspaceId]/tools` renders a React Flow canvas (reusing existing canvas infrastructure)
+- [ ] Tool nodes: card with icon/avatar, tool name, status badge (active=green, considering=yellow, cancelled=gray), cost display ($/mo)
+- [ ] Tool section nodes: group containers similar to process sections, with name label
+- [ ] Dragging tools into/out of tool sections works
+- [ ] "Add Tool" button in toolbar creates a new tool node on canvas
+- [ ] "Add Tool Section" button creates a new section container (e.g., "Sales Stack", "Marketing Tools")
+- [ ] Right sidebar summary when nothing selected: total monthly cost, total annual cost, tool counts by status (active/considering/cancelled)
+- [ ] Canvas zoom/pan controls (reuse existing)
+**Notes:** The tools canvas is the third canvas type (after process and journey). It does NOT use tabs — it's a single canvas per workspace. Use the same React Flow setup as the process canvas but with different node types. Tool nodes are simpler than step nodes (no connections between tools by default). Tool sections are purely organizational grouping.
+**Sub-tasks:**
+- [ ] [1/3] Tool canvas page setup: React Flow canvas, tool node component, tool section node component
+- [ ] [2/3] Add Tool / Add Tool Section toolbar, drag into sections, canvas controls
+- [ ] [3/3] Right sidebar cost summary panel (total monthly, annual, counts by status)
+
+### #FEAT-034 Tool detail panel
+**Phase:** 2c
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Clicking a tool on tools canvas opens right sidebar detail panel
+- [ ] Editable fields: name, vendor, URL, status (dropdown: active/considering/cancelled), cost type (dropdown: monthly/annual/one-time), cost amount (currency input), renewal date (date picker, only shown for monthly/annual), category (text input), notes (rich text via TipTap)
+- [ ] Changes persist to database on blur/change
+- [ ] "Step Usage" section at bottom: lists all steps that use this tool (via step_tools junction), each clickable to navigate to that step on the process canvas
+- [ ] "Delete Tool" link at bottom (red text, confirmation dialog)
+- [ ] Cost display: shows monthly equivalent (annual / 12 for annual tools, shows "one-time" label for one-time)
+**Notes:** The step usage section is the "backlink index" from the Puzzle spec — it shows everywhere a tool is referenced. This is computed by querying step_tools JOIN steps. Clicking a step navigates to the process canvas tab containing that step.
+
+### #FEAT-035 Step-tool assignment
+**Phase:** 2c
+**Priority:** P1 (important)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Step detail panel has a "Tools" section (accordion, below Roles section)
+- [ ] "Add Tool" button opens a dropdown/selector listing all tools in the workspace
+- [ ] Selected tools appear as badges/pills in the step detail panel (similar to role assignment)
+- [ ] Each tool badge shows tool name and small icon (if icon_url exists)
+- [ ] Remove tool by clicking X on the badge
+- [ ] Tool assignment persists via step_tools junction table
+- [ ] Step node on process canvas shows small tool icons (up to 3, then "+N" overflow)
+- [ ] Touchpoint detail panel also has "Tools" section with same behavior (reuse component)
+- [ ] Tool cost is factored into step cost calculation: step labor cost + sum of tool monthly costs for assigned tools = total step cost
+**Notes:** This connects the tools canvas to the process canvas. The cost integration is important — when a tool is assigned to a step, that tool's monthly cost is added to the step's cost display. For annual tools, use monthly equivalent (/12). For one-time tools, exclude from recurring cost (per Puzzle spec). Reuse the role-assignment UI pattern (dropdown + badges) for consistency.
+
+### #FEAT-036 Tool overlap and gap analysis
+**Phase:** 2c
+**Priority:** P1 (important)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New "Tool Analysis" section on the tools page (accessible via tab or button)
+- [ ] "Overlapping Tools" card: lists steps served by 2+ tools (potential redundancy). Shows step name, list of overlapping tools, combined monthly cost
+- [ ] "Unused Tools" card: lists tools with zero step assignments (tools that exist but aren't linked to any process step). Shows tool name, status, cost
+- [ ] "Coverage Gaps" card: lists steps with no tool assigned (manual/unautomated steps). Shows step name, section, frequency — sorted by frequency descending (highest-frequency unautomated steps first)
+- [ ] Total tool spend summary: monthly total, annual total, count by status
+- [ ] Clicking any step/tool name navigates to that element
+**Notes:** This is a standard consulting deliverable — "you're paying for 3 tools that do the same thing" and "these 10 high-frequency steps have no tool support." The analysis is computed client-side from tools + step_tools + steps data. No AI needed — pure data analysis.
+
+### #FEAT-037 Enhanced PDF export — multi-section report
+**Phase:** 2c
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Export dialog (replaces direct download) with section toggles — user chooses what to include
+- [ ] Available PDF sections (each toggleable):
+  - [ ] Title page (always included): workspace name, date, logo placeholder
+  - [ ] Executive Summary: key metrics (total steps, scored steps, average maturity, total cost, team count)
+  - [ ] Process Map: canvas snapshot (existing)
+  - [ ] Gap Analysis: summary cards + ranked table (existing)
+  - [ ] Cost Analysis: cost breakdown by section + top costly steps (existing)
+  - [ ] Journey Map: journey canvas snapshot (if journey tabs exist)
+  - [ ] Journey Sentiment: touchpoint pain/gain summary (if journey data exists)
+  - [ ] Perspective Comparison: divergence table (if perspectives exist)
+  - [ ] Prioritization Matrix: quadrant snapshot (if effort/impact scores exist)
+  - [ ] Tool Landscape: tool list with costs, status, usage count (if tools exist)
+  - [ ] Improvement Recommendations: list of improvement ideas by priority (if ideas exist)
+  - [ ] AI Insights: AI analysis results (if cached analysis exists)
+- [ ] PDF renders selected sections in order, each starting on a new page
+- [ ] "Full Audit" preset: selects all available sections
+- [ ] "Executive Summary" preset: title + executive summary + gap analysis + recommendations only
+- [ ] "Gap Report" preset: title + gap analysis + perspective comparison + recommendations
+- [ ] Export button generates and downloads the PDF
+- [ ] Each section uses existing dark-theme styling
+**Notes:** This is the "crown jewel" — what consultants actually hand to clients. The existing PDF export (FEAT-007) becomes one section within this larger report. The dialog approach lets consultants customize the deliverable per client. Presets save time. The export builds on the existing jspdf infrastructure. Each new section needs a corresponding render function in lib/export/pdf.ts (or split into lib/export/pdf-sections/). Keep render functions modular — one per section.
+**Sub-tasks:**
+- [ ] [1/4] Export dialog UI with section toggles and presets
+- [ ] [2/4] New PDF sections: executive summary, journey map snapshot, journey sentiment, perspective comparison
+- [ ] [3/4] New PDF sections: prioritization matrix, tool landscape, improvement recommendations, AI insights
+- [ ] [4/4] Polish: consistent styling across sections, page numbers, table of contents page
+
+### #FEAT-038 Phase 2c regression and quality pass
+**Phase:** 2c
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Full regression: process canvas, journey canvas, scoring, gap analysis, perspectives, prioritization, improvements, AI analysis all still work
+- [ ] Tools CRUD end-to-end: create tool → assign to step → see in tool detail backlinks → see cost in step panel
+- [ ] Tool analysis computes correctly: overlapping tools, unused tools, coverage gaps
+- [ ] Enhanced PDF export produces correct multi-section document with all available data
+- [ ] PDF presets work correctly (Full Audit, Executive Summary, Gap Report)
+- [ ] All new pages have loading states, error boundaries, aria-labels
+- [ ] Type check, lint, build pass
+- [ ] No console errors on any new page
+**Notes:** Dedicated testing iteration. Focus on data flow: tool cost → step cost → section cost → workspace cost → PDF cost page. This chain must be correct.
+
+---
+
+## Phase 3: The Living Playbook
+
+### #FEAT-039 Comments system
+**Phase:** 3
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `comments` table: id, workspace_id, commentable_type (enum: 'step', 'section', 'touchpoint', 'stage'), commentable_id (UUID), parent_id (UUID nullable FK comments — for threading), author_id (UUID FK users), content (text), category (enum: 'note', 'decision', 'pain_point', 'idea', 'question'), is_resolved (boolean default false), created_at, updated_at
+- [ ] RLS policies via `can_access_workspace()`
+- [ ] TypeScript types: `Comment`, `CommentCategory`, `CommentableType`
+- [ ] API routes: GET (filterable by commentable_type + commentable_id, or by workspace_id for all), POST create, PATCH update, DELETE
+- [ ] Client wrappers
+- [ ] Comment panel tab on step detail panel (speech bubble icon, per Puzzle spec)
+- [ ] Comment list shows: author name, timestamp (relative), category badge, content, reply count
+- [ ] "Add Comment" form: category dropdown + text area + submit button
+- [ ] Threaded replies: click "Reply" to add a child comment
+- [ ] "Resolve" button on comments (toggles is_resolved, dims the comment)
+- [ ] Comment count badge on step/section/touchpoint nodes on canvas
+- [ ] Workspace-level comment aggregation view: all comments across workspace, filterable by category, sortable by date
+**Notes:** Comments are the collaboration backbone. The category system (note/decision/pain_point/idea/question) is from the Puzzle spec — it helps consultants organize feedback from workshops. Threading via parent_id (null = top-level, non-null = reply). Start with basic CRUD — @mentions and email notifications are Phase 4. The aggregation view goes in a new comments panel accessible from the sidebar.
+**Sub-tasks:**
+- [ ] [1/3] Data model: migration, enums, types, API routes, client wrappers
+- [ ] [2/3] Comment panel on step/section detail panels: list, create, reply, resolve
+- [ ] [3/3] Comment count badges on canvas nodes + workspace-level comments aggregation view
+
+### #FEAT-040 Tasks system (step-level checklists)
+**Phase:** 3
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `tasks` table: id, workspace_id, step_id (UUID FK steps), title (text), is_completed (boolean default false), position (integer — for ordering), assigned_to (UUID nullable FK users), created_by (UUID FK users), created_at, updated_at
+- [ ] RLS policies via `can_access_workspace()`
+- [ ] TypeScript types: `Task`
+- [ ] API routes: GET by step_id, POST create, PATCH update (title, is_completed, position, assigned_to), DELETE
+- [ ] Client wrappers
+- [ ] Tasks tab on step detail panel (checkbox icon, per Puzzle spec)
+- [ ] Task list with: checkbox (toggle completion), title (inline editable), drag-to-reorder
+- [ ] Completed tasks show strikethrough styling
+- [ ] "Add Task" input at bottom of list
+- [ ] Task count indicator on step nodes on canvas (e.g., "2/5 tasks" or checkmark icon)
+- [ ] Section-level task rollup in section detail panel: lists all tasks from all steps in the section, grouped by step
+**Notes:** Tasks are lightweight step-scoped to-dos, not a full project management system. They're used during consulting engagements to track implementation items per step. Drag-to-reorder updates the position field. The section rollup is important — consultants review all outstanding tasks per section. Reuse existing sortable patterns if available, otherwise use a simple drag handler with position integers.
+**Sub-tasks:**
+- [ ] [1/2] Data model: migration, types, API routes, client wrappers
+- [ ] [2/2] Task panel UI on step detail: list, create, complete, reorder, delete + section rollup + canvas indicator
+
+### #FEAT-041 Runbook instances
+**Phase:** 3
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `runbooks` table: id, workspace_id, section_id (FK sections — a runbook is launched from a section), name (text — defaults to section name + instance info), status (enum: 'active', 'completed', 'cancelled'), started_at (timestamptz), completed_at (timestamptz nullable), created_by (UUID FK users), created_at, updated_at
+- [ ] New `runbook_steps` table: id, runbook_id (FK runbooks), step_id (FK steps), status (enum: 'pending', 'in_progress', 'completed', 'skipped'), assigned_to (UUID nullable FK users), completed_at (timestamptz nullable), notes (text nullable), position (integer — preserves step order from section), created_at, updated_at
+- [ ] RLS policies via `can_access_workspace()` through runbooks.workspace_id
+- [ ] TypeScript types: `Runbook`, `RunbookStep`, `RunbookStatus`, `RunbookStepStatus`
+- [ ] API routes: runbooks (GET list, POST create from section_id, PATCH status, DELETE), runbook-steps (GET by runbook_id, PATCH status/notes/assigned_to)
+- [ ] Client wrappers
+- [ ] "Run as Checklist" button on section detail panel — creates a runbook instance from the section's steps
+- [ ] Runbook view: simplified linear checklist (no canvas) showing steps in order, each with checkbox, assignee, status, notes field
+- [ ] Progress bar showing completion percentage
+- [ ] "Complete Runbook" button when all steps are done
+- [ ] Runbook list view: all runbooks in workspace with status, progress, dates
+**Notes:** This is the Phase 3 killer feature — it turns static process maps into executable checklists. A consultant maps the process, then the client's ops team "runs" it. The runbook is an instance of a section — the same section can have multiple active runbooks (e.g., "Client Onboarding — Acme Corp" and "Client Onboarding — Beta Inc"). Steps are copied from the section at creation time (snapshot, not live reference) so the runbook doesn't change if the process map is updated. The linear view is intentionally simple — no canvas complexity, just a checklist.
+**Sub-tasks:**
+- [ ] [1/3] Data model: migration, enums, types, API routes, client wrappers
+- [ ] [2/3] "Run as Checklist" button, runbook creation from section, linear checklist view
+- [ ] [3/3] Progress tracking, completion flow, runbook list view with filtering
+
+### #FEAT-042 Playbook mode (simplified execution view)
+**Phase:** 3
+**Priority:** P1 (important)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New "Playbook" view for active runbooks — a distraction-free linear view optimized for daily execution
+- [ ] Shows only the current step (large, centered) with: step name, description/notes, assigned person, tools needed, checklist tasks (from FEAT-040 if any)
+- [ ] "Mark Complete & Next" button advances to the next step
+- [ ] Progress indicator showing position in the overall runbook (step 3 of 12)
+- [ ] Previous/next navigation to review completed steps or peek ahead
+- [ ] Completed steps shown with green checkmark and completion timestamp
+- [ ] Current step highlighted with accent color
+- [ ] URL-shareable: each runbook has a direct URL that non-workspace-members could access (if public sharing is enabled for the workspace)
+**Notes:** Playbook mode is the "1000-foot view" for ops team members who don't need to see the full process map. They just need "what do I do next?" This is the upsell from Consultant tier to Team tier (per ROADMAP.md pricing). The view should be mobile-responsive since ops team members might use it on tablets. Keep it extremely simple — no sidebar, no canvas, no complexity.
+
+### #FEAT-043 Activity log
+**Phase:** 3
+**Priority:** P1 (important)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `activity_log` table: id, workspace_id, user_id (FK users), action (enum: 'created', 'updated', 'deleted', 'completed', 'assigned', 'commented', 'exported', 'shared'), entity_type (text — 'step', 'section', 'tool', 'runbook', etc.), entity_id (UUID), entity_name (text — snapshot of name at time of action), details (JSONB nullable — changed fields, old/new values), created_at
+- [ ] RLS policies via `can_access_workspace()`
+- [ ] TypeScript types: `ActivityLogEntry`, `ActivityAction`
+- [ ] Activity logging middleware/utility: function `logActivity(workspace_id, user_id, action, entity_type, entity_id, entity_name, details?)` called from relevant API routes
+- [ ] Activity log page at `/w/[workspaceId]/activity` — chronological list of all workspace activity
+- [ ] Each entry shows: user name/avatar, action description (human-readable sentence, e.g., "Patrick created step 'Data Entry' in section 'Onboarding'"), timestamp (relative), entity link (clickable)
+- [ ] Filterable by: user, action type, entity type, date range
+- [ ] Pagination (load more / infinite scroll) — activity logs can be large
+**Notes:** Activity log is the audit trail. It's important for consulting engagements (showing clients what changed and when) and for team collaboration (understanding what happened while you were away). The logging function should be called from existing API routes — add `logActivity()` calls to POST/PATCH/DELETE handlers for steps, sections, tools, runbooks. Don't log reads (GET). Keep the details JSONB small — only store changed field names and old/new values for updates.
+**Sub-tasks:**
+- [ ] [1/3] Data model: migration, types, logging utility function
+- [ ] [2/3] Add logActivity() calls to all relevant API routes (steps, sections, tabs, tools, runbooks, shares)
+- [ ] [3/3] Activity log page UI: chronological list, filtering, pagination, entity links
+
+### #FEAT-044 Workspace cloning
+**Phase:** 3
+**Priority:** P2 (nice to have)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] "Duplicate Workspace" button in workspace settings
+- [ ] Creates a deep copy of the workspace: new workspace + copies of all tabs, sections, steps, connections, teams, roles, people, tools, tool sections, step_roles, step_tools, stages, touchpoints, touchpoint_connections
+- [ ] New workspace name defaults to "{Original Name} (Copy)"
+- [ ] All IDs are regenerated (new UUIDs) — no reference to original workspace entities
+- [ ] Foreign key relationships preserved within the copy (section_id on steps points to the copied section, not the original)
+- [ ] Perspectives, annotations, comments, tasks, runbooks, activity log are NOT copied (they're instance-specific)
+- [ ] Improvement ideas are NOT copied
+- [ ] Server-side implementation via a SECURITY DEFINER function (single transaction for atomicity)
+- [ ] Loading state during clone (can take several seconds for large workspaces)
+- [ ] After clone, navigate to the new workspace
+**Notes:** Workspace cloning is how consultants reuse their frameworks. They build a "template workspace" with their standard sections, scoring rubric, and team structure, then clone it for each new client engagement. The clone must be a full deep copy — not references. Use a Supabase RPC function that does all the INSERTs in a single transaction. Map old IDs to new IDs to preserve internal relationships.
+
+### #FEAT-045 Conditional step coloring
+**Phase:** 3
+**Priority:** P2 (nice to have)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `coloring_rules` table: id, workspace_id, name (text), color (hex text), criteria_type (enum: 'status', 'executor', 'step_type', 'has_tool', 'has_role', 'maturity_below', 'maturity_above'), criteria_value (text — the value to match, e.g., 'draft', 'person', tool_id, role_id, '3'), is_active (boolean default true), position (integer — evaluation order), created_at, updated_at
+- [ ] RLS policies via `can_access_workspace()`
+- [ ] TypeScript types: `ColoringRule`, `CriteriaType`
+- [ ] API routes: GET list, POST create, PATCH update, DELETE
+- [ ] Client wrappers
+- [ ] Conditional coloring panel accessible from canvas toolbar (paintbrush icon in left sidebar)
+- [ ] Panel shows list of rules with: name (editable), color swatch (clickable color picker), criteria type dropdown, criteria value dropdown/input, active toggle, delete button
+- [ ] "Add Rule" button creates a new rule
+- [ ] Rules evaluated in order (position) — last matching rule wins
+- [ ] Step nodes on canvas apply the matching rule's color as background tint (subtle, preserving readability)
+- [ ] Rules apply in real-time as rules are created/edited
+**Notes:** Conditional coloring is from the Puzzle spec — it lets users visually highlight steps by criteria (e.g., "all draft steps = yellow", "all steps with no role assigned = red"). The evaluation is client-side: fetch all rules, evaluate each step against rules in order, apply the last matching color. Keep it simple — AND logic only (all criteria of a rule must match for it to apply). No complex boolean expressions. The color should be applied as a background tint (low opacity overlay) so text remains readable.
+**Sub-tasks:**
+- [ ] [1/2] Data model: migration, enums, types, API routes, client wrappers
+- [ ] [2/2] Coloring panel UI + real-time rule evaluation on canvas step nodes
+
+### #FEAT-046 Section templates (save & deploy)
+**Phase:** 3
+**Priority:** P2 (nice to have)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] New `templates` table: id, workspace_id (nullable — null = global/org template), organization_id, name (text), description (text nullable), category (text nullable — 'Marketing', 'Sales', 'Operations', etc.), template_data (JSONB — snapshot of section + steps + connections + roles + tools), created_by (UUID FK users), created_at, updated_at
+- [ ] RLS policies: workspace-scoped templates via `can_access_workspace()`, org-scoped via `is_org_member()`
+- [ ] TypeScript types: `Template`
+- [ ] API routes: GET list (filterable by category, workspace, org), POST create (from section_id), DELETE
+- [ ] Client wrappers
+- [ ] "Save as Template" button on section detail panel — opens dialog with name, description, category fields
+- [ ] Saving captures: section name/summary, all steps (name, status, type, executor, notes, time, frequency, maturity fields), connections between steps, role assignments, tool assignments — as a JSONB snapshot
+- [ ] Template browser accessible from canvas toolbar (grid icon) — shows templates as cards with name, description, category, step count
+- [ ] Searchable by name, filterable by category
+- [ ] "Deploy Template" creates a new section with all the captured steps, connections, and assignments on the current tab
+- [ ] Deployed steps get new UUIDs — no reference to original entities
+- [ ] Pre-built starter templates: "Customer Onboarding", "Support Ticket Resolution", "Content Creation", "Lead Nurturing" (seeded as org-level templates)
+**Notes:** Templates are how Puzzle enables reuse. A consultant builds their "Client Onboarding" framework once, saves it as a template, and deploys it in every client workspace. The template_data JSONB stores a complete snapshot — not references to live entities. When deploying, all IDs are regenerated. Role and tool assignments reference by name (not ID) since the target workspace may have different role/tool IDs — attempt to match by name, skip unmatched.
+**Sub-tasks:**
+- [ ] [1/3] Data model: migration, types, API routes (create from section, list, delete)
+- [ ] [2/3] "Save as Template" dialog on section panel + template data capture logic
+- [ ] [3/3] Template browser UI + deploy template logic (create section + steps + connections from JSONB snapshot)
+
+### #FEAT-047 Phase 3 regression and quality pass
+**Phase:** 3
+**Priority:** P0 (critical path)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] Full regression: all Phase 1, 1.5, 2a, 2b, 2c features still work
+- [ ] Comments CRUD end-to-end: create, reply, resolve, category filtering, aggregation view
+- [ ] Tasks CRUD end-to-end: create, complete, reorder, section rollup
+- [ ] Runbooks: create from section → execute steps → complete runbook
+- [ ] Playbook mode: step-by-step execution works
+- [ ] Activity log captures actions from all major API routes
+- [ ] Workspace cloning produces a correct deep copy
+- [ ] Conditional coloring rules apply correctly on canvas
+- [ ] Templates: save section → browse templates → deploy in another tab
+- [ ] All new pages have loading states, error boundaries, aria-labels
+- [ ] Type check, lint, build pass
+- [ ] No console errors on any page
+**Notes:** This is the largest testing gate. Phase 3 touches many systems (comments, tasks, runbooks, activity log, cloning, coloring, templates). Test data flow chains thoroughly: section with steps + tasks → create runbook → execute in playbook mode → activity log captures all actions.
