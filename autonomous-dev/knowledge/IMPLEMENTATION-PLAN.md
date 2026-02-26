@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-021 [1/3] DONE iter 41, [2/3] read-only canvases next)
+## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-021 [1/3] DONE iter 41, regression pass iter 42, [2/3] read-only canvases next)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 

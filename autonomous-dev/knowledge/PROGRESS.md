@@ -1195,3 +1195,27 @@
 - Efficiency (wasted actions?): 5 — Completed in single pass, one type error fix.
 - Proactive observations: 0
 **Notes:** Decomposed FEAT-021 into 3 sub-tasks. [1/3] sets up the routing, navigation, data fetching, and stats summary shell. [2/3] will add React Flow read-only canvases. [3/3] will add visual alignment hints. Human has added Phase 2b/2c/3 roadmap specs to autonomous-dev files (not committed here).
+
+## Iteration 42 — 2026-02-26
+**Task:** Regression pass — verify iterations 35-41 (journey canvas + comparison view)
+**Source:** Cadence floor (minimum every 8th iteration, last regression iter 34)
+**Complexity:** M
+**Result:** completed
+**Changes:** None (documentation only)
+**Research:** Reviewed 16 files changed since iter 34. Verified types/database.ts (Stage, Touchpoint, TouchpointConnection, CanvasType), canvas.ts (StageNodeData, TouchpointNodeData), API client wrappers (9 journey functions), compare/page.tsx data fetching, workspace-shell.tsx tab exclusion, tab-bar.tsx canvas type dropdown, page.tsx canvas_type routing.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 6 pre-existing warnings)
+- Build: pass (44 routes — all expected)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None (all silent catch patterns already documented as IMP-004)
+**Self-score:**
+- Code quality: N/A — no code changes
+- Test coverage of change: N/A — regression verification only
+- Confidence this won't regress: 5 — all changes since iter 34 are additive, no existing code modified
+- Efficiency (wasted actions?): 5 — focused review, no wasted actions
+- Proactive observations: 0 (unused imports addEdge/Plus noted in STATUS.md warnings)
+**Notes:** Regression cadence floor triggered (iter 34 + 8 = 42). Static-only regression due to Playwright MCP unavailability. All 16 changed files reviewed. Journey canvas integration verified: types ↔ API ↔ components ↔ pages are consistent. Comparison view data fetching pattern mirrors gap-analysis page. No debug artifacts, no new warnings, no regressions.

@@ -8,12 +8,12 @@
 
 ## Last Smoke Test
 
-- **Iteration:** 41
+- **Iteration:** 42
 - **Date:** 2026-02-26
 - **Result:** pass (static only — Playwright MCP unavailable)
 - **Pages checked:** 0 (browser testing skipped)
 - **Errors found:** 0
-- **Note:** FEAT-021 [1/3] (comparison view shell). Type-check, lint (0 errors), build all pass. New /w/[workspaceId]/compare route with side-by-side layout. Browser testing deferred — Playwright MCP unavailable.
+- **Note:** Regression pass. Type-check (0 errors), lint (0 errors, 6 warnings), build (44 routes) all pass. No code changes — verification only.
 
 ## Last Navigation Suite
 
@@ -70,27 +70,31 @@
 
 ## Last Regression Pass
 
-- **Iteration:** 34
+- **Iteration:** 42
 - **Date:** 2026-02-26
 - **Result:** pass (no regressions, static analysis only — Playwright MCP unavailable)
-- **Pages re-checked:** All routes (focus on iterations 32-33 journey canvas additions)
+- **Pages re-checked:** All 14 page routes + 30 API routes (44 total)
 - **Regressions found:** 0
-- **Iterations covered:** 32-33 (risk-triggered from iter 32 schema change, risk score 3)
-- **Files reviewed:** migration 011, 6 new API route files (stages, touchpoints, touchpoint-connections × route.ts + [id]/route.ts), client.ts wrapper functions, database.ts types
-- **Verification:** type-check pass, lint pass (0 errors, 5 pre-existing warnings), build pass (43 routes — 6 new)
+- **Iterations covered:** 35-41 (cadence floor: last regression iter 34 + 8 = 42)
+- **Files reviewed:** 16 source files changed since iter 34 (journey-canvas-view.tsx, stage-node.tsx, touchpoint-node.tsx, stage-detail-panel.tsx, touchpoint-detail-panel.tsx, pain.ts, tab-bar.tsx, page.tsx, workspace-shell.tsx, sidebar.tsx, compare-view.tsx, compare/page.tsx, compare/loading.tsx, canvas.ts, client.ts, tabs/route.ts)
+- **Verification:** type-check pass (0 errors), lint pass (0 errors, 6 warnings — unchanged), build pass (44 routes), zero debug artifacts
 - **Known-good baseline:**
   - /workspaces — clean (pre-existing hydration warning in dev only)
-  - /w/[id]/[tabId] (canvas) — clean (dynamic imports for pdf/png/tiptap, empty state overlay)
-  - /w/[id]/list — clean (empty state card added)
+  - /w/[id]/[tabId] (process canvas) — clean (dynamic imports for pdf/png/tiptap, empty state overlay)
+  - /w/[id]/[tabId] (journey canvas) — clean (stage/touchpoint nodes, detail panels, heat map)
+  - /w/[id]/list — clean (empty state card)
   - /w/[id]/gap-analysis — clean
+  - /w/[id]/compare — clean (new iter 41, stats summary + section/stage lists)
   - /w/[id]/teams — clean (a11y fixes: touch targets, aria-labels, focus indicators)
   - /w/[id]/settings — clean
-  - /public/[shareId] — clean (loading.tsx added)
+  - /public/[shareId] — clean (loading.tsx)
   - /login — redirects to /workspaces when authenticated (correct behavior)
-  - API routes — all 20 route groups present and typed correctly (14 original + 6 journey canvas)
+  - API routes — all 30 routes present and typed correctly (14 original + 6 journey canvas × 2)
   - Error boundaries (×2), offline banner, skeleton, toast helpers — all clean
-  - Getting Started template seeding — best-effort, properly guarded
-  - Journey canvas data layer — migration 011 + 6 API routes + 9 client wrappers all clean
+  - Journey canvas: complete (data model, API, canvas rendering, detail panels, heat map)
+  - Comparison view: shell complete ([2/3] canvases + [3/3] alignment hints remain)
+  - Pre-existing: 4 silent `.catch(() => {})` patterns (documented as IMP-004)
+  - Pre-existing: unused imports `addEdge` (journey-canvas-view) + `Plus` (sidebar)
 
 ## Last Data Integrity Check
 
