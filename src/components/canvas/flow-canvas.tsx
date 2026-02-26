@@ -18,7 +18,7 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Plus, Square, Thermometer } from "lucide-react";
+import { Plus, Square, Thermometer, FileDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNode } from "./step-node";
 import { SectionNode } from "./section-node";
@@ -59,6 +59,7 @@ interface FlowCanvasProps {
   onSectionDelete: (id: string) => void;
   onConnectionCreate: (conn: Connection) => void;
   onConnectionDelete: (id: string) => void;
+  onExportPdf?: (canvasElement: HTMLElement) => void;
 }
 
 function computeSectionMaturity(sectionId: string, steps: Step[]): { avg: number | null; avgTarget: number | null } {
@@ -127,8 +128,11 @@ export function FlowCanvas({
   onSectionDelete,
   onConnectionCreate,
   onConnectionDelete,
+  onExportPdf,
 }: FlowCanvasProps) {
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
   const [heatMapMode, setHeatMapMode] = React.useState(false);
+  const [exporting, setExporting] = React.useState(false);
 
   const initialNodes = React.useMemo(
     () => buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode),
@@ -313,7 +317,18 @@ export function FlowCanvas({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  const handleExportPdf = React.useCallback(async () => {
+    if (!onExportPdf || !wrapperRef.current || exporting) return;
+    setExporting(true);
+    try {
+      await onExportPdf(wrapperRef.current);
+    } finally {
+      setExporting(false);
+    }
+  }, [onExportPdf, exporting]);
+
   return (
+    <div ref={wrapperRef} className="w-full h-full">
     <ReactFlow
       nodes={nodes}
       edges={edges}
@@ -361,6 +376,22 @@ export function FlowCanvas({
           <Thermometer className="h-3.5 w-3.5" />
           Heat Map
         </Button>
+        {onExportPdf && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleExportPdf}
+            disabled={exporting}
+            title="Export workspace as PDF"
+          >
+            {exporting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <FileDown className="h-3.5 w-3.5" />
+            )}
+            {exporting ? "Exporting…" : "Export PDF"}
+          </Button>
+        )}
       </Panel>
 
       {/* Heat map legend */}
@@ -384,5 +415,6 @@ export function FlowCanvas({
         </Panel>
       )}
     </ReactFlow>
+    </div>
   );
 }

@@ -5,6 +5,9 @@ import { FlowCanvas } from "@/components/canvas/flow-canvas";
 import { StepDetailPanel } from "@/components/panels/step-detail-panel";
 import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
 import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
+import { useWorkspace } from "@/lib/context/workspace-context";
+import { exportWorkspacePdf } from "@/lib/export/pdf";
+import { toast } from "sonner";
 import type { Section, Step, Connection } from "@/types/database";
 
 interface CanvasViewProps {
@@ -82,6 +85,26 @@ export function CanvasView({
     setConnections((prev) => prev.filter((c) => c.id !== connectionId));
   };
 
+  const { workspace } = useWorkspace();
+
+  const handleExportPdf = React.useCallback(
+    async (canvasElement: HTMLElement) => {
+      try {
+        await exportWorkspacePdf({
+          workspaceName: workspace.name,
+          sections,
+          steps,
+          connections,
+          canvasElement,
+        });
+        toast.success("PDF exported successfully");
+      } catch {
+        toast.error("Failed to export PDF");
+      }
+    },
+    [workspace.name, sections, steps, connections]
+  );
+
   return (
     <div className="flex h-full">
       {/* Canvas */}
@@ -104,6 +127,7 @@ export function CanvasView({
           onSectionDelete={handleSectionDelete}
           onConnectionCreate={handleConnectionCreate}
           onConnectionDelete={handleConnectionDelete}
+          onExportPdf={handleExportPdf}
         />
       </div>
 
