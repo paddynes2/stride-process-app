@@ -57,7 +57,9 @@
 
 Prioritized features:
 - [x] #FEAT-027 Dashboard / workspace overview page — DONE iteration 63
-- [ ] #FEAT-028 Search & filtering across all entity types
+- [ ] #FEAT-028 Search & filtering across all entity types — IN PROGRESS
+  - [x] [1/2] Search & filter for People and Tools views — DONE iteration 68
+  - [ ] [2/2] Search & filter for Teams view
 - [x] #FEAT-029 People page (flesh out stub) — DONE iteration 65
 - [x] #FEAT-030 Tools page (flesh out stub) — DONE iteration 67
   - [x] [1/2] Data model + types + API routes + client functions — DONE iteration 66
@@ -80,3 +82,4 @@ Deferred to Phase 4+:
 - [2026-02-26] Iteration 65: People page fleshed out. Flat table view with inline editing, role picker for adding people, delete confirmation. Sidebar stub badge removed.
 - [2026-02-26] Iteration 66: Tools data layer built (migration 013, API routes, types, client functions). Decomposed into 2 sub-tasks — UI next iteration.
 - [2026-02-26] Iteration 67: Tools page UI complete. #FEAT-030 fully done. Sidebar stub badge removed. Next: #FEAT-028 search/filtering or #FEAT-031 bulk actions.
+- [2026-02-26] Iteration 68: #FEAT-028 [1/2] done — search & filter added to People and Tools views. [2/2] Teams view remaining.

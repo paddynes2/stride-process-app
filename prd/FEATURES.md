@@ -37,7 +37,9 @@
 
 ## Phase 3: Advanced Features — IN PROGRESS
 - [x] #FEAT-027 Dashboard / workspace overview page — DONE iteration 63, 2026-02-26
-- [ ] #FEAT-028 Search & filtering across all entity types (steps, sections, stages, touchpoints) — Attempts: 0
+- [ ] #FEAT-028 Search & filtering across all entity types (steps, sections, stages, touchpoints) — Attempts: 1
+  - [x] [1/2] Search & filter for People and Tools views — DONE iteration 68, 2026-02-26
+  - [ ] [2/2] Search & filter for Teams view
 - [x] #FEAT-029 People page (flesh out stub with people CRUD, role assignments) — DONE iteration 65, 2026-02-26
 - [x] #FEAT-030 Tools page (flesh out stub — define tools data model + CRUD) — DONE iteration 67, 2026-02-26
   - [x] [1/2] Data model + types + API routes + client functions — DONE iteration 66, 2026-02-26

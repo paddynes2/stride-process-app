@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 67
-- **Date:** 2026-02-26 22:00
+- **Iteration:** 68
+- **Date:** 2026-02-26 22:30
 - **Phase:** Phase 3: Advanced Features
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-030 [2/2] Tools page UI — CRUD view with inline editing
+- **Last task:** #FEAT-028 [1/2] Search & filter for People and Tools views
 - **Result:** completed
-- **Next task:** #FEAT-028 Search & filtering across all entity types
+- **Next task:** #FEAT-028 [2/2] Search & filter for Teams view
 - **Blockers:** None
 
 ## Context
 
-Completed Tools page: `tools-view.tsx` is a flat CRUD table with Name, Category, Vendor, Cost/mo columns. All fields are inline-editable (blur/enter commit pattern, matching people-view.tsx exactly). Summary cards show total tools, unique categories, and total monthly cost. Empty state with CTA button. Server page fetches tools from Supabase with auth guard. Sidebar `stub: true` removed from Tools item; also cleaned up the unused stub rendering code in sidebar.tsx since no items use it anymore. #FEAT-030 is now fully complete (both sub-tasks done).
+Added search & filtering to People view (`people-view.tsx`) and Tools view (`tools-view.tsx`). Both follow the exact step-list-view pattern: `React.useState` for search/filter state, `React.useMemo` for filtered computation, `Input` with `Search` icon via `leftElement`, native `<select>` elements for dropdown filters. People has search (name/email), role filter, team filter. Tools has search (name/category/vendor), category filter (only shown when categories exist). Both show "No X match your filters" when filtered list is empty. #FEAT-028 is decomposed: [1/2] done (flat tables), [2/2] remaining (Teams hierarchical view).
 
 ## Dev Server
 
