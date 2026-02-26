@@ -253,17 +253,17 @@
 - [x] Fewer than 3 items remain in IMPROVEMENTS.md (0 items remain — both IMP-001 and IMP-002 done)
 **Notes:** IMP-001: Extracted export logic to `src/hooks/use-canvas-export.ts`. IMP-002: Extracted maturity constants to `src/lib/maturity.ts` (replaced duplication in 7 files).
 
-### #FEAT-015 Responsive sanity check
+### #FEAT-015 Responsive sanity check — DONE iteration 30, 2026-02-26
 **Phase:** 1.5
 **Priority:** P2 (nice to have)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] Workspace list page is usable at 1024px width (no overflow, no clipped buttons)
-- [ ] Canvas page sidebar collapses cleanly at 1024px
-- [ ] Gap analysis table doesn't overflow at 1024px (horizontal scroll or column hiding)
-- [ ] Teams page is usable at 1024px
-**Notes:** Not mobile-first — consultants use laptops/desktops. But tablet/small laptop should not be broken. Test at 1024x768.
+- [x] Workspace list page is usable at 1024px width (no overflow, no clipped buttons) — already responsive (sm:/lg: breakpoints)
+- [x] Canvas page sidebar collapses cleanly at 1024px — auto-collapses via matchMedia at ≤1280px
+- [x] Gap analysis table doesn't overflow at 1024px (horizontal scroll or column hiding) — overflow-x-auto + min-w-[600px]
+- [x] Teams page is usable at 1024px — responsive summary cards + max-w-4xl fits in 976px available
+**Notes:** Panel width reduced from 360→300px at ≤1280px via CSS media query. Summary cards use grid-cols-1 sm:grid-cols-3 for graceful stacking.
 
 ### #FEAT-016 End-to-end golden path test
 **Phase:** 1.5

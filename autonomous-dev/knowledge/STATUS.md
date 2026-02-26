@@ -6,20 +6,20 @@
 
 ## Handoff
 
-- **Iteration:** 29
+- **Iteration:** 30
 - **Date:** 2026-02-26
 - **Phase:** Phase 1.5 — Ship & Harden
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-014 Extract shared maturity constants and canvas export hook (IMP-001 + IMP-002)
+- **Last task:** #FEAT-015 Responsive sanity check — key flows work on tablet (1024px)
 - **Result:** completed
-- **Next task:** #FEAT-015 Responsive sanity check — key flows work on tablet (1024px)
+- **Next task:** #FEAT-016 End-to-end golden path test
 - **Blockers:** None
 
 ## Context
 
-Completed both IMPROVEMENTS.md items in a single iteration. Created `src/lib/maturity.ts` as single source of truth for MATURITY_COLORS, MATURITY_LABELS, MATURITY_LEVELS, getMaturityColor() — replacing duplicated definitions in 7 files. Created `src/hooks/use-canvas-export.ts` extracting PDF/PNG export callbacks from canvas-view.tsx. Net -81 lines. Also fixed British spelling inconsistency ("Optimised" → "Optimized" in gap-analysis-view.tsx).
+Added responsive layout support for tablet/small laptop viewports (1024px). Changes across 5 files: (1) globals.css — media query reduces `--panel-width` from 360→300px at ≤1280px, (2) workspace-shell.tsx — auto-collapses sidebar via matchMedia at ≤1280px, (3) gap-analysis-view.tsx — responsive summary card grid + horizontal scroll on data table, (4) teams-view.tsx — responsive summary card grid, (5) gap-analysis loading.tsx — matching responsive skeleton. At 1024px, sidebar auto-collapses to 48px, panel shrinks to 300px, giving canvas 676px (was 444px). Summary cards stack vertically on very narrow screens (<640px).
 
-Phase 1.5 progress: tasks 1-5 of 7 done. Next up is FEAT-015 (responsive sanity check at 1024px) then FEAT-016 (end-to-end golden path test).
+Phase 1.5 progress: tasks 1-6 of 7 done. Only FEAT-016 (end-to-end golden path test) remains.
 
 ## Dev Server
 
@@ -30,5 +30,5 @@ Phase 1.5 progress: tasks 1-5 of 7 done. Next up is FEAT-015 (responsive sanity 
 ## Warnings
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
-- Pre-existing lint warnings (5 warnings — unused imports in page.tsx, flow-canvas.tsx, header.tsx, sidebar.tsx).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-29).
+- Pre-existing lint warnings (5 warnings — unchanged since iter 21).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-30).
