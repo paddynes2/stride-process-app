@@ -233,6 +233,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/lib/supabase/server.ts` — Server-side Supabase client
 - `src/lib/export/pdf.ts` — PDF export utility (jspdf + html-to-image)
 - `src/lib/export/png.ts` — PNG export utility (html-to-image toPng at 2x)
+- `src/lib/export/journey-pdf.ts` — Journey-specific PDF export (jspdf + html-to-image, title page + canvas snapshot + touchpoint table + pain ranking + stage breakdown)
 - `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection)
 - `src/components/ui/skeleton.tsx` — Skeleton primitive (animated pulse block for loading states)
 - `src/components/ui/offline-banner.tsx` — Network offline/online banner (useSyncExternalStore)

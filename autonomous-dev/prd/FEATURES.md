@@ -352,17 +352,20 @@
 - [x] [2/3] Read-only React Flow canvas rendering (process left, journey right) — DONE iteration 43
 - [x] [3/3] Visual alignment hints between stages/sections with matching names — DONE iteration 44
 
-### #FEAT-022 Journey export
+### #FEAT-022 Journey export — IN PROGRESS (iteration 45, 2026-02-26)
 **Phase:** 2a
 **Priority:** P2 (nice to have)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in-progress
 **Acceptance criteria:**
-- [ ] "Export PDF" on journey canvas produces journey-specific PDF
-- [ ] PDF includes: journey name, stage breakdown, touchpoint list with pain/gain scores, sentiment summary
-- [ ] Pain point ranking: touchpoints sorted by pain score descending
+- [x] "Export PDF" on journey canvas produces journey-specific PDF
+- [x] PDF includes: journey name, stage breakdown, touchpoint list with pain/gain scores, sentiment summary
+- [x] Pain point ranking: touchpoints sorted by pain score descending
 - [ ] Comparison view exportable as PDF (side-by-side snapshot)
 **Notes:** Extends the existing PDF export infrastructure from FEAT-007. Journey PDF follows same visual style.
+**Sub-tasks:**
+- [x] [1/2] Journey canvas PDF + PNG export — title page, canvas snapshot, touchpoint table, pain ranking, stage breakdown, PNG export button — DONE iteration 45
+- [ ] [2/2] Comparison view PDF export — side-by-side snapshot of process vs journey canvases
 
 ---
 

@@ -1269,3 +1269,30 @@
 - Efficiency (wasted actions?): 5 — Completed in single pass with targeted research.
 - Proactive observations: 0
 **Notes:** FEAT-021 is now fully DONE (all 3/3 sub-tasks complete across iterations 41, 43, 44). The comparison view is feature-complete: side-by-side React Flow canvases with read-only display, stats overlays, and alignment hints. Phase 2a remaining: FEAT-022 (journey export) + BUG-010/BUG-011 (P2 a11y).
+
+## Iteration 45 — 2026-02-26
+**Task:** #FEAT-022 [1/2] Journey canvas PDF + PNG export
+**Source:** prd/FEATURES.md
+**Complexity:** L (decomposed into 2 sub-tasks)
+**Result:** completed
+**Changes:**
+- Created: `src/lib/export/journey-pdf.ts` (~530 lines — journey-specific PDF export)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` (added PDF/PNG export buttons, PngExportButton component, wrapperRef, handleExportPdf callback, tabName + workspaceName props)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/page.tsx` (added tab.name + workspace name fetch, passed props to JourneyCanvasView)
+**Research:** Read pdf.ts (existing process PDF export — 763 lines), use-canvas-export.ts (export hook pattern), pain.ts (pain scoring constants), journey-canvas-view.tsx (journey canvas component), database.ts (entity types), canvas-view.tsx (process canvas export integration), flow-canvas.tsx (PngExportButton + wrapperRef pattern).
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 6 warnings — all pre-existing)
+- Build: pass
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Follows existing pdf.ts patterns exactly. Title page with stats, canvas snapshot, touchpoint table, pain ranking with visual bars, stage breakdown with sentiment mini-bars. Footer on all pages. Dynamic import for lazy loading.
+- Test coverage of change: 2 — Static verification only (type-check + lint + build). No browser test due to missing Playwright.
+- Confidence this won't regress: 5 — Pure additive (1 new file + 2 modified with additive changes only). No existing behavior modified. Uses proven patterns.
+- Efficiency (wasted actions?): 5 — Clean research → build → verify flow. 3 files changed, all first-pass.
+- Proactive observations: 0
+**Notes:** FEAT-022 decomposed into [1/2] journey PDF/PNG and [2/2] comparison PDF. Journey PDF includes: title page (stats + sentiment distribution bar), canvas snapshot, touchpoint details table (sorted by stage then name), pain point ranking (sorted by pain desc with visual bars), stage breakdown (channel, owner, count, avg pain, sentiment mini-bars). PngExportButton is separate component (needs useReactFlow() from ReactFlow context). fitView saves/restores viewport so user sees no flash.

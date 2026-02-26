@@ -6,20 +6,20 @@
 
 ## Handoff
 
-- **Iteration:** 44
+- **Iteration:** 45
 - **Date:** 2026-02-26
 - **Phase:** Phase 2a — Journey Mapping
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-021 [3/3] Visual alignment hints in comparison view
+- **Last task:** #FEAT-022 [1/2] Journey canvas PDF + PNG export
 - **Result:** completed
-- **Next task:** #FEAT-022 Journey export (journey-specific PDF) — or fix BUG-010/BUG-011 first (P2 a11y)
+- **Next task:** #FEAT-022 [2/2] Comparison view PDF export — then BUG-010/BUG-011 (P2 a11y)
 - **Blockers:** None
 
 ## Context
 
-FEAT-021 is now fully complete (all 3/3 sub-tasks done). The comparison view at /w/[workspaceId]/compare now renders side-by-side React Flow canvases with visual alignment hints. `computeNameMatches()` in compare-view.tsx pairs sections and stages by case-insensitive name matching. Matched nodes get a teal glow (`boxShadow` with `--brand` color) on the React Flow wrapper, and an alignment bar above the canvases shows the match count and paired names as teal pills. Only compare-view.tsx was modified — no shared components touched.
+FEAT-022 [1/2] is complete. Journey canvas now has PDF and PNG export buttons in the toolbar (matching process canvas pattern). Created `src/lib/export/journey-pdf.ts` (~530 lines) with title page (stats + sentiment bar), canvas snapshot, touchpoint details table, pain point ranking, and stage breakdown. Modified `journey-canvas-view.tsx` to add export buttons + PngExportButton component. Modified `page.tsx` to pass tabName and workspaceName props.
 
-Phase 2a has 2 remaining tasks: FEAT-022 (journey export PDF) and 2 P2 bugs (BUG-010, BUG-011 — text-quaternary used for functional content). Next iteration should either fix the P2 bugs (quick wins) or start FEAT-022.
+FEAT-022 has 1 remaining sub-task: [2/2] comparison view PDF export (acceptance criterion 4). After that, 2 P2 bugs (BUG-010, BUG-011 — text-quaternary a11y). Once those are done, Phase 2a is complete.
 
 ## Dev Server
 
@@ -31,6 +31,6 @@ Phase 2a has 2 remaining tasks: FEAT-022 (journey export PDF) and 2 P2 bugs (BUG
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (6 warnings — 3 in journey-canvas-view, 1 in flow-canvas, 1 in header, 1 in sidebar).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-44).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-45).
 - 2 open P2 a11y bugs (BUG-010, BUG-011) — text-quaternary used for functional content.
 - Unused import `addEdge` in flow-canvas.tsx and `Plus` in sidebar.tsx — minor cleanup opportunity.
