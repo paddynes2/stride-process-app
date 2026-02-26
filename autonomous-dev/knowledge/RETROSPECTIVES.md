@@ -149,3 +149,56 @@ No file at 5+ iterations — hotspot concern from iter 20 retro addressed by hoo
 2. **FEAT-016 (golden path test) will be limited to static verification** unless Playwright becomes available. Document this limitation clearly.
 3. **Consider Vitest or similar for component testing** — would improve test coverage scores without relying on browser automation.
 4. canvas-view.tsx hotspot reduced from 5 hits (iter 11-20) to 3 hits (iter 21-30) after export hook extraction. The action from iter 20 retro worked.
+
+## Retrospective — Iteration 40 (2026-02-26)
+
+### Metrics Summary (Iterations 31-40)
+- **Success rate:** 10/10 (100%) — 40/40 all-time
+- **Task breakdown:** 7 build (FEAT-016, FEAT-017×4, FEAT-018, FEAT-019, FEAT-020), 1 regression (iter 34), 1 golden path (iter 31), 1 UX sweep (iter 40)
+- **Failed tasks:** 0
+- **Bugs found:** 2 (both P2 a11y, found during UX sweep iter 40)
+- **Improvements found:** 6 (IMP-003 through IMP-008, all from UX sweep)
+- **Reverts:** 0
+
+### Hotspot Files (top 3 by modification frequency, iter 31-40)
+1. `journey-canvas-view.tsx` — **5 iterations** (35, 36, 37, 38, 39) — HOTSPOT threshold reached
+2. `src/types/canvas.ts` — 2 iterations (32, 39) — type additions
+3. `src/lib/api/client.ts` — 2 iterations (33, 35) — new API wrappers
+
+**Action:** journey-canvas-view.tsx is the same hotspot pattern as canvas-view.tsx was in iter 11-20. It's the integration point for all journey features. Once Phase 2a feature work is done, consider extracting export/summary logic when FEAT-022 (journey export) is built, similar to how IMP-001 extracted process export logic.
+
+### Self-Score Trends
+| Metric | Iter 31-33 avg | Iter 34-36 avg | Iter 37-40 avg | Trend |
+|--------|----------------|----------------|----------------|-------|
+| Code quality | 3.3* | 3.3* | 3.0* | Stable (testing iters skew with 0s) |
+| Test coverage | 2.3 | 2.7 | 1.3* | Low (Playwright unavailable) |
+| Confidence | 5.0 | 5.0 | 4.7 | Stable/High |
+| Efficiency | 5.0 | 4.7 | 4.7 | Stable |
+
+*Iterations with 0 scores (regression/sweep) included in averages, skewing down.
+
+### Velocity
+- Phase 2a progress: 4 of 6 tasks complete (FEAT-017, 018, 019, 020)
+- FEAT-017 decomposed into 4 sub-tasks, took 5 iterations (iter 32-36) — appropriate for largest feature
+- FEAT-018, 019, 020 each completed in 1 iteration — pattern-mirroring approach is highly efficient
+- 2 remaining: FEAT-021 (comparison view, large), FEAT-022 (journey export, medium)
+
+### Patterns
+- **Pattern mirroring is the fastest build approach:** Journey detail panels (FEAT-018, 019) and heat map (FEAT-020) were built by mirroring existing process canvas patterns. Each took exactly 1 iteration. This should continue for FEAT-022 (journey export).
+- **Silent error swallowing is systemic:** `.catch(() => {})` appears 4 times across both canvases (flow-canvas + journey-canvas-view). This was a design choice in the original process canvas that propagated to journey canvas via pattern mirroring.
+- **Playwright MCP still unavailable (28 consecutive iterations).** Test coverage is the persistent weak point. All quality assurance is static (typecheck, lint, build).
+- **UX sweep found the first new bugs since iter 10.** The --text-quaternary for functional content is a pattern issue — could appear in more places.
+
+### Comparison Across All Retrospectives
+| Metric | Iter 1-10 | Iter 11-20 | Iter 21-30 | Iter 31-40 | Trend |
+|--------|-----------|------------|------------|------------|-------|
+| Success rate | 100% | 100% | 100% | 100% | Consistent |
+| Bugs found | 9 | 0 | 0 | 2 | UX sweep catches what testing misses |
+| Feature velocity | 80% | 90% | 80% | 70% | Slightly lower (more cadence activities) |
+| Efficiency avg | 4.5 | 4.9 | 4.5 | 4.8 | Stable |
+
+### Actions
+1. **Grep for --text-quaternary used on functional content** — BUG-010/011 may be tip of iceberg. The color system docs say it's "decorative only" but it's been used in at least 2 functional contexts.
+2. **IMP-004 (silent error swallowing) should be addressed before FEAT-021** — it's a medium-effort fix that improves data reliability across both canvases.
+3. **journey-canvas-view.tsx hotspot expected** — it's in the same growth phase as canvas-view.tsx was in iter 11-20. Will naturally stabilize as Phase 2a wraps up.
+4. **Schedule next regression by iter 48** (8-iteration cadence from iter 40).

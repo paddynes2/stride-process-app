@@ -40,7 +40,35 @@
 
 ## Open Bugs
 
-_No open bugs._
+### #BUG-010 Pain/gain score helper text uses --text-quaternary (fails WCAG AA)
+**Severity:** P2 (WCAG 1.4.3 violation)
+**Phase:** 2a
+**Found:** iteration 40, 2026-02-26
+**Attempts:** 0
+**Status:** open
+**Page:** /w/[workspaceId]/[tabId] (journey canvas → touchpoint detail panel)
+**Steps to reproduce:**
+1. Navigate to a journey canvas tab
+2. Click a touchpoint to open the detail panel
+3. Look at the helper text below pain score buttons ("1 = low pain, 5 = high pain") and gain score buttons ("1 = low gain, 5 = high gain")
+**Expected:** Helper text is readable (meets WCAG AA 4.5:1 minimum contrast)
+**Actual:** Helper text uses `--text-quaternary` (rgba(255,255,255,0.15)), which has ~2:1 contrast on dark backgrounds. This is documented as "FAILS WCAG — decorative only" in AGENTS.md Color System but is used for functional content.
+**Console errors:** None
+
+### #BUG-011 Stage description text in node uses --text-quaternary (fails WCAG AA)
+**Severity:** P2 (WCAG 1.4.3 violation)
+**Phase:** 2a
+**Found:** iteration 40, 2026-02-26
+**Attempts:** 0
+**Status:** open
+**Page:** /w/[workspaceId]/[tabId] (journey canvas)
+**Steps to reproduce:**
+1. Navigate to a journey canvas tab
+2. Click a stage and add a description
+3. Look at the description text rendered on the stage node
+**Expected:** Description text is readable
+**Actual:** Stage node description uses `text-[var(--text-quaternary)]` (stage-node.tsx line 75), which has ~2:1 contrast. The description is functional content (helps identify stage purpose at a glance) but is rendered at a contrast level designated for decorative use only.
+**Console errors:** None
 
 ## Resolved
 

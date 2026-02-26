@@ -45,11 +45,13 @@
 
 ## Last UX Review
 
-- **Iteration:** (none yet)
-- **Date:** —
-- **Result:** not run
-- **Journey friction score:** —
-- **Top suggestions:** —
+- **Iteration:** 40
+- **Date:** 2026-02-26
+- **Result:** pass (static code review — Playwright MCP unavailable)
+- **Pages reviewed:** 4 (journey-canvas-view, touchpoint-detail-panel, stage-detail-panel, settings) + 2 comparison (canvas-view, flow-canvas)
+- **Bugs found:** 2 (BUG-010, BUG-011 — text-quaternary for functional content, WCAG AA violations)
+- **Improvements found:** 6 (IMP-003 through IMP-008 — export parity, silent errors, keyboard hints, sparse summary, missing pain data, no delete confirmation)
+- **Top findings:** (1) Silent `.catch(() => {})` on position updates in both canvases (4 instances), (2) --text-quaternary used for readable text in 2 components, (3) Journey canvas missing export buttons
 
 ## Last Accessibility Audit
 

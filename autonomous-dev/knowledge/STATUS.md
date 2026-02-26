@@ -6,27 +6,24 @@
 
 ## Handoff
 
-- **Iteration:** 39
+- **Iteration:** 40
 - **Date:** 2026-02-26
 - **Phase:** Phase 2a — Journey Mapping
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-020 Journey heat map — pain score coloring with stage roll-up
+- **Last task:** UX sweep (cadence trigger — every 20th iteration)
 - **Result:** completed
-- **Next task:** #FEAT-021 Process vs journey comparison view — side-by-side layout
+- **Next task:** #FEAT-021 Process vs journey comparison view — side-by-side layout (or address BUG-010/BUG-011 first if prioritizing P2 bugs)
 - **Blockers:** None
 
 ## Context
 
-FEAT-020 is complete. Added heat map mode to the journey canvas, mirroring the process canvas maturity heat map but using pain scores (inverted scale: 1=green, 5=red). Created `src/lib/pain.ts` with pain scoring constants. Modified `touchpoint-node.tsx` to color by pain score in heat map mode (falls back to sentiment coloring when off). Modified `stage-node.tsx` to show average pain score badge and colored background when heat map is active. Added heat map toggle button, legend panel, `computeStagePainScore()` function, and `heatMapMode` state to `journey-canvas-view.tsx`.
+Iteration 40 was a UX sweep (cadence trigger). Reviewed 4 pages via static code analysis: journey-canvas-view.tsx, touchpoint-detail-panel.tsx, stage-detail-panel.tsx, settings/page.tsx. Also cross-checked against process canvas (canvas-view.tsx, flow-canvas.tsx) for consistency.
 
-Key files created/modified:
-- `src/lib/pain.ts` — NEW, pain scoring constants (PAIN_COLORS, PAIN_LEVELS, getPainColor)
-- `src/types/canvas.ts` — Added `averagePainScore` and `heatMapMode` to journey node data types
-- `src/components/canvas/touchpoint-node.tsx` — Pain-based heat map coloring
-- `src/components/canvas/stage-node.tsx` — Average pain roll-up with heat map coloring
-- `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` — Heat map state, toggle, legend, computation
+Findings logged:
+- 2 new P2 bugs: BUG-010 (pain/gain helper text uses --text-quaternary, fails WCAG AA), BUG-011 (stage node description uses --text-quaternary, fails WCAG AA)
+- 6 new improvements: IMP-003 (journey export parity — already FEAT-022), IMP-004 (silent error swallowing on position updates, 4 instances across both canvases), IMP-005 (keyboard shortcut hints), IMP-006 (sparse journey summary panel), IMP-007 (stage panel missing pain summary), IMP-008 (no delete confirmation on canvas, NEEDS_REVIEW)
 
-Next: FEAT-021 (process vs journey comparison view) — side-by-side read-only canvases. This is the largest remaining Phase 2a task and should be decomposed.
+No code changes this iteration — documentation only. Also ran Phase 6.5 retrospective (iteration 40 = multiple of 10).
 
 ## Dev Server
 
@@ -39,4 +36,5 @@ Next: FEAT-021 (process vs journey comparison view) — side-by-side read-only c
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (6 warnings — unchanged since iter 21).
 - 2 pre-existing lint warnings in journey-canvas-view (handleKeyDown deps) — same pattern as flow-canvas.tsx.
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-39).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-40).
+- 2 new P2 a11y bugs found (BUG-010, BUG-011) — text-quaternary used for functional content.
