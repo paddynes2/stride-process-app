@@ -1,0 +1,4 @@
+# Ephemeral / runtime
+ralph.log
+.claude_stderr_tmp
+knowledge/SIGNAL
