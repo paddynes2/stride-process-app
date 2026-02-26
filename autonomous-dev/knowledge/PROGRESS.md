@@ -709,3 +709,37 @@
 - Efficiency (wasted actions?): 5 — Research delegated to Explore agent, all files created in parallel batches.
 - Proactive observations: 0
 **Notes:** FEAT-012 decomposed into [1/3] foundation (done), [2/3] offline banner + retry, [3/3] polish. Risk score 0 from iter 23. No cadence triggers at iter 24.
+
+## Iteration 25 — 2026-02-26
+**Task:** #FEAT-012 [2/3] Network offline banner + error toasts with retry
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed (sub-task [2/3])
+**Changes:**
+- Created: `src/components/ui/offline-banner.tsx` (network status banner via useSyncExternalStore)
+- Created: `src/lib/api/toast-helpers.ts` (toastError utility with retry action)
+- Modified: `src/app/layout.tsx` (added OfflineBanner import)
+- Modified: `src/components/canvas/flow-canvas.tsx` (6 toast.error → toastError with retry)
+- Modified: `src/components/layout/tab-bar.tsx` (3 toast.error → toastError with retry)
+- Modified: `src/components/panels/step-detail-panel.tsx` (4 toast.error → toastError)
+- Modified: `src/components/panels/section-detail-panel.tsx` (2 toast.error → toastError)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` (2 toast.error → toastError)
+- Modified: `src/app/(app)/w/[workspaceId]/settings/page.tsx` (5 toast.error → toastError)
+- Modified: `src/app/(app)/workspaces/workspace-list.tsx` (1 toast.error → toastError)
+**Research:** Explore agent searched all 34 toast calls across 8 files. Found: sonner v2.0.7, toast.error generic messages, no retry, no network detection. Design tokens --warning/--success available but unused. No existing offline detection anywhere.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing)
+- Build: pass (37 routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean module-level store pattern. useSyncExternalStore is the idiomatic React 19 approach for external state. Toast helper is minimal and composable.
+- Test coverage of change: 3 — Static verification only. Offline banner and retry toasts are interactive features that need browser testing.
+- Confidence this won't regress: 5 — No existing behavior changed. toast.error calls replaced with toastError which falls back to same behavior when no retry provided. Offline banner purely additive.
+- Efficiency (wasted actions?): 4 — Three attempts at offline-banner.tsx to satisfy strict React 19 lint rules. Final module-level store approach is better than the original.
+- Proactive observations: 0
+**Notes:** FEAT-012 [2/3] done. Strict React 19 lint rules (react-hooks/set-state-in-effect, react-hooks/refs) disallow setState in effect body AND ref access during render. Module-level external store with useSyncExternalStore is the correct pattern. 23 of 24 toast.error calls now use toastError. Remaining: 1 toast.error in settings copy-to-clipboard (not an API error).

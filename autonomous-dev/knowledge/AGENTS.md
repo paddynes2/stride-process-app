@@ -200,7 +200,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 
 ## Key Files
 
-<!-- Updated: iter-24, 2026-02-26 -->
+<!-- Updated: iter-25, 2026-02-26 -->
 
 - `src/app/(app)/w/[workspaceId]/workspace-shell.tsx` — Main workspace client layout (sidebar, header, tab bar)
 - `src/components/canvas/flow-canvas.tsx` — React Flow canvas with custom nodes
@@ -214,6 +214,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/app/(app)/w/[workspaceId]/teams/teams-view.tsx` — Teams page client component (team/role CRUD)
 - `src/lib/api/client.ts` — apiFetch wrappers for all API calls
 - `src/lib/api/response.ts` — successResponse/errorResponse envelope helpers
+- `src/lib/api/toast-helpers.ts` — toastError() utility (network detection + retry action buttons)
 - `src/lib/context/workspace-context.tsx` — React context (user, workspace, tabs)
 - `src/lib/supabase/client.ts` — Browser Supabase client
 - `src/lib/supabase/server.ts` — Server-side Supabase client
@@ -221,6 +222,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/lib/export/png.ts` — PNG export utility (html-to-image toPng at 2x)
 - `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare)
 - `src/components/ui/skeleton.tsx` — Skeleton primitive (animated pulse block for loading states)
+- `src/components/ui/offline-banner.tsx` — Network offline/online banner (useSyncExternalStore)
 - `src/app/(app)/error.tsx` — App-level error boundary (catches component crashes)
 - `src/app/(app)/w/[workspaceId]/error.tsx` — Workspace-level error boundary
 
