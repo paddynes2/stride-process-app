@@ -1109,3 +1109,32 @@
 - Efficiency (wasted actions?): 5 — Direct implementation, no false starts
 - Proactive observations: 0
 **Notes:** Touchpoint node already shows sentiment colors from FEAT-017 (acceptance criterion 4 pre-met). Pain/gain score selectors use click-to-toggle pattern (click same value to deselect to null).
+
+## Iteration 39 — 2026-02-26
+**Task:** #FEAT-020 Journey heat map — pain score coloring with stage roll-up
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: `src/lib/pain.ts` (pain scoring constants — PAIN_COLORS, PAIN_LEVELS, getPainColor)
+- Modified: `src/types/canvas.ts` (added averagePainScore + heatMapMode to journey node data types)
+- Modified: `src/components/canvas/touchpoint-node.tsx` (pain-based heat map coloring, pain badge)
+- Modified: `src/components/canvas/stage-node.tsx` (average pain roll-up badge + heat map background)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` (heatMapMode state, toggle button, legend panel, computeStagePainScore)
+**Research:** Read flow-canvas.tsx (heat map pattern), maturity.ts (color scale), step-node.tsx (heat map styling), section-node.tsx (roll-up badge), touchpoint-node.tsx + stage-node.tsx (current state), journey-canvas-view.tsx (integration target), database.ts (Touchpoint type).
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 6 warnings — all pre-existing)
+- Build: pass
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Exact mirror of process canvas heat map pattern, clean separation of pain constants
+- Test coverage of change: 2 — No runtime verification (Playwright unavailable). Type check + build verify compilation.
+- Confidence this won't regress: 5 — Process canvas code untouched. Journey heat map is additive — heatMapMode defaults to false, existing sentiment behavior unchanged.
+- Efficiency (wasted actions?): 5 — Completed in single pass with parallel research agent, no rework.
+- Proactive observations: 0
+**Notes:** Pain colors are inverted from maturity (1=green/low pain, 5=red/high pain). Heat map mode overrides sentiment coloring on touchpoints but falls back to sentiment when off. Stage average pain badge always shows (not gated by heatMapMode) — consistent with section maturity badge pattern.

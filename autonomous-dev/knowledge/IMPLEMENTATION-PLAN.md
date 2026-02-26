@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-019 DONE, FEAT-020 next)
+## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-020 DONE, FEAT-021 next)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -284,3 +284,4 @@ Tasks:
 - [2026-02-26] Iteration 36: **FEAT-017 DONE** (all 4/4 sub-tasks complete). Journey canvas rendering with React Flow — stage-node.tsx, touchpoint-node.tsx, full CRUD + keyboard shortcuts. 5 iterations total for FEAT-017 (iter 32-36). Next: FEAT-018 stage detail panel.
 - [2026-02-26] Iteration 37: FEAT-018 complete (stage detail panel). Mirrors section-detail-panel pattern: name, channel, owner, description (TipTap), touchpoint summary, delete. Next: FEAT-019 touchpoint detail panel.
 - [2026-02-26] Iteration 38: FEAT-019 complete (touchpoint detail panel). Mirrors stage-detail-panel: name, sentiment toggle, pain/gain scores, emotion, notes (TipTap). Next: FEAT-020 journey heat map.
+- [2026-02-26] Iteration 39: FEAT-020 complete (journey heat map). Pain score coloring with stage roll-up. Created pain.ts constants. Mirrors process canvas heat map exactly. Next: FEAT-021 comparison view.

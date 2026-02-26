@@ -324,17 +324,17 @@
 - [x] Touchpoint node on canvas shows sentiment color (green/gray/red) — already implemented in FEAT-017
 **Notes:** Mirrors stage-detail-panel.tsx pattern. Debounced name + emotion inputs, sentiment toggle buttons with colored highlights, pain/gain score button selectors (1-5) with click-to-toggle/deselect, TipTap rich text notes, delete with connection cleanup. Integrated into journey-canvas-view.tsx conditional panel rendering.
 
-### #FEAT-020 Journey heat map
+### #FEAT-020 Journey heat map — DONE iteration 39, 2026-02-26
 **Phase:** 2a
 **Priority:** P1 (important)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] Journey canvas has heat map toggle (similar to process canvas maturity heat map)
-- [ ] Heat map colors touchpoints by pain score (high pain = red, low = green)
-- [ ] Stage-level roll-up shows average pain score
-- [ ] Heat map legend explains the color scale
-**Notes:** Reuse the existing heat map infrastructure from FEAT-002. Different metric (pain vs maturity) but same visualization pattern.
+- [x] Journey canvas has heat map toggle (similar to process canvas maturity heat map)
+- [x] Heat map colors touchpoints by pain score (high pain = red, low = green)
+- [x] Stage-level roll-up shows average pain score
+- [x] Heat map legend explains the color scale
+**Notes:** Created src/lib/pain.ts with inverted color scale (1=green, 5=red). Mirrors process canvas heat map pattern exactly: toggle button, colored backgrounds, stage roll-up badges, legend panel.
 
 ### #FEAT-021 Process vs journey comparison view
 **Phase:** 2a
