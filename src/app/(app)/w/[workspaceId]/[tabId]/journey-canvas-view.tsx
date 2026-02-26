@@ -26,6 +26,8 @@ import { StageNode } from "@/components/canvas/stage-node";
 import { TouchpointNode } from "@/components/canvas/touchpoint-node";
 import { StageDetailPanel } from "@/components/panels/stage-detail-panel";
 import { TouchpointDetailPanel } from "@/components/panels/touchpoint-detail-panel";
+import { AnnotationPanel } from "@/components/panels/annotation-panel";
+import { useWorkspace } from "@/lib/context/workspace-context";
 import {
   createStage,
   updateStage,
@@ -145,6 +147,7 @@ export function JourneyCanvasView({
   initialTouchpoints,
   initialConnections,
 }: JourneyCanvasViewProps) {
+  const { activePerspective } = useWorkspace();
   const [stages, setStages] = React.useState(initialStages);
   const [touchpoints, setTouchpoints] = React.useState(initialTouchpoints);
   const [connections, setConnections] = React.useState(initialConnections);
@@ -525,42 +528,62 @@ export function JourneyCanvasView({
 
       {/* Side panel — stage detail or journey summary */}
       <div
-        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden"
+        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
         style={{ width: "var(--panel-width)" }}
       >
-        {selectedStage ? (
-          <StageDetailPanel
-            stage={selectedStage}
-            touchpoints={stageTouchpoints}
-            onUpdate={handleStageUpdate}
-            onDelete={handleStageDelete}
-            onClose={() => setSelectedStageId(null)}
-          />
-        ) : selectedTouchpoint ? (
-          <TouchpointDetailPanel
-            touchpoint={selectedTouchpoint}
-            onUpdate={handleTouchpointUpdate}
-            onDelete={handleTouchpointDelete}
-            onClose={() => setSelectedTouchpointId(null)}
-          />
-        ) : (
-          <div className="overflow-y-auto p-4 h-full">
-            <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">Journey Summary</h2>
-            <div className="space-y-2 text-[var(--text-sm)]">
-              <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">Stages</span>
-                <span className="text-[var(--text-primary)] font-medium">{stages.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">Touchpoints</span>
-                <span className="text-[var(--text-primary)] font-medium">{touchpoints.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">Connections</span>
-                <span className="text-[var(--text-primary)] font-medium">{connections.length}</span>
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {selectedStage ? (
+            <StageDetailPanel
+              stage={selectedStage}
+              touchpoints={stageTouchpoints}
+              onUpdate={handleStageUpdate}
+              onDelete={handleStageDelete}
+              onClose={() => setSelectedStageId(null)}
+            />
+          ) : selectedTouchpoint ? (
+            <TouchpointDetailPanel
+              touchpoint={selectedTouchpoint}
+              onUpdate={handleTouchpointUpdate}
+              onDelete={handleTouchpointDelete}
+              onClose={() => setSelectedTouchpointId(null)}
+            />
+          ) : (
+            <div className="overflow-y-auto p-4 h-full">
+              <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">Journey Summary</h2>
+              <div className="space-y-2 text-[var(--text-sm)]">
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-secondary)]">Stages</span>
+                  <span className="text-[var(--text-primary)] font-medium">{stages.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-secondary)]">Touchpoints</span>
+                  <span className="text-[var(--text-primary)] font-medium">{touchpoints.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-secondary)]">Connections</span>
+                  <span className="text-[var(--text-primary)] font-medium">{connections.length}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+        </div>
+        {activePerspective && selectedStage && (
+          <AnnotationPanel
+            perspectiveId={activePerspective.id}
+            perspectiveName={activePerspective.name}
+            perspectiveColor={activePerspective.color}
+            annotatableType="stage"
+            annotatableId={selectedStage.id}
+          />
+        )}
+        {activePerspective && selectedTouchpoint && !selectedStage && (
+          <AnnotationPanel
+            perspectiveId={activePerspective.id}
+            perspectiveName={activePerspective.name}
+            perspectiveColor={activePerspective.color}
+            annotatableType="touchpoint"
+            annotatableId={selectedTouchpoint.id}
+          />
         )}
       </div>
     </div>

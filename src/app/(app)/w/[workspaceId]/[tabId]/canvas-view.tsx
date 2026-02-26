@@ -5,6 +5,7 @@ import { FlowCanvas } from "@/components/canvas/flow-canvas";
 import { StepDetailPanel } from "@/components/panels/step-detail-panel";
 import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
 import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
+import { AnnotationPanel } from "@/components/panels/annotation-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
 import type { Section, Step, Connection } from "@/types/database";
@@ -84,7 +85,7 @@ export function CanvasView({
     setConnections((prev) => prev.filter((c) => c.id !== connectionId));
   };
 
-  const { workspace } = useWorkspace();
+  const { workspace, activePerspective } = useWorkspace();
   const { handleExportPdf, handleExportPng } = useCanvasExport({
     workspaceName: workspace.name,
     sections,
@@ -121,32 +122,52 @@ export function CanvasView({
 
       {/* Detail Panel / Summary Panel */}
       <div
-        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-y-auto"
+        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
         style={{ width: "var(--panel-width)" }}
       >
-        {selectedStep && (
-          <StepDetailPanel
-            step={selectedStep}
-            workspaceId={workspaceId}
-            onUpdate={handleStepUpdate}
-            onDelete={handleStepDelete}
-            onClose={() => setSelectedStepId(null)}
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {selectedStep && (
+            <StepDetailPanel
+              step={selectedStep}
+              workspaceId={workspaceId}
+              onUpdate={handleStepUpdate}
+              onDelete={handleStepDelete}
+              onClose={() => setSelectedStepId(null)}
+            />
+          )}
+          {selectedSection && !selectedStep && (
+            <SectionDetailPanel
+              section={selectedSection}
+              steps={steps.filter((s) => s.section_id === selectedSection.id)}
+              onUpdate={handleSectionUpdate}
+              onDelete={handleSectionDelete}
+              onClose={() => setSelectedSectionId(null)}
+            />
+          )}
+          {!selectedStep && !selectedSection && (
+            <WorkspaceSummaryPanel
+              sections={sections}
+              steps={steps}
+              connections={connections}
+            />
+          )}
+        </div>
+        {activePerspective && selectedStep && (
+          <AnnotationPanel
+            perspectiveId={activePerspective.id}
+            perspectiveName={activePerspective.name}
+            perspectiveColor={activePerspective.color}
+            annotatableType="step"
+            annotatableId={selectedStep.id}
           />
         )}
-        {selectedSection && !selectedStep && (
-          <SectionDetailPanel
-            section={selectedSection}
-            steps={steps.filter((s) => s.section_id === selectedSection.id)}
-            onUpdate={handleSectionUpdate}
-            onDelete={handleSectionDelete}
-            onClose={() => setSelectedSectionId(null)}
-          />
-        )}
-        {!selectedStep && !selectedSection && (
-          <WorkspaceSummaryPanel
-            sections={sections}
-            steps={steps}
-            connections={connections}
+        {activePerspective && selectedSection && !selectedStep && (
+          <AnnotationPanel
+            perspectiveId={activePerspective.id}
+            perspectiveName={activePerspective.name}
+            perspectiveColor={activePerspective.color}
+            annotatableType="section"
+            annotatableId={selectedSection.id}
           />
         )}
       </div>
