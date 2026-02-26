@@ -312,17 +312,17 @@
 - [x] Stage node on canvas shows name and channel icon (already implemented in FEAT-017)
 **Notes:** Mirrors section-detail-panel.tsx pattern. Debounced name + owner inputs, native <select> for channel, TipTap rich text for description. Touchpoint sentiment summary, delete with orphan handling. Integrated into journey-canvas-view.tsx with conditional panel rendering.
 
-### #FEAT-019 Touchpoint detail panel
+### #FEAT-019 Touchpoint detail panel — DONE iteration 38, 2026-02-26
 **Phase:** 2a
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] Clicking a touchpoint on journey canvas opens touchpoint detail panel
-- [ ] Touchpoint detail shows: name, pain score (1-5), gain score (1-5), sentiment selector (positive/neutral/negative), customer emotion (text), notes (rich text)
-- [ ] Changes persist to database
-- [ ] Touchpoint node on canvas shows sentiment color (green/gray/red)
-**Notes:** Pain/gain scoring is the journey equivalent of maturity scoring. Sentiment is visual shorthand.
+- [x] Clicking a touchpoint on journey canvas opens touchpoint detail panel
+- [x] Touchpoint detail shows: name, pain score (1-5), gain score (1-5), sentiment selector (positive/neutral/negative), customer emotion (text), notes (rich text)
+- [x] Changes persist to database
+- [x] Touchpoint node on canvas shows sentiment color (green/gray/red) — already implemented in FEAT-017
+**Notes:** Mirrors stage-detail-panel.tsx pattern. Debounced name + emotion inputs, sentiment toggle buttons with colored highlights, pain/gain score button selectors (1-5) with click-to-toggle/deselect, TipTap rich text notes, delete with connection cleanup. Integrated into journey-canvas-view.tsx conditional panel rendering.
 
 ### #FEAT-020 Journey heat map
 **Phase:** 2a

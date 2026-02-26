@@ -239,6 +239,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/components/canvas/stage-node.tsx` — Custom stage node (group, resizable, channel icons) — mirrors section-node.tsx
 - `src/components/canvas/touchpoint-node.tsx` — Custom touchpoint node (sentiment colors, pain score) — mirrors step-node.tsx
 - `src/components/panels/stage-detail-panel.tsx` — Stage detail panel (name, channel, owner, description, touchpoint summary, delete) — mirrors section-detail-panel.tsx
+- `src/components/panels/touchpoint-detail-panel.tsx` — Touchpoint detail panel (name, sentiment, pain/gain scores, customer emotion, notes, delete) — mirrors stage-detail-panel.tsx
 - `src/app/(app)/error.tsx` — App-level error boundary (catches component crashes)
 - `src/app/(app)/w/[workspaceId]/error.tsx` — Workspace-level error boundary
 

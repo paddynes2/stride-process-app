@@ -1083,3 +1083,29 @@
 - Efficiency (wasted actions?): 5 — Completed in single pass, no rework needed. Research was targeted.
 - Proactive observations: 0
 **Notes:** Stage detail panel follows section-detail-panel.tsx exactly. Channel uses native <select> (matching step-list-view filter pattern). Owner is debounced text input (same as name). TipTap for description (matching section notes). Next: FEAT-019 touchpoint detail panel.
+
+## Iteration 38 — 2026-02-26
+**Task:** #FEAT-019 Touchpoint detail panel — click touchpoint to edit name, pain/gain, sentiment, emotion, notes
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: `src/components/panels/touchpoint-detail-panel.tsx`
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` (added TouchpointDetailPanel import, selectedTouchpoint derivation, update/delete handlers, panel rendering)
+**Research:** Read stage-detail-panel.tsx (closest analog), step-detail-panel.tsx (scoring UI patterns), touchpoints API route (EDITABLE_FIELDS), journey-canvas-view.tsx (integration point), touchpoint-node.tsx (sentiment colors already implemented), database.ts (Touchpoint type).
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 6 warnings — all pre-existing)
+- Build: pass
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 4 — Clean pattern mirror of stage-detail-panel, proper debouncing, accessible aria-labels/pressed
+- Test coverage of change: 2 — No browser verification possible (Playwright unavailable)
+- Confidence this won't regress: 4 — Follows established patterns exactly, API fields already in EDITABLE_FIELDS
+- Efficiency (wasted actions?): 5 — Direct implementation, no false starts
+- Proactive observations: 0
+**Notes:** Touchpoint node already shows sentiment colors from FEAT-017 (acceptance criterion 4 pre-met). Pain/gain score selectors use click-to-toggle pattern (click same value to deselect to null).

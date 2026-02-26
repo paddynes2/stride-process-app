@@ -6,24 +6,24 @@
 
 ## Handoff
 
-- **Iteration:** 37
+- **Iteration:** 38
 - **Date:** 2026-02-26
 - **Phase:** Phase 2a — Journey Mapping
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-018 Stage detail panel — click stage → edit name, description, channel, owner
+- **Last task:** #FEAT-019 Touchpoint detail panel — click touchpoint → edit name, pain/gain scores, sentiment, customer emotion, notes
 - **Result:** completed
-- **Next task:** #FEAT-019 Touchpoint detail panel (click touchpoint → edit name, pain/gain scores, sentiment, emotion, notes)
+- **Next task:** #FEAT-020 Journey heat map — sentiment-colored touchpoints, pain point highlighting, stage-level roll-up
 - **Blockers:** None
 
 ## Context
 
-FEAT-018 is complete. Created `src/components/panels/stage-detail-panel.tsx` mirroring the section-detail-panel pattern. Panel shows when clicking a stage on the journey canvas: editable name (debounced), channel selector (web/phone/email/in-person/other), owner field (debounced), touchpoint sentiment summary, rich text description (TipTap), and delete button. Integrated into `journey-canvas-view.tsx` — panel replaces the journey summary when a stage is selected. Closing the panel or clicking the pane returns to summary view. Delete handler orphans touchpoints (same as keyboard delete).
+FEAT-019 is complete. Created `src/components/panels/touchpoint-detail-panel.tsx` mirroring the stage-detail-panel pattern. Panel opens when clicking a touchpoint on the journey canvas: editable name (debounced), sentiment toggle buttons (positive/neutral/negative with colored highlights), pain score (1-5, red themed) and gain score (1-5, green themed) button selectors with click-to-toggle/deselect, customer emotion text input (debounced), rich text notes (TipTap lazy-loaded), and delete button with connection cleanup. Integrated into `journey-canvas-view.tsx` — panel renders between stage detail and journey summary in the side panel conditional.
 
 Key files created/modified:
-- `src/components/panels/stage-detail-panel.tsx` — NEW, mirrors section-detail-panel.tsx pattern
-- `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` — Added StageDetailPanel import, selectedStage derivation, handleStageUpdate/handleStageDelete callbacks, conditional panel rendering
+- `src/components/panels/touchpoint-detail-panel.tsx` — NEW, mirrors stage-detail-panel.tsx pattern
+- `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` — Added TouchpointDetailPanel import, selectedTouchpoint derivation, handleTouchpointUpdate/handleTouchpointDelete callbacks, conditional panel rendering
 
-Next: FEAT-019 (touchpoint detail panel) — clicking a touchpoint should open a side panel for editing name, pain/gain scores, sentiment, customer emotion, notes. This will mirror the step-detail-panel pattern.
+Next: FEAT-020 (journey heat map) — toggle that colors touchpoints by pain score, with stage-level roll-up averages and a legend. Reuse heat map infrastructure from FEAT-002 (process canvas maturity heat map).
 
 ## Dev Server
 
@@ -34,6 +34,6 @@ Next: FEAT-019 (touchpoint detail panel) — clicking a touchpoint should open a
 ## Warnings
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
-- Pre-existing lint warnings (4 warnings — unchanged since iter 21).
+- Pre-existing lint warnings (6 warnings — unchanged since iter 21).
 - 2 pre-existing lint warnings in journey-canvas-view (handleKeyDown deps) — same pattern as flow-canvas.tsx.
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-37).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-38).
