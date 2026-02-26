@@ -21,6 +21,7 @@ import { Plus, Layers, Route } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StageNode } from "@/components/canvas/stage-node";
 import { TouchpointNode } from "@/components/canvas/touchpoint-node";
+import { StageDetailPanel } from "@/components/panels/stage-detail-panel";
 import {
   createStage,
   updateStage,
@@ -312,6 +313,21 @@ export function JourneyCanvasView({
 
   const isEmpty = stages.length === 0 && touchpoints.length === 0;
 
+  const selectedStage = selectedStageId ? stages.find((s) => s.id === selectedStageId) ?? null : null;
+  const stageTouchpoints = selectedStageId ? touchpoints.filter((tp) => tp.stage_id === selectedStageId) : [];
+
+  const handleStageUpdate = (updated: Stage) => {
+    setStages((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+  };
+
+  const handleStageDelete = (id: string) => {
+    setStages((prev) => prev.filter((s) => s.id !== id));
+    setTouchpoints((prev) =>
+      prev.map((t) => (t.stage_id === id ? { ...t, stage_id: null } : t))
+    );
+    setSelectedStageId(null);
+  };
+
   return (
     <div className="flex h-full">
       <div className="flex-1 relative">
@@ -384,26 +400,38 @@ export function JourneyCanvasView({
         </div>
       </div>
 
-      {/* Summary panel */}
+      {/* Side panel — stage detail or journey summary */}
       <div
-        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-y-auto p-4"
+        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden"
         style={{ width: "var(--panel-width)" }}
       >
-        <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">Journey Summary</h2>
-        <div className="space-y-2 text-[var(--text-sm)]">
-          <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">Stages</span>
-            <span className="text-[var(--text-primary)] font-medium">{stages.length}</span>
+        {selectedStage ? (
+          <StageDetailPanel
+            stage={selectedStage}
+            touchpoints={stageTouchpoints}
+            onUpdate={handleStageUpdate}
+            onDelete={handleStageDelete}
+            onClose={() => setSelectedStageId(null)}
+          />
+        ) : (
+          <div className="overflow-y-auto p-4 h-full">
+            <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">Journey Summary</h2>
+            <div className="space-y-2 text-[var(--text-sm)]">
+              <div className="flex justify-between">
+                <span className="text-[var(--text-secondary)]">Stages</span>
+                <span className="text-[var(--text-primary)] font-medium">{stages.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--text-secondary)]">Touchpoints</span>
+                <span className="text-[var(--text-primary)] font-medium">{touchpoints.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--text-secondary)]">Connections</span>
+                <span className="text-[var(--text-primary)] font-medium">{connections.length}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">Touchpoints</span>
-            <span className="text-[var(--text-primary)] font-medium">{touchpoints.length}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">Connections</span>
-            <span className="text-[var(--text-primary)] font-medium">{connections.length}</span>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
