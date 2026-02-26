@@ -22,3 +22,5 @@
 ## Meta
 
 - **Pre-existing lint warnings:** 5 warnings in flow-canvas.tsx (unused import, missing hook deps) and sidebar.tsx (unused import). These are known and acceptable.
+- **API route HTTP methods:** Not all entity routes export GET. Sections and stages are POST-only at the collection level (no list endpoint). 405 responses for GET are expected, not bugs.
+- **WebFetch limitations:** WebFetch cannot access localhost URLs. For regression testing, use production URL for unauthenticated pages and curl for localhost API probing.

@@ -32,7 +32,7 @@
 ## Phase 2b: Perspectives — features DONE, completion testing needed
 - [x] #FEAT-023 Perspectives data model + API + management UI — DONE (3 sub-tasks)
 - [x] #FEAT-024 Perspective annotations + canvas indicators — DONE (3 sub-tasks)
-- [ ] #FEAT-025 Phase 2b completion testing: regression suite — Attempts: 0
+- [x] #FEAT-025 Phase 2b completion testing: regression suite — DONE iteration 56, 2026-02-26
 - [ ] #FEAT-026 Phase 2b completion testing: quality audit — Attempts: 0
 
 ## Phase 3: Advanced Features — PLANNED
