@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { createTab, deleteTab, updateTab } from "@/lib/api/client";
 import type { Tab } from "@/types/database";
 import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 
 interface TabBarProps {
   tabs: Tab[];
@@ -29,7 +30,7 @@ export function TabBar({ tabs, activeTabId, workspaceId, onTabSelect, onTabsChan
       onTabsChange();
       onTabSelect(tab.id);
     } catch (err) {
-      toast.error("Failed to create tab");
+      toastError("Failed to create tab", { error: err, retry: handleAddTab });
     }
   };
 
@@ -47,7 +48,7 @@ export function TabBar({ tabs, activeTabId, workspaceId, onTabSelect, onTabsChan
         if (remaining.length > 0) onTabSelect(remaining[0].id);
       }
     } catch (err) {
-      toast.error("Failed to delete tab");
+      toastError("Failed to delete tab", { error: err });
     }
   };
 
@@ -64,7 +65,7 @@ export function TabBar({ tabs, activeTabId, workspaceId, onTabSelect, onTabsChan
       await updateTab(tabId, { name: trimmed });
       onTabsChange();
     } catch (err) {
-      toast.error("Failed to rename tab");
+      toastError("Failed to rename tab", { error: err });
     }
   };
 

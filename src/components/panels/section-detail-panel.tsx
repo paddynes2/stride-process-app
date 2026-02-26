@@ -12,6 +12,7 @@ import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch }
 import type { StepRoleWithDetails } from "@/lib/api/client";
 import type { Section, Step } from "@/types/database";
 import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 
 interface SectionDetailPanelProps {
   section: Section;
@@ -56,8 +57,8 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
     try {
       const updated = await updateSection(section.id, { [field]: value });
       onUpdate(updated);
-    } catch {
-      toast.error(`Failed to update ${field}`);
+    } catch (err) {
+      toastError(`Failed to update ${field}`, { error: err, retry: () => handleFieldUpdate(field, value) });
     }
   };
 
@@ -74,8 +75,8 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
       await apiDeleteSection(section.id);
       onDelete(section.id);
       toast.success("Section deleted");
-    } catch {
-      toast.error("Failed to delete section");
+    } catch (err) {
+      toastError("Failed to delete section", { error: err });
     }
   };
 

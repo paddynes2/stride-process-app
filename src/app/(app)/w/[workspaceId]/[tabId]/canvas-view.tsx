@@ -10,6 +10,7 @@ import { exportWorkspacePdf } from "@/lib/export/pdf";
 import { exportCanvasPng } from "@/lib/export/png";
 import { fetchStepRolesBatch } from "@/lib/api/client";
 import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 import type { Section, Step, Connection } from "@/types/database";
 
 interface CanvasViewProps {
@@ -103,8 +104,8 @@ export function CanvasView({
           stepRoles,
         });
         toast.success("PDF exported successfully");
-      } catch {
-        toast.error("Failed to export PDF");
+      } catch (err) {
+        toastError("Failed to export PDF", { error: err });
       }
     },
     [workspace.name, sections, steps, connections]
@@ -118,8 +119,8 @@ export function CanvasView({
           workspaceName: workspace.name,
         });
         toast.success("PNG exported successfully");
-      } catch {
-        toast.error("Failed to export PNG");
+      } catch (err) {
+        toastError("Failed to export PNG", { error: err });
       }
     },
     [workspace.name]

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { OfflineBanner } from "@/components/ui/offline-banner";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -35,6 +36,7 @@ export default function RootLayout({
             __html: `window.__testErrors=[];const _ce=console.error;console.error=function(){window.__testErrors.push([Date.now(),...arguments]);_ce.apply(console,arguments)};window.addEventListener('error',function(e){window.__testErrors.push([Date.now(),e.message,e.filename,e.lineno])});window.addEventListener('unhandledrejection',function(e){window.__testErrors.push([Date.now(),'UnhandledRejection',String(e.reason)])});`,
           }}
         />
+        <OfflineBanner />
         {children}
         <Toaster
           theme="dark"

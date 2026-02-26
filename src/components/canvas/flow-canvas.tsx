@@ -35,7 +35,7 @@ import {
 } from "@/lib/api/client";
 import type { Section, Step, Connection } from "@/types/database";
 import type { StepNodeData, SectionNodeData } from "@/types/canvas";
-import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 
 const nodeTypes = {
   step: StepNode,
@@ -240,7 +240,10 @@ export function FlowCanvas({
           const connId = change.id.replace("edge-", "");
           apiDeleteConnection(connId)
             .then(() => onConnectionDelete(connId))
-            .catch(() => toast.error("Failed to delete connection"));
+            .catch((err) => toastError("Failed to delete connection", {
+              error: err,
+              retry: () => apiDeleteConnection(connId).then(() => onConnectionDelete(connId)),
+            }));
         }
       }
     },
@@ -263,8 +266,11 @@ export function FlowCanvas({
           target_step_id: targetStepId,
         });
         onConnectionCreate(conn);
-      } catch {
-        toast.error("Failed to create connection");
+      } catch (err) {
+        toastError("Failed to create connection", {
+          error: err,
+          retry: () => handleConnect(connection),
+        });
       }
     },
     [workspaceId, tabId, onConnectionCreate]
@@ -299,8 +305,8 @@ export function FlowCanvas({
       });
       onStepCreate(step);
       onStepSelect(step.id);
-    } catch {
-      toast.error("Failed to create step");
+    } catch (err) {
+      toastError("Failed to create step", { error: err, retry: handleAddStep });
     }
   };
 
@@ -315,8 +321,8 @@ export function FlowCanvas({
         position_y: 50 + Math.random() * 200,
       });
       onSectionCreate(section);
-    } catch {
-      toast.error("Failed to create section");
+    } catch (err) {
+      toastError("Failed to create section", { error: err, retry: handleAddSection });
     }
   };
 
@@ -332,15 +338,15 @@ export function FlowCanvas({
           try {
             await deleteStep(selectedStepId);
             onStepDelete(selectedStepId);
-          } catch {
-            toast.error("Failed to delete step");
+          } catch (err) {
+            toastError("Failed to delete step", { error: err });
           }
         } else if (selectedSectionId) {
           try {
             await deleteSection(selectedSectionId);
             onSectionDelete(selectedSectionId);
-          } catch {
-            toast.error("Failed to delete section");
+          } catch (err) {
+            toastError("Failed to delete section", { error: err });
           }
         }
       }

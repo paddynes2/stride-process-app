@@ -15,6 +15,7 @@ import {
   updateShare,
 } from "@/lib/api/client";
 import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 import type { PublicShare } from "@/types/database";
 
 export default function SettingsPage() {
@@ -36,8 +37,8 @@ export default function SettingsPage() {
       try {
         const shares = await fetchShares(workspace.id);
         if (!cancelled) setShare(shares[0] ?? null);
-      } catch {
-        if (!cancelled) toast.error("Failed to load share settings");
+      } catch (err) {
+        if (!cancelled) toastError("Failed to load share settings", { error: err });
       } finally {
         if (!cancelled) setShareLoading(false);
       }
@@ -62,8 +63,8 @@ export default function SettingsPage() {
         setShare(created);
         toast.success("Share link created");
       }
-    } catch {
-      toast.error("Failed to enable sharing");
+    } catch (err) {
+      toastError("Failed to enable sharing", { error: err, retry: handleEnableShare });
     } finally {
       setShareToggling(false);
     }
@@ -76,8 +77,8 @@ export default function SettingsPage() {
       const updated = await updateShare(share.id, { is_active: false });
       setShare(updated);
       toast.success("Sharing disabled");
-    } catch {
-      toast.error("Failed to disable sharing");
+    } catch (err) {
+      toastError("Failed to disable sharing", { error: err, retry: handleDisableShare });
     } finally {
       setShareToggling(false);
     }
@@ -102,8 +103,8 @@ export default function SettingsPage() {
       await updateWorkspace(workspace.id, { name: name.trim() });
       toast.success("Workspace updated");
       router.refresh();
-    } catch {
-      toast.error("Failed to update workspace");
+    } catch (err) {
+      toastError("Failed to update workspace", { error: err });
     } finally {
       setSaving(false);
     }
@@ -117,8 +118,8 @@ export default function SettingsPage() {
       toast.success("Workspace deleted");
       router.push("/workspaces");
       router.refresh();
-    } catch {
-      toast.error("Failed to delete workspace");
+    } catch (err) {
+      toastError("Failed to delete workspace", { error: err });
     } finally {
       setDeleting(false);
     }

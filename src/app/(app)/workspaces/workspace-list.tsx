@@ -15,6 +15,7 @@ import {
 import { createWorkspace } from "@/lib/api/client";
 import type { Workspace } from "@/types/database";
 import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 
 interface WorkspaceListProps {
   workspaces: Workspace[];
@@ -39,7 +40,7 @@ export function WorkspaceList({ workspaces: initialWorkspaces }: WorkspaceListPr
       router.push(`/w/${ws.id}`);
       router.refresh();
     } catch (err) {
-      toast.error("Failed to create workspace");
+      toastError("Failed to create workspace", { error: err });
     } finally {
       setCreating(false);
     }

@@ -27,6 +27,7 @@ import {
 import type { TeamWithRoles, StepRoleWithDetails } from "@/lib/api/client";
 import type { Step, StepStatus, ExecutorType } from "@/types/database";
 import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 
 const STATUSES: { value: StepStatus; label: string }[] = [
   { value: "draft", label: "Draft" },
@@ -93,8 +94,8 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
     try {
       const created = await createStepRole({ step_id: step.id, role_id: roleId });
       setStepRoles((prev) => [...prev, created]);
-    } catch {
-      toast.error("Failed to assign role");
+    } catch (err) {
+      toastError("Failed to assign role", { error: err, retry: () => handleAssignRole(roleId) });
     }
   };
 
@@ -102,8 +103,8 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
     try {
       await deleteStepRole(stepRoleId);
       setStepRoles((prev) => prev.filter((sr) => sr.id !== stepRoleId));
-    } catch {
-      toast.error("Failed to remove role");
+    } catch (err) {
+      toastError("Failed to remove role", { error: err });
     }
   };
 
@@ -111,8 +112,8 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
     try {
       const updated = await updateStep(step.id, { [field]: value });
       onUpdate(updated);
-    } catch {
-      toast.error(`Failed to update ${field}`);
+    } catch (err) {
+      toastError(`Failed to update ${field}`, { error: err, retry: () => handleFieldUpdate(field, value) });
     }
   };
 
@@ -129,8 +130,8 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
       await apiDeleteStep(step.id);
       onDelete(step.id);
       toast.success("Step deleted");
-    } catch {
-      toast.error("Failed to delete step");
+    } catch (err) {
+      toastError("Failed to delete step", { error: err });
     }
   };
 
