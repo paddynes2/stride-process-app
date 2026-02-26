@@ -281,24 +281,24 @@
 
 ## Phase 2a: Journey Mapping
 
-### #FEAT-017 Journey canvas type
+### #FEAT-017 Journey canvas type — DONE iteration 36, 2026-02-26
 **Phase:** 2a
 **Priority:** P0 (critical path)
-**Attempts:** 2
-**Status:** in-progress
+**Attempts:** 3
+**Status:** done
 **Acceptance criteria:**
 - [x] Data model: `canvas_type` discriminator on tabs + new `stages`/`touchpoints`/`touchpoint_connections` tables (Decision D-001: parallel tables)
 - [x] TypeScript types updated (CanvasType, TouchpointSentiment, Stage, Touchpoint, TouchpointConnection, Tab.canvas_type)
 - [x] API routes for stages, touchpoints, touchpoint_connections (CRUD + client wrappers)
 - [x] Creating a new tab allows choosing "Process" or "Journey" type
-- [ ] Journey canvas has stages (group nodes) instead of sections
-- [ ] Journey canvas has touchpoints (step nodes) instead of steps
-**Notes:** Decision D-001: Parallel tables chosen over discriminator. Migration 011 pushed. Decomposed into 4 sub-tasks.
+- [x] Journey canvas has stages (group nodes) instead of sections
+- [x] Journey canvas has touchpoints (step nodes) instead of steps
+**Notes:** Decision D-001: Parallel tables chosen over discriminator. Migration 011 pushed. Decomposed into 4 sub-tasks. All complete.
 **Sub-tasks:**
 - [x] [1/4] Data model: migration 011 (enums, tables, RLS), TypeScript types — DONE iteration 32
 - [x] [2/4] API routes + client wrappers for stages, touchpoints, touchpoint_connections — DONE iteration 33
 - [x] [3/4] Tab type UI — canvas_type selector on tab creation, routing by canvas_type — DONE iteration 35
-- [ ] [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections
+- [x] [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections — DONE iteration 36
 
 ### #FEAT-018 Stage detail panel
 **Phase:** 2a

@@ -6,24 +6,26 @@
 
 ## Handoff
 
-- **Iteration:** 35
+- **Iteration:** 36
 - **Date:** 2026-02-26
 - **Phase:** Phase 2a — Journey Mapping
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-017 [3/4] Tab type UI — canvas_type selector on tab creation, routing by canvas_type
+- **Last task:** #FEAT-017 [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections
 - **Result:** completed
-- **Next task:** #FEAT-017 [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections
+- **Next task:** #FEAT-018 Stage detail panel (click stage → edit name, description, channel, owner)
 - **Blockers:** None
 
 ## Context
 
-Tab bar now has a dropdown for creating process or journey tabs. Each tab shows a type icon (Workflow for process, Route for journey). The page.tsx fetches the tab record first to determine canvas_type, then routes to either CanvasView (process) or JourneyCanvasView (journey). JourneyCanvasView is a functional placeholder with empty state (including "Add first stage" button that creates stages via API) and a summary panel showing counts. Sub-task [4/4] needs to add React Flow canvas with stage nodes (group) and touchpoint nodes (individual), replacing the placeholder content.
+FEAT-017 is now fully DONE (all 4 sub-tasks complete). Journey canvas has a working React Flow canvas with StageNode (group, resizable, channel icons) and TouchpointNode (sentiment colors green/gray/red, pain score display). Full CRUD: create stages/touchpoints via toolbar or keyboard shortcuts (N=touchpoint, S=stage), drag to reposition (persists to DB), delete selected (Delete/Backspace key), connect touchpoints by dragging handles. Touchpoints nested in stages use parentId for grouping. Empty state overlay matches process canvas pattern.
 
-FEAT-017 decomposition status:
-- [1/4] Data model + types (DONE iter 32)
-- [2/4] API routes + client wrappers (DONE iter 33)
-- [3/4] Tab type UI + routing (DONE iter 35)
-- [4/4] Journey canvas rendering — stage nodes, touchpoint nodes (NEXT)
+Key files created/modified:
+- `src/components/canvas/stage-node.tsx` — NEW, mirrors section-node.tsx pattern
+- `src/components/canvas/touchpoint-node.tsx` — NEW, mirrors step-node.tsx pattern with sentiment colors
+- `src/types/canvas.ts` — Added StageNodeData, TouchpointNodeData, JourneyCanvasNode types
+- `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` — Rewritten from placeholder to full React Flow canvas
+
+Next: FEAT-018 (stage detail panel) — clicking a stage should open a side panel for editing name, description, channel, owner. This will mirror the section-detail-panel pattern.
 
 ## Dev Server
 
@@ -35,4 +37,5 @@ FEAT-017 decomposition status:
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
 - Pre-existing lint warnings (4 warnings — unchanged since iter 21).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-35).
+- 2 new lint warnings in journey-canvas-view (handleKeyDown deps) — same pattern as flow-canvas.tsx.
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-36).

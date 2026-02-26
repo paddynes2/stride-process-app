@@ -1029,3 +1029,31 @@
 - Efficiency (wasted actions?): 5 — Completed in single pass, one type error caught and fixed immediately (createStage missing width/height)
 - Proactive observations: 0
 **Notes:** createStage client function was missing width/height params that the API route already accepted. Fixed as part of this iteration. Next: [4/4] journey canvas rendering with stage/touchpoint nodes.
+
+## Iteration 36 — 2026-02-26
+**Task:** #FEAT-017 [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections
+**Source:** prd/FEATURES.md
+**Complexity:** L
+**Result:** completed
+**Changes:**
+- Created: src/components/canvas/stage-node.tsx (group node with channel icons, resizable)
+- Created: src/components/canvas/touchpoint-node.tsx (sentiment colors, pain score display)
+- Modified: src/types/canvas.ts (added StageNodeData, TouchpointNodeData, JourneyCanvasNode types)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx (full rewrite: placeholder → React Flow canvas)
+**Research:** Read flow-canvas.tsx, step-node.tsx, section-node.tsx, canvas-view.tsx to mirror exact patterns. Read client.ts API functions for stages/touchpoints/connections. Checked canvas.ts types.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 6 warnings — 4 pre-existing + 2 new matching flow-canvas pattern)
+- Build: pass (all routes present)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Exact mirror of process canvas patterns (buildNodes/buildEdges, nodeTypes, CRUD handlers, keyboard shortcuts, empty state overlay)
+- Test coverage of change: 2 — No runtime verification (Playwright unavailable). Type check + build verify compilation.
+- Confidence this won't regress: 5 — Process canvas code is completely unchanged. Journey canvas is additive — new files + modified files that were journey-only.
+- Efficiency (wasted actions?): 4 — React Compiler lint errors required 2 rounds of fixes (Math.random purity, handleKeyDown deps). Could have anticipated from LEARNINGS.md.
+- Proactive observations: 0
+**Notes:** FEAT-017 is now fully DONE (all 4/4 sub-tasks). Journey canvas mirrors process canvas patterns: stage-node ≈ section-node, touchpoint-node ≈ step-node. Sentiment colors (green/gray/red) replace maturity colors. React Compiler lint is stricter in app/ directory files vs components/ directory — Math.random() flagged as impure, self-referential retry flagged. Used deterministic positioning (grid offset) instead of random. Next: FEAT-018 stage detail panel.
