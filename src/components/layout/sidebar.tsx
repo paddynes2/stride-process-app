@@ -38,7 +38,7 @@ const NAV_ITEMS = [
   { label: "Gap Analysis", icon: TrendingDown, href: "/gap-analysis" },
   { label: "Compare", icon: Split, href: "/compare" },
   { label: "Teams", icon: Users, href: "/teams" },
-  { label: "People", icon: User, href: "/people", stub: true },
+  { label: "People", icon: User, href: "/people" },
   { label: "Tools", icon: Wrench, href: "/tools", stub: true },
   { label: "Settings", icon: Settings, href: "/settings" },
 ];
