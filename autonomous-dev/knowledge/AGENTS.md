@@ -250,6 +250,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/components/panels/touchpoint-detail-panel.tsx` — Touchpoint detail panel (name, sentiment, pain/gain scores, customer emotion, notes, delete) — mirrors stage-detail-panel.tsx
 - `src/lib/pain.ts` — Pain scoring constants (PAIN_COLORS, PAIN_LEVELS, getPainColor) — inverted from maturity (1=green, 5=red)
 - `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` — Process vs journey comparison view (side-by-side stats, section/stage lists with maturity/pain badges, sentiment bar)
+- `src/components/panels/annotation-panel.tsx` — Perspective annotation panel (rating 1-5 + TipTap rich text, auto-save, used in all 4 detail panel areas when a perspective is active)
 - `src/app/(app)/error.tsx` — App-level error boundary (catches component crashes)
 - `src/app/(app)/w/[workspaceId]/error.tsx` — Workspace-level error boundary
 

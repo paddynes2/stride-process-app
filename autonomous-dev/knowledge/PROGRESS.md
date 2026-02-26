@@ -1484,3 +1484,30 @@
 - Efficiency (wasted actions?): 5 — Clean research, clean implementation, no wasted actions.
 - Proactive observations: 0
 **Notes:** FEAT-024 decomposed into 3 sub-tasks. [1/3] complete. Perspectives are fetched server-side for SSR. Active perspective state is client-side only (not persisted to URL or DB — resets on navigation). Switcher only renders when workspace has perspectives.
+
+## Iteration 53 — 2026-02-26
+**Task:** #FEAT-024 [2/3] Shared annotation panel component + wire into all 4 detail panels
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: `src/components/panels/annotation-panel.tsx` (~185 lines — AnnotationPanel component)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` (flex column layout, annotation panel for step/section)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` (flex column layout, annotation panel for stage/touchpoint, added useWorkspace import)
+**Research:** Read step-detail-panel.tsx (UI pattern), canvas-view.tsx (panel container layout), journey-canvas-view.tsx (panel container layout), workspace-context.tsx (activePerspective state), client.ts (annotation API wrappers), database.ts (PerspectiveAnnotation type). Confirmed annotation API supports fetchAnnotations with type+id filters.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 5 pre-existing warnings)
+- Build: pass (all routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Follows existing panel patterns exactly. Debounced auto-save, loading skeleton, dynamic TipTap import. Aria-labels on all interactive elements.
+- Test coverage of change: 2 — Static verification only. Annotation CRUD, perspective switching, and layout split need runtime verification.
+- Confidence this won't regress: 4 — Panel container layout changed from overflow-y-auto to flex column. Detail panels use h-full which should adapt, but the nested scroll interaction needs browser testing.
+- Efficiency (wasted actions?): 5 — Clean research phase, implementation in 3 edits, no wasted actions.
+- Proactive observations: 0
+**Notes:** FEAT-024 [2/3] complete. AnnotationPanel auto-creates annotations on first content/rating change. Panel layout uses flex column split with max-h-[280px] for annotation area. Both canvas views now import useWorkspace for activePerspective access. Only [3/3] visual indicators on canvas nodes remain.
