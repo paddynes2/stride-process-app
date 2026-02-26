@@ -60,8 +60,11 @@ export function AnnotationPanel({
           setLoading(false);
         }
       })
-      .catch(() => {
-        if (!cancelled) setLoading(false);
+      .catch((err) => {
+        if (!cancelled) {
+          toastError("Failed to load annotation", { error: err });
+          setLoading(false);
+        }
       });
     return () => {
       cancelled = true;
