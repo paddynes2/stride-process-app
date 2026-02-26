@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import type { AnnotatableType } from "@/types/database";
+
+const VALID_ANNOTATABLE_TYPES: AnnotatableType[] = ["step", "section", "touchpoint", "stage"];
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -58,6 +61,10 @@ export async function POST(request: NextRequest) {
 
   if (!annotatable_type) {
     return errorResponse("validation", "annotatable_type is required", 400);
+  }
+
+  if (!VALID_ANNOTATABLE_TYPES.includes(annotatable_type)) {
+    return errorResponse("validation", `Invalid annotatable_type. Must be one of: ${VALID_ANNOTATABLE_TYPES.join(", ")}`, 400);
   }
 
   if (!annotatable_id) {
