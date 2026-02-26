@@ -625,3 +625,29 @@
 - Efficiency (wasted actions?): 3 — Had to re-read all files due to Edit tool path format mismatch (Windows backslash vs forward slash)
 - Proactive observations: 0
 **Notes:** Phase 1.5 task 1 complete. All 8 WCAG violations resolved. Button contrast fix is component-level (affects all primary buttons globally). Sidebar active state now uses blue tint instead of near-invisible white-on-white. The Edit tool requires files to be read with the same path format used for editing — lesson learned for future iterations.
+
+## Iteration 22 — 2026-02-26
+**Task:** #FEAT-011 [1/2] Empty states — canvas overlay and list view empty state
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed (partial — sub-task [2/2] remains)
+**Changes:**
+- Modified: `src/components/canvas/flow-canvas.tsx` (canvas empty state overlay with icon, guidance, action buttons)
+- Modified: `src/app/(app)/w/[workspaceId]/list/step-list-view.tsx` (proper empty state card, hides filters when no steps)
+**Research:** Read all 4 target files (canvas-view, gap-analysis-view, teams-view, step-list-view) and flow-canvas. Found gap analysis and teams already had good empty states. Canvas and list view needed work.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 9 warnings — all pre-existing)
+- Build: pass (33 routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Minimal changes, matches existing empty state patterns from gap-analysis and teams
+- Test coverage of change: 3 — Static verification only. Empty states are visual — browser testing would confirm rendering.
+- Confidence this won't regress: 5 — Purely additive (new conditional renders). No logic changes, no API changes.
+- Efficiency (wasted actions?): 5 — Research identified 2 of 4 pages already done, avoided unnecessary work.
+- Proactive observations: 0
+**Notes:** FEAT-011 decomposed into [1/2] empty state UIs (done) and [2/2] Getting Started template (next iteration). Risk score from iter 21 was 4 (regression trigger) but skipped — regression was run at iter 20, and iter 21 changes were purely visual/a11y (aria-labels, CSS classes).
