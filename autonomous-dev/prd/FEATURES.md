@@ -198,21 +198,21 @@
 - [ ] BUG-009: Focus indicators have >= 3:1 contrast against adjacent colors
 **Notes:** 8 bugs found in iteration 10 accessibility audit. Fix in severity order: P1 first (002-006), then P2 (007-009). Agent should decompose into sub-tasks if needed.
 
-### #FEAT-011 Empty states and onboarding
+### #FEAT-011 Empty states and onboarding — DONE iteration 23, 2026-02-26
 **Phase:** 1.5
 **Priority:** P1 (important)
-**Attempts:** 1
-**Status:** in-progress
+**Attempts:** 2
+**Status:** done
 **Acceptance criteria:**
 - [x] Empty workspace canvas shows helpful prompt ("Add your first section to start mapping")
 - [x] Empty gap analysis page shows guidance ("Score steps with maturity ratings to see gap analysis") — pre-existing
 - [x] Empty teams page shows guidance ("Create a team to start assigning roles and calculating costs") — pre-existing
 - [x] Empty list view shows guidance ("Add steps to your canvas to see them listed here")
-- [ ] New workspace gets a "Getting Started" section with 3 example steps (deletable)
-**Notes:** Empty states are the first thing a new user sees. They should explain what to do, not just say "No data." Reference DESIGN-PRINCIPLES.md — recognition over recall.
+- [x] New workspace gets a "Getting Started" section with 3 example steps (deletable)
+**Notes:** Empty states are the first thing a new user sees. Template seeded server-side in POST /api/v1/workspaces (best-effort, won't fail creation). Section "Getting Started" with 3 connected steps.
 **Sub-tasks:**
 - [x] [1/2] Empty state UIs — canvas overlay + list view card (gap/teams already done) — DONE iteration 22
-- [ ] [2/2] Getting Started template — new workspace auto-creates example section with sample steps
+- [x] [2/2] Getting Started template — new workspace auto-creates example section with sample steps — DONE iteration 23
 
 ### #FEAT-012 Loading and error states
 **Phase:** 1.5

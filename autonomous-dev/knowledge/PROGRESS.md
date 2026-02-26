@@ -651,3 +651,28 @@
 - Efficiency (wasted actions?): 5 — Research identified 2 of 4 pages already done, avoided unnecessary work.
 - Proactive observations: 0
 **Notes:** FEAT-011 decomposed into [1/2] empty state UIs (done) and [2/2] Getting Started template (next iteration). Risk score from iter 21 was 4 (regression trigger) but skipped — regression was run at iter 20, and iter 21 changes were purely visual/a11y (aria-labels, CSS classes).
+
+## Iteration 23 — 2026-02-26
+**Task:** #FEAT-011 [2/2] Getting Started template — new workspace auto-creates example section with sample steps
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Modified: `src/app/api/v1/workspaces/route.ts` (added template seeding after bootstrap_workspace)
+**Research:** Read workspace creation flow (workspaces/route.ts POST, bootstrap_workspace RPC, workspace-list.tsx client). Read sections/steps API routes for field requirements. Read flow-canvas.tsx for position/dimension patterns. Read database.ts for Section/Step types. Checked migration 004 for default section dimensions (600x400).
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 9 warnings — all pre-existing)
+- Build: pass
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean, minimal change in one file. Best-effort pattern prevents template failures from blocking workspace creation.
+- Test coverage of change: 3 — Static verification only. Would need browser test to confirm template renders correctly on canvas after workspace creation.
+- Confidence this won't regress: 5 — Purely additive (new code after existing return path). Wrapped in try/catch. Cannot break existing workspace creation flow.
+- Efficiency (wasted actions?): 5 — Focused research, direct implementation, no wasted actions.
+- Proactive observations: 0
+**Notes:** FEAT-011 fully complete (both sub-tasks done). Phase 1.5 task 2 of 7 complete. Template creates section (700x200) with 3 connected steps positioned horizontally inside it. All deletable by the user.

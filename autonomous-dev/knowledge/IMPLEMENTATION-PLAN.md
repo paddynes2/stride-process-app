@@ -90,7 +90,7 @@ Tasks (in priority order):
 
 Tasks (in priority order):
 1. [x] Fix all 8 open accessibility bugs (BUG-002 through BUG-009) — contrast, labels, touch targets, headings, focus indicators
-2. [ ] Empty states & onboarding — first workspace experience, helpful empty states on canvas/gap/teams/list views, "getting started" guidance
+2. [x] Empty states & onboarding — first workspace experience, helpful empty states on canvas/gap/teams/list views, "getting started" guidance — DONE iteration 23
 3. [ ] Loading & error states — skeleton loaders on all data-fetching pages, error boundaries, retry affordances
 4. [ ] Performance pass — bundle analysis, lazy loading for heavy routes (gap analysis, teams), image optimization
 5. [ ] Work through IMPROVEMENTS.md backlog — agent-discovered UX wins from Phase 1 testing
@@ -269,3 +269,4 @@ Tasks:
 - [2026-02-26] Iteration 20: Regression pass (cadence — overdue, gap 10 iterations). 0 regressions found. All changes since iter 10 are additive. Phase 1.5 status updated to IN PROGRESS. Baseline reset for Phase 1.5 work.
 - [2026-02-26] Iteration 21: Fixed all 8 accessibility bugs (BUG-002 through BUG-009). Phase 1.5 task 1 of 7 complete. 11 files changed across button, sidebar, header, tab-bar, panels, gap-analysis, teams, list, and workspaces. All P1 bugs now resolved. Zero open bugs.
 - [2026-02-26] Iteration 22: FEAT-011 [1/2] complete (empty state UIs). Canvas empty state overlay with action buttons. List view empty state card replaces bare table. Gap analysis and teams already had good empty states. Decomposed: [2/2] Getting Started template remains. Phase 1.5 task 2 partially done.
+- [2026-02-26] Iteration 23: FEAT-011 [2/2] complete (Getting Started template). New workspaces auto-seed a section with 3 connected example steps via POST /api/v1/workspaces. Phase 1.5 task 2 of 7 fully done.

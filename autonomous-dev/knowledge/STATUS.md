@@ -6,22 +6,22 @@
 
 ## Handoff
 
-- **Iteration:** 22
+- **Iteration:** 23
 - **Date:** 2026-02-26
 - **Phase:** Phase 1.5 — Ship & Harden
 - **Branch:** ralph/init-stride
-- **Last task:** #FEAT-011 [1/2] Empty states — canvas overlay and list view empty state
-- **Result:** completed (partial — sub-task [2/2] Getting Started template remains)
-- **Next task:** #FEAT-011 [2/2] Getting Started template — new workspace auto-creates example section with 3 sample steps
+- **Last task:** #FEAT-011 [2/2] Getting Started template — new workspace auto-creates example section with sample steps
+- **Result:** completed
+- **Next task:** #FEAT-012 Loading and error states (or deferred performance/UX sweep cadence)
 - **Blockers:** None
 
 ## Context
 
-Added empty state UIs to the two pages that were missing them: canvas (flow-canvas.tsx) and list view (step-list-view.tsx). Canvas shows a centered overlay with icon, guidance text, and "Add Section"/"Add Step" buttons when no sections/steps exist. List view shows a card with icon and guidance instead of showing the empty table/filters. Gap analysis and teams already had good empty states from Phase 1 — no changes needed. FEAT-011 decomposed: [1/2] done (empty state UIs), [2/2] pending (Getting Started template for new workspaces — requires either modifying bootstrap_workspace RPC or post-creation logic). Type-check, lint, and build all pass.
+Completed FEAT-011 [2/2] by adding template seeding to `src/app/api/v1/workspaces/route.ts`. After `bootstrap_workspace` RPC creates the workspace and first tab, the POST handler now creates a "Getting Started" section (700x200, positioned at 100,80) containing 3 example steps ("Document the process", "Score maturity", "Identify gaps") connected in sequence. Template seeding is best-effort — wrapped in try/catch so it won't fail workspace creation. Steps are positioned inside the section at y=50, spaced horizontally. This completes FEAT-011 (empty states + onboarding). Phase 1.5 task 2 of 7 done. Next up: FEAT-012 (loading & error states) unless cadence overrides.
 
 ## Dev Server
 
-- **Status:** not running
+- **Status:** running (started this iteration)
 - **Port:** 3000
 - **Command:** npm run dev
 
