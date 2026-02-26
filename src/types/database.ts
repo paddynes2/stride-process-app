@@ -129,6 +129,19 @@ export interface Person {
   updated_at: string;
 }
 
+export interface Tool {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  vendor: string | null;
+  url: string | null;
+  cost_per_month: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface StepRole {
   id: string;
   step_id: string;

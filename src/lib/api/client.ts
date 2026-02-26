@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -245,6 +245,34 @@ export async function updatePerson(id: string, data: Partial<Pick<Person, "name"
 
 export async function deletePerson(id: string): Promise<void> {
   await apiFetch(`/api/v1/people/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Tools
+// ---------------------------------------------------------------------------
+
+export async function fetchTools(workspaceId: string): Promise<Tool[]> {
+  return apiFetch<Tool[]>(`/api/v1/tools?workspace_id=${workspaceId}`);
+}
+
+export async function createTool(data: { workspace_id: string; name?: string; description?: string; category?: string; vendor?: string; url?: string; cost_per_month?: number }): Promise<Tool> {
+  return apiFetch<Tool>("/api/v1/tools", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateTool(id: string, data: Partial<Pick<Tool, "name" | "description" | "category" | "vendor" | "url" | "cost_per_month">>): Promise<Tool> {
+  return apiFetch<Tool>(`/api/v1/tools/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTool(id: string): Promise<void> {
+  await apiFetch(`/api/v1/tools/${id}`, { method: "DELETE" });
 }
 
 // ---------------------------------------------------------------------------
