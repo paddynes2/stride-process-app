@@ -68,14 +68,14 @@
 
 ## Last Regression Pass
 
-- **Iteration:** 28
+- **Iteration:** 34
 - **Date:** 2026-02-26
 - **Result:** pass (no regressions, static analysis only — Playwright MCP unavailable)
-- **Pages re-checked:** All routes (static code review of 28 source files changed)
+- **Pages re-checked:** All routes (focus on iterations 32-33 journey canvas additions)
 - **Regressions found:** 0
-- **Iterations covered:** 21-27 (7 iterations since last regression at iter 20)
-- **Files reviewed:** button.tsx, sidebar.tsx, header.tsx, tab-bar.tsx, offline-banner.tsx, skeleton.tsx, toast-helpers.ts, error.tsx (×2), canvas-view.tsx, flow-canvas.tsx, step-detail-panel.tsx, section-detail-panel.tsx, step-list-view.tsx, gap-analysis-view.tsx, teams-view.tsx, workspace-list.tsx, workspaces/route.ts, settings/page.tsx, 7× loading.tsx, layout.tsx, video-embed.tsx, public/[shareId]/loading.tsx
-- **Verification:** type-check pass, lint pass (0 errors, 5 pre-existing warnings), build pass (37 routes)
+- **Iterations covered:** 32-33 (risk-triggered from iter 32 schema change, risk score 3)
+- **Files reviewed:** migration 011, 6 new API route files (stages, touchpoints, touchpoint-connections × route.ts + [id]/route.ts), client.ts wrapper functions, database.ts types
+- **Verification:** type-check pass, lint pass (0 errors, 5 pre-existing warnings), build pass (43 routes — 6 new)
 - **Known-good baseline:**
   - /workspaces — clean (pre-existing hydration warning in dev only)
   - /w/[id]/[tabId] (canvas) — clean (dynamic imports for pdf/png/tiptap, empty state overlay)
@@ -85,9 +85,10 @@
   - /w/[id]/settings — clean
   - /public/[shareId] — clean (loading.tsx added)
   - /login — redirects to /workspaces when authenticated (correct behavior)
-  - API routes — all 14 route groups present and typed correctly
+  - API routes — all 20 route groups present and typed correctly (14 original + 6 journey canvas)
   - Error boundaries (×2), offline banner, skeleton, toast helpers — all clean
   - Getting Started template seeding — best-effort, properly guarded
+  - Journey canvas data layer — migration 011 + 6 API routes + 9 client wrappers all clean
 
 ## Last Data Integrity Check
 

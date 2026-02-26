@@ -976,3 +976,27 @@
 - Efficiency (wasted actions?): 5 — All 6 route files + client wrappers created in one pass, single build verification.
 - Proactive observations: 0
 **Notes:** Journey canvas data layer complete (migration + API + client wrappers). Next: [3/4] tab type UI.
+
+## Iteration 34 — 2026-02-26
+**Task:** Regression pass — verify journey canvas data layer (iterations 32-33)
+**Source:** Risk-triggered regression (risk score 3 from iter 32 schema change)
+**Complexity:** M
+**Result:** completed
+**Changes:** None (documentation only — regression testing iteration)
+**Research:** Reviewed migration 011, all 6 new API route files, client.ts wrappers, git diff analysis
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing)
+- Build: pass (43 routes — 6 new journey canvas routes confirmed)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (no code changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: N/A — no code written
+- Test coverage of change: 4 — thorough static review of all new files, diff analysis confirms zero modifications to existing code
+- Confidence this won't regress: 5 — all changes purely additive, zero existing files modified (except client.ts appends)
+- Efficiency (wasted actions?): 5 — targeted file reads, no wasted exploration
+- Proactive observations: 0
+**Notes:** Risk-triggered regression from iter 32 (schema change, risk=3). All 6 API routes follow exact patterns of existing sections/steps/connections. Migration 011 has proper RLS, indexes, constraints. Client wrappers use correct apiFetch patterns. Next iteration: FEAT-017 [3/4] tab type UI.

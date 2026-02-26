@@ -289,14 +289,14 @@
 **Acceptance criteria:**
 - [x] Data model: `canvas_type` discriminator on tabs + new `stages`/`touchpoints`/`touchpoint_connections` tables (Decision D-001: parallel tables)
 - [x] TypeScript types updated (CanvasType, TouchpointSentiment, Stage, Touchpoint, TouchpointConnection, Tab.canvas_type)
-- [ ] API routes for stages, touchpoints, touchpoint_connections (CRUD + client wrappers)
+- [x] API routes for stages, touchpoints, touchpoint_connections (CRUD + client wrappers)
 - [ ] Creating a new tab allows choosing "Process" or "Journey" type
 - [ ] Journey canvas has stages (group nodes) instead of sections
 - [ ] Journey canvas has touchpoints (step nodes) instead of steps
 **Notes:** Decision D-001: Parallel tables chosen over discriminator. Migration 011 pushed. Decomposed into 4 sub-tasks.
 **Sub-tasks:**
 - [x] [1/4] Data model: migration 011 (enums, tables, RLS), TypeScript types — DONE iteration 32
-- [ ] [2/4] API routes + client wrappers for stages, touchpoints, touchpoint_connections
+- [x] [2/4] API routes + client wrappers for stages, touchpoints, touchpoint_connections — DONE iteration 33
 - [ ] [3/4] Tab type UI — canvas_type selector on tab creation, routing by canvas_type
 - [ ] [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections
 
