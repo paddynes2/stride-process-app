@@ -945,3 +945,34 @@
 - Efficiency (wasted actions?): 5 — Research was targeted, no wasted attempts
 - Proactive observations: 0
 **Notes:** First iteration of Phase 2a. FEAT-017 decomposed into 4 sub-tasks. Decision D-001 logged. FEAT-010 status in FEATURES.md needs correction (shows 'pending' but was done iter 21).
+
+## Iteration 33 — 2026-02-26
+**Task:** #FEAT-017 [2/4] API routes + client wrappers for stages, touchpoints, touchpoint_connections
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Created: src/app/api/v1/stages/route.ts (POST)
+- Created: src/app/api/v1/stages/[id]/route.ts (PATCH, DELETE)
+- Created: src/app/api/v1/touchpoints/route.ts (GET, POST)
+- Created: src/app/api/v1/touchpoints/[id]/route.ts (PATCH, DELETE)
+- Created: src/app/api/v1/touchpoint-connections/route.ts (POST)
+- Created: src/app/api/v1/touchpoint-connections/[id]/route.ts (DELETE)
+- Modified: src/lib/api/client.ts (+89 lines — 9 client wrapper functions + 3 new type imports)
+**Research:** Read sections/steps/connections route patterns (4 files). Read connections for duplicate handling pattern. Read client.ts for wrapper conventions. Read migration 011 for table columns/constraints. Read database.ts for type shapes.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 5 warnings — all pre-existing)
+- Build: pass (43 routes — 6 new API routes added)
+- Unit tests: N/A
+- Browser test: skipped (no UI changes — API routes only)
+- Canary test: skipped (no UI changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Exact pattern match with existing sections/steps/connections routes. No deviations.
+- Test coverage of change: 2 — No runtime verification yet (no UI to exercise these routes). Will be tested when [3/4] and [4/4] add UI.
+- Confidence this won't regress: 5 — Purely additive. No existing code modified except client.ts import line. All new routes follow proven patterns.
+- Efficiency (wasted actions?): 5 — All 6 route files + client wrappers created in one pass, single build verification.
+- Proactive observations: 0
+**Notes:** Journey canvas data layer complete (migration + API + client wrappers). Next: [3/4] tab type UI.

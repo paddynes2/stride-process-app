@@ -88,7 +88,10 @@ src/
 │   │   ├── people/          — POST create, PATCH/DELETE by id
 │   │   ├── step-roles/      — GET by step_id or step_ids (batch), POST create, DELETE by id
 │   │   ├── shares/          — GET list, POST create, PATCH/DELETE by id (authenticated)
-│   │   └── public/shares/   — GET by shareId (unauthenticated, calls SECURITY DEFINER RPC)
+│   │   ├── public/shares/   — GET by shareId (unauthenticated, calls SECURITY DEFINER RPC)
+│   │   ├── stages/          — POST create, PATCH/DELETE by id (journey canvas)
+│   │   ├── touchpoints/     — GET list, POST create, PATCH/DELETE by id (journey canvas)
+│   │   └── touchpoint-connections/ — POST create, DELETE by id (journey canvas)
 │   └── auth/callback/       — OAuth callback route
 ├── components/
 │   ├── ui/                  — button, input, badge, dialog, dropdown-menu, separator, tabs, textarea

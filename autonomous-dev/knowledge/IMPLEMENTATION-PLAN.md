@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-017 sub-task 1/4 done)
+## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-017 sub-task 2/4 done)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -279,3 +279,4 @@ Tasks:
 - [2026-02-26] Iteration 30: FEAT-015 complete (responsive sanity check). Auto-collapse sidebar at ≤1280px, reduce panel width, responsive summary card grids, table horizontal scroll. Phase 1.5 task 6 of 7 complete. Only golden path test remains.
 - [2026-02-26] Iteration 31: FEAT-016 complete (golden path test). All 10 steps of consultant workflow verified via static code tracing (3 parallel agents). **PHASE 1.5 COMPLETE** — 7/7 tasks done in 12 iterations (estimated 10-15). Moving to phase completion testing before Phase 2a.
 - [2026-02-26] Iteration 32: **Phase 2a started.** FEAT-017 [1/4] complete (data model + types). Decision D-001: parallel tables for journey canvas. Migration 011 pushed. FEAT-017 decomposed into 4 sub-tasks. Also fixed FEAT-010 status (was showing pending, actually done iter 21).
+- [2026-02-26] Iteration 33: FEAT-017 [2/4] complete (API routes + client wrappers). 6 route files, 9 client functions. Journey data layer fully operational. Sub-tasks [3/4] tab type UI and [4/4] canvas rendering remain.
