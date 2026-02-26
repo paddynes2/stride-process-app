@@ -19,8 +19,12 @@ import {
   createRole,
   updateRole,
   deleteRole,
+  createPerson,
+  updatePerson,
+  deletePerson,
   type TeamWithRoles,
 } from "@/lib/api/client";
+import type { Person } from "@/types/database";
 
 interface TeamsViewProps {
   workspaceId: string;
@@ -96,6 +100,27 @@ export function TeamsView({ workspaceId, initialTeams }: TeamsViewProps) {
     await refresh();
   };
 
+  const handleAddPerson = async (roleId: string) => {
+    await createPerson({ role_id: roleId, name: "New Person" });
+    await refresh();
+  };
+
+  const handleDeletePerson = async (personId: string) => {
+    await deletePerson(personId);
+    await refresh();
+  };
+
+  const handleUpdatePersonName = async (personId: string, name: string) => {
+    if (!name.trim()) return;
+    await updatePerson(personId, { name: name.trim() });
+    await refresh();
+  };
+
+  const handleUpdatePersonEmail = async (personId: string, email: string) => {
+    await updatePerson(personId, { email: email.trim() || null });
+    await refresh();
+  };
+
   // Summary stats
   const totalRoles = teams.reduce((sum, t) => sum + t.roles.length, 0);
   const ratesWithValues = teams.flatMap((t) =>
@@ -162,6 +187,10 @@ export function TeamsView({ workspaceId, initialTeams }: TeamsViewProps) {
                 onDeleteRole={handleDeleteRole}
                 onUpdateRoleName={handleUpdateRoleName}
                 onUpdateRoleRate={handleUpdateRoleRate}
+                onAddPerson={handleAddPerson}
+                onDeletePerson={handleDeletePerson}
+                onUpdatePersonName={handleUpdatePersonName}
+                onUpdatePersonEmail={handleUpdatePersonEmail}
               />
             ))}
           </div>
@@ -202,6 +231,10 @@ interface TeamCardProps {
   onDeleteRole: (roleId: string) => void;
   onUpdateRoleName: (roleId: string, name: string) => void;
   onUpdateRoleRate: (roleId: string, value: string) => void;
+  onAddPerson: (roleId: string) => void;
+  onDeletePerson: (personId: string) => void;
+  onUpdatePersonName: (personId: string, name: string) => void;
+  onUpdatePersonEmail: (personId: string, email: string) => void;
 }
 
 function TeamCard({
@@ -214,6 +247,10 @@ function TeamCard({
   onDeleteRole,
   onUpdateRoleName,
   onUpdateRoleRate,
+  onAddPerson,
+  onDeletePerson,
+  onUpdatePersonName,
+  onUpdatePersonEmail,
 }: TeamCardProps) {
   const [editingName, setEditingName] = React.useState(false);
   const [nameValue, setNameValue] = React.useState(team.name);
@@ -328,6 +365,10 @@ function TeamCard({
                   onUpdateName={(name) => onUpdateRoleName(role.id, name)}
                   onUpdateRate={(value) => onUpdateRoleRate(role.id, value)}
                   onDelete={() => onDeleteRole(role.id)}
+                  onAddPerson={() => onAddPerson(role.id)}
+                  onDeletePerson={onDeletePerson}
+                  onUpdatePersonName={onUpdatePersonName}
+                  onUpdatePersonEmail={onUpdatePersonEmail}
                 />
               ))}
               <div className="px-4 py-2 border-t border-[var(--border-subtle)]">
@@ -353,9 +394,14 @@ interface RoleRowProps {
   onUpdateName: (name: string) => void;
   onUpdateRate: (value: string) => void;
   onDelete: () => void;
+  onAddPerson: () => void;
+  onDeletePerson: (personId: string) => void;
+  onUpdatePersonName: (personId: string, name: string) => void;
+  onUpdatePersonEmail: (personId: string, email: string) => void;
 }
 
-function RoleRow({ role, onUpdateName, onUpdateRate, onDelete }: RoleRowProps) {
+function RoleRow({ role, onUpdateName, onUpdateRate, onDelete, onAddPerson, onDeletePerson, onUpdatePersonName, onUpdatePersonEmail }: RoleRowProps) {
+  const [expanded, setExpanded] = React.useState(false);
   const [editingName, setEditingName] = React.useState(false);
   const [nameValue, setNameValue] = React.useState(role.name);
   const [rateValue, setRateValue] = React.useState(
@@ -405,64 +451,220 @@ function RoleRow({ role, onUpdateName, onUpdateRate, onDelete }: RoleRowProps) {
   };
 
   return (
-    <div className="grid grid-cols-[1fr_120px_80px_36px] items-center px-4 py-2 border-t border-[var(--border-subtle)] hover:bg-[var(--bg-row-hover)] transition-colors">
-      {/* Role name */}
-      <div className="pl-6 flex items-center gap-2">
-        <Briefcase className="h-3.5 w-3.5 text-[var(--text-quaternary)] shrink-0" />
-        {editingName ? (
-          <Input
-            ref={nameRef}
-            value={nameValue}
-            onChange={(e) => setNameValue(e.target.value)}
-            onBlur={commitName}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commitName();
-              if (e.key === "Escape") {
-                setNameValue(role.name);
-                setEditingName(false);
-              }
-            }}
-            className="h-6 max-w-[180px] text-[12px]"
-          />
-        ) : (
+    <div className="border-t border-[var(--border-subtle)]">
+      <div className="grid grid-cols-[1fr_120px_80px_36px] items-center px-4 py-2 hover:bg-[var(--bg-row-hover)] transition-colors">
+        {/* Role name */}
+        <div className="pl-6 flex items-center gap-2">
           <button
-            onClick={() => setEditingName(true)}
-            className="text-[13px] text-[var(--text-primary)] hover:text-[var(--accent-blue)] transition-colors truncate text-left"
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center justify-center h-4 w-4 text-[var(--text-quaternary)] hover:text-[var(--text-tertiary)] transition-colors shrink-0"
           >
-            {role.name}
+            <ChevronRight
+              className="h-3 w-3 transition-transform"
+              style={{ transform: expanded ? "rotate(90deg)" : undefined }}
+            />
           </button>
-        )}
+          <Briefcase className="h-3.5 w-3.5 text-[var(--text-quaternary)] shrink-0" />
+          {editingName ? (
+            <Input
+              ref={nameRef}
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              onBlur={commitName}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitName();
+                if (e.key === "Escape") {
+                  setNameValue(role.name);
+                  setEditingName(false);
+                }
+              }}
+              className="h-6 max-w-[180px] text-[12px]"
+            />
+          ) : (
+            <button
+              onClick={() => setEditingName(true)}
+              className="text-[13px] text-[var(--text-primary)] hover:text-[var(--accent-blue)] transition-colors truncate text-left"
+            >
+              {role.name}
+            </button>
+          )}
+        </div>
+
+        {/* Hourly rate */}
+        <div className="flex items-center gap-1">
+          <DollarSign className="h-3 w-3 text-[var(--text-quaternary)] shrink-0" />
+          <Input
+            value={rateValue}
+            onChange={(e) => setRateValue(e.target.value)}
+            onBlur={commitRate}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitRate();
+            }}
+            placeholder="0"
+            type="number"
+            min="0"
+            step="0.01"
+            className="h-6 w-[90px] text-[12px]"
+          />
+        </div>
+
+        {/* People count */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--accent-blue)] transition-colors text-left"
+        >
+          {role.people.length}
+        </button>
+
+        {/* Delete */}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onDelete}
+          className="h-6 w-6 text-[var(--text-quaternary)] hover:text-[var(--error)]"
+        >
+          <Trash2 className="h-3 w-3" />
+        </Button>
       </div>
 
-      {/* Hourly rate */}
-      <div className="flex items-center gap-1">
-        <DollarSign className="h-3 w-3 text-[var(--text-quaternary)] shrink-0" />
+      {/* People (expanded) */}
+      {expanded && (
+        <div className="bg-[var(--bg-base)] border-t border-[var(--border-subtle)] ml-12 mr-4 mb-2 rounded-[var(--radius-md)] border border-[var(--border-subtle)]">
+          {role.people.length === 0 ? (
+            <div className="px-4 py-3 text-center">
+              <p className="text-[11px] text-[var(--text-quaternary)] mb-2">
+                No people in this role
+              </p>
+              <Button onClick={onAddPerson} variant="ghost" size="sm">
+                <Plus className="h-3 w-3" />
+                Add Person
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* People header */}
+              <div className="grid grid-cols-[1fr_1fr_32px] items-center px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+                <span>Name</span>
+                <span>Email</span>
+                <span />
+              </div>
+              {role.people.map((person) => (
+                <PersonRow
+                  key={person.id}
+                  person={person}
+                  onUpdateName={(name) => onUpdatePersonName(person.id, name)}
+                  onUpdateEmail={(email) => onUpdatePersonEmail(person.id, email)}
+                  onDelete={() => onDeletePerson(person.id)}
+                />
+              ))}
+              <div className="px-3 py-1.5 border-t border-[var(--border-subtle)]">
+                <Button onClick={onAddPerson} variant="ghost" size="sm">
+                  <Plus className="h-3 w-3" />
+                  Add Person
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Person Row
+// ---------------------------------------------------------------------------
+
+interface PersonRowProps {
+  person: Person;
+  onUpdateName: (name: string) => void;
+  onUpdateEmail: (email: string) => void;
+  onDelete: () => void;
+}
+
+function PersonRow({ person, onUpdateName, onUpdateEmail, onDelete }: PersonRowProps) {
+  const [editingName, setEditingName] = React.useState(false);
+  const [nameValue, setNameValue] = React.useState(person.name);
+  const [emailValue, setEmailValue] = React.useState(person.email ?? "");
+  const nameRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    setNameValue(person.name);
+  }, [person.name]);
+
+  React.useEffect(() => {
+    setEmailValue(person.email ?? "");
+  }, [person.email]);
+
+  React.useEffect(() => {
+    if (editingName && nameRef.current) {
+      nameRef.current.focus();
+      nameRef.current.select();
+    }
+  }, [editingName]);
+
+  const commitName = () => {
+    setEditingName(false);
+    if (nameValue.trim() && nameValue.trim() !== person.name) {
+      onUpdateName(nameValue.trim());
+    } else {
+      setNameValue(person.name);
+    }
+  };
+
+  const commitEmail = () => {
+    const trimmed = emailValue.trim();
+    if (trimmed !== (person.email ?? "")) {
+      onUpdateEmail(trimmed);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-[1fr_1fr_32px] items-center px-3 py-1.5 border-t border-[var(--border-subtle)] hover:bg-[var(--bg-row-hover)] transition-colors">
+      {/* Person name */}
+      {editingName ? (
         <Input
-          value={rateValue}
-          onChange={(e) => setRateValue(e.target.value)}
-          onBlur={commitRate}
+          ref={nameRef}
+          value={nameValue}
+          onChange={(e) => setNameValue(e.target.value)}
+          onBlur={commitName}
           onKeyDown={(e) => {
-            if (e.key === "Enter") commitRate();
+            if (e.key === "Enter") commitName();
+            if (e.key === "Escape") {
+              setNameValue(person.name);
+              setEditingName(false);
+            }
           }}
-          placeholder="0"
-          type="number"
-          min="0"
-          step="0.01"
-          className="h-6 w-[90px] text-[12px]"
+          className="h-6 max-w-[160px] text-[12px]"
         />
-      </div>
+      ) : (
+        <button
+          onClick={() => setEditingName(true)}
+          className="text-[12px] text-[var(--text-primary)] hover:text-[var(--accent-blue)] transition-colors truncate text-left"
+        >
+          {person.name}
+        </button>
+      )}
 
-      {/* People count */}
-      <div className="text-[12px] text-[var(--text-tertiary)]">
-        {role.people.length}
-      </div>
+      {/* Email */}
+      <Input
+        value={emailValue}
+        onChange={(e) => setEmailValue(e.target.value)}
+        onBlur={commitEmail}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commitEmail();
+        }}
+        placeholder="email@example.com"
+        type="email"
+        className="h-6 text-[12px]"
+      />
 
       {/* Delete */}
       <Button
         variant="ghost"
         size="icon-sm"
         onClick={onDelete}
-        className="h-6 w-6 text-[var(--text-quaternary)] hover:text-[var(--error)]"
+        className="h-5 w-5 text-[var(--text-quaternary)] hover:text-[var(--error)]"
       >
         <Trash2 className="h-3 w-3" />
       </Button>
