@@ -17,7 +17,8 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Plus, Layers, Route } from "lucide-react";
+import { Plus, Layers, Route, Thermometer } from "lucide-react";
+import { PAIN_LEVELS } from "@/lib/pain";
 import { Button } from "@/components/ui/button";
 import { StageNode } from "@/components/canvas/stage-node";
 import { TouchpointNode } from "@/components/canvas/touchpoint-node";
@@ -50,17 +51,25 @@ interface JourneyCanvasViewProps {
   initialConnections: TouchpointConnection[];
 }
 
+function computeStagePainScore(stageId: string, touchpoints: Touchpoint[]): number | null {
+  const stageTps = (touchpoints ?? []).filter((t) => t.stage_id === stageId);
+  const withPain = stageTps.filter((t) => t.pain_score != null);
+  if (withPain.length === 0) return null;
+  return withPain.reduce((sum, t) => sum + t.pain_score!, 0) / withPain.length;
+}
+
 function buildJourneyNodes(
   stages: Stage[],
   touchpoints: Touchpoint[],
   selectedStageId: string | null,
-  selectedTouchpointId: string | null
+  selectedTouchpointId: string | null,
+  heatMapMode: boolean
 ): Node[] {
   const stageNodes: Node<StageNodeData>[] = (stages ?? []).filter(Boolean).map((stage) => ({
     id: `stage-${stage.id}`,
     type: "stage",
     position: { x: stage.position_x, y: stage.position_y },
-    data: { stage },
+    data: { stage, averagePainScore: computeStagePainScore(stage.id, touchpoints), heatMapMode },
     style: { width: stage.width, height: stage.height },
     selected: stage.id === selectedStageId,
   }));
@@ -69,7 +78,7 @@ function buildJourneyNodes(
     id: `tp-${tp.id}`,
     type: "touchpoint",
     position: { x: tp.position_x, y: tp.position_y },
-    data: { touchpoint: tp, selected: tp.id === selectedTouchpointId },
+    data: { touchpoint: tp, selected: tp.id === selectedTouchpointId, heatMapMode },
     parentId: tp.stage_id ? `stage-${tp.stage_id}` : undefined,
     extent: tp.stage_id ? "parent" as const : undefined,
     selected: tp.id === selectedTouchpointId,
@@ -99,10 +108,11 @@ export function JourneyCanvasView({
   const [connections, setConnections] = React.useState(initialConnections);
   const [selectedStageId, setSelectedStageId] = React.useState<string | null>(null);
   const [selectedTouchpointId, setSelectedTouchpointId] = React.useState<string | null>(null);
+  const [heatMapMode, setHeatMapMode] = React.useState(false);
 
   const initialNodes = React.useMemo(
-    () => buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId),
-    [stages, touchpoints, selectedStageId, selectedTouchpointId]
+    () => buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode),
+    [stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode]
   );
   const initialEdges = React.useMemo(() => buildJourneyEdges(connections), [connections]);
 
@@ -111,8 +121,8 @@ export function JourneyCanvasView({
 
   // Sync external state → React Flow state
   React.useEffect(() => {
-    setNodes(buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId));
-  }, [stages, touchpoints, selectedStageId, selectedTouchpointId, setNodes]);
+    setNodes(buildJourneyNodes(stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode));
+  }, [stages, touchpoints, selectedStageId, selectedTouchpointId, heatMapMode, setNodes]);
 
   React.useEffect(() => {
     setEdges(buildJourneyEdges(connections));
@@ -389,7 +399,31 @@ export function JourneyCanvasView({
                 <Layers className="h-3.5 w-3.5" />
                 Stage
               </Button>
+              <Button
+                variant={heatMapMode ? "default" : "secondary"}
+                size="sm"
+                onClick={() => setHeatMapMode((prev) => !prev)}
+                title="Toggle pain score heat map"
+              >
+                <Thermometer className="h-3.5 w-3.5" />
+                Heat Map
+              </Button>
             </Panel>
+
+            {/* Heat map legend */}
+            {heatMapMode && (
+              <Panel position="bottom-left">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+                  <span className="text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide mr-1">Pain</span>
+                  {PAIN_LEVELS.map(({ level, color }) => (
+                    <div key={level} className="flex items-center gap-1">
+                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                      <span className="text-[10px] text-[var(--text-secondary)]">{level}</span>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+            )}
           </ReactFlow>
 
           {/* Empty state overlay */}

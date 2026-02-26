@@ -23,11 +23,14 @@ export type CanvasEdge = Edge;
 // Custom node data types for React Flow — Journey canvas
 export interface StageNodeData extends Record<string, unknown> {
   stage: Stage;
+  averagePainScore: number | null;
+  heatMapMode?: boolean;
 }
 
 export interface TouchpointNodeData extends Record<string, unknown> {
   touchpoint: Touchpoint;
   selected?: boolean;
+  heatMapMode?: boolean;
 }
 
 export type StageNode = Node<StageNodeData, "stage">;

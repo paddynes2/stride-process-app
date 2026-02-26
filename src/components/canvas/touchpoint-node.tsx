@@ -4,6 +4,7 @@ import * as React from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { cn } from "@/lib/utils";
 import type { TouchpointNodeData } from "@/types/canvas";
+import { PAIN_COLORS, PAIN_FALLBACK_COLOR } from "@/lib/pain";
 
 const SENTIMENT_COLORS: Record<string, string> = {
   positive: "#22C55E",
@@ -19,10 +20,25 @@ const SENTIMENT_LABELS: Record<string, string> = {
 
 export function TouchpointNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as TouchpointNodeData;
-  const { touchpoint } = nodeData;
+  const { touchpoint, heatMapMode } = nodeData;
   const sentimentColor = touchpoint.sentiment
     ? SENTIMENT_COLORS[touchpoint.sentiment] ?? "#6B7280"
     : null;
+
+  const painColor = touchpoint.pain_score != null
+    ? PAIN_COLORS[touchpoint.pain_score] ?? PAIN_FALLBACK_COLOR
+    : null;
+
+  // Heat map mode: color by pain score. Normal mode: color by sentiment.
+  const bgStyle = (() => {
+    if (heatMapMode && painColor) {
+      return { backgroundColor: `${painColor}15`, borderColor: selected ? undefined : `${painColor}60` };
+    }
+    if (sentimentColor) {
+      return { backgroundColor: `${sentimentColor}15`, borderColor: selected ? undefined : `${sentimentColor}60` };
+    }
+    return { backgroundColor: "var(--bg-surface)" };
+  })();
 
   return (
     <div
@@ -35,11 +51,7 @@ export function TouchpointNode({ data, selected }: NodeProps) {
           ? "border-[var(--accent-blue)] shadow-[0_0_0_1px_var(--accent-blue)]"
           : "border-[var(--border-subtle)]"
       )}
-      style={
-        sentimentColor
-          ? { backgroundColor: `${sentimentColor}15`, borderColor: selected ? undefined : `${sentimentColor}60` }
-          : { backgroundColor: "var(--bg-surface)" }
-      }
+      style={bgStyle}
     >
       {/* Handles */}
       <Handle
@@ -90,13 +102,21 @@ export function TouchpointNode({ data, selected }: NodeProps) {
             )}
           </div>
         </div>
-        {touchpoint.sentiment && sentimentColor && (
+        {heatMapMode && touchpoint.pain_score != null && painColor ? (
+          <div
+            className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white mt-0.5"
+            style={{ backgroundColor: painColor }}
+            title={`Pain: ${touchpoint.pain_score}/5`}
+          >
+            {touchpoint.pain_score}
+          </div>
+        ) : touchpoint.sentiment && sentimentColor ? (
           <div
             className="flex-shrink-0 w-2.5 h-2.5 rounded-full mt-1"
             style={{ backgroundColor: sentimentColor }}
             title={`Sentiment: ${SENTIMENT_LABELS[touchpoint.sentiment] ?? touchpoint.sentiment}`}
           />
-        )}
+        ) : null}
       </div>
     </div>
   );
