@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   }},
   { label: "List View", icon: List, href: "/list" },
   { label: "Gap Analysis", icon: TrendingDown, href: "/gap-analysis" },
-  { label: "Teams", icon: Users, href: "/teams", stub: true },
+  { label: "Teams", icon: Users, href: "/teams" },
   { label: "People", icon: User, href: "/people", stub: true },
   { label: "Tools", icon: Wrench, href: "/tools", stub: true },
   { label: "Settings", icon: Settings, href: "/settings" },

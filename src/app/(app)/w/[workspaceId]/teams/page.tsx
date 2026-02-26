@@ -1,10 +1,27 @@
-export default function TeamsPage() {
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { TeamsView } from "./teams-view";
+
+export default async function TeamsPage({
+  params,
+}: {
+  params: Promise<{ workspaceId: string }>;
+}) {
+  const { workspaceId } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: teams } = await supabase
+    .from("teams")
+    .select("*, roles(*, people(*))")
+    .eq("workspace_id", workspaceId)
+    .order("created_at");
+
   return (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-center">
-        <p className="text-[16px] font-semibold text-[var(--text-primary)] mb-2">Teams Canvas</p>
-        <p className="text-[13px] text-[var(--text-tertiary)]">Coming in Phase 1</p>
-      </div>
-    </div>
+    <TeamsView
+      workspaceId={workspaceId}
+      initialTeams={teams ?? []}
+    />
   );
 }
