@@ -10,12 +10,27 @@ const MATURITY_COLORS: Record<number, string> = {
   5: "#22C55E",
 };
 
+const GAP_COLORS: Record<number, string> = {
+  0: "#6B7280",
+  1: "#22C55E",
+  2: "#84CC16",
+  3: "#EAB308",
+  4: "#F97316",
+  5: "#EF4444",
+};
+
+interface StepRoleForExport {
+  step_id: string;
+  role: { hourly_rate: number | null };
+}
+
 interface ExportPdfOptions {
   workspaceName: string;
   sections: Section[];
   steps: Step[];
   connections: Connection[];
   canvasElement: HTMLElement;
+  stepRoles?: StepRoleForExport[];
 }
 
 export async function exportWorkspacePdf({
@@ -24,6 +39,7 @@ export async function exportWorkspacePdf({
   steps,
   connections,
   canvasElement,
+  stepRoles = [],
 }: ExportPdfOptions): Promise<void> {
   const pdf = new jsPDF({
     orientation: "landscape",
@@ -36,6 +52,10 @@ export async function exportWorkspacePdf({
   const margin = 15;
   const contentWidth = pageWidth - margin * 2;
   let y = margin;
+
+  // Pre-compute shared lookups
+  const sectionMap = new Map(sections.map((s) => [s.id, s.name]));
+  const stepRolesMap = buildStepRolesMap(stepRoles);
 
   // --- Title Page ---
   pdf.setFillColor(10, 10, 11);
@@ -195,9 +215,6 @@ export async function exportWorkspacePdf({
     }
     y += 7;
 
-    // Section lookup
-    const sectionMap = new Map(sections.map((s) => [s.id, s.name]));
-
     // Sort steps by section, then name
     const sortedSteps = [...steps].sort((a, b) => {
       const secA = a.section_id ? sectionMap.get(a.section_id) ?? "" : "";
@@ -231,7 +248,7 @@ export async function exportWorkspacePdf({
       colX += cols[0].width;
 
       pdf.setTextColor(255, 255, 255, 140);
-      const sectionName = step.section_id ? sectionMap.get(step.section_id) ?? "—" : "—";
+      const sectionName = step.section_id ? sectionMap.get(step.section_id) ?? "\u2014" : "\u2014";
       pdf.text(truncate(sectionName, 28), colX, y + 3);
       colX += cols[1].width;
 
@@ -250,7 +267,7 @@ export async function exportWorkspacePdf({
         pdf.text(String(step.maturity_score), colX + 5, y + 3);
       } else {
         pdf.setTextColor(255, 255, 255, 76);
-        pdf.text("—", colX + 5, y + 3);
+        pdf.text("\u2014", colX + 5, y + 3);
       }
       colX += cols[3].width;
 
@@ -260,7 +277,7 @@ export async function exportWorkspacePdf({
         pdf.text(String(step.target_maturity), colX + 5, y + 3);
       } else {
         pdf.setTextColor(255, 255, 255, 76);
-        pdf.text("—", colX + 5, y + 3);
+        pdf.text("\u2014", colX + 5, y + 3);
       }
       colX += cols[4].width;
 
@@ -279,17 +296,17 @@ export async function exportWorkspacePdf({
         }
       } else {
         pdf.setTextColor(255, 255, 255, 76);
-        pdf.text("—", colX, y + 3);
+        pdf.text("\u2014", colX, y + 3);
       }
       colX += cols[5].width;
 
       // Time
       pdf.setTextColor(255, 255, 255, 140);
-      pdf.text(step.time_minutes ? String(step.time_minutes) : "—", colX, y + 3);
+      pdf.text(step.time_minutes ? String(step.time_minutes) : "\u2014", colX, y + 3);
       colX += cols[6].width;
 
       // Frequency
-      pdf.text(step.frequency_per_month ? String(step.frequency_per_month) : "—", colX, y + 3);
+      pdf.text(step.frequency_per_month ? String(step.frequency_per_month) : "\u2014", colX, y + 3);
       colX += cols[7].width;
 
       // Monthly hours
@@ -299,10 +316,393 @@ export async function exportWorkspacePdf({
         pdf.text(hrs.toFixed(1), colX, y + 3);
       } else {
         pdf.setTextColor(255, 255, 255, 76);
-        pdf.text("—", colX, y + 3);
+        pdf.text("\u2014", colX, y + 3);
       }
 
       y += 6;
+    }
+  }
+
+  // --- Gap Analysis Summary Page ---
+  const gapSteps = steps
+    .filter((s) => s.maturity_score != null && s.target_maturity != null)
+    .map((s) => ({
+      ...s,
+      gap: s.target_maturity! - s.maturity_score!,
+    }))
+    .sort((a, b) => b.gap - a.gap);
+
+  if (gapSteps.length > 0) {
+    pdf.addPage("a4", "landscape");
+    y = margin;
+    pdf.setFillColor(10, 10, 11);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("Gap Analysis", margin, y);
+    y += 8;
+
+    // Summary cards
+    const scoredCount = gapSteps.length;
+    const belowTarget = gapSteps.filter((s) => s.gap > 0).length;
+    const avgGap = gapSteps.reduce((sum, s) => sum + s.gap, 0) / gapSteps.length;
+    const maxGap = Math.max(...gapSteps.map((s) => s.gap));
+
+    const gapSummaryStats = [
+      { label: "Steps Scored", value: String(scoredCount) },
+      { label: "Below Target", value: String(belowTarget) },
+      { label: "Avg Gap", value: avgGap.toFixed(1) },
+      { label: "Max Gap", value: String(maxGap) },
+    ];
+
+    const gapCardW = 50;
+    const gapCardGap = 5;
+    gapSummaryStats.forEach((stat, i) => {
+      const x = margin + i * (gapCardW + gapCardGap);
+      pdf.setFillColor(20, 20, 21);
+      pdf.roundedRect(x, y, gapCardW, 16, 2, 2, "F");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(14);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(stat.value, x + gapCardW / 2, y + 9, { align: "center" });
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(6);
+      pdf.setTextColor(255, 255, 255, 76);
+      pdf.text(stat.label.toUpperCase(), x + gapCardW / 2, y + 14, { align: "center" });
+    });
+    y += 22;
+
+    // Gap table header
+    const gapCols = [
+      { label: "Step", width: 70 },
+      { label: "Section", width: 60 },
+      { label: "Current", width: 30 },
+      { label: "Target", width: 30 },
+      { label: "Gap", width: 25 },
+      { label: "", width: contentWidth - 70 - 60 - 30 - 30 - 25 }, // bar area
+    ];
+
+    pdf.setFillColor(20, 20, 21);
+    pdf.rect(margin, y, contentWidth, 7, "F");
+
+    let colX = margin + 2;
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7);
+    pdf.setTextColor(255, 255, 255, 76);
+    for (const col of gapCols) {
+      if (col.label) pdf.text(col.label.toUpperCase(), colX, y + 4.5);
+      colX += col.width;
+    }
+    y += 7;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+
+    for (let rowIndex = 0; rowIndex < gapSteps.length; rowIndex++) {
+      const step = gapSteps[rowIndex];
+
+      if (y > pageHeight - margin - 5) {
+        pdf.addPage("a4", "landscape");
+        y = margin;
+        pdf.setFillColor(10, 10, 11);
+        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      }
+
+      if (rowIndex % 2 === 0) {
+        pdf.setFillColor(14, 14, 15);
+        pdf.rect(margin, y - 1, contentWidth, 6, "F");
+      }
+
+      colX = margin + 2;
+
+      // Step name
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(truncate(step.name, 40), colX, y + 3);
+      colX += gapCols[0].width;
+
+      // Section
+      pdf.setTextColor(255, 255, 255, 140);
+      const secName = step.section_id ? sectionMap.get(step.section_id) ?? "\u2014" : "\u2014";
+      pdf.text(truncate(secName, 35), colX, y + 3);
+      colX += gapCols[1].width;
+
+      // Current maturity with color dot
+      if (step.maturity_score != null) {
+        const color = MATURITY_COLORS[step.maturity_score];
+        if (color) {
+          const [r, g, b] = hexToRgb(color);
+          pdf.setFillColor(r, g, b);
+          pdf.circle(colX + 1.5, y + 2, 1.2, "F");
+        }
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(String(step.maturity_score), colX + 5, y + 3);
+      }
+      colX += gapCols[2].width;
+
+      // Target
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(String(step.target_maturity ?? ""), colX + 5, y + 3);
+      colX += gapCols[3].width;
+
+      // Gap value (color-coded)
+      const gapColor = getGapColor(step.gap);
+      const [gr, gg, gb] = hexToRgb(gapColor);
+      pdf.setTextColor(gr, gg, gb);
+      pdf.text(step.gap > 0 ? `+${step.gap}` : String(step.gap), colX, y + 3);
+      colX += gapCols[4].width;
+
+      // Visual gap bar
+      if (step.gap > 0 && maxGap > 0) {
+        const barMaxWidth = gapCols[5].width - 4;
+        const barWidth = (step.gap / maxGap) * barMaxWidth;
+        pdf.setFillColor(gr, gg, gb);
+        pdf.roundedRect(colX, y + 0.5, barWidth, 3, 1, 1, "F");
+      }
+
+      y += 6;
+    }
+  }
+
+  // --- Cost Summary Page ---
+  const totalMonthlyHours = steps.reduce((sum, s) => {
+    if (s.time_minutes && s.frequency_per_month) {
+      return sum + (s.time_minutes * s.frequency_per_month) / 60;
+    }
+    return sum;
+  }, 0);
+
+  const totalMonthlyCost = steps.reduce((total, s) => {
+    return total + computeStepMonthlyCost(s, stepRolesMap);
+  }, 0);
+
+  if (totalMonthlyHours > 0 || totalMonthlyCost > 0) {
+    pdf.addPage("a4", "landscape");
+    y = margin;
+    pdf.setFillColor(10, 10, 11);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("Cost Summary", margin, y);
+    y += 8;
+
+    // Total cards
+    const costCardItems = [
+      { label: "Monthly Hours", value: `${totalMonthlyHours.toFixed(1)}h` },
+    ];
+    if (totalMonthlyCost > 0) {
+      costCardItems.push({ label: "Monthly Cost", value: `$${formatCurrency(totalMonthlyCost)}` });
+      costCardItems.push({ label: "Annual Cost (est.)", value: `$${formatCurrency(totalMonthlyCost * 12)}` });
+    }
+
+    const costCardW = 65;
+    const costCardGap = 5;
+    costCardItems.forEach((stat, i) => {
+      const x = margin + i * (costCardW + costCardGap);
+      pdf.setFillColor(20, 20, 21);
+      pdf.roundedRect(x, y, costCardW, 18, 2, 2, "F");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(16);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(stat.value, x + costCardW / 2, y + 10, { align: "center" });
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(6);
+      pdf.setTextColor(255, 255, 255, 76);
+      pdf.text(stat.label.toUpperCase(), x + costCardW / 2, y + 16, { align: "center" });
+    });
+    y += 24;
+
+    // Per-section cost breakdown
+    const sectionCosts = sections.map((section) => {
+      const sectionSteps = steps.filter((s) => s.section_id === section.id);
+      const hrs = sectionSteps.reduce((sum, s) => {
+        if (s.time_minutes && s.frequency_per_month) {
+          return sum + (s.time_minutes * s.frequency_per_month) / 60;
+        }
+        return sum;
+      }, 0);
+      const cost = sectionSteps.reduce((sum, s) => sum + computeStepMonthlyCost(s, stepRolesMap), 0);
+      return { name: section.name, stepCount: sectionSteps.length, hours: hrs, cost };
+    }).filter((s) => s.hours > 0 || s.cost > 0);
+
+    if (sectionCosts.length > 0) {
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("By Section", margin, y);
+      y += 6;
+
+      // Section cost table header
+      const costCols = [
+        { label: "Section", width: 80 },
+        { label: "Steps", width: 30 },
+        { label: "Hrs/month", width: 40 },
+        { label: "Cost/month", width: 50 },
+        { label: "", width: contentWidth - 80 - 30 - 40 - 50 }, // bar area
+      ];
+
+      pdf.setFillColor(20, 20, 21);
+      pdf.rect(margin, y, contentWidth, 7, "F");
+
+      let colX = margin + 2;
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7);
+      pdf.setTextColor(255, 255, 255, 76);
+      for (const col of costCols) {
+        if (col.label) pdf.text(col.label.toUpperCase(), colX, y + 4.5);
+        colX += col.width;
+      }
+      y += 7;
+
+      // Sort sections by cost descending (or hours if no cost)
+      const sortedSectionCosts = [...sectionCosts].sort((a, b) => {
+        if (a.cost !== b.cost) return b.cost - a.cost;
+        return b.hours - a.hours;
+      });
+
+      const maxSectionVal = Math.max(...sortedSectionCosts.map((s) => s.cost || s.hours));
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
+
+      for (let rowIndex = 0; rowIndex < sortedSectionCosts.length; rowIndex++) {
+        const sec = sortedSectionCosts[rowIndex];
+
+        if (y > pageHeight - margin - 5) {
+          pdf.addPage("a4", "landscape");
+          y = margin;
+          pdf.setFillColor(10, 10, 11);
+          pdf.rect(0, 0, pageWidth, pageHeight, "F");
+        }
+
+        if (rowIndex % 2 === 0) {
+          pdf.setFillColor(14, 14, 15);
+          pdf.rect(margin, y - 1, contentWidth, 6, "F");
+        }
+
+        colX = margin + 2;
+
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(truncate(sec.name, 45), colX, y + 3);
+        colX += costCols[0].width;
+
+        pdf.setTextColor(255, 255, 255, 140);
+        pdf.text(String(sec.stepCount), colX, y + 3);
+        colX += costCols[1].width;
+
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(sec.hours.toFixed(1), colX, y + 3);
+        colX += costCols[2].width;
+
+        if (sec.cost > 0) {
+          pdf.text(`$${formatCurrency(sec.cost)}`, colX, y + 3);
+        } else {
+          pdf.setTextColor(255, 255, 255, 76);
+          pdf.text("\u2014", colX, y + 3);
+        }
+        colX += costCols[3].width;
+
+        // Bar
+        const barVal = sec.cost || sec.hours;
+        if (barVal > 0 && maxSectionVal > 0) {
+          const barMaxWidth = costCols[4].width - 4;
+          const barWidth = (barVal / maxSectionVal) * barMaxWidth;
+          pdf.setFillColor(59, 130, 246); // accent-blue
+          pdf.roundedRect(colX, y + 0.5, barWidth, 3, 1, 1, "F");
+        }
+
+        y += 6;
+      }
+    }
+
+    // Top 5 costliest steps
+    const stepCosts = steps
+      .map((s) => ({
+        name: s.name,
+        section: s.section_id ? sectionMap.get(s.section_id) ?? "" : "",
+        hours: s.time_minutes && s.frequency_per_month ? (s.time_minutes * s.frequency_per_month) / 60 : 0,
+        cost: computeStepMonthlyCost(s, stepRolesMap),
+      }))
+      .filter((s) => s.hours > 0)
+      .sort((a, b) => {
+        if (a.cost !== b.cost) return b.cost - a.cost;
+        return b.hours - a.hours;
+      })
+      .slice(0, 5);
+
+    if (stepCosts.length > 0) {
+      y += 6;
+
+      if (y > pageHeight - margin - 40) {
+        pdf.addPage("a4", "landscape");
+        y = margin;
+        pdf.setFillColor(10, 10, 11);
+        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      }
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("Top 5 Costliest Steps", margin, y);
+      y += 6;
+
+      pdf.setFillColor(20, 20, 21);
+      pdf.rect(margin, y, contentWidth, 7, "F");
+
+      let colX = margin + 2;
+      const topCols = [
+        { label: "Step", width: 80 },
+        { label: "Section", width: 60 },
+        { label: "Hrs/month", width: 40 },
+        { label: "Cost/month", width: 50 },
+      ];
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7);
+      pdf.setTextColor(255, 255, 255, 76);
+      for (const col of topCols) {
+        pdf.text(col.label.toUpperCase(), colX, y + 4.5);
+        colX += col.width;
+      }
+      y += 7;
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
+
+      for (let i = 0; i < stepCosts.length; i++) {
+        const sc = stepCosts[i];
+
+        if (i % 2 === 0) {
+          pdf.setFillColor(14, 14, 15);
+          pdf.rect(margin, y - 1, contentWidth, 6, "F");
+        }
+
+        colX = margin + 2;
+
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(truncate(sc.name, 45), colX, y + 3);
+        colX += topCols[0].width;
+
+        pdf.setTextColor(255, 255, 255, 140);
+        pdf.text(truncate(sc.section, 35), colX, y + 3);
+        colX += topCols[1].width;
+
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(sc.hours.toFixed(1), colX, y + 3);
+        colX += topCols[2].width;
+
+        if (sc.cost > 0) {
+          pdf.text(`$${formatCurrency(sc.cost)}`, colX, y + 3);
+        } else {
+          pdf.setTextColor(255, 255, 255, 76);
+          pdf.text("\u2014", colX, y + 3);
+        }
+
+        y += 6;
+      }
     }
   }
 
@@ -313,7 +713,7 @@ export async function exportWorkspacePdf({
     pdf.setFontSize(7);
     pdf.setTextColor(255, 255, 255, 50);
     pdf.text(
-      `${workspaceName} — Page ${i} of ${totalPages}`,
+      `${workspaceName} \u2014 Page ${i} of ${totalPages}`,
       pageWidth / 2,
       pageHeight - 5,
       { align: "center" }
@@ -327,6 +727,35 @@ export async function exportWorkspacePdf({
   pdf.save(`${safeFilename}-process-report.pdf`);
 }
 
+function buildStepRolesMap(stepRoles: StepRoleForExport[]): Map<string, StepRoleForExport[]> {
+  const map = new Map<string, StepRoleForExport[]>();
+  for (const sr of stepRoles) {
+    const existing = map.get(sr.step_id);
+    if (existing) {
+      existing.push(sr);
+    } else {
+      map.set(sr.step_id, [sr]);
+    }
+  }
+  return map;
+}
+
+function computeStepMonthlyCost(step: Step, rolesMap: Map<string, StepRoleForExport[]>): number {
+  if (!step.time_minutes || !step.frequency_per_month) return 0;
+  const monthlyHours = (step.time_minutes * step.frequency_per_month) / 60;
+  const roles = rolesMap.get(step.id) ?? [];
+  const rolesWithRate = roles.filter((sr) => sr.role.hourly_rate != null);
+  if (rolesWithRate.length === 0) return 0;
+  const avgRate = rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length;
+  return monthlyHours * avgRate;
+}
+
+function getGapColor(gap: number): string {
+  if (gap <= 0) return GAP_COLORS[0];
+  if (gap >= 5) return GAP_COLORS[5];
+  return GAP_COLORS[gap] ?? GAP_COLORS[3];
+}
+
 function truncate(str: string, maxLen: number): string {
   if (str.length <= maxLen) return str;
   return str.slice(0, maxLen - 1) + "\u2026";
@@ -334,6 +763,10 @@ function truncate(str: string, maxLen: number): string {
 
 function formatStatus(status: string): string {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatCurrency(amount: number): string {
+  return amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function hexToRgb(hex: string): [number, number, number] {

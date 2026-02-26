@@ -7,6 +7,7 @@ import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
 import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { exportWorkspacePdf } from "@/lib/export/pdf";
+import { fetchStepRolesBatch } from "@/lib/api/client";
 import { toast } from "sonner";
 import type { Section, Step, Connection } from "@/types/database";
 
@@ -90,12 +91,15 @@ export function CanvasView({
   const handleExportPdf = React.useCallback(
     async (canvasElement: HTMLElement) => {
       try {
+        const stepIds = steps.map((s) => s.id);
+        const stepRoles = stepIds.length > 0 ? await fetchStepRolesBatch(stepIds) : [];
         await exportWorkspacePdf({
           workspaceName: workspace.name,
           sections,
           steps,
           connections,
           canvasElement,
+          stepRoles,
         });
         toast.success("PDF exported successfully");
       } catch {
