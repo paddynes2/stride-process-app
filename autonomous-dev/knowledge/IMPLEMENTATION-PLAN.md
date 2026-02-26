@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2b — Analysis & Intelligence (starting iter 49, audit passed iter 48)
+## Current Phase: Phase 2b — Analysis & Intelligence (starting iter 49, audit passed iter 48, FEAT-024 done iter 54)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -153,14 +153,14 @@ Tasks (in priority order):
      ═══════════════════════════════════════════════════════════════════════ -->
 
 ### Phase 2b: Analysis & Intelligence
-**Status:** IN PROGRESS (starting iteration 49, FEAT-024 [3/3] visual indicators remain)
+**Status:** IN PROGRESS (starting iteration 49, FEAT-024 done iter 54, next FEAT-025)
 **Depends on:** Phase 2a (DONE)
 **Estimated iterations:** 20-25
 **Goal:** Layer analysis tools on top of process and journey data. Move from "document what exists" to "reveal what's broken and where perceptions diverge." Introduce AI where it adds clear consulting value.
 
 Tasks (in priority order — detailed specs in FEATURES.md):
 1. [x] Perspectives data model + UI shell (FEAT-023) — perspectives table, annotations table, types, API, management UI — DONE iteration 51
-2. [ ] Perspective annotation UI (FEAT-024) — perspective switcher, annotation panel on elements, visual indicators
+2. [x] Perspective annotation UI (FEAT-024) — perspective switcher, annotation panel on elements, visual indicators — DONE iteration 54
 3. [ ] Perspective comparison view (FEAT-025) — side-by-side table, divergence highlighting, summary stats
 4. [ ] Prioritization matrix (FEAT-026) — effort/impact scores on steps/touchpoints, quadrant visualization
 5. [ ] Improvement ideas tracker (FEAT-027) — improvement_ideas table, CRUD, kanban view, link to source elements
@@ -325,3 +325,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 51: **FEAT-023 DONE** (all 3/3 sub-tasks complete). Management UI added to workspace settings page — create, inline rename, color picker (8 presets), delete. 3 iterations total for FEAT-023 (iter 49-51). Next: FEAT-024 perspective annotation UI.
 - [2026-02-26] Iteration 52: FEAT-024 [1/3] complete (perspective switcher + context state). Active perspective state in WorkspaceContext, PerspectiveSwitcher dropdown in header, server-side perspective fetching. Decomposed FEAT-024 into 3 sub-tasks. Sub-tasks [2/3] annotation panel and [3/3] visual indicators remain.
 - [2026-02-26] Iteration 53: FEAT-024 [2/3] complete (annotation panel + wired into 4 detail panels). Created AnnotationPanel component with rating selector + TipTap notes + auto-save. Wired into canvas-view (step/section) and journey-canvas-view (stage/touchpoint). Only [3/3] visual indicators on canvas nodes remain.
+- [2026-02-26] Iteration 54: **FEAT-024 DONE** (all 3/3 sub-tasks complete). Visual indicators on all 4 canvas node types — colored dot (perspective color) on top-right of annotated elements. Fetches annotations per active perspective, refreshes on create/delete. 3 iterations total for FEAT-024 (iter 52-54). Next: FEAT-025 perspective comparison view.

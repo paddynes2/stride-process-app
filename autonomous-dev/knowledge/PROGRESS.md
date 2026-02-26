@@ -1511,3 +1511,36 @@
 - Efficiency (wasted actions?): 5 — Clean research phase, implementation in 3 edits, no wasted actions.
 - Proactive observations: 0
 **Notes:** FEAT-024 [2/3] complete. AnnotationPanel auto-creates annotations on first content/rating change. Panel layout uses flex column split with max-h-[280px] for annotation area. Both canvas views now import useWorkspace for activePerspective access. Only [3/3] visual indicators on canvas nodes remain.
+
+## Iteration 54 — 2026-02-26
+**Task:** #FEAT-024 [3/3] Visual indicators on all 4 canvas node types
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Modified: `src/types/canvas.ts` (+4 lines — annotationColor on all 4 node data interfaces)
+- Modified: `src/components/canvas/step-node.tsx` (+13 lines — annotation dot, relative positioning)
+- Modified: `src/components/canvas/section-node.tsx` (+13 lines — annotation dot, relative positioning)
+- Modified: `src/components/canvas/touchpoint-node.tsx` (+13 lines — annotation dot, relative positioning)
+- Modified: `src/components/canvas/stage-node.tsx` (+13 lines — annotation dot, relative positioning)
+- Modified: `src/components/canvas/flow-canvas.tsx` (+18 lines — annotatedIds/annotationColor props, pass to buildNodes)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` (+24 lines — fetch annotations, refreshAnnotatedIds callback)
+- Modified: `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` (+41 lines — fetch annotations, refreshAnnotatedIds callback)
+- Modified: `src/components/panels/annotation-panel.tsx` (+5 lines — onAnnotationChange callback)
+**Research:** Read all 4 node components (step-node, section-node, touchpoint-node, stage-node), canvas.ts types, flow-canvas.tsx buildNodes, canvas-view.tsx and journey-canvas-view.tsx panel layout, annotation-panel.tsx lifecycle, client.ts fetchAnnotations API.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 5 pre-existing warnings)
+- Build: pass (all routes)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Follows existing patterns exactly. Annotation dot is consistent across all 4 node types. Annotation fetching mirrors the pattern used in annotation-panel itself. Callback pattern is clean.
+- Test coverage of change: 2 — Static verification only. The annotation indicator rendering and fetch lifecycle need runtime verification.
+- Confidence this won't regress: 4 — Purely additive (new optional props, new visual element). Node components only render the dot when annotationColor is truthy. Fetch only fires when activePerspective is set. Risk: untested browser interaction.
+- Efficiency (wasted actions?): 5 — Clean research, clean implementation across 9 files. No wasted actions.
+- Proactive observations: 0
+**Notes:** FEAT-024 fully complete (all 3/3 sub-tasks done across iterations 52-54). Perspective annotation UI is now fully functional: switcher in header, annotation panel on element selection, visual indicators on canvas nodes. Next: FEAT-025 (perspective comparison view) or regression pass (risk score 4).

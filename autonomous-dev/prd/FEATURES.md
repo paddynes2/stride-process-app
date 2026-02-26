@@ -396,24 +396,24 @@
 - [x] [2/3] API routes + client wrappers — DONE iteration 50
 - [x] [3/3] Basic perspectives management UI (create/edit/delete perspectives in workspace settings) — DONE iteration 51
 
-### #FEAT-024 Perspective annotation UI
+### #FEAT-024 Perspective annotation UI — DONE iteration 54, 2026-02-26
 **Phase:** 2b
 **Priority:** P0 (critical path)
-**Attempts:** 2
-**Status:** in-progress
+**Attempts:** 3
+**Status:** done
 **Acceptance criteria:**
 - [x] Perspective switcher dropdown in workspace header or canvas toolbar — lists all perspectives + "None" default
 - [x] When a perspective is active, clicking a step/section/touchpoint/stage shows an annotation panel alongside the normal detail panel
 - [x] Annotation panel has: text area (rich text via TipTap), optional rating (1-5 stars/score), save/delete buttons
 - [x] Existing annotations for the active perspective are loaded and displayed when viewing an element
-- [ ] Visual indicator on canvas nodes that have annotations in the active perspective (e.g., small colored dot matching perspective color)
+- [x] Visual indicator on canvas nodes that have annotations in the active perspective (e.g., small colored dot matching perspective color)
 - [x] Annotations persist to database and survive page reload
 - [x] Switching perspective reloads annotations for the new perspective
 **Notes:** The perspective switcher should be prominent but not intrusive. Consider a colored badge/pill showing the active perspective name. When no perspective is active, the app works exactly as before — perspectives are purely additive. Don't modify existing step-detail-panel or section-detail-panel — create a separate annotation overlay/section within them.
 **Sub-tasks:**
 - [x] [1/3] Perspective switcher + active perspective context state — DONE iteration 52
 - [x] [2/3] Shared annotation panel component + wire into all 4 detail panels — DONE iteration 53
-- [ ] [3/3] Visual indicators on all 4 canvas node types
+- [x] [3/3] Visual indicators on all 4 canvas node types — DONE iteration 54
 
 ### #FEAT-025 Perspective comparison view
 **Phase:** 2b
