@@ -58,7 +58,7 @@ export function SectionNode({ data, selected }: NodeProps) {
           )}
         </div>
         {section.summary && (
-          <p className="text-[11px] text-[var(--text-quaternary)] line-clamp-2">
+          <p className="text-[11px] text-[var(--text-tertiary)] line-clamp-2">
             {section.summary}
           </p>
         )}

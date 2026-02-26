@@ -72,7 +72,7 @@ export function StageNode({ data, selected }: NodeProps) {
           )}
         </div>
         {stage.description && (
-          <p className="text-[11px] text-[var(--text-quaternary)] line-clamp-2">
+          <p className="text-[11px] text-[var(--text-tertiary)] line-clamp-2">
             {stage.description}
           </p>
         )}

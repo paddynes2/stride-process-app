@@ -165,7 +165,7 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
             Steps ({steps.length})
           </label>
           {steps.length === 0 ? (
-            <p className="text-[11px] text-[var(--text-quaternary)]">No steps in this section</p>
+            <p className="text-[11px] text-[var(--text-tertiary)]">No steps in this section</p>
           ) : (
             <div className="flex flex-wrap gap-1.5">
               {Object.entries(statusCounts).map(([status, count]) => (

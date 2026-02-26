@@ -154,7 +154,7 @@ export function TouchpointDetailPanel({ touchpoint, onUpdate, onDelete, onClose 
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low pain, 5 = high pain</p>
+          <p className="text-[10px] text-[var(--text-tertiary)] mt-1">1 = low pain, 5 = high pain</p>
         </div>
 
         {/* Gain score */}
@@ -180,7 +180,7 @@ export function TouchpointDetailPanel({ touchpoint, onUpdate, onDelete, onClose 
               </button>
             ))}
           </div>
-          <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low gain, 5 = high gain</p>
+          <p className="text-[10px] text-[var(--text-tertiary)] mt-1">1 = low gain, 5 = high gain</p>
         </div>
 
         <Separator />

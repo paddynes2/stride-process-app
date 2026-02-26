@@ -146,7 +146,7 @@ export function StageDetailPanel({ stage, touchpoints, onUpdate, onDelete, onClo
             Touchpoints ({touchpoints.length})
           </label>
           {touchpoints.length === 0 ? (
-            <p className="text-[11px] text-[var(--text-quaternary)]">No touchpoints in this stage</p>
+            <p className="text-[11px] text-[var(--text-tertiary)]">No touchpoints in this stage</p>
           ) : (
             <div className="space-y-1.5">
               {Object.entries(sentimentCounts).map(([sentiment, count]) => (
