@@ -99,3 +99,29 @@ export interface Connection {
   target_step_id: string;
   created_at: string;
 }
+
+export interface Team {
+  id: string;
+  workspace_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Role {
+  id: string;
+  team_id: string;
+  name: string;
+  hourly_rate: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Person {
+  id: string;
+  role_id: string;
+  name: string;
+  email: string | null;
+  created_at: string;
+  updated_at: string;
+}

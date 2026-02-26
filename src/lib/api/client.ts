@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -166,4 +166,83 @@ export async function createConnection(data: {
 
 export async function deleteConnection(id: string): Promise<void> {
   await apiFetch(`/api/v1/connections/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Teams
+// ---------------------------------------------------------------------------
+
+export type TeamWithRoles = Team & { roles: RoleWithPeople[] };
+export type RoleWithPeople = Role & { people: Person[] };
+
+export async function fetchTeams(workspaceId: string): Promise<TeamWithRoles[]> {
+  return apiFetch<TeamWithRoles[]>(`/api/v1/teams?workspace_id=${workspaceId}`);
+}
+
+export async function createTeam(data: { workspace_id: string; name?: string }): Promise<Team> {
+  return apiFetch<Team>("/api/v1/teams", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateTeam(id: string, data: Partial<Pick<Team, "name">>): Promise<Team> {
+  return apiFetch<Team>(`/api/v1/teams/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTeam(id: string): Promise<void> {
+  await apiFetch(`/api/v1/teams/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Roles
+// ---------------------------------------------------------------------------
+
+export async function createRole(data: { team_id: string; name?: string; hourly_rate?: number }): Promise<Role> {
+  return apiFetch<Role>("/api/v1/roles", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateRole(id: string, data: Partial<Pick<Role, "name" | "hourly_rate">>): Promise<Role> {
+  return apiFetch<Role>(`/api/v1/roles/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteRole(id: string): Promise<void> {
+  await apiFetch(`/api/v1/roles/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// People
+// ---------------------------------------------------------------------------
+
+export async function createPerson(data: { role_id: string; name?: string; email?: string }): Promise<Person> {
+  return apiFetch<Person>("/api/v1/people", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updatePerson(id: string, data: Partial<Pick<Person, "name" | "email">>): Promise<Person> {
+  return apiFetch<Person>(`/api/v1/people/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deletePerson(id: string): Promise<void> {
+  await apiFetch(`/api/v1/people/${id}`, { method: "DELETE" });
 }
