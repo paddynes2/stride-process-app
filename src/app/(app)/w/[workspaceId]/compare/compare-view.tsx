@@ -19,6 +19,8 @@ import {
   Layers,
   ArrowRight,
   Link2,
+  FileDown,
+  Loader2,
 } from "lucide-react";
 import { StepNode } from "@/components/canvas/step-node";
 import { SectionNode } from "@/components/canvas/section-node";
@@ -228,6 +230,7 @@ function computeJourneyStats(stages: Stage[], touchpoints: Touchpoint[]) {
 
 interface CompareViewProps {
   workspaceId: string;
+  workspaceName: string;
   processTab: Tab | null;
   journeyTab: Tab | null;
   processSections: Section[];
@@ -244,6 +247,7 @@ interface CompareViewProps {
 
 export function CompareView({
   workspaceId,
+  workspaceName,
   processTab,
   journeyTab,
   processSections,
@@ -255,6 +259,10 @@ export function CompareView({
 }: CompareViewProps) {
   const hasBoth = processTab !== null && journeyTab !== null;
   const hasNeither = processTab === null && journeyTab === null;
+
+  const processCanvasRef = React.useRef<HTMLDivElement>(null);
+  const journeyCanvasRef = React.useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = React.useState(false);
 
   const processStats = React.useMemo(
     () => computeProcessStats(processSections, processSteps),
@@ -276,6 +284,30 @@ export function CompareView({
     () => new Set(nameMatches.map((m) => m.stageId)),
     [nameMatches]
   );
+
+  const handleExportPdf = React.useCallback(async () => {
+    if (!processCanvasRef.current || !journeyCanvasRef.current || !processTab || !journeyTab) return;
+    setExporting(true);
+    try {
+      const { exportComparisonPdf } = await import("@/lib/export/comparison-pdf");
+      await exportComparisonPdf({
+        workspaceName,
+        processTabName: processTab.name,
+        journeyTabName: journeyTab.name,
+        sections: processSections,
+        steps: processSteps,
+        stages: journeyStages,
+        touchpoints: journeyTouchpoints,
+        nameMatches: nameMatches.map((m) => ({ sectionName: m.sectionName, stageName: m.stageName })),
+        processCanvasElement: processCanvasRef.current,
+        journeyCanvasElement: journeyCanvasRef.current,
+      });
+    } catch (err) {
+      console.error("Comparison PDF export failed:", err);
+    } finally {
+      setExporting(false);
+    }
+  }, [workspaceName, processTab, journeyTab, processSections, processSteps, journeyStages, journeyTouchpoints, nameMatches]);
 
   if (!hasBoth) {
     return (
@@ -306,6 +338,19 @@ export function CompareView({
         <h1 className="text-base font-semibold text-[var(--text-primary)]">
           Process vs Journey Comparison
         </h1>
+        <button
+          onClick={handleExportPdf}
+          disabled={exporting}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[var(--radius)] bg-[var(--bg-surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-active)] transition-colors disabled:opacity-50"
+          aria-label="Export comparison as PDF"
+        >
+          {exporting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <FileDown className="h-3.5 w-3.5" />
+          )}
+          Export PDF
+        </button>
       </div>
 
       {/* Alignment matches bar */}
@@ -342,7 +387,7 @@ export function CompareView({
             workspaceId={workspaceId}
             accentColor="var(--accent-blue)"
           />
-          <div className="flex-1 min-h-0">
+          <div ref={processCanvasRef} className="flex-1 min-h-0">
             <ReadOnlyProcessCanvas
               sections={processSections}
               steps={processSteps}
@@ -363,7 +408,7 @@ export function CompareView({
             workspaceId={workspaceId}
             accentColor="var(--brand)"
           />
-          <div className="flex-1 min-h-0">
+          <div ref={journeyCanvasRef} className="flex-1 min-h-0">
             <ReadOnlyJourneyCanvas
               stages={journeyStages}
               touchpoints={journeyTouchpoints}

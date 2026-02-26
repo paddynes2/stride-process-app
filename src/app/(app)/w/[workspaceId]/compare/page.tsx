@@ -12,6 +12,13 @@ export default async function ComparePage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Fetch workspace name
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("name")
+    .eq("id", workspaceId)
+    .single();
+
   // Fetch all tabs to find process and journey types
   const { data: tabs } = await supabase
     .from("tabs")
@@ -56,6 +63,7 @@ export default async function ComparePage({
   return (
     <CompareView
       workspaceId={workspaceId}
+      workspaceName={workspace?.name ?? "Workspace"}
       processTab={processTab}
       journeyTab={journeyTab}
       processSections={processSections as import("@/types/database").Section[]}
