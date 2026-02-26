@@ -1000,3 +1000,32 @@
 - Efficiency (wasted actions?): 5 — targeted file reads, no wasted exploration
 - Proactive observations: 0
 **Notes:** Risk-triggered regression from iter 32 (schema change, risk=3). All 6 API routes follow exact patterns of existing sections/steps/connections. Migration 011 has proper RLS, indexes, constraints. Client wrappers use correct apiFetch patterns. Next iteration: FEAT-017 [3/4] tab type UI.
+
+## Iteration 35 — 2026-02-26
+**Task:** #FEAT-017 [3/4] Tab type UI + canvas_type routing
+**Source:** prd/FEATURES.md
+**Complexity:** M
+**Result:** completed
+**Changes:**
+- Modified: src/app/api/v1/tabs/route.ts (accept canvas_type param)
+- Modified: src/lib/api/client.ts (createTab + createStage signatures updated)
+- Modified: src/components/layout/tab-bar.tsx (dropdown menu + type icons)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/page.tsx (fetch tab, route by canvas_type)
+- Created: src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx (placeholder with empty state + summary panel)
+**Research:** Read tab-bar.tsx, page.tsx, canvas-view.tsx, tabs API route, createTab client function, dropdown-menu component, stages API route. Matched existing patterns exactly.
+**Verification:**
+- Type check: pass
+- Lint: pass (0 errors, 4 warnings — all pre-existing)
+- Build: pass (42 routes — unchanged)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean implementation following existing patterns (Radix dropdown, lucide icons, apiFetch envelope)
+- Test coverage of change: 2 — No runtime verification (Playwright unavailable). Will be exercised when [4/4] adds canvas rendering.
+- Confidence this won't regress: 5 — Process canvas path is unchanged. Journey routing is additive.
+- Efficiency (wasted actions?): 5 — Completed in single pass, one type error caught and fixed immediately (createStage missing width/height)
+- Proactive observations: 0
+**Notes:** createStage client function was missing width/height params that the API route already accepted. Fixed as part of this iteration. Next: [4/4] journey canvas rendering with stage/touchpoint nodes.

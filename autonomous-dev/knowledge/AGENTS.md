@@ -235,6 +235,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/types/database.ts` — All entity TypeScript types (incl. StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection)
 - `src/components/ui/skeleton.tsx` — Skeleton primitive (animated pulse block for loading states)
 - `src/components/ui/offline-banner.tsx` — Network offline/online banner (useSyncExternalStore)
+- `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` — Journey canvas client component (placeholder — stages + touchpoints)
 - `src/app/(app)/error.tsx` — App-level error boundary (catches component crashes)
 - `src/app/(app)/w/[workspaceId]/error.tsx` — Workspace-level error boundary
 

@@ -6,24 +6,24 @@
 
 ## Handoff
 
-- **Iteration:** 34
+- **Iteration:** 35
 - **Date:** 2026-02-26
 - **Phase:** Phase 2a — Journey Mapping
 - **Branch:** ralph/init-stride
-- **Last task:** Regression pass — verify journey canvas data layer (iterations 32-33) didn't break existing functionality
+- **Last task:** #FEAT-017 [3/4] Tab type UI — canvas_type selector on tab creation, routing by canvas_type
 - **Result:** completed
-- **Next task:** #FEAT-017 [3/4] Tab type UI — canvas_type selector on tab creation, routing by canvas_type
+- **Next task:** #FEAT-017 [4/4] Journey canvas rendering — stage nodes, touchpoint nodes, connections
 - **Blockers:** None
 
 ## Context
 
-Regression pass verified all changes from iterations 32-33 (migration 011 + 6 API routes + 9 client wrappers). All changes are purely additive — zero existing files modified except client.ts (which only gained new functions at the end). Build produces 43 routes (6 new). Type check, lint, build all pass. No regressions detected.
+Tab bar now has a dropdown for creating process or journey tabs. Each tab shows a type icon (Workflow for process, Route for journey). The page.tsx fetches the tab record first to determine canvas_type, then routes to either CanvasView (process) or JourneyCanvasView (journey). JourneyCanvasView is a functional placeholder with empty state (including "Add first stage" button that creates stages via API) and a summary panel showing counts. Sub-task [4/4] needs to add React Flow canvas with stage nodes (group) and touchpoint nodes (individual), replacing the placeholder content.
 
 FEAT-017 decomposition status:
 - [1/4] Data model + types (DONE iter 32)
 - [2/4] API routes + client wrappers (DONE iter 33)
-- [3/4] Tab type UI — canvas_type selector on tab creation (NEXT)
-- [4/4] Journey canvas rendering — stage nodes, touchpoint nodes
+- [3/4] Tab type UI + routing (DONE iter 35)
+- [4/4] Journey canvas rendering — stage nodes, touchpoint nodes (NEXT)
 
 ## Dev Server
 
@@ -34,5 +34,5 @@ FEAT-017 decomposition status:
 ## Warnings
 
 - Pre-existing hydration warning on /workspaces page (date formatting mismatch).
-- Pre-existing lint warnings (5 warnings — unchanged since iter 21).
-- Browser testing skipped — Playwright MCP unavailable (all iterations 20-34).
+- Pre-existing lint warnings (4 warnings — unchanged since iter 21).
+- Browser testing skipped — Playwright MCP unavailable (all iterations 20-35).
