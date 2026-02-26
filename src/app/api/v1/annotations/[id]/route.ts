@@ -29,6 +29,10 @@ export async function PATCH(
     return errorResponse("validation", "No valid fields to update", 400);
   }
 
+  if (updates.rating !== undefined && (typeof updates.rating !== "number" || (updates.rating as number) < 1 || (updates.rating as number) > 5)) {
+    return errorResponse("validation", "Rating must be an integer between 1 and 5", 400);
+  }
+
   const { data: annotation, error } = await supabase
     .from("perspective_annotations")
     .update(updates)

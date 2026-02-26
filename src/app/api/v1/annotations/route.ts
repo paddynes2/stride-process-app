@@ -71,6 +71,10 @@ export async function POST(request: NextRequest) {
     return errorResponse("validation", "annotatable_id is required", 400);
   }
 
+  if (rating !== undefined && (typeof rating !== "number" || rating < 1 || rating > 5)) {
+    return errorResponse("validation", "Rating must be an integer between 1 and 5", 400);
+  }
+
   const insert: Record<string, unknown> = {
     perspective_id,
     annotatable_type,
