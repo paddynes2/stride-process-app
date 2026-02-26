@@ -31,19 +31,25 @@ const MATURITY_COLORS: Record<number, string> = {
 
 export function StepNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as StepNodeData;
-  const { step } = nodeData;
+  const { step, heatMapMode } = nodeData;
+  const maturityColor = step.maturity_score != null ? MATURITY_COLORS[step.maturity_score] ?? "#6B7280" : null;
 
   return (
     <div
       className={cn(
         "px-3 py-2.5 rounded-[var(--radius-md)] border min-w-[180px] max-w-[240px]",
-        "bg-[var(--bg-surface)] shadow-[var(--shadow-sm)]",
+        "shadow-[var(--shadow-sm)]",
         "transition-all duration-[var(--duration-fast)]",
         "hover:shadow-[var(--shadow-md)] hover:border-[var(--border-default)]",
         selected
           ? "border-[var(--accent-blue)] shadow-[0_0_0_1px_var(--accent-blue)]"
           : "border-[var(--border-subtle)]"
       )}
+      style={
+        heatMapMode && maturityColor
+          ? { backgroundColor: `${maturityColor}15`, borderColor: selected ? undefined : `${maturityColor}60` }
+          : { backgroundColor: "var(--bg-surface)" }
+      }
     >
       {/* Handles */}
       <Handle

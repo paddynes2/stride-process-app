@@ -18,7 +18,7 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Plus, Square, MousePointer } from "lucide-react";
+import { Plus, Square, Thermometer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepNode } from "./step-node";
 import { SectionNode } from "./section-node";
@@ -61,21 +61,37 @@ interface FlowCanvasProps {
   onConnectionDelete: (id: string) => void;
 }
 
-function buildNodes(sections: Section[], steps: Step[], selectedStepId: string | null, selectedSectionId: string | null): Node[] {
-  const sectionNodes: Node<SectionNodeData>[] = (sections ?? []).filter(Boolean).map((section) => ({
-    id: `section-${section.id}`,
-    type: "section",
-    position: { x: section.position_x, y: section.position_y },
-    data: { section },
-    style: { width: section.width, height: section.height },
-    selected: section.id === selectedSectionId,
-  }));
+function computeSectionMaturity(sectionId: string, steps: Step[]): { avg: number | null; avgTarget: number | null } {
+  const sectionSteps = (steps ?? []).filter((s) => s.section_id === sectionId);
+  const withMaturity = sectionSteps.filter((s) => s.maturity_score != null);
+  const withTarget = sectionSteps.filter((s) => s.target_maturity != null);
+  const avg = withMaturity.length > 0
+    ? withMaturity.reduce((sum, s) => sum + s.maturity_score!, 0) / withMaturity.length
+    : null;
+  const avgTarget = withTarget.length > 0
+    ? withTarget.reduce((sum, s) => sum + s.target_maturity!, 0) / withTarget.length
+    : null;
+  return { avg, avgTarget };
+}
+
+function buildNodes(sections: Section[], steps: Step[], selectedStepId: string | null, selectedSectionId: string | null, heatMapMode: boolean): Node[] {
+  const sectionNodes: Node<SectionNodeData>[] = (sections ?? []).filter(Boolean).map((section) => {
+    const { avg, avgTarget } = computeSectionMaturity(section.id, steps);
+    return {
+      id: `section-${section.id}`,
+      type: "section",
+      position: { x: section.position_x, y: section.position_y },
+      data: { section, averageMaturity: avg, averageTargetMaturity: avgTarget, heatMapMode },
+      style: { width: section.width, height: section.height },
+      selected: section.id === selectedSectionId,
+    };
+  });
 
   const stepNodes: Node<StepNodeData>[] = (steps ?? []).filter(Boolean).map((step) => ({
     id: `step-${step.id}`,
     type: "step",
     position: { x: step.position_x, y: step.position_y },
-    data: { step, selected: step.id === selectedStepId },
+    data: { step, selected: step.id === selectedStepId, heatMapMode },
     parentId: step.section_id ? `section-${step.section_id}` : undefined,
     extent: step.section_id ? "parent" as const : undefined,
     selected: step.id === selectedStepId,
@@ -112,9 +128,11 @@ export function FlowCanvas({
   onConnectionCreate,
   onConnectionDelete,
 }: FlowCanvasProps) {
+  const [heatMapMode, setHeatMapMode] = React.useState(false);
+
   const initialNodes = React.useMemo(
-    () => buildNodes(sections, steps, selectedStepId, selectedSectionId),
-    [sections, steps, selectedStepId, selectedSectionId]
+    () => buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode),
+    [sections, steps, selectedStepId, selectedSectionId, heatMapMode]
   );
   const initialEdges = React.useMemo(() => buildEdges(connections), [connections]);
 
@@ -123,8 +141,8 @@ export function FlowCanvas({
 
   // Sync external state → React Flow state
   React.useEffect(() => {
-    setNodes(buildNodes(sections, steps, selectedStepId, selectedSectionId));
-  }, [sections, steps, selectedStepId, selectedSectionId, setNodes]);
+    setNodes(buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode));
+  }, [sections, steps, selectedStepId, selectedSectionId, heatMapMode, setNodes]);
 
   React.useEffect(() => {
     setEdges(buildEdges(connections));
@@ -334,7 +352,37 @@ export function FlowCanvas({
           <Square className="h-3.5 w-3.5" />
           Section
         </Button>
+        <Button
+          variant={heatMapMode ? "default" : "secondary"}
+          size="sm"
+          onClick={() => setHeatMapMode((prev) => !prev)}
+          title="Toggle maturity heat map"
+        >
+          <Thermometer className="h-3.5 w-3.5" />
+          Heat Map
+        </Button>
       </Panel>
+
+      {/* Heat map legend */}
+      {heatMapMode && (
+        <Panel position="bottom-left">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+            <span className="text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide mr-1">Maturity</span>
+            {[
+              { level: 1, color: "#EF4444", label: "Initial" },
+              { level: 2, color: "#F97316", label: "Developing" },
+              { level: 3, color: "#EAB308", label: "Defined" },
+              { level: 4, color: "#84CC16", label: "Managed" },
+              { level: 5, color: "#22C55E", label: "Optimized" },
+            ].map(({ level, color }) => (
+              <div key={level} className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                <span className="text-[10px] text-[var(--text-secondary)]">{level}</span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
     </ReactFlow>
   );
 }

@@ -5,10 +5,14 @@ import type { Step, Section } from "./database";
 export interface StepNodeData extends Record<string, unknown> {
   step: Step;
   selected?: boolean;
+  heatMapMode?: boolean;
 }
 
 export interface SectionNodeData extends Record<string, unknown> {
   section: Section;
+  averageMaturity: number | null;
+  averageTargetMaturity: number | null;
+  heatMapMode?: boolean;
 }
 
 export type StepNode = Node<StepNodeData, "step">;

@@ -64,6 +64,17 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
     {} as Record<string, number>
   );
 
+  // Maturity averages (exclude null values)
+  const stepsWithMaturity = steps.filter((s) => s.maturity_score != null);
+  const stepsWithTarget = steps.filter((s) => s.target_maturity != null);
+  const avgMaturity = stepsWithMaturity.length > 0
+    ? stepsWithMaturity.reduce((sum, s) => sum + s.maturity_score!, 0) / stepsWithMaturity.length
+    : null;
+  const avgTarget = stepsWithTarget.length > 0
+    ? stepsWithTarget.reduce((sum, s) => sum + s.target_maturity!, 0) / stepsWithTarget.length
+    : null;
+  const maturityGap = avgMaturity != null && avgTarget != null ? avgTarget - avgMaturity : null;
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)]">
@@ -114,6 +125,52 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
             </div>
           )}
         </div>
+
+        {/* Maturity averages */}
+        {(avgMaturity != null || avgTarget != null) && (
+          <>
+            <Separator />
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-2">
+                Maturity
+              </label>
+              <div className="space-y-2">
+                {avgMaturity != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-[var(--text-secondary)]">Current Avg</span>
+                    <span className="text-[12px] font-semibold text-[var(--text-primary)]">
+                      {avgMaturity.toFixed(1)} / 5
+                    </span>
+                  </div>
+                )}
+                {avgTarget != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-[var(--text-secondary)]">Target Avg</span>
+                    <span className="text-[12px] font-semibold text-[var(--text-primary)]">
+                      {avgTarget.toFixed(1)} / 5
+                    </span>
+                  </div>
+                )}
+                {maturityGap != null && (
+                  <div className="flex items-center justify-between pt-1 border-t border-[var(--border-subtle)]">
+                    <span className="text-[12px] text-[var(--text-secondary)]">Gap</span>
+                    <span
+                      className="text-[12px] font-semibold"
+                      style={{
+                        color: maturityGap <= 0 ? "#22C55E" : maturityGap <= 1 ? "#EAB308" : "#EF4444",
+                      }}
+                    >
+                      {maturityGap > 0 ? `+${maturityGap.toFixed(1)} levels to improve` : "On target"}
+                    </span>
+                  </div>
+                )}
+                <p className="text-[10px] text-[var(--text-quaternary)]">
+                  Based on {stepsWithMaturity.length} of {steps.length} steps scored
+                </p>
+              </div>
+            </div>
+          </>
+        )}
 
         <Separator />
 
