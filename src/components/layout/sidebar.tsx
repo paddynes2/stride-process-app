@@ -13,6 +13,7 @@ import {
   Plus,
   ChevronLeft,
   List,
+  TrendingDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,9 +29,10 @@ const NAV_ITEMS = [
   { label: "Workflows", icon: GitBranch, href: "", active: (p: string, wsId: string) => {
     // Active when on /w/{wsId} or /w/{wsId}/{tabId}
     const base = `/w/${wsId}`;
-    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list"));
+    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list") && !p.includes("/gap-analysis"));
   }},
   { label: "List View", icon: List, href: "/list" },
+  { label: "Gap Analysis", icon: TrendingDown, href: "/gap-analysis" },
   { label: "Teams", icon: Users, href: "/teams", stub: true },
   { label: "People", icon: User, href: "/people", stub: true },
   { label: "Tools", icon: Wrench, href: "/tools", stub: true },
