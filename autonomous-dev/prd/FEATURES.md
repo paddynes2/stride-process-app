@@ -339,14 +339,18 @@
 ### #FEAT-021 Process vs journey comparison view
 **Phase:** 2a
 **Priority:** P1 (important)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in-progress
 **Acceptance criteria:**
-- [ ] New "Compare" view accessible from workspace navigation (only when workspace has both process and journey tabs)
+- [x] New "Compare" view accessible from workspace navigation (only when workspace has both process and journey tabs)
 - [ ] Side-by-side layout: process canvas on left, journey canvas on right
 - [ ] Both canvases are read-only in comparison mode (click to navigate to full canvas)
 - [ ] Visual alignment hints: stages and sections that share names or are linked are highlighted
 **Notes:** This is the killer feature of journey mapping. The comparison reveals gaps between what the company does internally and what the customer experiences. The linking mechanism (stage ↔ section) can be manual or name-based.
+**Sub-tasks:**
+- [x] [1/3] Route + sidebar nav + side-by-side shell with data fetching + stats summary — DONE iteration 41
+- [ ] [2/3] Read-only React Flow canvas rendering (process left, journey right)
+- [ ] [3/3] Visual alignment hints between stages/sections with matching names
 
 ### #FEAT-022 Journey export
 **Phase:** 2a

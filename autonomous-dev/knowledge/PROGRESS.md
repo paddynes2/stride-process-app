@@ -1166,3 +1166,32 @@
 - Efficiency (wasted actions?): 4 — thorough review, could have been slightly faster
 - Proactive observations: 8 (2 bugs + 6 improvements logged)
 **Notes:** UX sweep cadence trigger (iteration 40 = 2×20). Reviewed 4 pages + 2 comparison pages. Also ran retrospective (iter 40 = multiple of 10). Key cross-cutting finding: silent `.catch(() => {})` on position updates in both process and journey canvases (4 instances total).
+
+## Iteration 41 — 2026-02-26
+**Task:** #FEAT-021 [1/3] Comparison view — route, sidebar nav, side-by-side shell with data fetching
+**Source:** prd/FEATURES.md
+**Complexity:** L (decomposed into 3 sub-tasks)
+**Result:** completed
+**Changes:**
+- Created: `src/app/(app)/w/[workspaceId]/compare/page.tsx` (server component, fetches tabs + both canvas data)
+- Created: `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` (client component, side-by-side layout with stats)
+- Created: `src/app/(app)/w/[workspaceId]/compare/loading.tsx` (skeleton loader)
+- Modified: `src/components/layout/sidebar.tsx` (added "Compare" nav item with Split icon)
+- Modified: `src/app/(app)/w/[workspaceId]/workspace-shell.tsx` (excluded "compare" from tab ID detection)
+**Research:** Read sidebar.tsx (nav patterns), workspace-shell.tsx (tab ID exclusion list), gap-analysis/page.tsx (server data fetch pattern), [tabId]/page.tsx (process/journey routing pattern), workspace-context.tsx (context provider), database.ts (all entity types), maturity.ts + pain.ts (color helpers).
+**Verification:**
+- Type check: pass (1 fix — lucide icon style prop, wrapped in span)
+- Lint: pass (0 errors, 6 warnings — all pre-existing)
+- Build: pass (new /w/[workspaceId]/compare route visible in output)
+- Unit tests: N/A
+- Browser test: skipped (Playwright MCP unavailable)
+- Canary test: skipped (Playwright MCP unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Follows existing patterns exactly (gap-analysis page pattern for server data fetch, sidebar nav pattern, workspace-shell tab exclusion)
+- Test coverage of change: 2 — No runtime verification. Type check + build verify compilation.
+- Confidence this won't regress: 5 — All changes additive. No existing code paths affected. Sidebar nav addition, new route.
+- Efficiency (wasted actions?): 5 — Completed in single pass, one type error fix.
+- Proactive observations: 0
+**Notes:** Decomposed FEAT-021 into 3 sub-tasks. [1/3] sets up the routing, navigation, data fetching, and stats summary shell. [2/3] will add React Flow read-only canvases. [3/3] will add visual alignment hints. Human has added Phase 2b/2c/3 roadmap specs to autonomous-dev files (not committed here).

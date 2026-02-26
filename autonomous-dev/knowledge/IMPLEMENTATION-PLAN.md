@@ -25,7 +25,7 @@ The following are NOT phases — they're recurring activities woven into the loo
 
 ---
 
-## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-020 DONE, UX sweep iter 40, FEAT-021 next)
+## Current Phase: Phase 2a — Journey Mapping (IN PROGRESS — FEAT-021 [1/3] DONE iter 41, [2/3] read-only canvases next)
 
 <!-- Agent: update this line every iteration to reflect where you are. -->
 
@@ -312,3 +312,4 @@ Tasks (in priority order — detailed specs in FEATURES.md):
 - [2026-02-26] Iteration 38: FEAT-019 complete (touchpoint detail panel). Mirrors stage-detail-panel: name, sentiment toggle, pain/gain scores, emotion, notes (TipTap). Next: FEAT-020 journey heat map.
 - [2026-02-26] Iteration 39: FEAT-020 complete (journey heat map). Pain score coloring with stage roll-up. Created pain.ts constants. Mirrors process canvas heat map exactly. Next: FEAT-021 comparison view.
 - [2026-02-26] Iteration 40: UX sweep (cadence trigger). Reviewed 4 pages + 2 comparison pages. Found 2 P2 a11y bugs (BUG-010, BUG-011: text-quaternary used for functional content) and 6 improvements (IMP-003 through IMP-008). Retrospective completed. Next: FEAT-021 or BUG-010/011.
+- [2026-02-26] Iteration 41: FEAT-021 [1/3] complete (comparison view shell). New /compare route, sidebar nav, side-by-side layout with stats summaries, server-side data fetching for both canvas types. Decomposed into 3 sub-tasks. [2/3] read-only canvases and [3/3] alignment hints remain. Human added Phase 2b/2c/3 detailed specs to FEATURES.md and IMPLEMENTATION-PLAN.md.

@@ -69,6 +69,7 @@ src/
 │   │   │   ├── [tabId]/     — Canvas view (canvas-view.tsx + page.tsx)
 │   │   │   ├── list/        — Step list view (step-list-view.tsx)
 │   │   │   ├── gap-analysis/ — Gap analysis view (gap-analysis-view.tsx)
+│   │   │   ├── compare/     — Process vs journey comparison view (compare-view.tsx)
 │   │   │   ├── settings/    — Workspace settings
 │   │   │   ├── teams/       — Teams page (stub → Phase 1 CRUD)
 │   │   │   ├── people/      — Stub page (Phase 1+)
@@ -241,6 +242,7 @@ Normalized tables (NOT JSONB blob). Canvas reconstructs React Flow nodes/edges f
 - `src/components/panels/stage-detail-panel.tsx` — Stage detail panel (name, channel, owner, description, touchpoint summary, delete) — mirrors section-detail-panel.tsx
 - `src/components/panels/touchpoint-detail-panel.tsx` — Touchpoint detail panel (name, sentiment, pain/gain scores, customer emotion, notes, delete) — mirrors stage-detail-panel.tsx
 - `src/lib/pain.ts` — Pain scoring constants (PAIN_COLORS, PAIN_LEVELS, getPainColor) — inverted from maturity (1=green, 5=red)
+- `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` — Process vs journey comparison view (side-by-side stats, section/stage lists with maturity/pain badges, sentiment bar)
 - `src/app/(app)/error.tsx` — App-level error boundary (catches component crashes)
 - `src/app/(app)/w/[workspaceId]/error.tsx` — Workspace-level error boundary
 

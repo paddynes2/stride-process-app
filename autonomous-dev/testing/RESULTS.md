@@ -8,12 +8,12 @@
 
 ## Last Smoke Test
 
-- **Iteration:** 19
+- **Iteration:** 41
 - **Date:** 2026-02-26
 - **Result:** pass (static only — Playwright MCP unavailable)
 - **Pages checked:** 0 (browser testing skipped)
 - **Errors found:** 0
-- **Note:** FEAT-009 [3/3] (public read-only view). Type-check, lint, build all pass. New /public/[shareId] route with read-only canvas. Browser testing deferred — Playwright MCP unavailable. Phase 1 complete.
+- **Note:** FEAT-021 [1/3] (comparison view shell). Type-check, lint (0 errors), build all pass. New /w/[workspaceId]/compare route with side-by-side layout. Browser testing deferred — Playwright MCP unavailable.
 
 ## Last Navigation Suite
 
