@@ -23,11 +23,10 @@
   - **Where:** All perspective + annotation API routes (POST/PATCH/DELETE)
   - **Fix applied:** Added PGRST116 detection in all mutation handlers. POST→403, PATCH/DELETE→404. DELETE routes now use `.select().single()` to detect 0-row deletes.
 
-- [ ] #BUG-014 No `annotatable_type` enum validation in annotation API routes — Attempts: 0
+- [x] #BUG-014 No `annotatable_type` enum validation in annotation API routes — DONE iteration 60, 2026-02-26
   - **Found:** Iteration 57 (quality audit)
   - **Where:** `src/app/api/v1/annotations/route.ts` POST handler
-  - **Impact:** API accepts any string for `annotatable_type` (e.g., "banana"). DB has a PostgreSQL enum constraint, so the INSERT will fail with an opaque 500 error instead of a helpful 400 validation error.
-  - **Fix:** Add validation: `const VALID_TYPES = ["step", "section", "touchpoint", "stage"]; if (!VALID_TYPES.includes(annotatable_type)) return errorResponse("validation", "Invalid annotatable_type", 400);`
+  - **Fix applied:** Added typed `VALID_ANNOTATABLE_TYPES` constant (from `AnnotatableType`) and validation guard before DB insert. Returns 400 with descriptive message listing valid values.
 
 ### P2 (Degraded UX)
 

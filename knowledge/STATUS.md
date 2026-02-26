@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 59
-- **Date:** 2026-02-26 22:00
+- **Iteration:** 60
+- **Date:** 2026-02-26 23:00
 - **Phase:** Bug fixes before Phase 3
 - **Branch:** ralph/init-stride
-- **Last task:** #BUG-013 Detect RLS-denied mutations in perspective/annotation API routes
+- **Last task:** #BUG-014 Add annotatable_type enum validation in annotation POST route
 - **Result:** completed
-- **Next task:** Fix #BUG-014 (No annotatable_type enum validation in annotation API) — P1 bug
+- **Next task:** Fix #BUG-015 (rating range validation in annotation POST/PATCH routes) — P2 bug
 - **Blockers:** None
 
 ## Context
 
-Added PGRST116 error code detection to all perspective and annotation mutation routes (POST, PATCH, DELETE). POST routes return 403 when RLS silently blocks inserts. PATCH/DELETE routes return 404 ("not found or not accessible") for either missing IDs or RLS-blocked access. DELETE routes now chain `.select().single()` so empty deletes produce a detectable PGRST116 error instead of silent success. Four files touched: `src/app/api/v1/perspectives/route.ts`, `perspectives/[id]/route.ts`, `annotations/route.ts`, `annotations/[id]/route.ts`. Two P1 bugs remain: BUG-014 (enum validation) and BUG-016 was reclassified as P2.
+Added `annotatable_type` enum validation to the annotation POST handler in `src/app/api/v1/annotations/route.ts`. Uses a typed constant `VALID_ANNOTATABLE_TYPES` (imported `AnnotatableType` from `database.ts`) to reject invalid values with a 400 before reaching the DB. The pattern is: validate enum → return 400 with descriptive message. All P1 bugs (BUG-012, 013, 014) are now resolved. Two P2 bugs remain: BUG-015 (rating range validation) and BUG-016 (silent annotation fetch error).
 
 ## Dev Server
 
@@ -24,5 +24,5 @@ Added PGRST116 error code detection to all perspective and annotation mutation r
 - 5 pre-existing lint warnings in flow-canvas.tsx, journey-canvas-view.tsx, sidebar.tsx (unchanged)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation) — static verification only
-- 1 P1 bug remaining: BUG-014 (annotatable_type enum validation)
+- Accessibility cadence (iter 60) deferred — Playwright unavailable for meaningful a11y testing
 - 2 P2 bugs remaining: BUG-015, BUG-016

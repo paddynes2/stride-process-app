@@ -1,1 +1,1 @@
-CONTINUE: Fix #BUG-014 No annotatable_type enum validation in annotation API
+CONTINUE: Fix #BUG-015 No rating range validation before DB insert (annotations)

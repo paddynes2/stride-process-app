@@ -152,3 +152,27 @@
 - Efficiency (wasted actions?): 4 — had to fix lint warnings from unused destructured vars (minor)
 - Proactive observations: 0
 **Notes:** PGRST116 is PostgREST's error code for ".single() with 0 rows". INSERT routes return 403 (RLS blocked creation). PATCH/DELETE return 404 (not found or not accessible — avoids information leakage about resource existence). DELETE routes now chain .select().single() to make 0-row deletes detectable.
+
+## Iteration 60 — 2026-02-26 23:00
+**Task:** #BUG-014 Add annotatable_type enum validation in annotation POST route
+**Source:** prd/BUGS.md
+**Complexity:** S
+**Result:** completed
+**Changes:** src/app/api/v1/annotations/route.ts (7 lines added)
+**Research:** Read annotations/route.ts, annotations/[id]/route.ts, types/database.ts, migration 012. Confirmed AnnotatableType enum exists in both TS types and DB schema.
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (5 pre-existing warnings, 0 errors, 0 new warnings)
+- Build: pass (all routes compile)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright MCP unavailable — static verification only)
+- Canary test: skipped (Playwright unavailable)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — type-safe constant from AnnotatableType, follows existing validation pattern
+- Test coverage of change: 2 — no browser test, verified via type check + lint + build only
+- Confidence this won't regress: 5 — additive guard clause only, no existing behavior changed for valid inputs
+- Efficiency (wasted actions?): 5 — minimal research needed, single-file fix
+- Proactive observations: 0
+**Notes:** All P1 bugs (BUG-012, 013, 014) now resolved. Only P2 bugs remain (BUG-015, BUG-016). Accessibility cadence (iter 60) deferred due to Playwright unavailability.
