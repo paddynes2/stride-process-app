@@ -64,12 +64,51 @@ Prioritized features:
 - [x] #FEAT-030 Tools page (flesh out stub) — DONE iteration 67
   - [x] [1/2] Data model + types + API routes + client functions — DONE iteration 66
   - [x] [2/2] Tools page UI (CRUD view, remove sidebar stub badge) — DONE iteration 67
-- [ ] #FEAT-031 Step list bulk actions
-- [ ] #FEAT-032 Workspace templates
+- [ ] #FEAT-031 Step list bulk actions — **DEFERRED** (per human feedback)
+- [ ] #FEAT-032 Workspace templates — **DEFERRED** (per human feedback)
 
-Deferred to Phase 4+:
+## Phase 3a: Analysis Intelligence — PENDING
+**Target iterations:** 70+
+**Depends on:** Human course correction processed
+
+Core consulting insight features:
+- [ ] #FEAT-033 Perspective comparison view
+- [ ] #FEAT-034 Prioritization matrix (effort/impact scoring + quadrant chart)
+- [ ] #FEAT-035 Improvement ideas tracker (proposals → approval → completion)
+- [ ] #FEAT-036 AI process analysis (Anthropic API, structured bottleneck/redundancy/automation analysis)
+- [ ] #FEAT-037 AI gap narrative generator (consulting-grade summary text)
+- [ ] #FEAT-038 AI improvement suggestions (bridges AI analysis → improvement tracker)
+- [ ] #FEAT-039 Phase 3a testing gate (full regression + new features)
+
+## Phase 3b: Tools Canvas + Enhanced Export — PENDING
+**Depends on:** Phase 3a complete
+
+- [ ] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape)
+- [ ] #FEAT-041 Tool detail panel + step-tool assignment (junction table, cost integration)
+- [ ] #FEAT-042 Tool overlap and gap analysis (client-side computation)
+- [ ] #FEAT-043 Enhanced PDF export — multi-section report (4 sub-tasks)
+  - [ ] [1/4] Export dialog UI with section toggles and presets
+  - [ ] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison
+  - [ ] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights
+  - [ ] [4/4] Page numbers, table of contents, consistent styling
+- [ ] #FEAT-044 Phase 3b testing gate
+
+## Phase 4: The Living Playbook — PENDING
+**Depends on:** Phase 3b complete
+
+- [ ] #FEAT-045 Comments system (threaded, categorized: note/decision/pain_point/idea/question)
+- [ ] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder)
+- [ ] #FEAT-047 Runbook instances (turn sections into executable checklists)
+- [ ] #FEAT-048 Playbook mode (distraction-free runbook execution view)
+- [ ] #FEAT-049 Activity log (audit trail for consulting engagements)
+- [ ] #FEAT-050 Workspace cloning (deep copy for reuse)
+- [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting)
+- [ ] #FEAT-052 Section templates (save & deploy)
+- [ ] #FEAT-053 Phase 4 testing gate
+
+Deferred indefinitely:
 - Versioning / snapshot history for canvases
-- Collaboration (real-time or async comments)
+- Real-time collaboration
 - Advanced permissions (workspace-level roles beyond org member)
 
 ## Amendments
@@ -84,3 +123,4 @@ Deferred to Phase 4+:
 - [2026-02-26] Iteration 67: Tools page UI complete. #FEAT-030 fully done. Sidebar stub badge removed. Next: #FEAT-028 search/filtering or #FEAT-031 bulk actions.
 - [2026-02-26] Iteration 68: #FEAT-028 [1/2] done — search & filter added to People and Tools views. [2/2] Teams view remaining.
 - [2026-02-26] Iteration 69: #FEAT-028 [2/2] done — search & filter added to Teams view with hierarchical matching. #FEAT-028 fully complete. Next: #FEAT-031 bulk actions.
+- [2026-02-27] **HUMAN COURSE CORRECTION:** Product owner reviewed iterations 55-69. Agent built utility features (dashboard, search, people/tools CRUD) instead of high-value consulting features. Phase 3 (Advanced Features) STOPPED. FEAT-031 and FEAT-032 deferred. New phases added: Phase 3a (Analysis Intelligence, FEAT-033-039), Phase 3b (Tools Canvas + Enhanced Export, FEAT-040-044), Phase 4 (The Living Playbook, FEAT-045-053). Next task: FEAT-033. See knowledge/FEEDBACK.md for full override details.
