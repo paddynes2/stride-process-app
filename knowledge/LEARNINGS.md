@@ -22,6 +22,10 @@
 - **Supabase RLS silent mutations:** INSERT/UPDATE/DELETE filtered by RLS don't throw errors — they affect 0 rows silently. API routes must check if `data` is null after mutations and return 403 explicitly. Otherwise clients think operations succeeded when they didn't.
 - **Polymorphic FK limitation:** `annotatable_id` in `perspective_annotations` has no FK constraint because it points to different tables depending on `annotatable_type`. Orphaned annotations accumulate when parent entities are deleted. Consider a cleanup trigger or periodic sweep.
 
+## Environment
+
+- **Playwright MCP unavailable — not a dev server issue:** Playwright MCP has been unavailable since iteration 56. In Phase 0 (Preflight) step 3, if Playwright can't navigate, this is a TOOL LIMITATION, not a dev server outage. Do NOT write "DEV SERVER DOWN" to SIGNAL. Instead: verify the dev server is running via `curl http://localhost:3000` or `lsof -i :3000`, note "Playwright MCP unavailable" in STATUS.md warnings, and continue. The dev server is likely fine.
+
 ## Meta
 
 - **Pre-existing lint warnings:** 5 warnings in flow-canvas.tsx (unused import, missing hook deps) and sidebar.tsx (unused import). These are known and acceptable.
