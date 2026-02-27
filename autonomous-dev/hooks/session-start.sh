@@ -16,8 +16,17 @@
 # ═══════════════════════════════════════════════════════════════════════════
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-STATUS_FILE="$SCRIPT_DIR/knowledge/STATUS.md"
-SIGNAL_FILE="$SCRIPT_DIR/knowledge/SIGNAL"
+
+# Source config to get PROJECT_ROOT (where Ralph actually reads/writes knowledge files)
+if [ -f "$SCRIPT_DIR/ralph.conf" ]; then
+  source "$SCRIPT_DIR/ralph.conf"
+else
+  echo "WARNING: ralph.conf not found at $SCRIPT_DIR/ralph.conf — falling back to SCRIPT_DIR"
+  PROJECT_ROOT="$SCRIPT_DIR"
+fi
+
+STATUS_FILE="$PROJECT_ROOT/knowledge/STATUS.md"
+SIGNAL_FILE="$PROJECT_ROOT/knowledge/SIGNAL"
 
 # ─── Print Context Header ─────────────────────────────────────────────────
 

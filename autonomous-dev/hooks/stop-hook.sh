@@ -17,9 +17,18 @@
 
 # Path to the autonomous-dev directory (adjust for your setup)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-STATUS_FILE="$SCRIPT_DIR/knowledge/STATUS.md"
-PROGRESS_FILE="$SCRIPT_DIR/knowledge/PROGRESS.md"
-SIGNAL_FILE="$SCRIPT_DIR/knowledge/SIGNAL"
+
+# Source config to get PROJECT_ROOT (where Ralph actually reads/writes knowledge files)
+if [ -f "$SCRIPT_DIR/ralph.conf" ]; then
+  source "$SCRIPT_DIR/ralph.conf"
+else
+  echo "WARNING: ralph.conf not found at $SCRIPT_DIR/ralph.conf — falling back to SCRIPT_DIR"
+  PROJECT_ROOT="$SCRIPT_DIR"
+fi
+
+STATUS_FILE="$PROJECT_ROOT/knowledge/STATUS.md"
+PROGRESS_FILE="$PROJECT_ROOT/knowledge/PROGRESS.md"
+SIGNAL_FILE="$PROJECT_ROOT/knowledge/SIGNAL"
 
 ERRORS=()
 
@@ -70,7 +79,7 @@ fi
 
 # ─── Check METRICS.jsonl was updated (warning only) ─────────────────────
 
-METRICS_FILE="$SCRIPT_DIR/knowledge/METRICS.jsonl"
+METRICS_FILE="$PROJECT_ROOT/knowledge/METRICS.jsonl"
 if [ -f "$METRICS_FILE" ]; then
   TODAY=$(date '+%Y-%m-%d')
   if ! grep -q "$TODAY" "$METRICS_FILE" 2>/dev/null; then
