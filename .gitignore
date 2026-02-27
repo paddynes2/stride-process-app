@@ -41,7 +41,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-.env.local
 .supabase
 
-.vercel
+# claude code
+.claude/
+
+# playwright MCP artifacts
+.playwright-mcp/
+
+# test screenshots
+gap-analysis-screenshot.png
+heatmap-test.png
