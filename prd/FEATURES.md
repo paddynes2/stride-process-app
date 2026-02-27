@@ -35,7 +35,7 @@
 - [x] #FEAT-025 Phase 2b completion testing: regression suite — DONE iteration 56, 2026-02-26
 - [x] #FEAT-026 Phase 2b completion testing: quality audit — DONE iteration 57, 2026-02-26
 
-## Phase 3: Advanced Features — IN PROGRESS
+## Phase 3: Advanced Features — PAUSED (remaining items deferred)
 - [x] #FEAT-027 Dashboard / workspace overview page — DONE iteration 63, 2026-02-26
 - [x] #FEAT-028 Search & filtering across all entity types (steps, sections, stages, touchpoints) — DONE iteration 69, 2026-02-26
   - [x] [1/2] Search & filter for People and Tools views — DONE iteration 68, 2026-02-26

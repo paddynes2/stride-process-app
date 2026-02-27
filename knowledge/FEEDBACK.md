@@ -27,11 +27,16 @@ instead of the high-value consulting features that make Stride a differentiated 
 
 5. **After processing this feedback**, update STATUS.md to reflect the phase change and set your next task to FEAT-033. Add an amendment to IMPLEMENTATION-PLAN.md noting the course correction.
 
+6. **Cadence deferral:** The accessibility cadence floor that would trigger at iteration 70 is DEFERRED to iteration 72. Your first task after processing this feedback MUST be FEAT-033, not a testing cadence. Note the deferral in STATUS.md warnings.
+
+7. **Already done for you:** FEAT-031 and FEAT-032 are already marked deferred in `prd/FEATURES.md`. The amendment is already in `knowledge/IMPLEMENTATION-PLAN.md`. STATUS.md is already updated. You do NOT need to redo these — just verify they look correct, note "already applied by human" in your PROGRESS.md, and proceed to building FEAT-033.
+
 This feedback item should be moved to Processed after you have:
-- Marked FEAT-031 and FEAT-032 as deferred
-- Updated STATUS.md with the new phase
-- Added an amendment to IMPLEMENTATION-PLAN.md
+- Verified FEAT-031 and FEAT-032 are marked deferred (already done)
+- Verified STATUS.md reflects Phase 3a (already done)
+- Verified amendment exists in IMPLEMENTATION-PLAN.md (already done)
 - Set SIGNAL to CONTINUE with FEAT-033
+- Started building FEAT-033 in this same iteration
 
 ## Processed
 

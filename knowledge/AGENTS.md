@@ -167,6 +167,14 @@ Types: step, section, touchpoint, stage.
 - Never sort prop arrays directly — use `[...arr].sort()`
 - Canvas arrays: `(arr ?? []).filter(Boolean)` before `.map()`
 
+## PRD File Rules (permanent)
+<!-- Added by human, 2026-02-27. DO NOT remove this section. -->
+
+- **DO NOT restructure, reformat, or rewrite `prd/FEATURES.md` or `knowledge/IMPLEMENTATION-PLAN.md`.**
+- Permitted modifications: mark tasks done/in-progress, add sub-tasks, increment attempt counters, append amendments.
+- DO NOT delete features, change feature numbers, rewrite section headers, compress format, or create new feature IDs in Phase 3a/3b/4 sections.
+- New features (if needed) go in Phase 5+ with IDs from TASK-COUNTER.json.
+
 ## Color System
 <!-- Updated: iter-55, 2026-02-26 -->
 
