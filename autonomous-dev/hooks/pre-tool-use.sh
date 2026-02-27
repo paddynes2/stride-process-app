@@ -26,25 +26,25 @@ if echo "$TOOL_INPUT" | grep -qiE '\.env\b|\.env\.|credentials|secrets|\.pem|\.k
   if echo "$TOOL_INPUT" | grep -qiE '\.env\.example|\.env\.template'; then
     exit 0
   fi
-  echo "BLOCKED: Accessing secrets/credentials files. Ralph loop rule #11: Never modify .env files."
+  echo "BLOCKED: Accessing secrets/credentials files. Ralph loop rule #13: Never modify .env files."
   exit 2
 fi
 
 # Block git push (ralph loop is local-only)
 if echo "$TOOL_INPUT" | grep -qE 'git\s+push'; then
-  echo "BLOCKED: git push is not allowed in the ralph loop. Rule #12: Never push to remote."
+  echo "BLOCKED: git push is not allowed in the ralph loop. Rule #14: Never push to remote."
   exit 2
 fi
 
 # Block git add . and git add -A (must add specific files)
 if echo "$TOOL_INPUT" | grep -qE 'git\s+add\s+(-A|\.)'; then
-  echo "BLOCKED: Use 'git add <specific files>' instead. Rule #14: Never use git add . or git add -A."
+  echo "BLOCKED: Use 'git add <specific files>' instead. Rule #16: Never use git add . or git add -A."
   exit 2
 fi
 
 # Block destructive rm -rf on broad paths
 if echo "$TOOL_INPUT" | grep -qE 'rm\s+-rf\s+(/|~|\.\.|\./)'; then
-  echo "BLOCKED: Destructive rm -rf on broad path. Rule #13: Never delete files unless PRD says to."
+  echo "BLOCKED: Destructive rm -rf on broad path. Rule #15: Never delete files unless PRD says to."
   exit 2
 fi
 
@@ -68,7 +68,7 @@ if echo "$TOOL_INPUT" | grep -qE 'PROMPT\.md'; then
   fi
   # Block writing/editing
   if echo "$TOOL_INPUT" | grep -qE '(sed|awk|>>|>)\s.*PROMPT\.md'; then
-    echo "BLOCKED: PROMPT.md is immutable during the ralph loop. Rule #10: Never modify PROMPT.md."
+    echo "BLOCKED: PROMPT.md is immutable during the ralph loop. Rule #12: Never modify PROMPT.md."
     exit 2
   fi
 fi
