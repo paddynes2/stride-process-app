@@ -28,9 +28,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONF_FILE="$SCRIPT_DIR/ralph.conf"
 PROMPT_FILE="$SCRIPT_DIR/PROMPT.md"
 LOG_FILE="$SCRIPT_DIR/ralph.log"
-SIGNAL_FILE="$SCRIPT_DIR/knowledge/SIGNAL"
-PROGRESS_FILE="$SCRIPT_DIR/knowledge/PROGRESS.md"
-STATUS_FILE="$SCRIPT_DIR/knowledge/STATUS.md"
 
 # ─── Load Configuration ──────────────────────────────────────────────────
 
@@ -54,6 +51,15 @@ LOOP_CIRCUIT_BREAKER="${LOOP_CIRCUIT_BREAKER:-3}"
 LOOP_SLEEP_BETWEEN="${LOOP_SLEEP_BETWEEN:-2}"
 GIT_BRANCH_PREFIX="${GIT_BRANCH_PREFIX:-ralph}"
 GIT_TAG_PREFIX="${GIT_TAG_PREFIX:-ralph-iter}"
+
+# ─── Knowledge file paths (must be AFTER conf is sourced for PROJECT_ROOT) ──
+# NOTE: These point at PROJECT_ROOT/knowledge/, NOT SCRIPT_DIR/knowledge/.
+# Ralph (Claude) reads/writes knowledge/ relative to PROJECT_ROOT.
+# ralph.sh must read from the same paths so signal, circuit breaker, and
+# session tracking all work against the live files, not stale copies.
+SIGNAL_FILE="$PROJECT_ROOT/knowledge/SIGNAL"
+PROGRESS_FILE="$PROJECT_ROOT/knowledge/PROGRESS.md"
+STATUS_FILE="$PROJECT_ROOT/knowledge/STATUS.md"
 
 # ─── Parse Arguments ──────────────────────────────────────────────────────
 
@@ -151,7 +157,7 @@ get_consecutive_failures() {
 
 check_signal() {
   # Human override file — Claude never touches this one
-  local human_signal_file="$SCRIPT_DIR/knowledge/HUMAN_SIGNAL"
+  local human_signal_file="$PROJECT_ROOT/knowledge/HUMAN_SIGNAL"
   if [ -f "$human_signal_file" ]; then
     local hsig
     hsig=$(cat "$human_signal_file" 2>/dev/null || echo "")
@@ -460,7 +466,7 @@ fi
 # ─── Dashboard Functions ──────────────────────────────────────────────────
 
 dashboard_from_metrics() {
-  local metrics_file="$SCRIPT_DIR/knowledge/METRICS.jsonl"
+  local metrics_file="$PROJECT_ROOT/knowledge/METRICS.jsonl"
   local total success_count streak circuit_trips
 
   total=$(wc -l < "$metrics_file")
@@ -568,7 +574,7 @@ dashboard_from_progress() {
 }
 
 do_dashboard() {
-  local metrics_file="$SCRIPT_DIR/knowledge/METRICS.jsonl"
+  local metrics_file="$PROJECT_ROOT/knowledge/METRICS.jsonl"
   if [ -f "$metrics_file" ] && [ -s "$metrics_file" ]; then
     dashboard_from_metrics
   elif [ -f "$PROGRESS_FILE" ]; then
@@ -584,7 +590,7 @@ do_dashboard() {
 write_session_summary() {
   local end_iter session_history_file start_tag end_tag commits
   end_iter=$(get_iteration_count)
-  session_history_file="$SCRIPT_DIR/knowledge/SESSION-HISTORY.md"
+  session_history_file="$PROJECT_ROOT/knowledge/SESSION-HISTORY.md"
 
   # Only write if iterations were completed
   if [ "$end_iter" -le "$SESSION_START_ITER" ]; then
