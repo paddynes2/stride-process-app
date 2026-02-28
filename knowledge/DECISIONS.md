@@ -13,3 +13,9 @@
 **Options:** (A) Separate junction table per entity type, (B) Polymorphic (annotatable_type, annotatable_id)
 **Decision:** Polymorphic — single `perspective_annotations` table with type+id columns
 **Trade-off:** No foreign key enforcement on annotatable_id, but simpler schema and API
+
+## D-003 — Reuse annotatable_type enum for comments (Phase 4, Iteration 71)
+**Context:** Comments target the same entity types as annotations (step/section/touchpoint/stage)
+**Options:** (A) Create new `commentable_type` enum with same values, (B) Reuse existing `annotatable_type` enum
+**Decision:** Reuse `annotatable_type` — comments table uses the same Postgres enum
+**Trade-off:** Tight coupling between comments and annotations at the DB level, but avoids duplicating identical enum values. If comment targets ever diverge from annotation targets, a migration would be needed.

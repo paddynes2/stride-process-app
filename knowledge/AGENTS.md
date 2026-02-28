@@ -66,6 +66,7 @@ npx supabase db push     # Push migrations
 - `shares/route.ts` + `[id]/route.ts` — CRUD
 - `perspectives/route.ts` + `[id]/route.ts` — CRUD
 - `annotations/route.ts` + `[id]/route.ts` — CRUD
+- `comments/route.ts` + `[id]/route.ts` — CRUD (GET filterable, POST, PATCH, DELETE)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
 
 ### Components
@@ -97,7 +98,7 @@ npx supabase db push     # Push migrations
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation + enums |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment + enums (CommentCategory, CommentableType) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types |
 | `src/types/index.ts` | Re-exports |
 
@@ -122,6 +123,7 @@ npx supabase db push     # Push migrations
 | 011 | Journey canvas (canvas_type, stages, touchpoints, touchpoint_connections) |
 | 012 | Perspectives + perspective_annotations |
 | 013 | Tools table + RLS policies |
+| 014 | Comments table + comment_category enum + RLS (reuses annotatable_type) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->

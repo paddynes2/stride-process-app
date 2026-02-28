@@ -1,10 +1,10 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 64
-- **Date:** 2026-02-26
-- **Suite:** Regression (cadence floor — every 8th iteration)
-- **Method:** Static analysis via 3 parallel Explore agents + API probing via curl
+- **Iteration:** 71
+- **Date:** 2026-02-28
+- **Suite:** Build verification (typecheck + lint + build)
+- **Method:** npx tsc --noEmit, npm run lint, npm run build — all pass
 
 ## Suite Results
 

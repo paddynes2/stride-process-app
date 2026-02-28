@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 70,
-  "date": "2026-02-28T00:00:00Z",
+  "iteration": 71,
+  "date": "2026-02-28T18:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "b48f07f",
+    "last_commit_hash": "09d4b1b43a329f0b741fc9e8b589125a18d65d83",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,79 +13,83 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-033",
-      "description": "Perspective comparison view — new page at /w/[workspaceId]/perspectives/compare with two perspective selectors, comparison table showing annotations side-by-side, divergence highlighting (2+ point rating gap), summary stats, element navigation links, and sidebar nav entry",
+      "id": "#FEAT-045",
+      "description": "Comments system — data model + types + API routes + client wrappers [1/3]",
       "source": "prd/FEATURES.md",
       "type": "build",
-      "phase": "Phase 3a: Analysis Intelligence",
-      "complexity": "L",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
       "attempts": 1,
-      "risk_score": 2,
+      "risk_score": 3,
       "acceptance_criteria": [
-        "New page at /w/[workspaceId]/perspectives/compare — only visible when 2+ perspectives exist with annotations",
-        "Two dropdown selectors at top to pick which perspectives to compare",
-        "Table layout: rows = annotated elements (steps/sections/touchpoints/stages), columns = each perspective's annotation text + rating",
-        "Divergence highlighting: rows where ratings differ by 2+ points get amber background",
-        "Summary stats at top: annotation count per perspective, average rating, divergence count, top 3 most divergent elements",
-        "Clicking element name navigates to that element on the correct canvas",
-        "Sidebar nav entry for Perspectives Compare (only shown when 2+ perspectives exist)",
-        "Type check, lint, build pass"
+        "New migration 014_comments.sql creates: comment_category enum (note/decision/pain_point/idea/question), commentable_type enum reusing annotatable_type or new enum (step/section/touchpoint/stage), comments table with id, workspace_id, commentable_type, commentable_id, parent_id (nullable self-FK for threading), author_id (FK users), content (text NOT NULL), category (comment_category NOT NULL DEFAULT 'note'), is_resolved (boolean NOT NULL DEFAULT false), created_at, updated_at",
+        "RLS policies on comments table using can_access_workspace(workspace_id) — SELECT/INSERT/UPDATE/DELETE",
+        "Updated_at trigger, indexes on workspace_id, commentable_type+commentable_id, parent_id",
+        "Comment and CommentCategory types added to src/types/database.ts, re-exported from index.ts",
+        "CommentableType type added (reuse AnnotatableType or define separately — prefer reuse if identical enum values)",
+        "API route GET /api/v1/comments — filterable by workspace_id (required), commentable_type, commentable_id, category, is_resolved. Returns Comment[] ordered by created_at asc",
+        "API route POST /api/v1/comments — creates comment with validation (workspace_id required, commentable_type validated, content required). Sets author_id from session user. Returns 201",
+        "API route PATCH /api/v1/comments/[id] — updates content, category, is_resolved. Returns updated comment",
+        "API route DELETE /api/v1/comments/[id] — deletes comment (cascades to replies via parent_id FK). Returns 204",
+        "Client wrappers in lib/api/client.ts: fetchComments(workspaceId, filters?), createComment(data), updateComment(id, data), deleteComment(id)",
+        "All API routes check for null data after mutations (RLS silent mutation pattern from BUG-013)",
+        "Type check passes, lint passes, build passes"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/perspectives/**",
-        "src/components/layout/sidebar.tsx"
+        "supabase/migrations/014_comments.sql",
+        "src/app/api/v1/comments/route.ts",
+        "src/app/api/v1/comments/[id]/route.ts",
+        "src/types/database.ts",
+        "src/lib/api/client.ts"
       ],
       "files_read_only": [
-        "src/types/database.ts",
-        "src/lib/api/client.ts",
-        "src/lib/context/workspace-context.tsx",
-        "src/app/(app)/w/[workspaceId]/compare/page.tsx",
-        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx",
-        "src/components/layout/header.tsx"
+        "src/lib/api/response.ts",
+        "src/lib/supabase/server.ts",
+        "src/types/index.ts",
+        "supabase/migrations/012_perspectives.sql"
       ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/compare/page.tsx — server-side data fetching pattern with Supabase",
-          "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx — client comparison component pattern (stats overlays, name matching, export button)"
+          "supabase/migrations/012_perspectives.sql",
+          "src/app/api/v1/annotations/route.ts",
+          "src/app/api/v1/annotations/[id]/route.ts"
         ],
         "patterns_to_follow": [
-          "Server component page.tsx fetches data via createClient() + supabase queries, passes to client view component",
-          "Client component uses useState for selection, useMemo for computed data",
-          "fetchAnnotations(perspectiveId) from client.ts returns PerspectiveAnnotation[] — use for client-side cross-referencing",
-          "Sidebar NAV_ITEMS array with label, icon, href pattern — add entry between Compare and Teams",
-          "Use useWorkspace() for perspectives array (already in context)",
-          "Dark theme: bg-surface-primary, bg-surface-secondary, text-white/90, text-white/55, accent-blue for interactive",
-          "Divergence threshold should be a named constant: DIVERGENCE_THRESHOLD = 2"
+          "Polymorphic commentable_type enum — same values as annotatable_type (step/section/touchpoint/stage). Consider reusing annotatable_type enum in migration if Postgres allows, otherwise create commentable_type separately",
+          "RLS policies: use can_access_workspace(workspace_id) directly since comments have workspace_id (simpler than annotations which join through perspectives)",
+          "API routes: follow annotations/route.ts pattern — auth check, validation, PGRST116 detection, envelope response",
+          "Client wrappers: follow fetchAnnotations/createAnnotation pattern in client.ts",
+          "Types: follow PerspectiveAnnotation interface pattern in database.ts"
         ],
         "learnings_relevant": [
-          "apiFetch unwraps envelope — result IS the data, not result.data",
-          "Canvas null guards — use (arr ?? []).filter(Boolean) before .map()",
-          "React state immutability — [...arr].sort() not arr.sort()"
+          "Supabase RLS silent mutations — check data is not null after mutations, return 403",
+          "PGRST116 detection for RLS-denied INSERT...RETURNING",
+          "apiFetch unwraps envelope — client functions return apiFetch<T>() directly"
         ],
         "affected_urls": [
-          "/w/[workspaceId]/perspectives/compare"
+          "/api/v1/comments",
+          "/api/v1/comments/[id]"
         ]
       },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "HUMAN-OVERRIDE: This is the first task of Phase 3a (Analysis Intelligence). Process FEEDBACK.md override: verify FEAT-031/032 deferred, verify STATUS.md updated, then build. Uses existing perspectives + perspective_annotations tables — NO migration needed. All entity names (steps, sections, stages, touchpoints) must be fetched server-side to populate the comparison table rows. For PDF export: add a simple button that calls a new comparison-perspective-pdf export function (similar pattern to comparison-pdf.ts). Consider decomposing into sub-tasks [1/2] core page + table + stats, [2/2] PDF export — but builder may do it in one pass if manageable."
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "FEAT-045 is L complexity overall — decomposed into 3 sub-tasks. This is [1/3] data layer only. [2/3] comment panel UI and [3/3] canvas badges + workspace comments view will follow in subsequent iterations. The commentable_type enum values match annotatable_type exactly (step/section/touchpoint/stage) — in Postgres you can reuse the same enum type if desired, OR create a new one for clarity. Either approach is fine. parent_id self-FK enables threading: ON DELETE CASCADE so deleting a parent deletes all replies. author_id should reference auth.users(id) not the users table if that's the pattern used elsewhere — check migration 003 for the FK pattern."
     },
     {
       "slot": 2,
       "id": "#IMP-001",
-      "description": "Add hex color format validation to perspective API routes (POST and PATCH)",
+      "description": "Add hex color format validation to perspective API routes",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
-      "phase": "Phase 2b: Perspectives",
+      "phase": "Phase 2b: Perspectives (polish)",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "POST /api/v1/perspectives validates color field matches /^#[0-9A-Fa-f]{6}$/i",
-        "PATCH /api/v1/perspectives/[id] validates color field if provided",
-        "Invalid color returns 400 with descriptive error message",
-        "Missing/null color still allowed (optional field)",
-        "Type check, lint pass"
+        "POST /api/v1/perspectives validates color field matches /^#[0-9A-Fa-f]{6}$/i — returns 400 if invalid",
+        "PATCH /api/v1/perspectives/[id] validates color field (if provided) matches same regex — returns 400 if invalid",
+        "Validation only runs when color is provided (it has a DEFAULT in DB, so omission is fine)",
+        "Type check passes, lint passes"
       ],
       "files_owned": [
         "src/app/api/v1/perspectives/route.ts",
@@ -96,38 +100,38 @@
       ],
       "context": {
         "similar_files": [
-          "src/app/api/v1/annotations/route.ts — annotatable_type enum validation pattern (BUG-014 fix)",
-          "src/app/api/v1/annotations/[id]/route.ts — rating range validation pattern (BUG-015 fix)"
+          "src/app/api/v1/annotations/route.ts"
         ],
         "patterns_to_follow": [
-          "Guard clause before DB operation: if (color && !/^#[0-9A-Fa-f]{6}$/i.test(color)) return errorResponse('validation', 'Invalid color format. Expected hex color like #FF5733', 400)",
-          "Use errorResponse() from lib/api/response.ts"
+          "Validation guard before DB insert — return errorResponse('validation', message, 400)",
+          "Same pattern as rating validation in annotations POST (BUG-015 fix)"
         ],
         "learnings_relevant": [],
-        "affected_urls": []
+        "affected_urls": [
+          "/api/v1/perspectives",
+          "/api/v1/perspectives/[id]"
+        ]
       },
       "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "Simple guard clause addition. Match the validation pattern from BUG-014 (annotatable_type validation) and BUG-015 (rating range validation)."
+      "special_instructions": "Simple regex validation. The suggested fix from IMP-001 is exact: if (color && !/^#[0-9A-Fa-f]{6}$/i.test(color)) return errorResponse('validation', 'Invalid color format. Use hex format: #RRGGBB', 400)"
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
-    "owner": null,
-    "note": "Task 1 (FEAT-033) owns sidebar.tsx. Task 2 (IMP-001) owns perspective API routes. No overlap."
+    "read_only": ["package.json", "tsconfig.json", "src/types/index.ts"],
+    "owner": "#FEAT-045",
+    "note": "FEAT-045 owns database.ts and client.ts. IMP-001 does not touch these files."
   },
-  "merge_order": ["#IMP-001", "#FEAT-033"],
+  "merge_order": ["#IMP-001", "#FEAT-045"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Last regression at iter 64, next due at 72. Risk score 2 — normal range.",
+    "regression_reason": "Last regression at iter 64. Due at iter 72 (every 8th). Not yet triggered.",
     "suites_to_run": [],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "FEEDBACK.md HUMAN-OVERRIDE verified as already applied (FEAT-031/032 deferred, STATUS.md updated, amendment in IMPLEMENTATION-PLAN.md). Proceeding with FEAT-033."
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

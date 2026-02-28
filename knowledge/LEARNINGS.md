@@ -26,6 +26,10 @@
 
 - **Playwright MCP unavailable — not a dev server issue:** Playwright MCP has been unavailable since iteration 56. In Phase 0 (Preflight) step 3, if Playwright can't navigate, this is a TOOL LIMITATION, not a dev server outage. Do NOT write "DEV SERVER DOWN" to SIGNAL. Instead: verify the dev server is running via `curl http://localhost:3000` or `lsof -i :3000`, note "Playwright MCP unavailable" in STATUS.md warnings, and continue. The dev server is likely fine.
 
+## Pipeline
+
+- **Worktree merge failure:** Ralph v3.0 builder worktrees may be cleaned up without merging code back to the main branch. The builder's commit becomes unreachable (visible via `git fsck --unreachable`). Reviewer must check for orphaned commits and cherry-pick/checkout files manually. Root cause likely in the pipeline's worktree cleanup logic.
+
 ## Meta
 
 - **Pre-existing lint warnings:** 5 warnings in flow-canvas.tsx (unused import, missing hook deps) and sidebar.tsx (unused import). These are known and acceptable.
