@@ -886,9 +886,10 @@ run_agent() {
   export RALPH_AGENT="$agent_name"
 
   # Pipe prompt via stdin
+  # --no-session-persistence: prevents concurrent agents from conflicting on session files
   # shellcheck disable=SC2086
   if ! (cd "$PROJECT_ROOT" && cat "$prompt_file" | \
-    claude --print --permission-mode bypassPermissions $model_flag \
+    claude --print --no-session-persistence --permission-mode bypassPermissions $model_flag \
     2>"$stderr_file"); then
     exit_code=$?
   fi
@@ -923,6 +924,12 @@ create_worktree() {
   # Create worktree on new branch from current HEAD
   # IMPORTANT: Redirect git output to stderr — stdout is used for the return value
   (cd "$PROJECT_ROOT" && git worktree add "$worktree_path" -b "$branch_name" HEAD) >/dev/null 2>&1
+
+  # Verify worktree was actually created
+  if [ ! -d "$worktree_path/.git" ] && [ ! -f "$worktree_path/.git" ]; then
+    log "ERROR: Failed to create worktree at $worktree_path" >&2
+    return 1
+  fi
 
   # Log to stderr so it doesn't pollute the captured return value
   log "  │   Created worktree: $worktree_path (branch: $branch_name)" >&2
