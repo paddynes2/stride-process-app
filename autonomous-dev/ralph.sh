@@ -1000,6 +1000,16 @@ cleanup_worktrees() {
       local branch_name
       branch_name=$(cd "$wt" && git branch --show-current 2>/dev/null || echo "")
 
+      # Remove symlinked/junctioned node_modules FIRST to prevent
+      # rm -rf from following the link and deleting the real node_modules
+      if [ -L "$wt/node_modules" ]; then
+        rm "$wt/node_modules" 2>/dev/null || true
+      elif [ -e "$wt/node_modules" ]; then
+        # Windows junction: rmdir removes junction without following it
+        rmdir "$wt/node_modules" 2>/dev/null || \
+          cmd //c "rmdir \"$(cygpath -w "$wt/node_modules" 2>/dev/null)\"" 2>/dev/null || true
+      fi
+
       # Remove worktree
       (cd "$PROJECT_ROOT" && git worktree remove --force "$wt" 2>/dev/null) || rm -rf "$wt"
 
@@ -1150,6 +1160,29 @@ run_pipeline() {
       local wt_path
       wt_path=$(create_worktree "$slot")
 
+      # ── Provision worktree with gitignored dependencies ──
+      # Worktrees only contain committed files. node_modules/ is gitignored but
+      # required for type-check, lint, and build. Link it from the main project.
+      if [ -d "$PROJECT_ROOT/node_modules" ] && [ ! -e "$wt_path/node_modules" ]; then
+        # Try Windows NTFS junction (fast, no admin), then POSIX symlink
+        local wt_win proj_win
+        wt_win=$(cygpath -w "$wt_path/node_modules" 2>/dev/null || echo "")
+        proj_win=$(cygpath -w "$PROJECT_ROOT/node_modules" 2>/dev/null || echo "")
+        if [ -n "$wt_win" ] && [ -n "$proj_win" ]; then
+          cmd //c "mklink /J \"$wt_win\" \"$proj_win\"" >/dev/null 2>&1 || true
+        fi
+        if [ ! -e "$wt_path/node_modules" ]; then
+          ln -s "$PROJECT_ROOT/node_modules" "$wt_path/node_modules" 2>/dev/null || true
+        fi
+        if [ ! -e "$wt_path/node_modules" ]; then
+          log "  │   WARNING: Could not link node_modules to worktree $slot — verification may fail" >&2
+        fi
+      fi
+      # Also link .env.local if present (needed for NEXT_PUBLIC_ vars during build)
+      if [ -f "$PROJECT_ROOT/.env.local" ] && [ ! -f "$wt_path/.env.local" ]; then
+        cp "$PROJECT_ROOT/.env.local" "$wt_path/.env.local" 2>/dev/null || true
+      fi
+
       # Copy handoff files to worktree (builders need to read EXECUTION_PLAN)
       mkdir -p "$wt_path/knowledge/handoffs"
       cp "$plan_file" "$wt_path/knowledge/handoffs/"
@@ -1161,9 +1194,18 @@ run_pipeline() {
       # Launch builder in background, working in worktree
       # NOTE: Capture main PROJECT_ROOT before subshell overrides it
       local main_handoffs_dir="$PROJECT_ROOT/knowledge/handoffs"
+      local iter_num="$ITER_NUM"
       (
         export PROJECT_ROOT="$wt_path"
         run_agent "builder-${slot}" "$prompt_file_path" "$BUILDER_MODEL"
+
+        # ── Commit staged changes ──
+        # Builder stages files (git add) but does NOT commit per its prompt.
+        # We commit here so merge_worktrees can do git merge on branches.
+        if ! (cd "$wt_path" && git diff --cached --quiet) 2>/dev/null; then
+          (cd "$wt_path" && git commit -m "ralph: builder slot $slot iteration $iter_num" --no-verify) >/dev/null 2>&1
+        fi
+
         # Copy BUILD_RESULT back to main handoffs dir (NOT worktree — use captured path)
         if [ -f "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" ]; then
           cp "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" \
