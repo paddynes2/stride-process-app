@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 71,
-  "date": "2026-02-28T18:00:00Z",
-  "mode": "multi_task",
+  "iteration": 72,
+  "date": "2026-02-28T19:00:00Z",
+  "mode": "testing_only",
   "validation": {
-    "last_commit_hash": "09d4b1b43a329f0b741fc9e8b589125a18d65d83",
+    "last_commit_hash": "8a51c0a509c80735265fdf6a0bc77adc6d0c63c8",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,125 +13,82 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-045",
-      "description": "Comments system — data model + types + API routes + client wrappers [1/3]",
-      "source": "prd/FEATURES.md",
-      "type": "build",
+      "id": "REGRESSION-72",
+      "description": "Full regression suite + data-integrity check. Triggered by risk score 9 (FEAT-045 [1/3] touched schema + RLS + shared types/client) AND cadence floor (8 iterations since last regression at iter 64).",
+      "source": "testing/RESULTS.md",
+      "type": "regression",
       "phase": "Phase 4: The Living Playbook",
       "complexity": "M",
       "attempts": 1,
-      "risk_score": 3,
+      "risk_score": 9,
       "acceptance_criteria": [
-        "New migration 014_comments.sql creates: comment_category enum (note/decision/pain_point/idea/question), commentable_type enum reusing annotatable_type or new enum (step/section/touchpoint/stage), comments table with id, workspace_id, commentable_type, commentable_id, parent_id (nullable self-FK for threading), author_id (FK users), content (text NOT NULL), category (comment_category NOT NULL DEFAULT 'note'), is_resolved (boolean NOT NULL DEFAULT false), created_at, updated_at",
-        "RLS policies on comments table using can_access_workspace(workspace_id) — SELECT/INSERT/UPDATE/DELETE",
-        "Updated_at trigger, indexes on workspace_id, commentable_type+commentable_id, parent_id",
-        "Comment and CommentCategory types added to src/types/database.ts, re-exported from index.ts",
-        "CommentableType type added (reuse AnnotatableType or define separately — prefer reuse if identical enum values)",
-        "API route GET /api/v1/comments — filterable by workspace_id (required), commentable_type, commentable_id, category, is_resolved. Returns Comment[] ordered by created_at asc",
-        "API route POST /api/v1/comments — creates comment with validation (workspace_id required, commentable_type validated, content required). Sets author_id from session user. Returns 201",
-        "API route PATCH /api/v1/comments/[id] — updates content, category, is_resolved. Returns updated comment",
-        "API route DELETE /api/v1/comments/[id] — deletes comment (cascades to replies via parent_id FK). Returns 204",
-        "Client wrappers in lib/api/client.ts: fetchComments(workspaceId, filters?), createComment(data), updateComment(id, data), deleteComment(id)",
-        "All API routes check for null data after mutations (RLS silent mutation pattern from BUG-013)",
-        "Type check passes, lint passes, build passes"
+        "All 19 core regression checks pass (login, workspace, canvas, panels, list/gap/compare views, settings, teams, perspectives, exports)",
+        "Dashboard page renders correctly (added iter 63)",
+        "People page CRUD works (added iter 65)",
+        "Tools page CRUD works (added iter 67)",
+        "Search/filter on People, Tools, Teams views works (added iter 68-69)",
+        "Comments API routes respond correctly: GET /api/v1/comments (200), POST (201 or 401), PATCH/DELETE by id (401 unauthed)",
+        "Comments table structure verified: columns match migration 014 (id, workspace_id, commentable_type, commentable_id, parent_id, author_id, content, category, is_resolved, created_at, updated_at)",
+        "Comments RLS policies exist and use can_access_workspace()",
+        "Type definitions in database.ts match DB schema (Comment, CommentCategory, CommentableType)",
+        "Client wrappers in client.ts exist (fetchComments, createComment, updateComment, deleteComment)",
+        "No new TypeScript errors (npx tsc --noEmit)",
+        "No new lint errors (npm run lint)",
+        "Build succeeds (npm run build)"
       ],
-      "files_owned": [
-        "supabase/migrations/014_comments.sql",
+      "files_owned": [],
+      "files_read_only": [
+        "src/app/(auth)/login/page.tsx",
+        "src/app/(app)/workspaces/page.tsx",
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+        "src/components/canvas/flow-canvas.tsx",
+        "src/components/panels/step-detail-panel.tsx",
+        "src/components/panels/section-detail-panel.tsx",
+        "src/app/(app)/w/[workspaceId]/list/step-list-view.tsx",
+        "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
+        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx",
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx",
+        "src/app/(app)/w/[workspaceId]/teams/teams-view.tsx",
+        "src/app/(app)/w/[workspaceId]/people/people-view.tsx",
+        "src/app/(app)/w/[workspaceId]/tools/tools-view.tsx",
+        "src/app/(app)/w/[workspaceId]/dashboard/dashboard-view.tsx",
+        "src/lib/export/pdf.ts",
+        "src/lib/export/png.ts",
         "src/app/api/v1/comments/route.ts",
         "src/app/api/v1/comments/[id]/route.ts",
         "src/types/database.ts",
-        "src/lib/api/client.ts"
-      ],
-      "files_read_only": [
-        "src/lib/api/response.ts",
-        "src/lib/supabase/server.ts",
-        "src/types/index.ts",
-        "supabase/migrations/012_perspectives.sql"
+        "src/lib/api/client.ts",
+        "supabase/migrations/014_comments.sql"
       ],
       "context": {
-        "similar_files": [
-          "supabase/migrations/012_perspectives.sql",
-          "src/app/api/v1/annotations/route.ts",
-          "src/app/api/v1/annotations/[id]/route.ts"
-        ],
-        "patterns_to_follow": [
-          "Polymorphic commentable_type enum — same values as annotatable_type (step/section/touchpoint/stage). Consider reusing annotatable_type enum in migration if Postgres allows, otherwise create commentable_type separately",
-          "RLS policies: use can_access_workspace(workspace_id) directly since comments have workspace_id (simpler than annotations which join through perspectives)",
-          "API routes: follow annotations/route.ts pattern — auth check, validation, PGRST116 detection, envelope response",
-          "Client wrappers: follow fetchAnnotations/createAnnotation pattern in client.ts",
-          "Types: follow PerspectiveAnnotation interface pattern in database.ts"
-        ],
-        "learnings_relevant": [
-          "Supabase RLS silent mutations — check data is not null after mutations, return 403",
-          "PGRST116 detection for RLS-denied INSERT...RETURNING",
-          "apiFetch unwraps envelope — client functions return apiFetch<T>() directly"
-        ],
-        "affected_urls": [
-          "/api/v1/comments",
-          "/api/v1/comments/[id]"
-        ]
-      },
-      "has_ui_changes": false,
-      "has_data_model_changes": true,
-      "special_instructions": "FEAT-045 is L complexity overall — decomposed into 3 sub-tasks. This is [1/3] data layer only. [2/3] comment panel UI and [3/3] canvas badges + workspace comments view will follow in subsequent iterations. The commentable_type enum values match annotatable_type exactly (step/section/touchpoint/stage) — in Postgres you can reuse the same enum type if desired, OR create a new one for clarity. Either approach is fine. parent_id self-FK enables threading: ON DELETE CASCADE so deleting a parent deletes all replies. author_id should reference auth.users(id) not the users table if that's the pattern used elsewhere — check migration 003 for the FK pattern."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-001",
-      "description": "Add hex color format validation to perspective API routes",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 2b: Perspectives (polish)",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "POST /api/v1/perspectives validates color field matches /^#[0-9A-Fa-f]{6}$/i — returns 400 if invalid",
-        "PATCH /api/v1/perspectives/[id] validates color field (if provided) matches same regex — returns 400 if invalid",
-        "Validation only runs when color is provided (it has a DEFAULT in DB, so omission is fine)",
-        "Type check passes, lint passes"
-      ],
-      "files_owned": [
-        "src/app/api/v1/perspectives/route.ts",
-        "src/app/api/v1/perspectives/[id]/route.ts"
-      ],
-      "files_read_only": [
-        "src/lib/api/response.ts"
-      ],
-      "context": {
-        "similar_files": [
-          "src/app/api/v1/annotations/route.ts"
-        ],
-        "patterns_to_follow": [
-          "Validation guard before DB insert — return errorResponse('validation', message, 400)",
-          "Same pattern as rating validation in annotations POST (BUG-015 fix)"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/api/v1/perspectives",
-          "/api/v1/perspectives/[id]"
-        ]
+        "similar_files": [],
+        "patterns_to_follow": ["Regression suite pattern from iteration 64 (testing/RESULTS.md)"],
+        "learnings_relevant": ["Supabase RLS silent mutations (LEARNINGS.md)", "API route HTTP methods — sections/stages POST-only (LEARNINGS.md)", "WebFetch cannot access localhost (LEARNINGS.md)"],
+        "affected_urls": ["/login", "/workspaces", "/w/[id]/[tabId]", "/w/[id]/list", "/w/[id]/gap-analysis", "/w/[id]/compare", "/w/[id]/settings", "/w/[id]/teams", "/w/[id]/people", "/w/[id]/tools", "/w/[id]/dashboard"]
       },
       "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "Simple regex validation. The suggested fix from IMP-001 is exact: if (color && !/^#[0-9A-Fa-f]{6}$/i.test(color)) return errorResponse('validation', 'Invalid color format. Use hex format: #RRGGBB', 400)"
+      "special_instructions": "This is a testing-only iteration. No code changes. Run static analysis via Explore agents (3 parallel) + API probing via curl. Check all 19 core regression items from iteration 64, plus 5 additional checks for features added since (dashboard, people, tools, search/filter, comments API). Data-integrity: verify comments migration structure, RLS policies, and type definitions match. Write results to testing/RESULTS.md."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/index.ts"],
-    "owner": "#FEAT-045",
-    "note": "FEAT-045 owns database.ts and client.ts. IMP-001 does not touch these files."
+    "read_only": ["package.json", "tsconfig.json", "next.config.ts", "tailwind.config.ts"],
+    "owner": null,
+    "note": "Testing-only iteration — no files should be modified except testing/RESULTS.md and knowledge/ handoff files."
   },
-  "merge_order": ["#IMP-001", "#FEAT-045"],
+  "merge_order": [],
   "testing_plan": {
-    "run_acceptance": true,
-    "run_regression": false,
-    "regression_reason": "Last regression at iter 64. Due at iter 72 (every 8th). Not yet triggered.",
-    "suites_to_run": [],
-    "cadence_trigger": null
+    "run_acceptance": false,
+    "run_regression": true,
+    "regression_reason": "Risk score 9 from iteration 71 (schema + RLS + shared components + partial result). Cadence floor triggered (8 iterations since last regression at iter 64).",
+    "suites_to_run": ["regression", "data-integrity"],
+    "cadence_trigger": "regression (8-iteration floor)"
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": [
+      "Regression triggered by risk score 9 AND cadence floor. IMP-001 and FEAT-045 [2/3] deferred to iteration 73.",
+      "Builder slot 2 has failed to execute in 2 consecutive iterations (70, 71). Pipeline dispatch issue may need investigation."
+    ],
     "diagnoses_written": false,
     "signal_override": null
   }

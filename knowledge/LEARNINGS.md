@@ -35,3 +35,4 @@
 - **Pre-existing lint warnings:** 5 warnings in flow-canvas.tsx (unused import, missing hook deps) and sidebar.tsx (unused import). These are known and acceptable.
 - **API route HTTP methods:** Not all entity routes export GET. Sections and stages are POST-only at the collection level (no list endpoint). 405 responses for GET are expected, not bugs.
 - **WebFetch limitations:** WebFetch cannot access localhost URLs. For regression testing, use production URL for unauthenticated pages and curl for localhost API probing.
+- **Pipeline dispatch reliability:** 3 consecutive iterations (70-72) had pipeline dispatch failures — builders or testers never executing despite correct EXECUTION_PLAN.json. Root cause likely in ralph.sh agent subprocess management. Impacts: blocked iterations accumulate, regression debt grows, deferred tasks pile up.
