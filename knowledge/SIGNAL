@@ -1,1 +1,1 @@
-CONTINUE: #IMP-001 hex color validation (retry — not built in iter 71) + #FEAT-045 [2/3] comment panel UI
+CONTINUE: REGRESSION-72 retry (risk score 9 unresolved) — pipeline dispatch issue must be investigated before next iteration
