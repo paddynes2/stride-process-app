@@ -1394,7 +1394,6 @@ if [ "$MODE" == "status" ]; then
   (cd "$PROJECT_ROOT" && git tag -l "${GIT_TAG_PREFIX}-*" | sort -t- -k3 -n | tail -10) 2>/dev/null || echo "(none)"
   echo ""
   echo "─── Dev Server ───"
-  local http_code
   http_code=$(check_dev_server)
   if [ "$http_code" == "200" ] || [ "$http_code" == "304" ]; then
     echo "Running at $APP_URL (HTTP $http_code)"
@@ -1487,7 +1486,6 @@ else
   ensure_ralph_branch
   # Preserve context-rich SIGNAL (e.g., "CONTINUE: Phase 4 — start FEAT-045")
   # Only overwrite if SIGNAL is missing, empty, or contains a stop/block state
-  local current_signal
   current_signal=$(cat "$SIGNAL_FILE" 2>/dev/null || echo "")
   case "$current_signal" in
     CONTINUE*) ;; # Already a continue signal — keep the context message
