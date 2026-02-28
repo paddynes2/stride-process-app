@@ -224,9 +224,16 @@ verify_clean_git_state() {
     log "ERROR: Not a git repository or git not available at $PROJECT_ROOT"
     return 1
   fi
-  if [ -n "$status" ]; then
+  # Only stash if there are stashable changes (modified/staged/deleted tracked files).
+  # Untracked-only state (?? lines) causes "git stash push" to fail with exit 1
+  # ("No local changes to save"), which crashes the script under set -e.
+  local stashable
+  stashable=$(echo "$status" | grep -v '^??' || true)
+  if [ -n "$stashable" ]; then
     log "WARNING: Uncommitted changes detected. Stashing."
     (cd "$PROJECT_ROOT" && git stash push -m "ralph-auto-stash-$(date +%s)")
+  elif [ -n "$status" ]; then
+    log "NOTE: Untracked files present (ignored — not stashable)"
   fi
   return 0
 }
@@ -1148,7 +1155,14 @@ run_pipeline() {
 
   if [ "$revert_needed" = "true" ]; then
     log "  │   Reverting last commit (planner flagged as invalid)..."
-    (cd "$PROJECT_ROOT" && git revert HEAD --no-edit) || {
+    # Use -m 1 if HEAD is a merge commit (keeps first-parent side).
+    # git rev-parse HEAD^2 succeeds only if HEAD has a second parent.
+    local revert_flag=""
+    if (cd "$PROJECT_ROOT" && git rev-parse HEAD^2 &>/dev/null); then
+      revert_flag="-m 1"
+    fi
+    # shellcheck disable=SC2086
+    (cd "$PROJECT_ROOT" && git revert HEAD --no-edit $revert_flag) || {
       log "  │   WARNING: Revert failed"
     }
   fi
@@ -1158,9 +1172,13 @@ run_pipeline() {
   # ═══════════════════════════════════════════════════════════════
 
   if [ "$plan_mode" != "testing_only" ]; then
-    # Count tasks
+    # Count tasks (capped at MAX_PARALLEL_BUILDERS to prevent resource exhaustion)
     local task_count
     task_count=$(json_count "$plan_file" .tasks)
+    if [ "$task_count" -gt "$MAX_PARALLEL_BUILDERS" ] 2>/dev/null; then
+      log "  │   Planner requested $task_count tasks — capping at $MAX_PARALLEL_BUILDERS"
+      task_count="$MAX_PARALLEL_BUILDERS"
+    fi
 
     log "  ├── Stage 2: BUILDERS ($task_count tasks)"
 
@@ -1170,7 +1188,11 @@ run_pipeline() {
     for ((slot=1; slot<=task_count; slot++)); do
       # Create worktree
       local wt_path
-      wt_path=$(create_worktree "$slot")
+      wt_path=$(create_worktree "$slot") || true
+      if [ -z "$wt_path" ] || [ ! -d "$wt_path" ]; then
+        log "  │   ERROR: Worktree creation failed for slot $slot — skipping"
+        continue
+      fi
 
       # ── Provision worktree with gitignored dependencies ──
       # Worktrees only contain committed files. node_modules/ is gitignored but
@@ -1463,7 +1485,14 @@ if [ "$MODE" == "resume" ]; then
   echo "CONTINUE: blocker resolved, resuming" > "$SIGNAL_FILE"
 else
   ensure_ralph_branch
-  echo "CONTINUE" > "$SIGNAL_FILE"
+  # Preserve context-rich SIGNAL (e.g., "CONTINUE: Phase 4 — start FEAT-045")
+  # Only overwrite if SIGNAL is missing, empty, or contains a stop/block state
+  local current_signal
+  current_signal=$(cat "$SIGNAL_FILE" 2>/dev/null || echo "")
+  case "$current_signal" in
+    CONTINUE*) ;; # Already a continue signal — keep the context message
+    *) echo "CONTINUE" > "$SIGNAL_FILE" ;;
+  esac
 fi
 
 SESSION_BRANCH=$(cd "$PROJECT_ROOT" && git branch --show-current 2>/dev/null || echo "unknown")
