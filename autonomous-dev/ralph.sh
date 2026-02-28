@@ -921,6 +921,9 @@ create_worktree() {
     (cd "$PROJECT_ROOT" && git worktree remove --force "$worktree_path" 2>/dev/null || true)
   fi
 
+  # Delete stale branch from a previous crashed run (git worktree add -b fails if branch exists)
+  (cd "$PROJECT_ROOT" && git branch -D "$branch_name" 2>/dev/null || true)
+
   # Create worktree on new branch from current HEAD
   # IMPORTANT: Redirect git output to stderr — stdout is used for the return value
   (cd "$PROJECT_ROOT" && git worktree add "$worktree_path" -b "$branch_name" HEAD) >/dev/null 2>&1
@@ -957,13 +960,22 @@ merge_worktrees() {
     local branch_name="ralph-build-${ITER_NUM}-slot-${slot}"
     local build_result="$PROJECT_ROOT/knowledge/handoffs/BUILD_RESULT_${slot}.json"
 
-    # Skip failed builders (check BUILD_RESULT status)
+    # Skip failed or crashed builders
     if [ -f "$build_result" ]; then
       local status
       status=$(json_val "$build_result" .status "unknown")
 
       if [ "$status" = "failed" ]; then
         log "  │   Skipping merge for slot $slot (build failed)"
+        continue
+      fi
+    else
+      # No BUILD_RESULT file — builder likely crashed without producing output
+      # Check if branch has any commits beyond base; if not, skip the merge
+      local branch_exists
+      branch_exists=$(cd "$PROJECT_ROOT" && git rev-parse --verify "$branch_name" 2>/dev/null && echo "yes" || echo "no")
+      if [ "$branch_exists" = "no" ]; then
+        log "  │   Skipping merge for slot $slot (branch missing — builder crashed)"
         continue
       fi
     fi
@@ -1199,9 +1211,11 @@ run_pipeline() {
         export PROJECT_ROOT="$wt_path"
         run_agent "builder-${slot}" "$prompt_file_path" "$BUILDER_MODEL"
 
-        # ── Commit staged changes ──
-        # Builder stages files (git add) but does NOT commit per its prompt.
-        # We commit here so merge_worktrees can do git merge on branches.
+        # ── Stage and commit all changes ──
+        # Builder may create files but miss git-adding some. Since this is a
+        # disposable worktree, git add -A is safe — stage everything, then commit.
+        # Without a commit, merge_worktrees sees "Already up to date."
+        (cd "$wt_path" && git add -A) 2>/dev/null || true
         if ! (cd "$wt_path" && git diff --cached --quiet) 2>/dev/null; then
           (cd "$wt_path" && git commit -m "ralph: builder slot $slot iteration $iter_num" --no-verify) >/dev/null 2>&1
         fi
@@ -1416,6 +1430,19 @@ echo ""
 
 log "Session started: mode=$MODE max=$MAX_ITERATIONS"
 
+# ─── Trap: Cleanup on interrupt ──────────────────────────────────────────
+# Ctrl+C or SIGTERM during an iteration leaves stale worktrees, branches,
+# and node_modules junctions. Clean them up and write session summary.
+trap_cleanup() {
+  echo ""
+  log "Signal received — cleaning up..."
+  cleanup_worktrees 2>/dev/null || true
+  write_session_summary 2>/dev/null || true
+  log "Cleanup complete. Exiting."
+  exit 130
+}
+trap trap_cleanup INT TERM
+
 # ─── Pre-Session Setup ────────────────────────────────────────────────────
 
 SESSION_START_TIME=$(date '+%Y-%m-%d %H:%M')
@@ -1500,7 +1527,7 @@ for ((i=1; i<=MAX_ITERATIONS; i++)); do
     RESULT=""
     CLAUDE_STDERR=""
     # Pipe prompt via stdin to avoid "Argument list too long" on Windows/MSYS2
-    if RESULT=$(cd "$PROJECT_ROOT" && cat "$PROMPT_FILE" | claude --print --permission-mode bypassPermissions 2>"$SCRIPT_DIR/.claude_stderr_tmp"); then
+    if RESULT=$(cd "$PROJECT_ROOT" && cat "$PROMPT_FILE" | claude --print --no-session-persistence --permission-mode bypassPermissions 2>"$SCRIPT_DIR/.claude_stderr_tmp"); then
       log_structured "$ITER_NUM" "completed" ""
     else
       CLAUDE_EXIT=$?
