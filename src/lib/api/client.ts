@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -504,4 +504,49 @@ export async function updateAnnotation(id: string, data: Partial<Pick<Perspectiv
 
 export async function deleteAnnotation(id: string): Promise<void> {
   await apiFetch(`/api/v1/annotations/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Comments
+// ---------------------------------------------------------------------------
+
+export async function fetchComments(workspaceId: string, filters?: {
+  commentable_type?: CommentableType;
+  commentable_id?: string;
+  category?: CommentCategory;
+  is_resolved?: boolean;
+}): Promise<Comment[]> {
+  const params = new URLSearchParams({ workspace_id: workspaceId });
+  if (filters?.commentable_type) params.set("commentable_type", filters.commentable_type);
+  if (filters?.commentable_id) params.set("commentable_id", filters.commentable_id);
+  if (filters?.category) params.set("category", filters.category);
+  if (filters?.is_resolved !== undefined) params.set("is_resolved", String(filters.is_resolved));
+  return apiFetch<Comment[]>(`/api/v1/comments?${params}`);
+}
+
+export async function createComment(data: {
+  workspace_id: string;
+  commentable_type: CommentableType;
+  commentable_id: string;
+  content: string;
+  parent_id?: string;
+  category?: CommentCategory;
+}): Promise<Comment> {
+  return apiFetch<Comment>("/api/v1/comments", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateComment(id: string, data: Partial<Pick<Comment, "content" | "category" | "is_resolved">>): Promise<Comment> {
+  return apiFetch<Comment>(`/api/v1/comments/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteComment(id: string): Promise<void> {
+  await apiFetch(`/api/v1/comments/${id}`, { method: "DELETE" });
 }

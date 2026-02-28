@@ -211,6 +211,27 @@ export interface TouchpointConnection {
 
 export type AnnotatableType = "step" | "section" | "touchpoint" | "stage";
 
+// =============================================================================
+// Comments — threaded comments on canvas elements
+// =============================================================================
+
+export type CommentCategory = "note" | "decision" | "pain_point" | "idea" | "question";
+export type CommentableType = AnnotatableType;
+
+export interface Comment {
+  id: string;
+  workspace_id: string;
+  commentable_type: CommentableType;
+  commentable_id: string;
+  parent_id: string | null;
+  author_id: string;
+  content: string;
+  category: CommentCategory;
+  is_resolved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Perspective {
   id: string;
   workspace_id: string;
