@@ -2,19 +2,17 @@
 
 ## Pending
 
-### [HUMAN-OVERRIDE] Roadmap course correction — READ CAREFULLY
+### [HUMAN-OVERRIDE] Phase 4 prioritization — READ CAREFULLY
 
 **Priority:** IMMEDIATE — process this BEFORE selecting any task.
 
-The product owner has reviewed iterations 55-69 and identified a critical roadmap deviation.
-You have been building utility features (dashboard, search, people CRUD, tools CRUD, bulk actions)
-instead of the high-value consulting features that make Stride a differentiated product.
+The product owner has reversed the Phase 3a prioritization from the previous course correction.
 
 **Effective immediately, the following rules apply:**
 
-1. **STOP Phase 3: Advanced Features.** Do NOT work on FEAT-031 (bulk actions) or FEAT-032 (workspace templates). Mark both as `Status: deferred`.
+1. **SKIP Phase 3a and Phase 3b.** Do NOT work on FEAT-033 through FEAT-044. These phases are DEFERRED until Phase 4 is complete.
 
-2. **START Phase 3a: Analysis Intelligence.** The features FEAT-033 through FEAT-039 have been added to `prd/FEATURES.md`. These are the consulting features that were originally planned for Phase 2b but were skipped. Work them in order starting with FEAT-033.
+2. **START Phase 4: The Living Playbook.** Work features FEAT-045 through FEAT-053 in order, starting with FEAT-045 (Comments system).
 
 3. **DO NOT restructure, reformat, or rewrite `prd/FEATURES.md` or `knowledge/IMPLEMENTATION-PLAN.md`.** You may ONLY:
    - Mark individual tasks as done/in-progress
@@ -23,21 +21,19 @@ instead of the high-value consulting features that make Stride a differentiated 
    - Append amendments to IMPLEMENTATION-PLAN.md
    You may NOT delete features, change feature numbers, rewrite section headers, or compress the format.
 
-4. **Phase order going forward:** 3a (Analysis Intelligence) → 3b (Tools Canvas + Enhanced Export) → 4 (The Living Playbook). Follow the features in `prd/FEATURES.md` in order.
+4. **Phase order going forward:** 4 (The Living Playbook) → 3a (Analysis Intelligence) → 3b (Tools Canvas + Enhanced Export).
 
-5. **After processing this feedback**, update STATUS.md to reflect the phase change and set your next task to FEAT-033. Add an amendment to IMPLEMENTATION-PLAN.md noting the course correction.
-
-6. **Cadence deferral:** The accessibility cadence floor that would trigger at iteration 70 is DEFERRED to iteration 72. Your first task after processing this feedback MUST be FEAT-033, not a testing cadence. Note the deferral in STATUS.md warnings.
-
-7. **Already done for you:** FEAT-031 and FEAT-032 are already marked deferred in `prd/FEATURES.md`. The amendment is already in `knowledge/IMPLEMENTATION-PLAN.md`. STATUS.md is already updated. You do NOT need to redo these — just verify they look correct, note "already applied by human" in your PROGRESS.md, and proceed to building FEAT-033.
+5. **Already done for you:** Phase 3a and 3b are marked DEFERRED in IMPLEMENTATION-PLAN.md. Phase 4 is marked IN PROGRESS. STATUS.md is updated. You do NOT need to redo these — just verify they look correct and proceed to building FEAT-045.
 
 This feedback item should be moved to Processed after you have:
-- Verified FEAT-031 and FEAT-032 are marked deferred (already done)
-- Verified STATUS.md reflects Phase 3a (already done)
-- Verified amendment exists in IMPLEMENTATION-PLAN.md (already done)
-- Set SIGNAL to CONTINUE with FEAT-033
-- Started building FEAT-033 in this same iteration
+- Verified Phase 3a and 3b are marked DEFERRED (already done)
+- Verified Phase 4 is marked IN PROGRESS (already done)
+- Verified STATUS.md reflects Phase 4 (already done)
+- Set SIGNAL to CONTINUE with FEAT-045
+- Started building FEAT-045 in this same iteration
 
 ## Processed
 
-<!-- Processed items with iteration number and response. -->
+### [HUMAN-OVERRIDE] Phase 3a prioritization (superseded)
+**Processed:** Iteration 71
+**Response:** Superseded by Phase 4 prioritization override above. Phase 3a was never started — planner generated EXECUTION_PLAN for FEAT-033 in iteration 70 but builders failed due to pipeline bug. No Phase 3a code was ever written. Product owner redirected to Phase 4 (The Living Playbook) utility features instead.

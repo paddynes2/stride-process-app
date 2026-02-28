@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "execution-plan.schema.json",
+  "title": "Execution Plan",
+  "description": "Planner agent output: task assignments and file ownership for the orchestrator and downstream agents.",
+  "type": "object",
+  "required": ["schema_version", "iteration", "date", "mode", "validation", "tasks", "shared_files", "merge_order", "testing_plan", "status_updates"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "iteration": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["multi_task", "single_task", "blocked", "testing_only"]
+    },
+    "validation": {
+      "type": "object",
+      "required": ["last_commit_hash", "last_commit_valid", "compilation_status", "revert_needed"],
+      "properties": {
+        "last_commit_hash": { "type": "string" },
+        "last_commit_valid": { "type": "boolean" },
+        "compilation_status": {
+          "type": "string",
+          "enum": ["passing", "failing", "unknown"]
+        },
+        "revert_needed": { "type": "boolean" },
+        "revert_reason": { "type": ["string", "null"] }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["slot", "id", "description", "source", "type", "phase", "complexity", "attempts", "risk_score", "acceptance_criteria", "files_owned", "files_read_only", "context", "has_ui_changes", "has_data_model_changes"],
+        "properties": {
+          "slot": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^#(FEAT|BUG|IMP|DEBT)-[0-9]+$"
+          },
+          "description": { "type": "string" },
+          "source": {
+            "type": "string",
+            "pattern": "^prd/(FEATURES|BUGS|IMPROVEMENTS|TECH-DEBT)\\.md$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["build", "fix", "improve", "regression", "cleanup"]
+          },
+          "phase": { "type": "string" },
+          "complexity": {
+            "type": "string",
+            "enum": ["S", "M", "L"]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "risk_score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          },
+          "files_owned": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "files_read_only": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "context": {
+            "type": "object",
+            "required": ["similar_files", "patterns_to_follow", "learnings_relevant", "affected_urls"],
+            "properties": {
+              "similar_files": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "patterns_to_follow": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "learnings_relevant": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "affected_urls": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "has_ui_changes": { "type": "boolean" },
+          "has_data_model_changes": { "type": "boolean" },
+          "special_instructions": { "type": "string" }
+        }
+      }
+    },
+    "shared_files": {
+      "type": "object",
+      "required": ["read_only"],
+      "properties": {
+        "read_only": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "owner": { "type": ["string", "null"] },
+        "note": { "type": "string" }
+      }
+    },
+    "merge_order": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "testing_plan": {
+      "type": "object",
+      "required": ["run_acceptance", "run_regression"],
+      "properties": {
+        "run_acceptance": { "type": "boolean" },
+        "run_regression": { "type": "boolean" },
+        "regression_reason": { "type": ["string", "null"] },
+        "suites_to_run": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "cadence_trigger": { "type": ["string", "null"] }
+      }
+    },
+    "status_updates": {
+      "type": "object",
+      "properties": {
+        "warnings_added": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "diagnoses_written": { "type": "boolean" },
+        "signal_override": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

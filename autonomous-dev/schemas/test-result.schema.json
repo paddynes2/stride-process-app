@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "test-result.schema.json",
+  "title": "Test Result",
+  "description": "Tester agent output: acceptance criteria verification, quality gate results, bugs, and improvements.",
+  "type": "object",
+  "required": ["schema_version", "iteration", "test_type", "status", "duration_seconds", "criteria_results", "quality_gate", "bugs_found", "improvements_found", "actions_used", "action_budget"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "iteration": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "test_type": {
+      "type": "string",
+      "enum": ["acceptance", "regression", "suite"]
+    },
+    "suite_name": {
+      "type": ["string", "null"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["passed", "failed", "skipped", "playwright_unavailable", "app_down"]
+    },
+    "duration_seconds": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "criteria_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["criterion", "task_id", "result", "evidence"],
+        "properties": {
+          "criterion": { "type": "string" },
+          "task_id": { "type": "string" },
+          "result": {
+            "type": "string",
+            "enum": ["pass", "fail"]
+          },
+          "evidence": { "type": "string" },
+          "screenshot_description": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "quality_gate": {
+      "type": "object",
+      "required": ["pages_checked", "console_errors", "network_errors", "accessibility_issues", "layout_shifts"],
+      "properties": {
+        "pages_checked": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "console_errors": { "type": "integer", "minimum": 0 },
+        "network_errors": { "type": "integer", "minimum": 0 },
+        "accessibility_issues": { "type": "integer", "minimum": 0 },
+        "layout_shifts": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "bugs_found": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "page", "description", "steps_to_reproduce", "related_task"],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["P0", "P1", "P2"]
+          },
+          "page": { "type": "string" },
+          "description": { "type": "string" },
+          "steps_to_reproduce": { "type": "string" },
+          "related_task": { "type": "string" }
+        }
+      }
+    },
+    "improvements_found": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "page", "observation", "design_principle", "suggested_approach"],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["usability", "accessibility", "performance", "visual", "content"]
+          },
+          "page": { "type": "string" },
+          "observation": { "type": "string" },
+          "design_principle": { "type": "string" },
+          "suggested_approach": { "type": "string" }
+        }
+      }
+    },
+    "actions_used": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "action_budget": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

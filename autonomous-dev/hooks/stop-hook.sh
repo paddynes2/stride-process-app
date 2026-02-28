@@ -13,18 +13,24 @@
 #
 # ═══════════════════════════════════════════════════════════════════════════
 
+# ─── Agent-Aware Bypass ──────────────────────────────────────────────────
+# Non-reviewer agents exit freely — only the reviewer must complete full docs
+if [ -n "${RALPH_AGENT:-}" ] && [ "${RALPH_AGENT}" != "reviewer" ]; then
+  exit 0
+fi
+
 # ─── Configuration ─────────────────────────────────────────────────────────
 
-# Path to the autonomous-dev directory (adjust for your setup)
+# SCRIPT_DIR = autonomous-dev/ directory (parent of hooks/)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Source config to get PROJECT_ROOT (where Ralph actually reads/writes knowledge files)
+# Source ralph.conf for PROJECT_ROOT (agents write to PROJECT_ROOT/knowledge/,
+# which may differ from SCRIPT_DIR in deployed instances).
 if [ -f "$SCRIPT_DIR/ralph.conf" ]; then
+  # shellcheck source=/dev/null
   source "$SCRIPT_DIR/ralph.conf"
-else
-  echo "WARNING: ralph.conf not found at $SCRIPT_DIR/ralph.conf — falling back to SCRIPT_DIR"
-  PROJECT_ROOT="$SCRIPT_DIR"
 fi
+PROJECT_ROOT="${PROJECT_ROOT:-$SCRIPT_DIR}"
 
 STATUS_FILE="$PROJECT_ROOT/knowledge/STATUS.md"
 PROGRESS_FILE="$PROJECT_ROOT/knowledge/PROGRESS.md"

@@ -1,4 +1,12 @@
-# Ephemeral / runtime
-ralph.log
-.claude_stderr_tmp
+# Ephemeral state (not tracked)
 knowledge/SIGNAL
+knowledge/HUMAN_SIGNAL
+ralph.log
+
+# Multi-agent handoffs (ephemeral inter-agent communication)
+knowledge/handoffs/*.json
+
+# Runtime state (worktrees, temp prompts)
+.ralph/worktrees/
+.ralph/builder-prompt-*.md
+.ralph/tester-prompt-*.md

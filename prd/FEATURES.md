@@ -56,7 +56,7 @@
 
 ---
 
-## Phase 3a: Analysis Intelligence — PENDING
+## Phase 3a: Analysis Intelligence — DEFERRED (Phase 4 prioritized)
 
 ### #FEAT-033 Perspective comparison view
 **Phase:** 3a
@@ -164,7 +164,7 @@
 
 ---
 
-## Phase 3b: Tools Canvas + Enhanced Export — PENDING
+## Phase 3b: Tools Canvas + Enhanced Export — DEFERRED (Phase 4 prioritized)
 
 ### #FEAT-040 Tools canvas upgrade
 **Phase:** 3b
@@ -244,7 +244,7 @@
 
 ---
 
-## Phase 4: The Living Playbook — PENDING
+## Phase 4: The Living Playbook — IN PROGRESS
 
 ### #FEAT-045 Comments system
 **Phase:** 4

@@ -1,8 +1,13 @@
 # RALPH LOOP — ITERATION PROMPT
 
-> **PROJECT:** Stride — Process Mapping SaaS
-> **ROOT:** /c/Users/Patrick/Builds/Cursor Projects/apps/Process App/stride
-> **PORT:** 3000
+> **DEPRECATED (v3.0):** This file is preserved as the `--legacy` single-agent fallback.
+> The multi-agent pipeline uses `agents/planner.md`, `agents/builder.md`,
+> `agents/tester.md`, and `agents/reviewer.md` instead. Set `AGENT_MODE=single`
+> in `ralph.conf` or use `./ralph.sh --legacy` to use this file.
+
+> **PROJECT:** [FILL IN — project name]
+> **ROOT:** [FILL IN — absolute path to project]
+> **PORT:** [FILL IN — dev server port]
 
 You are an autonomous development agent running in a loop. Each iteration you get a
 FRESH context window. You have no memory of previous iterations. Your memory lives
@@ -117,9 +122,7 @@ Calculate a risk score for the LAST completed iteration:
 RISK_SCORE = 0
 If touched auth/middleware/RLS/security:    +3
 If touched data model/migrations/schema:    +3
-If touched globals.css/design tokens:       +3 (affects entire app)
 If touched >5 files:                        +2
-If touched shared components (Button, Input, Badge, sidebar): +2
 If touched shared components/utilities:     +2
 If last iteration was a revert:             +2
 If last iteration was partial/blocked:      +1
@@ -135,7 +138,6 @@ If last iteration was partial/blocked:      +1
 - Regression: at least every 8th iteration
 - Accessibility: every 10th even iteration (10, 30, 50...)
 - Performance: every 10th odd iteration (20, 40, 60...)
-- UX sweep: every 20th iteration (20, 40, 60...) — see below
 - Phase completion: full quality audit when all features in a phase are done
 
 When a cadence triggers, skip normal task selection. The testing IS your task.
@@ -147,18 +149,6 @@ run the deeper suite (accessibility includes a regression-style sweep).
 to `prd/FEATURES.md` in order: golden-paths → data-integrity → responsive →
 accessibility → security → visual-consistency → content-quality → performance.
 Run one per iteration. After all pass, score the `knowledge/PERFECTION-SCORECARD.md`.
-
-**UX Sweep (every 20th iteration):** This is NOT a bug fix or feature. It's a dedicated
-review iteration. Spend the full iteration on UX quality:
-1. Pick 3-4 pages you haven't reviewed recently
-2. Run `__auditStateCoverage()` on each — check loading/empty/error/success states exist
-3. Run `__auditDesignTokens()` on each — check for hardcoded colors/magic pixel values
-4. Run `__auditCognitiveLoad()` on each — check element counts and complexity
-5. Do a microcopy pass: read every button label, placeholder, and error message on each page
-6. Log ALL findings to `prd/IMPROVEMENTS.md` (category: Visual polish, Microcopy, Missing affordance, etc.)
-7. Report in PROGRESS.md as `TYPE: ux-sweep` with findings count
-If UX sweep collides with another cadence (e.g., iteration 20 = performance + UX sweep),
-run the other cadence first and do the UX sweep next iteration.
 
 ### Attempt Tracking
 
@@ -231,15 +221,6 @@ Spend 10 actions browsing the app with NO task — purely observing:
 - Run cognitive load audit on 2-3 pages
 - Log all findings to IMPROVEMENTS.md
 
-### Systemic Bug Handling
-
-If a bug has **3+ instances** across the codebase (e.g., "7 icon buttons missing aria-labels"):
-1. **Find ALL instances first** — grep the codebase for the pattern before fixing any single one
-2. **Fix at the component level if possible** — one fix to Button component is better than 7 fixes to 7 files
-3. **If component-level fix isn't possible**, decompose into sub-tasks grouping by file
-4. **After fixing, grep again** to confirm zero remaining instances
-5. **Run `__auditAccessibility()`** on 3+ pages to verify the fix propagated
-
 ### Task Decomposition
 
 If the selected task is too large for a single iteration (you estimate it needs 3+ files
@@ -288,19 +269,6 @@ Budget: 5 tool calls maximum. Document what you found in your Phase 6 PROGRESS e
 1. **Read the relevant source files** — understand what exists before writing anything.
    Check AGENTS.md for file locations and conventions.
 2. **Check LEARNINGS.md** for gotchas related to the area you're touching.
-
-### Micro-Fix Pathway (S-complexity CSS/a11y fixes)
-
-For tasks that are purely CSS changes, aria-label additions, or single-property fixes:
-- Skip Phase 2.5 research (you already know where the fix goes)
-- Make the change, verify in browser, commit. Don't over-engineer.
-- **But**: after fixing, grep for similar patterns — if the same issue exists in 3+ places,
-  fix ALL of them in this iteration. A contrast fix in one badge but not another is worse
-  than no fix at all (inconsistency).
-- For a11y fixes specifically: run `__auditAccessibility()` BEFORE and AFTER the fix.
-  Confirm the violation count decreased. If the audit can't detect your specific fix
-  (e.g., it checks presence but not correctness), manually verify in the browser.
-- Reference `AGENTS.md > Color System` for safe color combinations and contrast ratios.
 
 ### Implementation
 
@@ -387,21 +355,16 @@ Log inconsistencies to IMPROVEMENTS.md.
 
 ### Proactive Observation (while testing)
 
-While verifying your change, actively observe the pages you visit using this UX taxonomy.
-Scan each dimension — don't just look at the happy path:
+While verifying your change, actively observe the pages you visit. Ask:
 
-**Visual:** spacing, alignment, hierarchy, contrast, density, affordances (do buttons look clickable?)
-**Interaction:** hover/focus states, keyboard flows, error handling, loading/latency states
-**Copy:** clarity, scannability, tone consistency, inline hints, error microcopy, button specificity
-**State coverage:** loading, empty, error, success, disabled, partial-data states — are they all handled?
-**Accessibility:** landmarks, headings, labels, focus order, ARIA, color contrast
-
-For each dimension, ask:
 1. **Is there unnecessary friction?** Could a step be eliminated? Would a default value help?
-2. **Is something missing that users would expect?** A tooltip, a confirmation, a search filter?
-3. **Could the flow be shorter?** Fewer clicks to value? Any dead-ends?
+   Would linking two related pages save the user a round-trip?
+2. **Is something missing that users would expect?** A tooltip, a confirmation message,
+   an undo option, a search filter, a sort column, a bulk action?
+3. **Could the flow be shorter?** Can you get to value in fewer clicks? Is there a dead-end
+   that forces the user back to the beginning?
 4. **Is the microcopy helping?** Are empty states guiding users? Are error messages specific?
-   Are button labels descriptive ("Create workspace" not "Submit")? Are placeholders examples?
+   Are button labels descriptive? Are placeholders examples (not instructions)?
 5. **Does this match best practices?** Check against `knowledge/DESIGN-PRINCIPLES.md` —
    Nielsen's heuristics, cognitive load thresholds, Fitts's Law target sizes.
 
@@ -785,7 +748,7 @@ Then **EXIT**. Do not start another task.
 21. **Write the minimum code.** No extras, no refactoring, no "improvements" beyond the task.
 
 ### Testing Reference
-22. **CHECKLIST.md (40 checks)** — per-page quality gate (35 core + 5 microcopy for UX sweeps).
+22. **CHECKLIST.md (35 checks)** — per-page quality gate, run on every page visited.
 23. **SUITE-INDEX.md** — master index of all 13 suites with cadences and selection guide.
 24. **DESIGN-PRINCIPLES.md** — Nielsen's heuristics, Fitts's Law, cognitive load, animation
     timing, Gestalt principles. Consult when evaluating UX during testing.

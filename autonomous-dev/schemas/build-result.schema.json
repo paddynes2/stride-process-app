@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "build-result.schema.json",
+  "title": "Build Result",
+  "description": "Builder agent output: files changed, verification results, and staging status.",
+  "type": "object",
+  "required": ["schema_version", "iteration", "slot", "task_id", "status", "duration_seconds", "files_changed", "verification", "dependencies_added", "staged_files", "ownership_violations"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "iteration": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "slot": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "failed", "partial"]
+    },
+    "duration_seconds": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "action", "lines_added", "lines_removed"],
+        "properties": {
+          "path": { "type": "string" },
+          "action": {
+            "type": "string",
+            "enum": ["created", "modified", "deleted"]
+          },
+          "lines_added": { "type": "integer", "minimum": 0 },
+          "lines_removed": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": ["typecheck", "lint", "build", "unit_tests"],
+      "properties": {
+        "typecheck": {
+          "type": "object",
+          "required": ["status", "errors"],
+          "properties": {
+            "status": { "type": "string", "enum": ["pass", "fail", "skipped"] },
+            "errors": { "type": "integer", "minimum": 0 },
+            "output": { "type": "string" }
+          }
+        },
+        "lint": {
+          "type": "object",
+          "required": ["status", "errors"],
+          "properties": {
+            "status": { "type": "string", "enum": ["pass", "fail", "skipped"] },
+            "errors": { "type": "integer", "minimum": 0 },
+            "output": { "type": "string" }
+          }
+        },
+        "build": {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": { "type": "string", "enum": ["pass", "fail", "skipped", "not_applicable"] },
+            "output": { "type": "string" }
+          }
+        },
+        "unit_tests": {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": { "type": "string", "enum": ["pass", "fail", "skipped", "not_applicable"] },
+            "passed": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 },
+            "output": { "type": "string" }
+          }
+        }
+      }
+    },
+    "dependencies_added": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "staged_files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ownership_violations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": { "type": "string" },
+    "failure_details": {
+      "type": ["object", "null"],
+      "properties": {
+        "phase": {
+          "type": "string",
+          "enum": ["typecheck", "lint", "build", "test"]
+        },
+        "error": { "type": "string" },
+        "attempts": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["phase", "error", "attempts"]
+    }
+  }
+}

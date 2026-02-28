@@ -15,15 +15,15 @@
 #
 # ═══════════════════════════════════════════════════════════════════════════
 
+# SCRIPT_DIR = autonomous-dev/ directory (parent of hooks/)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Source config to get PROJECT_ROOT (where Ralph actually reads/writes knowledge files)
+# Source ralph.conf for PROJECT_ROOT (knowledge files live at PROJECT_ROOT level)
 if [ -f "$SCRIPT_DIR/ralph.conf" ]; then
+  # shellcheck source=/dev/null
   source "$SCRIPT_DIR/ralph.conf"
-else
-  echo "WARNING: ralph.conf not found at $SCRIPT_DIR/ralph.conf — falling back to SCRIPT_DIR"
-  PROJECT_ROOT="$SCRIPT_DIR"
 fi
+PROJECT_ROOT="${PROJECT_ROOT:-$SCRIPT_DIR}"
 
 STATUS_FILE="$PROJECT_ROOT/knowledge/STATUS.md"
 SIGNAL_FILE="$PROJECT_ROOT/knowledge/SIGNAL"

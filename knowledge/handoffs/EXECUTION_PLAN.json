@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0",
+  "iteration": 70,
+  "date": "2026-02-28T00:00:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "b48f07f",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-033",
+      "description": "Perspective comparison view — new page at /w/[workspaceId]/perspectives/compare with two perspective selectors, comparison table showing annotations side-by-side, divergence highlighting (2+ point rating gap), summary stats, element navigation links, and sidebar nav entry",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "L",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "New page at /w/[workspaceId]/perspectives/compare — only visible when 2+ perspectives exist with annotations",
+        "Two dropdown selectors at top to pick which perspectives to compare",
+        "Table layout: rows = annotated elements (steps/sections/touchpoints/stages), columns = each perspective's annotation text + rating",
+        "Divergence highlighting: rows where ratings differ by 2+ points get amber background",
+        "Summary stats at top: annotation count per perspective, average rating, divergence count, top 3 most divergent elements",
+        "Clicking element name navigates to that element on the correct canvas",
+        "Sidebar nav entry for Perspectives Compare (only shown when 2+ perspectives exist)",
+        "Type check, lint, build pass"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/perspectives/**",
+        "src/components/layout/sidebar.tsx"
+      ],
+      "files_read_only": [
+        "src/types/database.ts",
+        "src/lib/api/client.ts",
+        "src/lib/context/workspace-context.tsx",
+        "src/app/(app)/w/[workspaceId]/compare/page.tsx",
+        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx",
+        "src/components/layout/header.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/compare/page.tsx — server-side data fetching pattern with Supabase",
+          "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx — client comparison component pattern (stats overlays, name matching, export button)"
+        ],
+        "patterns_to_follow": [
+          "Server component page.tsx fetches data via createClient() + supabase queries, passes to client view component",
+          "Client component uses useState for selection, useMemo for computed data",
+          "fetchAnnotations(perspectiveId) from client.ts returns PerspectiveAnnotation[] — use for client-side cross-referencing",
+          "Sidebar NAV_ITEMS array with label, icon, href pattern — add entry between Compare and Teams",
+          "Use useWorkspace() for perspectives array (already in context)",
+          "Dark theme: bg-surface-primary, bg-surface-secondary, text-white/90, text-white/55, accent-blue for interactive",
+          "Divergence threshold should be a named constant: DIVERGENCE_THRESHOLD = 2"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — result IS the data, not result.data",
+          "Canvas null guards — use (arr ?? []).filter(Boolean) before .map()",
+          "React state immutability — [...arr].sort() not arr.sort()"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/perspectives/compare"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "HUMAN-OVERRIDE: This is the first task of Phase 3a (Analysis Intelligence). Process FEEDBACK.md override: verify FEAT-031/032 deferred, verify STATUS.md updated, then build. Uses existing perspectives + perspective_annotations tables — NO migration needed. All entity names (steps, sections, stages, touchpoints) must be fetched server-side to populate the comparison table rows. For PDF export: add a simple button that calls a new comparison-perspective-pdf export function (similar pattern to comparison-pdf.ts). Consider decomposing into sub-tasks [1/2] core page + table + stats, [2/2] PDF export — but builder may do it in one pass if manageable."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-001",
+      "description": "Add hex color format validation to perspective API routes (POST and PATCH)",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 2b: Perspectives",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "POST /api/v1/perspectives validates color field matches /^#[0-9A-Fa-f]{6}$/i",
+        "PATCH /api/v1/perspectives/[id] validates color field if provided",
+        "Invalid color returns 400 with descriptive error message",
+        "Missing/null color still allowed (optional field)",
+        "Type check, lint pass"
+      ],
+      "files_owned": [
+        "src/app/api/v1/perspectives/route.ts",
+        "src/app/api/v1/perspectives/[id]/route.ts"
+      ],
+      "files_read_only": [
+        "src/lib/api/response.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/api/v1/annotations/route.ts — annotatable_type enum validation pattern (BUG-014 fix)",
+          "src/app/api/v1/annotations/[id]/route.ts — rating range validation pattern (BUG-015 fix)"
+        ],
+        "patterns_to_follow": [
+          "Guard clause before DB operation: if (color && !/^#[0-9A-Fa-f]{6}$/i.test(color)) return errorResponse('validation', 'Invalid color format. Expected hex color like #FF5733', 400)",
+          "Use errorResponse() from lib/api/response.ts"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": []
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "Simple guard clause addition. Match the validation pattern from BUG-014 (annotatable_type validation) and BUG-015 (rating range validation)."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
+    "owner": null,
+    "note": "Task 1 (FEAT-033) owns sidebar.tsx. Task 2 (IMP-001) owns perspective API routes. No overlap."
+  },
+  "merge_order": ["#IMP-001", "#FEAT-033"],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": false,
+    "regression_reason": "Last regression at iter 64, next due at 72. Risk score 2 — normal range.",
+    "suites_to_run": [],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [
+      "FEEDBACK.md HUMAN-OVERRIDE verified as already applied (FEAT-031/032 deferred, STATUS.md updated, amendment in IMPLEMENTATION-PLAN.md). Proceeding with FEAT-033."
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

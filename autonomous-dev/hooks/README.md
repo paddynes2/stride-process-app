@@ -92,6 +92,12 @@ Runs when Claude tries to exit the session. Verifies:
 - `knowledge/SIGNAL` file was written
 - No uncommitted changes remain (everything committed or stashed)
 
+**Multi-agent bypass (v3.0):** In multi-agent mode, ralph.sh sets the `RALPH_AGENT`
+environment variable to identify which agent is running. Non-reviewer agents
+(planner, builder, tester) bypass the stop-hook entirely — they exit freely because
+documentation is NOT their responsibility. Only the reviewer agent is subject to
+the full doc-completion checks.
+
 Exit codes: 0 = allow exit, 2 = block exit (forces Claude to complete docs).
 
 ### `session-start.sh` — Context Injection (Optional)
@@ -122,3 +128,21 @@ ralph.sh (external)          Claude Code session (internal)
 ├── health check
 └── git state verification
 ```
+
+## Multi-Agent Mode (v3.0)
+
+In multi-agent mode, ralph.sh launches multiple Claude sessions (planner, builders,
+testers, reviewer). Each session inherits the hooks configuration.
+
+**Key behavior:**
+- `RALPH_AGENT` env var is set by ralph.sh to identify the current agent
+- `stop-hook.sh` checks this var and bypasses for non-reviewer agents
+- `pre-tool-use.sh` applies equally to ALL agents (security is universal)
+- `post-tool-use.sh` applies equally to ALL agents (quality feedback is universal)
+
+| Agent | pre-tool-use | post-tool-use | stop-hook |
+|-------|-------------|---------------|-----------|
+| planner | enforced | enforced | bypassed |
+| builder | enforced | enforced | bypassed |
+| tester | enforced | enforced | bypassed |
+| reviewer | enforced | enforced | **enforced** |

@@ -67,9 +67,9 @@ Prioritized features:
 - [ ] #FEAT-031 Step list bulk actions — **DEFERRED** (per human feedback)
 - [ ] #FEAT-032 Workspace templates — **DEFERRED** (per human feedback)
 
-## Phase 3a: Analysis Intelligence — PENDING
-**Target iterations:** 70+
-**Depends on:** Human course correction processed
+## Phase 3a: Analysis Intelligence — DEFERRED (per human feedback — Phase 4 prioritized)
+**Target iterations:** TBD
+**Depends on:** Phase 4 complete
 
 Core consulting insight features:
 - [ ] #FEAT-033 Perspective comparison view
@@ -80,8 +80,8 @@ Core consulting insight features:
 - [ ] #FEAT-038 AI improvement suggestions (bridges AI analysis → improvement tracker)
 - [ ] #FEAT-039 Phase 3a testing gate (full regression + new features)
 
-## Phase 3b: Tools Canvas + Enhanced Export — PENDING
-**Depends on:** Phase 3a complete
+## Phase 3b: Tools Canvas + Enhanced Export — DEFERRED (per human feedback — Phase 4 prioritized)
+**Depends on:** Phase 4 complete
 
 - [ ] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape)
 - [ ] #FEAT-041 Tool detail panel + step-tool assignment (junction table, cost integration)
@@ -93,8 +93,8 @@ Core consulting insight features:
   - [ ] [4/4] Page numbers, table of contents, consistent styling
 - [ ] #FEAT-044 Phase 3b testing gate
 
-## Phase 4: The Living Playbook — PENDING
-**Depends on:** Phase 3b complete
+## Phase 4: The Living Playbook — IN PROGRESS
+**Target iterations:** 71+
 
 - [ ] #FEAT-045 Comments system (threaded, categorized: note/decision/pain_point/idea/question)
 - [ ] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder)
@@ -124,3 +124,5 @@ Deferred indefinitely:
 - [2026-02-26] Iteration 68: #FEAT-028 [1/2] done — search & filter added to People and Tools views. [2/2] Teams view remaining.
 - [2026-02-26] Iteration 69: #FEAT-028 [2/2] done — search & filter added to Teams view with hierarchical matching. #FEAT-028 fully complete. Next: #FEAT-031 bulk actions.
 - [2026-02-27] **HUMAN COURSE CORRECTION:** Product owner reviewed iterations 55-69. Agent built utility features (dashboard, search, people/tools CRUD) instead of high-value consulting features. Phase 3 (Advanced Features) STOPPED. FEAT-031 and FEAT-032 deferred. New phases added: Phase 3a (Analysis Intelligence, FEAT-033-039), Phase 3b (Tools Canvas + Enhanced Export, FEAT-040-044), Phase 4 (The Living Playbook, FEAT-045-053). Next task: FEAT-033. See knowledge/FEEDBACK.md for full override details.
+- [2026-02-28] Iteration 70: Multi-agent pipeline first run — planner executed successfully but builders failed (create_worktree stdout pollution bug). No code changes. See PROGRESS.md iter 70.
+- [2026-02-28] **HUMAN COURSE CORRECTION #2:** Product owner reversed Phase 3a prioritization. Phase 4 (The Living Playbook, FEAT-045-053) is now the active phase. Phase 3a and 3b are DEFERRED until Phase 4 is complete. Ralph v3.0 multi-agent pipeline deployed. Next task: FEAT-045.
