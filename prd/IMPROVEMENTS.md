@@ -61,7 +61,7 @@
   - **Why it matters:** Nielsen H7 — Flexibility and efficiency of use. Shortcuts need to be discoverable.
   - **Suggested fix:** Add keyboard shortcut legend to journey toolbar or tooltip on buttons.
 
-- [ ] #IMP-008 flow-canvas handleKeyDown useCallback has incomplete dependency array — Attempts: 0
+- [x] #IMP-008 flow-canvas handleKeyDown useCallback has incomplete dependency array — Attempts: 1 — DONE iteration 78, 2026-03-01
   - **Found:** Iteration 75 (regression tester)
   - **Category:** Code maintainability
   - **Where:** `src/components/canvas/flow-canvas.tsx` — handleKeyDown useCallback

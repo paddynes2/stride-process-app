@@ -608,6 +608,22 @@ tsconfig.json, etc.) are off-limits to all builders.
 - `AGENT_MODE=single` in ralph.conf → permanently use legacy mode
 - All existing modes (--monitor, --rollback, --status, --dashboard, --init, --resume) unchanged
 
+### Diagnostic Logging (`RALPH_VERBOSE`)
+
+Set `RALPH_VERBOSE=1` (env var or in `ralph.conf`) to enable `[VERBOSE]` log lines at
+every pipeline decision point. Covers:
+
+- **JSON helpers** (`json_val`, `json_count`, `json_pluck`) — key, value, return code (G014 `\r` detection)
+- **Worktree lifecycle** — path, branch name, creation verify result
+- **Builder subshells** — entry (slot, path, prompt), `run_agent` exit code, BUILD_RESULT health check, copy-back success
+- **Merge decisions** — per-slot branch existence, build status
+- **Tester launch** — all boolean conditions (playwright, acceptance, regression, UI changes)
+- **Signal parsing** — raw value + hex dump (invisible `\r`/`\n` detection)
+- **Circuit breaker** — consecutive failure count
+
+Default is `0` (off). No performance impact when disabled — `vlog()` short-circuits on the
+first `if` test.
+
 ### Failure Modes
 
 | Failure | Detection | Recovery |

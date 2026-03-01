@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-76, 2026-03-01 -->
+<!-- Updated: iter-78, 2026-03-01 -->
 
 ## Project
 
@@ -76,7 +76,7 @@ npx supabase db push     # Push migrations
 |-----------|-----------|---------|
 | `src/components/ui/` | button, input, textarea, badge, dialog, dropdown-menu, separator, tabs, skeleton, offline-banner | Design system primitives |
 | `src/components/canvas/` | flow-canvas, step-node, section-node, touchpoint-node, stage-node | React Flow canvas nodes |
-| `src/components/panels/` | step-detail-panel, section-detail-panel, touchpoint-detail-panel, stage-detail-panel, workspace-summary-panel, annotation-panel, comment-panel, rich-text-editor, video-embed | Right-side edit panels |
+| `src/components/panels/` | step-detail-panel, section-detail-panel, touchpoint-detail-panel, stage-detail-panel, workspace-summary-panel, annotation-panel, comment-panel, task-panel, rich-text-editor, video-embed | Right-side edit panels |
 | `src/components/layout/` | sidebar, header, tab-bar | App shell layout |
 
 ### Lib
@@ -101,7 +101,7 @@ npx supabase db push     # Push migrations
 | File | Key Types |
 |------|-----------|
 | `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task + enums (CommentCategory, CommentableType) |
-| `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext |
+| `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 
 ### Hooks
@@ -156,8 +156,8 @@ Types: step, section, touchpoint, stage.
 ### Context Provider
 `WorkspaceProvider` wraps authenticated app. `useWorkspace()` exposes user, org, workspace, tabs, perspectives, activePerspective.
 
-### Comment Counts on Canvas Nodes
-`CommentCountsContext` (from `canvas.ts`) provides Map<entityId, count> to node components. Canvas views fetch all workspace comments once, build the count map, and wrap React Flow in the provider. Node components consume the context directly via `useContext(CommentCountsContext)`. This avoids prop-drilling through FlowCanvas (D-004).
+### Comment & Task Counts on Canvas Nodes
+`CommentCountsContext` (from `canvas.ts`) provides Map<entityId, count> to node components. `TaskCountsContext` provides Map<stepId, { completed, total }>. Canvas views fetch all workspace comments/tasks once, build count maps, and wrap React Flow in both providers. Node components consume via `useContext()`. Comment badge: bottom-right. Task badge: bottom-left (step nodes only). Section detail panel shows task rollup (per-step progress + summary). This avoids prop-drilling through FlowCanvas (D-004).
 
 ### Reserved Paths in Workspace Shell
 `workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard"]`

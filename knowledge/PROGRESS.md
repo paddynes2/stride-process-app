@@ -663,3 +663,35 @@
 - Efficiency: 2 — builders succeeded but worktree merge failed again (4th occurrence). Reviewer recovered code from unreachable git commits (186099a, 262a973). Two pipeline runs wasted before recovery.
 - Observations: 4 (3 pipeline bugs + 1 improvement)
 **Notes:** Fourth consecutive iteration requiring manual code recovery from unreachable commits. Builders ran twice — first run documented as failure (commit abfb2ec), second run produced BUILD_RESULTs but merge still failed. Reviewer used `git fsck --unreachable` to find builder commits and `git checkout <hash> -- <file>` to extract code. Pipeline G007 bug (git add -A staging handoff files in worktrees) remains unfixed. FEAT-046 [2/3] now complete — [3/3] (task count badges + section rollup) is next.
+
+## Iteration 78 — 2026-03-01 23:30
+**Tasks:**
+- #FEAT-046 [3/3] Task count badges on step nodes + section-level task rollup — slot 1 — completed
+- #IMP-008 flow-canvas handleKeyDown useCallback deps fix — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Modified: src/app/api/v1/tasks/route.ts (+7/-6 — step_id made optional for workspace-wide fetch)
+- Modified: src/lib/api/client.ts (+4 — fetchAllTasks(workspaceId) added)
+- Modified: src/types/canvas.ts (+4 — TaskCountsContext via createContext)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (+25/-2 — fetch all tasks, build counts map, TaskCountsContext.Provider)
+- Modified: src/components/canvas/step-node.tsx (+15/-2 — task count badge bottom-left with ListTodo icon)
+- Modified: src/components/panels/section-detail-panel.tsx (+42/-1 — task rollup with per-step progress + summary)
+- Modified: src/components/canvas/flow-canvas.tsx (+4/-2 — handleAddStep/handleAddSection wrapped in useCallback, added to handleKeyDown deps)
+**Verification:**
+- Type check: pass (0 errors — verified by reviewer after recovery from unreachable commits)
+- Lint: pass (0 errors on changed files, 3 pre-existing warnings — reduced from 4, IMP-008 resolved one)
+- Build: pass (reported by slot 1 builder — next build compiled 27/27 pages in 5.4s)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true for slot 1)
+**Bugs found:** None (no TEST_RESULTs available — testers may not have run)
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — TaskCountsContext mirrors CommentCountsContext exactly. API change minimal and backwards-compatible. Section rollup cleanly aggregates per-step data. IMP-008 is textbook useCallback fix.
+- Test coverage: 1 — typecheck + lint only, no browser or acceptance testing
+- Confidence: 5 — purely additive features following proven pattern (CommentCountsContext worked since iter 74). No existing behavior changed.
+- Efficiency: 2 — both builders succeeded but worktree merge failed again (5th occurrence). Reviewer recovered code from unreachable commits (6858b30, 287dbc2). Pipeline G007 bug remains unfixed.
+- Observations: 1 (worktree merge bug — 5th occurrence)
+**Notes:** Fifth consecutive iteration requiring manual code recovery from unreachable commits. FEAT-046 is now fully complete (3/3): data layer (iter 76), task panel UI (iter 77), canvas badges + section rollup (iter 78). IMP-008 resolves a lint warning found by regression tester in iter 75. Pre-existing lint warnings reduced from 4 to 3 (addEdge unused import in flow-canvas.tsx remains, plus 2 in journey-canvas-view.tsx).

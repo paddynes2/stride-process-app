@@ -187,6 +187,18 @@ AGENT_MODE="single"             # Uses PROMPT.md instead of agents/
 ```
 Or use the `--legacy` flag: `./ralph.sh --legacy`
 
+**Debugging:**
+```bash
+RALPH_VERBOSE=0                 # Set to 1 for diagnostic logging at pipeline decision points
+```
+Or pass as an env var to enable for a single run without editing the config:
+```bash
+RALPH_VERBOSE=1 bash ralph.sh 1
+```
+When enabled, `[VERBOSE]` lines appear in `ralph.log` showing JSON parse results,
+worktree creation details, builder subshell lifecycle, merge decisions, tester launch
+conditions, and signal file contents. Useful for diagnosing pipeline failures.
+
 **Template system:** Builder and tester prompts are templates with `{{variables}}` that
 ralph.sh substitutes before launching each agent. Builders get their task slot and worktree
 path. Testers get their test type (acceptance vs regression), output file number, and

@@ -100,7 +100,7 @@ Core consulting insight features:
   - [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 71
   - [x] [2/3] Comment panel UI on detail panels — DONE iteration 73
   - [x] [3/3] Canvas badges + workspace comments view — DONE iteration 74
-- [ ] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder) — [1/3] DONE iter 76, [2/3] DONE iter 77
+- [x] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder) — [1/3] DONE iter 76, [2/3] DONE iter 77, [3/3] DONE iter 78
 - [ ] #FEAT-047 Runbook instances (turn sections into executable checklists)
 - [ ] #FEAT-048 Playbook mode (distraction-free runbook execution view)
 - [ ] #FEAT-049 Activity log (audit trail for consulting engagements)
@@ -136,3 +136,4 @@ Deferred indefinitely:
 - [2026-03-01] Iteration 75: Testing-only — regression 32/32 PASS. All features through Phase 4 FEAT-045 verified. Pipeline fixes: builder health check, exit code capture, regression tester Playwright independence, skip-on-failure. 2 new improvements (IMP-008, IMP-009). Next: IMP-002 re-attempt + FEAT-046.
 - [2026-03-01] Iteration 76: FEAT-046 [1/3] completed — tasks data layer (migration 015, API routes, types, client wrappers). IMP-002 completed (reviewer missed BUILD_RESULT_2 initially — corrected in 6ec8fc1). Next: FEAT-046 [2/3] tasks tab UI.
 - [2026-03-01] Iteration 77: FEAT-046 [2/3] and IMP-003 both completed. Builder worktree merge failed again (4th occurrence) — reviewer recovered code from unreachable commits (186099a, 262a973) via `git fsck`. TaskPanel UI built (254 lines), ARIA labels added to all 4 node types. Pipeline G007 bug still unfixed. Next: FEAT-046 [3/3] task count badges.
+- [2026-03-01] Iteration 78: FEAT-046 [3/3] completed — task count badges on step nodes (TaskCountsContext, mirrors CommentCountsContext), section-level task rollup in section-detail-panel. IMP-008 fixed (handleKeyDown deps). 5th worktree merge failure — code recovered from unreachable commits (6858b30, 287dbc2). FEAT-046 fully complete. Next: FEAT-047 Runbook instances.

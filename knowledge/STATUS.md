@@ -1,21 +1,19 @@
 ## Handoff
 
-- **Iteration:** 77
-- **Date:** 2026-03-01 22:30
+- **Iteration:** 78
+- **Date:** 2026-03-01 23:30
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-046 [2/3] TaskPanel UI (completed — recovered from unreachable commit), #IMP-003 annotation ARIA labels (completed — recovered from unreachable commit)
+- **Last task(s):** #FEAT-046 [3/3] task count badges + section rollup (completed), #IMP-008 flow-canvas handleKeyDown deps fix (completed)
 - **Result:** completed
-- **Next task:** #FEAT-046 [3/3] — Task count badges on step nodes + section rollup (mirrors FEAT-045 [3/3] pattern)
-- **Blockers:** None (code recovered successfully this iteration)
+- **Next task:** #FEAT-047 Runbook instances [1/3] data model + types + API + client wrappers
+- **Blockers:** None
 
 ## Context
 
-TaskPanel component created at `src/components/panels/task-panel.tsx` (254 lines). Follows CommentPanel pattern: standalone panel with own data fetching (useEffect+cancelled), loading skeleton, empty state. Features: checkbox toggle (optimistic), inline-editable titles (click/blur/enter/escape), drag-to-reorder (native HTML DnD, position swap), add task input (Enter to save), hover-reveal delete button. Integrated into `canvas-view.tsx` right sidebar between AnnotationPanel and CommentPanel when a step is selected.
+FEAT-046 is now fully complete (3/3). TaskCountsContext added to `src/types/canvas.ts`, fetched in `canvas-view.tsx` (mirrors CommentCountsContext pattern), consumed by `step-node.tsx` (bottom-left badge: "2/5") and `section-detail-panel.tsx` (per-step task progress rollup). Tasks API GET route now accepts optional `step_id` — omitting it returns all workspace tasks. `fetchAllTasks(workspaceId)` added to `client.ts`.
 
-ARIA labels (`role="img"` + `aria-label="Annotated by perspective"`) added to annotation indicator dots in all 4 canvas node types (step-node, section-node, touchpoint-node, stage-node).
-
-Builder code was recovered from unreachable commits (186099a slot 1, 262a973 slot 2) — worktree merge failed silently again (4th occurrence). Pipeline merge reliability remains a systemic issue.
+IMP-008 fixed — `handleAddStep` and `handleAddSection` wrapped in `useCallback`, added to `handleKeyDown` deps. Reduces pre-existing lint warnings from 4 to 3 in flow-canvas.tsx.
 
 ## Dev Server
 
@@ -26,8 +24,9 @@ Builder code was recovered from unreachable commits (186099a slot 1, 262a973 slo
 ## Warnings
 
 - Migrations 014_comments.sql + 015_tasks.sql need `npx supabase db push` to deploy to remote DB
-- Pipeline worktree merge bug persists — 4th consecutive multi-task iteration requiring manual code recovery by reviewer. G007 (git add -A in worktrees) still unfixed in ralph.sh.
-- Retrospective overdue — was due at iteration 70. Next milestone: iteration 80.
-- 4 pre-existing lint warnings in flow-canvas.tsx, journey-canvas-view.tsx
+- Pipeline worktree merge bug persists — 5th consecutive multi-task iteration requiring manual code recovery by reviewer. G007 (git add -A in worktrees) still unfixed in ralph.sh.
+- Regression recommended for iter 79 (risk score 4 from iter 77, shared canvas components).
+- Retrospective due at iteration 80.
+- 3 pre-existing lint warnings in flow-canvas.tsx (addEdge unused), journey-canvas-view.tsx (handleAddTouchpoint, handleAddStage)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation) — static verification only

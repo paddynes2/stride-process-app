@@ -1,40 +1,68 @@
 {
   "schema_version": "1.0",
-  "iteration": 77,
+  "iteration": 78,
   "slot": 1,
-  "task_id": "#FEAT-046 [2/3]",
+  "task_id": "#FEAT-046",
   "status": "completed",
-  "duration_seconds": 420,
+  "duration_seconds": 480,
 
   "files_changed": [
     {
-      "path": "src/components/panels/task-panel.tsx",
-      "action": "created",
-      "lines_added": 276,
+      "path": "src/app/api/v1/tasks/route.ts",
+      "action": "modified",
+      "lines_added": 7,
+      "lines_removed": 6
+    },
+    {
+      "path": "src/lib/api/client.ts",
+      "action": "modified",
+      "lines_added": 4,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/types/canvas.ts",
+      "action": "modified",
+      "lines_added": 4,
       "lines_removed": 0
     },
     {
       "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
       "action": "modified",
-      "lines_added": 4,
-      "lines_removed": 0
+      "lines_added": 25,
+      "lines_removed": 2
+    },
+    {
+      "path": "src/components/canvas/step-node.tsx",
+      "action": "modified",
+      "lines_added": 15,
+      "lines_removed": 2
+    },
+    {
+      "path": "src/components/panels/section-detail-panel.tsx",
+      "action": "modified",
+      "lines_added": 42,
+      "lines_removed": 1
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
-    "lint": { "status": "pass", "errors": 0, "output": "4 pre-existing warnings in journey-canvas-view.tsx and flow-canvas.tsx only (documented in LEARNINGS.md)" },
-    "build": { "status": "pass", "output": "next build — Compiled successfully in 5.5s, 27/27 static pages generated" },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for panel components" }
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "4 pre-existing warnings (documented in LEARNINGS.md), 0 errors" },
+    "build": { "status": "pass", "output": "Compiled successfully in 5.4s, 27/27 static pages generated" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for this area" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/components/panels/task-panel.tsx",
-    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+    "src/app/api/v1/tasks/route.ts",
+    "src/lib/api/client.ts",
+    "src/types/canvas.ts",
+    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+    "src/components/canvas/step-node.tsx",
+    "src/components/panels/section-detail-panel.tsx"
   ],
   "ownership_violations": [],
-  "notes": "TaskPanel follows CommentPanel pattern exactly: useEffect with cancelled flag, loading skeleton, useWorkspace() for workspace.id. Features: collapsible header (ChevronDown with rotate-180 toggle), checkbox toggle with optimistic update, inline-editable titles (click/blur/enter/escape), add task input (Enter to add), hover-reveal delete button (X), drag-to-reorder via native HTML DnD (swap positions on drop, batch updateTask for both swapped tasks, re-fetch on error). TaskPanel placed below CommentPanel for step in canvas-view.tsx right sidebar. All acceptance criteria satisfied.",
+  "notes": "client.ts modification authorized via shared_files.owner = #FEAT-046 in EXECUTION_PLAN.json. All 6 acceptance criteria met: (1) tasks GET route now accepts optional step_id — omitting it returns all workspace tasks; (2) fetchAllTasks(workspaceId) added to client.ts; (3) TaskCountsContext created in canvas.ts as Map<string, { completed: number; total: number }>; (4) canvas-view.tsx fetches all workspace tasks on mount, builds the map, wraps ReactFlow in TaskCountsContext.Provider (outer) + CommentCountsContext.Provider (inner); (5) step-node.tsx consumes TaskCountsContext and displays completed/total badge bottom-left with ListTodo icon (avoids overlap with comment badge at bottom-right); (6) section-detail-panel.tsx consumes TaskCountsContext and shows task rollup with per-step progress rows plus section-level summary total.",
 
   "failure_details": null
 }
