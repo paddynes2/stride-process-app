@@ -64,6 +64,8 @@ export function TouchpointNode({ data, selected }: NodeProps) {
           className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-[var(--bg-surface)]"
           style={{ backgroundColor: annotationColor }}
           title="Has perspective annotation"
+          role="img"
+          aria-label="Annotated by perspective"
         />
       )}
 

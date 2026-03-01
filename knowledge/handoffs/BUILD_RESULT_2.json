@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "iteration": 77,
+  "slot": 2,
+  "task_id": "#IMP-003",
+  "status": "completed",
+  "duration_seconds": 120,
+
+  "files_changed": [
+    {
+      "path": "src/components/canvas/step-node.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/components/canvas/section-node.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/components/canvas/touchpoint-node.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/components/canvas/stage-node.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 0
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "4 pre-existing warnings in flow-canvas.tsx and journey-canvas-view.tsx (documented in LEARNINGS.md)" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/components/canvas/step-node.tsx",
+    "src/components/canvas/section-node.tsx",
+    "src/components/canvas/touchpoint-node.tsx",
+    "src/components/canvas/stage-node.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Added role='img' and aria-label='Annotated by perspective' to the annotation indicator dot <div> in all 4 canvas node components. The existing title attribute was preserved for mouse-hover tooltip. section-node and stage-node use 12-space attribute indentation (vs 10-space in step-node/touchpoint-node) due to deeper nesting inside the content wrapper div.",
+
+  "failure_details": null
+}
