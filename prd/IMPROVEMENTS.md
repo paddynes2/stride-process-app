@@ -20,13 +20,11 @@
 ## Medium Priority
 <!-- Improvements that would help but aren't urgent -->
 
-- [ ] #IMP-003 Annotation indicator dots lack semantic ARIA for screen readers — Attempts: 1
+- [x] #IMP-003 Annotation indicator dots lack semantic ARIA for screen readers — DONE iteration 77, 2026-03-01
   - **Found:** Iteration 57 (quality audit)
   - **Category:** Accessibility
   - **Where:** `src/components/canvas/step-node.tsx`, `section-node.tsx`, `touchpoint-node.tsx`, `stage-node.tsx`
-  - **What:** Annotation indicator dots have `title` attribute but no `aria-label` or `role="status"`. Screen readers won't announce them meaningfully.
-  - **Why it matters:** Perspective annotations are invisible to assistive tech users.
-  - **Suggested fix:** Add `aria-label="Annotated by perspective"` and `role="img"` to indicator divs.
+  - **Fix applied:** Added `role="img"` and `aria-label="Annotated by perspective"` to annotation indicator `<div>` elements in all 4 node types. Existing `title` preserved for mouse hover tooltip.
 
 - [ ] #IMP-004 Optimize annotation loading for large canvases — Attempts: 0
   - **Found:** Iteration 57 (quality audit)

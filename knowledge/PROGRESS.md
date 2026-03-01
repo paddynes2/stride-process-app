@@ -633,28 +633,33 @@
 - Observations: 0
 **Notes:** Both tasks completed. FEAT-046 [1/3] tasks data layer ready. IMP-002 finally landed after 2 prior failed attempts (iter 74 merge loss, initial reviewer missed BUILD_RESULT_2.json). Correction commit fixes docs.
 
-## Iteration 77 — 2026-03-01 22:00
+## Iteration 77 — 2026-03-01 22:30
 **Tasks:**
-- #FEAT-046 [2/3] Tasks tab UI (TaskPanel component) — slot 1 — failed (builder crashed, branch never created)
-- #IMP-003 Annotation indicator ARIA labels — slot 2 — failed (merge conflict, code never merged)
+- #FEAT-046 [2/3] TaskPanel UI — checkbox list, inline edit, drag reorder, add/delete — slot 1 — completed
+- #IMP-003 Annotation indicator ARIA labels (`role="img"` + `aria-label`) — slot 2 — completed
 **Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
 **Mode:** multi_task
-**Result:** blocked
-**Changes:** None — zero product code merged. Codebase identical to commit 575c7a1.
+**Result:** completed
+**Changes:**
+- Created: src/components/panels/task-panel.tsx (254 lines)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (+4 lines — TaskPanel import + placement)
+- Modified: src/components/canvas/step-node.tsx (+2 lines — ARIA on annotation dot)
+- Modified: src/components/canvas/section-node.tsx (+2 lines — ARIA on annotation dot)
+- Modified: src/components/canvas/stage-node.tsx (+2 lines — ARIA on annotation dot)
+- Modified: src/components/canvas/touchpoint-node.tsx (+2 lines — ARIA on annotation dot)
 **Verification:**
-- Type check: pass (vacuous — no changes)
-- Lint: pass (vacuous — no changes)
-- Build: N/A (no code to build)
+- Type check: pass (0 errors — verified by reviewer after recovery)
+- Lint: pass (0 errors on changed files, 4 pre-existing warnings elsewhere)
+- Build: pass (reported by slot 1 builder — next build compiled 27/27 pages in 5.5s)
 - Unit tests: N/A (no test suite exists)
-- Browser test: skipped (no changes to test)
-- Canary test: skipped (no changes)
-- Regression: 19/19 baseline PASS (codebase unchanged), 0/6 acceptance FAIL (all planned code absent)
-**Bugs found:** 3 pipeline bugs — (1) P1: FEAT-046 builder crashed both attempts, branch never created; (2) P1: IMP-003 merge conflict both attempts, handoff JSONs caused conflict (G007); (3) P2: root cause is git add -A in worktrees staging handoff files
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true for slot 1)
+**Bugs found:** 3 pipeline bugs (from first run attempt) — (1) builder crash, (2) merge conflict G007, (3) git add -A in worktrees. Plus 1 improvement (IMP-010 collapsible panels).
 **Improvements found:** 1 — collapsible panel UX with localStorage state (from tester, logged as IMP-010)
 **Self-score:**
-- Code quality: N/A — no code produced
-- Test coverage: 3 — regression tester ran comprehensive static analysis (19 baseline + 6 acceptance checks)
-- Confidence: 1 — both tasks must be retried, pipeline merge bug must be fixed first
-- Efficiency: 1 — entire iteration wasted due to pipeline failures
+- Code quality: 4 — TaskPanel follows CommentPanel pattern cleanly. Optimistic updates with rollback on edit. Native HTML DnD (no deps). ARIA changes minimal and correct.
+- Test coverage: 1 — typecheck + lint only. No browser or acceptance testing. Canary skipped.
+- Confidence: 4 — purely additive (new panel, ARIA attributes). No existing behavior changed. Deducted 1 for no runtime testing.
+- Efficiency: 2 — builders succeeded but worktree merge failed again (4th occurrence). Reviewer recovered code from unreachable git commits (186099a, 262a973). Two pipeline runs wasted before recovery.
 - Observations: 4 (3 pipeline bugs + 1 improvement)
-**Notes:** Third consecutive iteration with merge failures for at least one slot. Pattern: builders report success in worktrees but code never reaches main branch. G007 (handoff file conflicts) has been a known issue since iter 74. Builder crash in slot 1 is a new failure mode — ralph.log should be reviewed. BUILD_RESULT files are misleading (report completed but code is absent).
+**Notes:** Fourth consecutive iteration requiring manual code recovery from unreachable commits. Builders ran twice — first run documented as failure (commit abfb2ec), second run produced BUILD_RESULTs but merge still failed. Reviewer used `git fsck --unreachable` to find builder commits and `git checkout <hash> -- <file>` to extract code. Pipeline G007 bug (git add -A staging handoff files in worktrees) remains unfixed. FEAT-046 [2/3] now complete — [3/3] (task count badges + section rollup) is next.

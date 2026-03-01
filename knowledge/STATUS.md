@@ -1,19 +1,21 @@
 ## Handoff
 
 - **Iteration:** 77
-- **Date:** 2026-03-01 22:00
+- **Date:** 2026-03-01 22:30
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-046 [2/3] Tasks tab UI (failed — builder crashed), #IMP-003 annotation ARIA (failed — merge conflict)
-- **Result:** blocked
-- **Next task:** #FEAT-046 [2/3] retry + #IMP-003 retry — but fix ralph.sh merge conflict root cause first (G007: git add -A stages handoff JSONs in worktrees)
-- **Blockers:** Pipeline merge failures — both builder slots failed to merge code into main branch. Root cause: (1) slot 1 builder crash (branch never created), (2) slot 2 merge conflict from handoff JSON files staged by `git add -A` (G007). Until ralph.sh excludes handoff files from worktree commits, slot 2 merge conflicts will recur.
+- **Last task(s):** #FEAT-046 [2/3] TaskPanel UI (completed — recovered from unreachable commit), #IMP-003 annotation ARIA labels (completed — recovered from unreachable commit)
+- **Result:** completed
+- **Next task:** #FEAT-046 [3/3] — Task count badges on step nodes + section rollup (mirrors FEAT-045 [3/3] pattern)
+- **Blockers:** None (code recovered successfully this iteration)
 
 ## Context
 
-Zero code changes this iteration. Codebase identical to commit 575c7a1 (iter 76 fixes). Both builders reported success in their worktrees (BUILD_RESULT_1.json and BUILD_RESULT_2.json show status=completed) but neither slot's code was merged into ralph/init-stride. Slot 1 (FEAT-046 TaskPanel) builder crashed — no branch was ever created. Slot 2 (IMP-003 ARIA labels) built successfully but merge failed due to conflicts in EXECUTION_PLAN.json or handoff files. Regression tester confirmed: task-panel.tsx doesn't exist, no aria-label/role='img' on any node files.
+TaskPanel component created at `src/components/panels/task-panel.tsx` (254 lines). Follows CommentPanel pattern: standalone panel with own data fetching (useEffect+cancelled), loading skeleton, empty state. Features: checkbox toggle (optimistic), inline-editable titles (click/blur/enter/escape), drag-to-reorder (native HTML DnD, position swap), add task input (Enter to save), hover-reveal delete button. Integrated into `canvas-view.tsx` right sidebar between AnnotationPanel and CommentPanel when a step is selected.
 
-The ralph.sh diff shows 3 diagnostic log lines were added (unstaged) — these are debug artifacts from the pipeline operator, not iteration code.
+ARIA labels (`role="img"` + `aria-label="Annotated by perspective"`) added to annotation indicator dots in all 4 canvas node types (step-node, section-node, touchpoint-node, stage-node).
+
+Builder code was recovered from unreachable commits (186099a slot 1, 262a973 slot 2) — worktree merge failed silently again (4th occurrence). Pipeline merge reliability remains a systemic issue.
 
 ## Dev Server
 
@@ -23,10 +25,9 @@ The ralph.sh diff shows 3 diagnostic log lines were added (unstaged) — these a
 
 ## Warnings
 
-- **CRITICAL:** Pipeline merge conflict recurring (G007) — `git add -A` in builder worktrees stages handoff JSON files, causing conflicts with main branch. Must be fixed before next iteration.
-- **CRITICAL:** Builder slot 1 crashes — two consecutive crash attempts this iteration. ralph.log should be checked for root cause.
 - Migrations 014_comments.sql + 015_tasks.sql need `npx supabase db push` to deploy to remote DB
-- Retrospective overdue — was due at iteration 70. Next multiple of 10: iteration 80.
+- Pipeline worktree merge bug persists — 4th consecutive multi-task iteration requiring manual code recovery by reviewer. G007 (git add -A in worktrees) still unfixed in ralph.sh.
+- Retrospective overdue — was due at iteration 70. Next milestone: iteration 80.
 - 4 pre-existing lint warnings in flow-canvas.tsx, journey-canvas-view.tsx
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation) — static verification only
