@@ -1,1 +1,1 @@
-CONTINUE: #IMP-002 re-attempt (changes lost in iter 74 merge) + #FEAT-046 tasks system (step-level checklists)
+CONTINUE: #FEAT-046 [2/3] Tasks tab UI on step detail panel + #IMP-002 re-attempt (attempt 3)
