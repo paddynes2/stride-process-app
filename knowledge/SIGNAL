@@ -1,1 +1,1 @@
-CONTINUE: Fix ralph.sh merge conflict root cause (G007: exclude handoff files from worktree commits), then retry #FEAT-046 [2/3] + #IMP-003
+CONTINUE: #FEAT-046 [3/3] — Task count badges on step canvas nodes + section-level task rollup in section detail panel
