@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -549,4 +549,38 @@ export async function updateComment(id: string, data: Partial<Pick<Comment, "con
 
 export async function deleteComment(id: string): Promise<void> {
   await apiFetch(`/api/v1/comments/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Tasks
+// ---------------------------------------------------------------------------
+
+export async function fetchTasks(workspaceId: string, stepId: string): Promise<Task[]> {
+  const params = new URLSearchParams({ workspace_id: workspaceId, step_id: stepId });
+  return apiFetch<Task[]>(`/api/v1/tasks?${params}`);
+}
+
+export async function createTask(data: {
+  workspace_id: string;
+  step_id: string;
+  title: string;
+  assigned_to?: string;
+}): Promise<Task> {
+  return apiFetch<Task>("/api/v1/tasks", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateTask(id: string, data: Partial<Pick<Task, "title" | "is_completed" | "position" | "assigned_to">>): Promise<Task> {
+  return apiFetch<Task>(`/api/v1/tasks/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTask(id: string): Promise<void> {
+  await apiFetch(`/api/v1/tasks/${id}`, { method: "DELETE" });
 }

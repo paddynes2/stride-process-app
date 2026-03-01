@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "iteration": 76,
+  "slot": 1,
+  "task_id": "#FEAT-046",
+  "status": "completed",
+  "duration_seconds": 180,
+
+  "files_changed": [
+    {
+      "path": "supabase/migrations/015_tasks.sql",
+      "action": "created",
+      "lines_added": 45,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/types/database.ts",
+      "action": "modified",
+      "lines_added": 17,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/tasks/route.ts",
+      "action": "created",
+      "lines_added": 99,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/tasks/[id]/route.ts",
+      "action": "created",
+      "lines_added": 80,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/lib/api/client.ts",
+      "action": "modified",
+      "lines_added": 37,
+      "lines_removed": 1
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0" },
+    "lint": { "status": "pass", "errors": 0, "output": "eslint: 0 errors, 8 warnings (all pre-existing in flow-canvas.tsx and journey-canvas-view.tsx)" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "supabase/migrations/015_tasks.sql",
+    "src/app/api/v1/tasks/route.ts",
+    "src/app/api/v1/tasks/[id]/route.ts",
+    "src/types/database.ts",
+    "src/lib/api/client.ts"
+  ],
+  "ownership_violations": [],
+  "notes": "All acceptance criteria met. Task interface added to database.ts (auto-re-exported via types/index.ts since index.ts already has `export * from './database'` — no index.ts modification needed). Position auto-assignment uses max(position)+1 query before insert, defaulting to 0 when no tasks exist for the step. PGRST116 mapped to 403 on POST (RLS denial), 404 on PATCH/DELETE (not found or inaccessible).",
+
+  "failure_details": null
+}

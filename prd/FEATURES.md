@@ -269,8 +269,12 @@
 ### #FEAT-046 Tasks system (step-level checklists)
 **Phase:** 4
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in_progress
+**Sub-tasks:**
+- [ ] [1/3] Data model + types + API routes + client wrappers — IN PROGRESS iteration 76
+- [ ] [2/3] Tasks tab UI on step detail panel (checkbox list, inline edit, drag-to-reorder, add task input)
+- [ ] [3/3] Task count on canvas nodes + section-level rollup in section detail panel
 **Acceptance criteria:**
 - [ ] New `tasks` table: id, workspace_id, step_id (FK), title, is_completed (boolean), position (integer), assigned_to (nullable FK users), created_by (FK users), created_at, updated_at
 - [ ] RLS, types, API (GET by step_id, POST, PATCH, DELETE), client wrappers

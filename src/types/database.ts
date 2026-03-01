@@ -252,3 +252,20 @@ export interface PerspectiveAnnotation {
   created_at: string;
   updated_at: string;
 }
+
+// =============================================================================
+// Tasks — step-scoped checklist items
+// =============================================================================
+
+export interface Task {
+  id: string;
+  workspace_id: string;
+  step_id: string;
+  title: string;
+  is_completed: boolean;
+  position: number;
+  assigned_to: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}

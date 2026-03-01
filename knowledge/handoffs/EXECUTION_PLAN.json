@@ -1,91 +1,143 @@
 {
   "schema_version": "1.0",
-  "iteration": 75,
-  "date": "2026-03-01T17:00:00Z",
-  "mode": "testing_only",
+  "iteration": 76,
+  "date": "2026-03-01T19:30:00Z",
+  "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "d6bfff9a915d84c48d1cc93a7780ee5e6e4d67d1",
+    "last_commit_hash": "4e1076723b8645e9a8f45c54f068f5c5a0d11f15",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
     "revert_reason": null
   },
-  "tasks": [],
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-046",
+      "description": "Tasks system [1/3] — migration 015_tasks.sql, Task type in database.ts, API routes (GET list by step_id + POST, PATCH, DELETE), client wrapper functions in client.ts. Follows comments system pattern (014_comments.sql, comments/route.ts, comments/[id]/route.ts, client.ts).",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 3,
+      "acceptance_criteria": [
+        "Migration 015_tasks.sql creates `tasks` table: id (UUID PK DEFAULT gen_random_uuid()), workspace_id (UUID NOT NULL FK workspaces ON DELETE CASCADE), step_id (UUID NOT NULL FK steps ON DELETE CASCADE), title (TEXT NOT NULL), is_completed (BOOLEAN NOT NULL DEFAULT false), position (INTEGER NOT NULL DEFAULT 0), assigned_to (UUID nullable FK users ON DELETE SET NULL), created_by (UUID NOT NULL FK users ON DELETE CASCADE), created_at (TIMESTAMPTZ NOT NULL DEFAULT now()), updated_at (TIMESTAMPTZ NOT NULL DEFAULT now())",
+        "update_updated_at trigger on tasks table",
+        "Indexes: idx_tasks_workspace (workspace_id), idx_tasks_step (step_id), idx_tasks_step_position (step_id, position)",
+        "RLS policies on tasks using can_access_workspace(workspace_id) — SELECT, INSERT, UPDATE, DELETE",
+        "Task interface exported from src/types/database.ts matching migration columns",
+        "GET /api/v1/tasks?workspace_id=X&step_id=Y returns tasks for a step ordered by position ASC",
+        "POST /api/v1/tasks creates task — required: workspace_id, step_id, title. Optional: assigned_to. Server sets created_by=user.id, position=max(position)+1 for step",
+        "PATCH /api/v1/tasks/[id] updates subset of: title, is_completed, position, assigned_to",
+        "DELETE /api/v1/tasks/[id] deletes single task",
+        "All routes: auth guard, input validation, PGRST116 → 403 on RLS denial",
+        "Client wrappers: fetchTasks(workspaceId, stepId), createTask(data), updateTask(id, data), deleteTask(id)",
+        "npx tsc --noEmit passes with 0 errors"
+      ],
+      "files_owned": [
+        "supabase/migrations/015_tasks.sql",
+        "src/app/api/v1/tasks/route.ts",
+        "src/app/api/v1/tasks/[id]/route.ts",
+        "src/types/database.ts",
+        "src/lib/api/client.ts"
+      ],
+      "files_read_only": [
+        "supabase/migrations/014_comments.sql",
+        "src/app/api/v1/comments/route.ts",
+        "src/app/api/v1/comments/[id]/route.ts",
+        "src/lib/api/response.ts",
+        "src/lib/supabase/server.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "supabase/migrations/014_comments.sql",
+          "src/app/api/v1/comments/route.ts",
+          "src/app/api/v1/comments/[id]/route.ts",
+          "src/lib/api/client.ts"
+        ],
+        "patterns_to_follow": [
+          "Migration: follow 014_comments.sql — CREATE TABLE, update_updated_at trigger, indexes, ENABLE ROW LEVEL SECURITY, four CRUD policies using can_access_workspace()",
+          "API GET: auth check → query param extraction → supabase query builder with .eq() filters → .order('position', {ascending: true}) → successResponse(data)",
+          "API POST: auth check → body extraction → field validation with early returns → build insert object (set created_by: user.id) → .insert().select().single() → PGRST116 → 403",
+          "API PATCH: EDITABLE_FIELDS whitelist → filter body keys → .update(updates).eq('id', id).select().single() → PGRST116 → 404",
+          "API DELETE: .delete().eq('id', id).select().single() → PGRST116 → 404 → successResponse({ deleted: true })",
+          "Client wrappers: follow comments section in client.ts — apiFetch<T> with URLSearchParams for GET, method+headers+body for mutations"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — returns T directly, no nested property access",
+          "Supabase RLS silent mutations — check if data is null after mutations, return 403",
+          "React 19 useRef requires initial value"
+        ],
+        "affected_urls": [
+          "/api/v1/tasks",
+          "/api/v1/tasks/[id]"
+        ]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "This is sub-task [1/3] of FEAT-046. ONLY build the data layer — no UI. Do NOT create step-detail-panel changes, canvas node changes, or section rollup. Those are [2/3] and [3/3]. Tasks are step-scoped (direct step_id FK, not polymorphic). step_id FK must use ON DELETE CASCADE (deleting a step removes its tasks). assigned_to FK must use ON DELETE SET NULL (deleting a user doesn't delete tasks). For position auto-assignment in POST: query SELECT COALESCE(MAX(position), -1) + 1 FROM tasks WHERE step_id = $step_id before insert. Migration file must be named exactly 015_tasks.sql. Add Task import to types/index.ts re-exports."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-002",
+      "description": "Color picker keyboard accessibility + ARIA in perspective settings — add role='listbox', aria-expanded, arrow key navigation, Escape to close, Enter/Space to select.",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 2,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Color picker trigger button has aria-expanded={showColorPicker}",
+        "Color palette container has role='listbox' and aria-label='Color options'",
+        "Each color swatch button has role='option' and aria-selected={color === perspective.color}",
+        "Color swatch aria-labels use descriptive names (map hex → name: e.g., '#3B82F6' → 'Blue')",
+        "Escape key closes the picker and returns focus to trigger button",
+        "Left/Right arrow keys navigate between color options when picker is open",
+        "Enter or Space on focused option selects the color and closes picker",
+        "Auto-focus first option (or current color) when picker opens",
+        "npx tsc --noEmit passes with 0 errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "PerspectiveRow component: lines 349-468 of settings/page.tsx",
+          "PERSPECTIVE_COLORS array provides the color list (8 colors)",
+          "showColorPicker state + colorRef for outside-click detection already exist",
+          "Focus-visible outline: focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)]"
+        ],
+        "learnings_relevant": [
+          "Lucide-react no title prop — use aria-label instead (TS2322)"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/settings"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Attempt 2 — code was built in iter 74 but lost in worktree merge. Not a code quality failure. Scope: ONLY the PerspectiveRow component color picker (lines ~391-417). Add a focusedColorIndex state (useState). When picker opens, set focus to current color index (or 0). Add onKeyDown handler to popup div: ArrowRight increments index (wrap), ArrowLeft decrements (wrap), Enter/Space selects and closes, Escape closes and returns focus to trigger. Use refs array for color buttons to imperatively focus them. Create a COLOR_NAMES map at module scope: { '#3B82F6': 'Blue', '#14B8A6': 'Teal', ... } for descriptive aria-labels. Do NOT refactor surrounding code or touch anything outside PerspectiveRow."
+    }
+  ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
-    "owner": null,
-    "note": "Testing-only iteration. No source files should be modified."
+    "read_only": ["package.json", "tsconfig.json", "src/lib/api/response.ts", "src/lib/supabase/server.ts", "src/types/canvas.ts", "src/types/index.ts"],
+    "owner": "#FEAT-046",
+    "note": "FEAT-046 [1/3] has exclusive write access to database.ts (add Task type) and client.ts (add task wrappers). IMP-002 only touches settings/page.tsx — zero overlap."
   },
-  "merge_order": [],
+  "merge_order": ["#FEAT-046", "#IMP-002"],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": true,
-    "regression_reason": "Cadence floor breach: last regression iter 64, current iter 75 (11 iterations, floor 8). Risk score 5 from iter 74 (11 files changed, shared components touched, partial result). Iter 73 regression had 0/5 acceptance failures (code absent at test time).",
-    "suites_to_run": ["regression", "acceptance"],
-    "cadence_trigger": "regression_overdue",
-    "regression_scope": {
-      "baseline_checks": [
-        "1. /login renders (curl 200)",
-        "2. /workspaces redirects unauthed (curl 307→login)",
-        "3. Canvas tab loads with nodes (static: canvas-view.tsx, flow-canvas.tsx)",
-        "4. Click step → detail panel (static: onNodeClick → onStepSelect)",
-        "5. Edit step name saves (static: debounced handleNameChange → updateStep)",
-        "6. Click section → panel (static: onSectionSelect → SectionDetailPanel)",
-        "7. Canvas zoom/pan (static: React Flow defaults + Controls + MiniMap)",
-        "8. Journey tab renders (static: journey-canvas-view.tsx, canvas_type check)",
-        "9. Click touchpoint → panel (static: selectedTouchpointId → TouchpointDetailPanel)",
-        "10. Click stage → panel (static: selectedStageId → StageDetailPanel)",
-        "11. Step list displays (static: step-list-view.tsx — fetch, filter, sort, render)",
-        "12. Gap analysis displays (static: gap-analysis-view.tsx — maturity gaps + visual bars)",
-        "13. Comparison view renders (static: compare-view.tsx — side-by-side + match glow)",
-        "14. Settings page loads (static: settings/page.tsx — name, sharing, perspectives)",
-        "15. Teams page loads (static: teams-view.tsx — full CRUD hierarchy)",
-        "16. Perspectives list displays (static: settings PerspectivesSection + PerspectiveRow)",
-        "17. PDF export no errors (static: pdf.ts all imports valid)",
-        "18. PNG export no errors (static: png.ts + use-canvas-export.ts)",
-        "19. No new console errors (API probing + static analysis)"
-      ],
-      "extended_checks_since_iter_64": [
-        "20. Dashboard page renders (static: dashboard/page.tsx — data transformations, all imports valid)",
-        "21. People page renders with CRUD (static: people-view.tsx — inline editing, role picker, delete confirm)",
-        "22. Tools page renders with CRUD (static: tools-view.tsx — CRUD view, imports valid)",
-        "23. Search/filter on People view (static: people-view.tsx — filter state, input binding)",
-        "24. Search/filter on Tools view (static: tools-view.tsx — filter state, input binding)",
-        "25. Search/filter on Teams view (static: teams-view.tsx — hierarchical matching logic)",
-        "26. Comments API route exists and has auth guards (curl: POST /api/v1/comments → 401)",
-        "27. Comment panel component exists (static: comment-panel.tsx — props, fetch, render)",
-        "28. Comment count badges on canvas nodes (static: step-node, section-node, stage-node, touchpoint-node — useContext(CommentCountsContext))",
-        "29. Workspace comments page renders (static: comments/comments-view.tsx — category filter, comment list)",
-        "30. Sidebar includes Comments nav item (static: sidebar.tsx — Comments entry with MessageSquare icon)",
-        "31. workspace-shell.tsx reserves 'comments' path (static: reserved paths array includes 'comments')",
-        "32. Hex color validation on perspectives API (static: perspectives route.ts — HEX_COLOR_REGEX guard)"
-      ],
-      "api_auth_probe": [
-        "workspaces → 401",
-        "steps → 401",
-        "perspectives → 401",
-        "annotations → 401",
-        "teams → 401",
-        "comments → 401",
-        "tools → 401",
-        "people → 401",
-        "sections → 405 (POST-only)",
-        "stages → 405 (POST-only)",
-        "public/shares/[id] → not_found"
-      ],
-      "data_integrity_checks": [
-        "CommentCountsContext provider wraps React Flow in both canvas-view.tsx and journey-canvas-view.tsx",
-        "Comment panel integrated in all 4 detail panels (step, section, touchpoint, stage)",
-        "All canvas node types import and use CommentCountsContext",
-        "Comments migration (014) defines proper enums and RLS policies",
-        "No orphaned imports or missing dependencies in new files"
-      ]
-    }
+    "run_regression": false,
+    "regression_reason": null,
+    "suites_to_run": ["acceptance"],
+    "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "REGRESSION executing iteration 75 (overdue since iter 64, 11 iterations). Extended scope: 32 checks covering all features through Phase 4 FEAT-045."
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

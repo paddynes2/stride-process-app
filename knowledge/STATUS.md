@@ -1,21 +1,19 @@
 ## Handoff
 
-- **Iteration:** 75
-- **Date:** 2026-03-01 18:30
+- **Iteration:** 76
+- **Date:** 2026-03-01 20:00
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** REGRESSION-75 (testing_only — 32/32 checks PASS) + ralph.sh pipeline fixes
-- **Result:** completed
-- **Next task:** #IMP-002 (re-attempt, changes lost in iter 74 merge) + #FEAT-046 (tasks system)
+- **Last task(s):** (planner output — iteration 76 plan)
+- **Result:** planned
+- **Next task:** Slot 1: #FEAT-046 [1/3] Tasks data layer (migration + types + API + client). Slot 2: #IMP-002 (color picker a11y, attempt 2).
 - **Blockers:** None
 
 ## Context
 
-Iteration 75 completed the overdue regression suite (32/32 checks via static analysis + API auth probing). All features through Phase 4 FEAT-045 verified: 19 baseline checks + 13 extended checks covering dashboard, people/tools CRUD, search/filter, comments system (API, panel, badges, workspace page), sidebar nav, hex color validation. 11 API auth probes + 5 data integrity checks all pass.
+Iteration 76 plan: two parallel builder tasks. Slot 1 builds the tasks system data layer (#FEAT-046 [1/3]) — migration 015_tasks.sql, Task type in database.ts, API routes (GET/POST + PATCH/DELETE), client wrappers. Follows the comments system pattern exactly. Slot 2 re-attempts #IMP-002 (color picker keyboard accessibility + ARIA) — changes lost in iter 74 merge. Files are non-overlapping (types/API/migration vs settings/page.tsx).
 
-Pipeline fixes also committed: ralph.sh improvements for builder health checks, proper exit code capture, regression tester independence from Playwright, skip-on-upstream-failure logic, and testing_only mode tester enablement.
-
-2 new improvements logged: IMP-008 (flow-canvas useCallback missing deps), IMP-009 (comments page missing entity navigation links).
+Codebase compiles clean (0 errors). Regression passed iter 75 (32/32). Risk score 0 from iter 75 (testing-only iteration). No cadence triggers.
 
 ## Dev Server
 
