@@ -10,8 +10,8 @@ import { CommentPanel } from "@/components/panels/comment-panel";
 import { TaskPanel } from "@/components/panels/task-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations, fetchComments } from "@/lib/api/client";
-import { CommentCountsContext } from "@/types/canvas";
+import { fetchAnnotations, fetchComments, fetchAllTasks } from "@/lib/api/client";
+import { CommentCountsContext, TaskCountsContext } from "@/types/canvas";
 import type { Section, Step, Connection } from "@/types/database";
 
 interface CanvasViewProps {
@@ -135,7 +135,29 @@ export function CanvasView({
     return () => { cancelled = true; };
   }, [workspaceId]);
 
+  // Fetch all workspace tasks once to compute per-step completion counts for badges
+  const [taskCounts, setTaskCounts] = React.useState<Map<string, { completed: number; total: number }>>(new Map());
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchAllTasks(workspaceId)
+      .then((tasks) => {
+        if (cancelled) return;
+        const counts = new Map<string, { completed: number; total: number }>();
+        for (const t of tasks) {
+          const prev = counts.get(t.step_id) ?? { completed: 0, total: 0 };
+          counts.set(t.step_id, {
+            completed: prev.completed + (t.is_completed ? 1 : 0),
+            total: prev.total + 1,
+          });
+        }
+        setTaskCounts(counts);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspaceId]);
+
   return (
+    <TaskCountsContext.Provider value={taskCounts}>
     <CommentCountsContext.Provider value={commentCounts}>
       <div className="flex h-full">
         {/* Canvas */}
@@ -229,5 +251,6 @@ export function CanvasView({
         </div>
       </div>
     </CommentCountsContext.Provider>
+    </TaskCountsContext.Provider>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, ListTodo } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,7 @@ const RichTextEditor = dynamic(
 import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch } from "@/lib/api/client";
 import type { StepRoleWithDetails } from "@/lib/api/client";
 import type { Section, Step } from "@/types/database";
+import { TaskCountsContext } from "@/types/canvas";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
 
@@ -89,6 +90,13 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
       toastError("Failed to delete section", { error: err });
     }
   };
+
+  const taskCounts = React.useContext(TaskCountsContext);
+
+  // Task rollup — total/completed across all steps in this section
+  const totalTasksCompleted = steps.reduce((sum, s) => sum + (taskCounts.get(s.id)?.completed ?? 0), 0);
+  const totalTasksCount = steps.reduce((sum, s) => sum + (taskCounts.get(s.id)?.total ?? 0), 0);
+  const stepsWithTasks = steps.filter((s) => (taskCounts.get(s.id)?.total ?? 0) > 0);
 
   // Status distribution
   const statusCounts = steps.reduce(
@@ -176,6 +184,39 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
             </div>
           )}
         </div>
+
+        {/* Task rollup — only shown when section has steps with tasks */}
+        {totalTasksCount > 0 && (
+          <>
+            <Separator />
+            <div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <ListTodo className="h-3.5 w-3.5 text-[var(--text-tertiary)]" />
+                <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide">
+                  Tasks
+                </label>
+                <span className="ml-auto text-[11px] font-semibold text-[var(--text-primary)]">
+                  {totalTasksCompleted}/{totalTasksCount}
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {stepsWithTasks.map((s) => {
+                  const tc = taskCounts.get(s.id)!;
+                  return (
+                    <div key={s.id} className="flex items-center justify-between">
+                      <span className="text-[12px] text-[var(--text-secondary)] truncate flex-1 min-w-0 mr-2">
+                        {s.name}
+                      </span>
+                      <span className="text-[12px] font-medium text-[var(--text-primary)] shrink-0">
+                        {tc.completed}/{tc.total}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Maturity averages */}
         {(avgMaturity != null || avgTarget != null) && (

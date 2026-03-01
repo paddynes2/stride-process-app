@@ -560,6 +560,10 @@ export async function fetchTasks(workspaceId: string, stepId: string): Promise<T
   return apiFetch<Task[]>(`/api/v1/tasks?${params}`);
 }
 
+export async function fetchAllTasks(workspaceId: string): Promise<Task[]> {
+  return apiFetch<Task[]>(`/api/v1/tasks?workspace_id=${workspaceId}`);
+}
+
 export async function createTask(data: {
   workspace_id: string;
   step_id: string;

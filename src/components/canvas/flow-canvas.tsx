@@ -299,7 +299,7 @@ export function FlowCanvas({
   }, [onStepSelect, onSectionSelect]);
 
   // Add step
-  const handleAddStep = async () => {
+  const handleAddStep = React.useCallback(async () => {
     try {
       const step = await createStep({
         workspace_id: workspaceId,
@@ -313,10 +313,10 @@ export function FlowCanvas({
     } catch (err) {
       toastError("Failed to create step", { error: err, retry: handleAddStep });
     }
-  };
+  }, [workspaceId, tabId, onStepCreate, onStepSelect]);
 
   // Add section
-  const handleAddSection = async () => {
+  const handleAddSection = React.useCallback(async () => {
     try {
       const section = await createSection({
         workspace_id: workspaceId,
@@ -329,7 +329,7 @@ export function FlowCanvas({
     } catch (err) {
       toastError("Failed to create section", { error: err, retry: handleAddSection });
     }
-  };
+  }, [workspaceId, tabId, onSectionCreate]);
 
   // Handle delete key
   const handleKeyDown = React.useCallback(
@@ -371,7 +371,7 @@ export function FlowCanvas({
         handleAddSection();
       }
     },
-    [selectedStepId, selectedSectionId, onStepDelete, onSectionDelete]
+    [selectedStepId, selectedSectionId, onStepDelete, onSectionDelete, handleAddStep, handleAddSection]
   );
 
   React.useEffect(() => {

@@ -7,6 +7,10 @@ import type { Step, Section, Stage, Touchpoint } from "./database";
 // provide this context, avoiding prop-drilling through FlowCanvas.
 export const CommentCountsContext = createContext<Map<string, number>>(new Map());
 
+// Context providing task completion counts (stepId → { completed, total }) to canvas nodes.
+// canvas-view fetches all workspace tasks once, builds this map, and provides it to node components.
+export const TaskCountsContext = createContext<Map<string, { completed: number; total: number }>>(new Map());
+
 // Custom node data types for React Flow — Process canvas
 export interface StepNodeData extends Record<string, unknown> {
   step: Step;

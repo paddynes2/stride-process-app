@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, ListTodo } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { StepNodeData } from "@/types/canvas";
-import { CommentCountsContext } from "@/types/canvas";
+import { CommentCountsContext, TaskCountsContext } from "@/types/canvas";
 import { MATURITY_COLORS, MATURITY_FALLBACK_COLOR } from "@/lib/maturity";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -30,6 +30,8 @@ export function StepNode({ data, selected }: NodeProps) {
   const maturityColor = step.maturity_score != null ? MATURITY_COLORS[step.maturity_score] ?? MATURITY_FALLBACK_COLOR : null;
   const commentCounts = React.useContext(CommentCountsContext);
   const commentCount = commentCounts.get(step.id) ?? 0;
+  const taskCounts = React.useContext(TaskCountsContext);
+  const taskCount = taskCounts.get(step.id);
 
   return (
     <div
@@ -110,6 +112,17 @@ export function StepNode({ data, selected }: NodeProps) {
           </div>
         )}
       </div>
+
+      {/* Task count badge — bottom-left, only when total > 0 */}
+      {taskCount && taskCount.total > 0 && (
+        <div
+          className="absolute bottom-1 left-1 flex items-center gap-0.5 bg-[var(--bg-surface-active)] rounded px-1 py-0.5"
+          title={`${taskCount.completed}/${taskCount.total} tasks completed`}
+        >
+          <ListTodo className="h-2.5 w-2.5 text-[var(--text-tertiary)]" />
+          <span className="text-[9px] font-medium text-[var(--text-tertiary)]">{taskCount.completed}/{taskCount.total}</span>
+        </div>
+      )}
 
       {/* Comment count badge — bottom-right, only when count > 0 */}
       {commentCount > 0 && (

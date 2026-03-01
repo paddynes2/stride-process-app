@@ -17,16 +17,17 @@ export async function GET(request: NextRequest) {
     return errorResponse("validation", "workspace_id is required", 400);
   }
 
-  if (!stepId) {
-    return errorResponse("validation", "step_id is required", 400);
-  }
-
-  const { data: tasks, error } = await supabase
+  let query = supabase
     .from("tasks")
     .select("*")
     .eq("workspace_id", workspaceId)
-    .eq("step_id", stepId)
     .order("position", { ascending: true });
+
+  if (stepId) {
+    query = query.eq("step_id", stepId);
+  }
+
+  const { data: tasks, error } = await query;
 
   if (error) {
     return errorResponse("fetch_failed", error.message, 500);
