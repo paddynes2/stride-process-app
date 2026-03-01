@@ -246,24 +246,24 @@
 
 ## Phase 4: The Living Playbook — IN PROGRESS
 
-### #FEAT-045 Comments system
+### #FEAT-045 Comments system — DONE iteration 74, 2026-03-01
 **Phase:** 4
 **Priority:** P0 (critical path)
-**Attempts:** 2
-**Status:** in_progress
+**Attempts:** 3
+**Status:** done
 **Sub-tasks:**
 - [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 71, 2026-02-28
 - [x] [2/3] Comment panel UI on step/section/touchpoint/stage detail panels — DONE iteration 73, 2026-03-01
-- [ ] [3/3] Canvas badges + workspace-level comments view
+- [x] [3/3] Canvas badges + workspace-level comments view — DONE iteration 74, 2026-03-01
 **Acceptance criteria:**
 - [x] New `comments` table: id, workspace_id, commentable_type (enum: step/section/touchpoint/stage), commentable_id, parent_id (nullable FK for threading), author_id (FK users), content, category (enum: note/decision/pain_point/idea/question), is_resolved (boolean), created_at, updated_at
 - [x] RLS, types, API routes (GET filterable, POST, PATCH, DELETE), client wrappers
 - [x] Comment panel tab on step/section detail panels — DONE iteration 73
-- [ ] Comment list: author, relative timestamp, category badge, content, reply count
-- [ ] "Add Comment" form: category dropdown + text + submit
-- [ ] Thread replies (parent_id), "Resolve" button (dims comment)
-- [ ] Comment count badge on canvas nodes
-- [ ] Workspace-level comments view: all comments, filterable by category
+- [x] Comment list: author, relative timestamp, category badge, content, reply count
+- [x] "Add Comment" form: category dropdown + text + submit
+- [x] Thread replies (parent_id), "Resolve" button (dims comment)
+- [x] Comment count badge on canvas nodes — via CommentCountsContext (avoids FlowCanvas prop-drilling)
+- [x] Workspace-level comments view: all comments, filterable by category — /w/{id}/comments
 **Notes:** Category system (note/decision/pain_point/idea/question) from Puzzle spec — helps organize workshop feedback. No @mentions until Phase 5.
 
 ### #FEAT-046 Tasks system (step-level checklists)

@@ -96,10 +96,10 @@ Core consulting insight features:
 ## Phase 4: The Living Playbook — IN PROGRESS
 **Target iterations:** 71+
 
-- [ ] #FEAT-045 Comments system (threaded, categorized: note/decision/pain_point/idea/question) — IN PROGRESS
+- [x] #FEAT-045 Comments system (threaded, categorized: note/decision/pain_point/idea/question) — DONE iteration 74
   - [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 71
   - [x] [2/3] Comment panel UI on detail panels — DONE iteration 73
-  - [ ] [3/3] Canvas badges + workspace comments view
+  - [x] [3/3] Canvas badges + workspace comments view — DONE iteration 74
 - [ ] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder)
 - [ ] #FEAT-047 Runbook instances (turn sections into executable checklists)
 - [ ] #FEAT-048 Playbook mode (distraction-free runbook execution view)
@@ -132,3 +132,4 @@ Deferred indefinitely:
 - [2026-02-28] Iteration 71: FEAT-045 [1/3] completed — comments data layer (migration, API, types, client). IMP-001 not built (builder slot 2 did not execute). Pipeline worktree merge issue discovered and manually resolved by reviewer.
 - [2026-02-28] Iteration 72: Testing-only iteration (REGRESSION-72) — tester agent did not execute. Regression still overdue (risk score 9 from iter 71). 3rd consecutive pipeline dispatch failure.
 - [2026-03-01] Iteration 73: FEAT-045 [2/3] and IMP-001 both completed. Comment panel UI built (415 lines) and integrated into both canvas views. Hex color validation added to perspectives API. Builder worktrees cleaned before merge again — reviewer recovered from unreachable commits. 2 new improvements logged (IMP-006, IMP-007).
+- [2026-03-01] Iteration 74: FEAT-045 [3/3] completed — canvas badges + workspace comments page. CommentCountsContext avoids prop-drilling. IMP-002 built but lost in merge. Pipeline worktree merge bug is critical (3rd occurrence).

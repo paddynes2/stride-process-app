@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-55, 2026-02-26 -->
+<!-- Updated: iter-74, 2026-03-01 -->
 
 ## Project
 
@@ -44,6 +44,7 @@ npx supabase db push     # Push migrations
 | `/w/.../teams` | `src/app/(app)/w/[workspaceId]/teams/page.tsx` | Teams management |
 | `/w/.../people` | `src/app/(app)/w/[workspaceId]/people/page.tsx` | People management (flat table CRUD) |
 | `/w/.../tools` | `src/app/(app)/w/[workspaceId]/tools/page.tsx` | Tools management (flat table CRUD) |
+| `/w/.../comments` | `src/app/(app)/w/[workspaceId]/comments/page.tsx` | Workspace comments (all comments, category filter) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 
@@ -99,7 +100,7 @@ npx supabase db push     # Push migrations
 | File | Key Types |
 |------|-----------|
 | `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment + enums (CommentCategory, CommentableType) |
-| `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types |
+| `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext |
 | `src/types/index.ts` | Re-exports |
 
 ### Hooks
@@ -152,6 +153,12 @@ Types: step, section, touchpoint, stage.
 
 ### Context Provider
 `WorkspaceProvider` wraps authenticated app. `useWorkspace()` exposes user, org, workspace, tabs, perspectives, activePerspective.
+
+### Comment Counts on Canvas Nodes
+`CommentCountsContext` (from `canvas.ts`) provides Map<entityId, count> to node components. Canvas views fetch all workspace comments once, build the count map, and wrap React Flow in the provider. Node components consume the context directly via `useContext(CommentCountsContext)`. This avoids prop-drilling through FlowCanvas (D-004).
+
+### Reserved Paths in Workspace Shell
+`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard"]`
 
 ### Component Conventions
 - Dark theme only. All colors via CSS custom properties in globals.css

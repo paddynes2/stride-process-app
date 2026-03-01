@@ -19,3 +19,9 @@
 **Options:** (A) Create new `commentable_type` enum with same values, (B) Reuse existing `annotatable_type` enum
 **Decision:** Reuse `annotatable_type` — comments table uses the same Postgres enum
 **Trade-off:** Tight coupling between comments and annotations at the DB level, but avoids duplicating identical enum values. If comment targets ever diverge from annotation targets, a migration would be needed.
+
+## D-004 — CommentCountsContext over prop-drilling (Phase 4, Iteration 74)
+**Context:** Comment count badges needed on 4 canvas node types. FlowCanvas (`flow-canvas.tsx`) is not owned by FEAT-045 (shared component) — cannot add commentCounts prop to it.
+**Options:** (A) Modify FlowCanvas to pass commentCounts through (ownership violation), (B) React Context consumed directly by node components
+**Decision:** React Context — `CommentCountsContext` exported from `canvas.ts`, provided by canvas views, consumed by node components
+**Trade-off:** Bypasses FlowCanvas prop chain, making the data flow less explicit. But avoids ownership violation and prop-drilling through a shared component.

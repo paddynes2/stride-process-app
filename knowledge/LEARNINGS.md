@@ -37,3 +37,8 @@
 - **WebFetch limitations:** WebFetch cannot access localhost URLs. For regression testing, use production URL for unauthenticated pages and curl for localhost API probing.
 - **Pipeline dispatch reliability:** 3 consecutive iterations (70-72) had pipeline dispatch failures — builders or testers never executing despite correct EXECUTION_PLAN.json. Root cause: 5 ralph.sh bugs fixed in commit 00a7356. Iteration 73 — both builders completed successfully.
 - **Pipeline worktree merge recurring:** Iteration 71 and 73 — builders complete their work in worktrees, but worktrees are cleaned up before code is merged back to main branch. Reviewer must run `git fsck --unreachable` to find orphaned commits, then `git checkout <sha> -- <files>` to recover. This is a recurring pipeline issue that needs a fix in ralph.sh worktree cleanup logic.
+
+## Pipeline Issues
+
+- **Worktree commit path bug:** Builder's `git add -A` in worktree commits files under `autonomous-dev/.ralph/worktrees/build-N/src/` instead of main `src/`. The pipeline's merge step copies files from worktree to main but the builder commits before merge happens. Occurred iter 71, 73, 74.
+- **Lucide-react no `title` prop:** Lucide-react icon components don't accept a `title` prop (TS2322). Use `aria-label` instead for accessibility labeling.

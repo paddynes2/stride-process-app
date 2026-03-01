@@ -1,11 +1,11 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 73
+- **Iteration:** 74
 - **Date:** 2026-03-01
-- **Suite:** Regression (static analysis)
-- **Method:** Static analysis — Playwright unavailable. Tester found builder code NOT present on disk (worktree merge failure). Baseline regression checks pass (19/19), but iter-73 code (comment-panel, hex validation) was not testable at test time. Reviewer later recovered and committed the code.
-- **Note:** Baseline code is clean. Builder code was recovered from unreachable commits and re-verified (tsc + lint pass). Full regression with committed code still recommended.
+- **Suite:** None (no tester ran)
+- **Method:** N/A — no TEST_RESULT files produced. Typecheck + lint verified by reviewer post-merge.
+- **Note:** FEAT-045 [3/3] code merged by reviewer from worktree commit. All verification passing (tsc 0 errors, lint 0 errors). REGRESSION OVERDUE — last full run was iteration 64 (11 iterations ago). MUST run iteration 75.
 
 ## Suite Results
 

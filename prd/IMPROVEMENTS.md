@@ -9,7 +9,7 @@
   - **Where:** `src/app/api/v1/perspectives/route.ts` POST, `src/app/api/v1/perspectives/[id]/route.ts` PATCH
   - **Fix applied:** `HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i` at module scope. Guard clause validates when color is defined, returns 400 with descriptive message.
 
-- [ ] #IMP-002 Color picker keyboard accessibility + ARIA in perspective settings — Attempts: 0
+- [ ] #IMP-002 Color picker keyboard accessibility + ARIA in perspective settings — Attempts: 1 (iter 74 — build completed but changes lost in merge)
   - **Found:** Iteration 57 (quality audit)
   - **Category:** Accessibility
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — PerspectiveRow color picker

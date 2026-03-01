@@ -1,22 +1,21 @@
 ## Handoff
 
-- **Iteration:** 73
-- **Date:** 2026-03-01 14:30
+- **Iteration:** 74
+- **Date:** 2026-03-01 16:00
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-045 [2/3] comment panel UI (slot 1), #IMP-001 hex color validation (slot 2)
-- **Result:** completed
-- **Next task:** #FEAT-045 [3/3] canvas badges + workspace-level comments view, then regression (overdue since iter 64)
+- **Last task(s):** #FEAT-045 [3/3] canvas badges + workspace comments view (slot 1), #IMP-002 color picker a11y (slot 2 — lost in merge)
+- **Result:** partial
+- **Next task:** #IMP-002 (re-attempt, changes lost during merge), then REGRESSION (mandatory, overdue since iter 64)
 - **Blockers:** None
 
 ## Context
 
-Iteration 73 built 2 tasks in parallel via multi-agent pipeline. Both builders completed but worktrees were cleaned before merge — reviewer recovered code from unreachable commits (c9067b5, f4b5ade) and re-verified compilation.
+Iteration 74 built 2 tasks in parallel. Slot 1 (#FEAT-045 [3/3]) completed — comment count badges on all 4 canvas node types (step, section, stage, touchpoint) via CommentCountsContext, plus new workspace-level comments page at `/w/{id}/comments` with category filtering. Sidebar updated with Comments nav item. Slot 2 (#IMP-002) completed per BUILD_RESULT but worktree was cleaned before merge — changes lost.
 
-1. **FEAT-045 [2/3]** — New `comment-panel.tsx` (415 lines) with loading skeleton, empty state, category badges (note/decision/pain_point/idea/question), threaded replies via parent_id, resolve toggle, inline reply form. Integrated below detail panels in `canvas-view.tsx` and `journey-canvas-view.tsx`. Always visible when entity selected (not gated by perspective).
-2. **IMP-001** — `HEX_COLOR_REGEX` validation added to POST and PATCH in perspectives routes. Validates when color is defined, returns 400 on invalid format.
+Critical pipeline issue: builder commit `03dd1d2` committed code under worktree path (`autonomous-dev/.ralph/worktrees/build-1/src/`) instead of main `src/`. Reviewer extracted code from commit and applied to correct paths. Worktree artifacts removed from repo. This is the 3rd consecutive iteration with worktree merge failure.
 
-Committed as d5a549c, tagged ralph-iter-73.
+Committed as 21b5266, tagged ralph-iter-74.
 
 ## Dev Server
 
@@ -26,10 +25,11 @@ Committed as d5a549c, tagged ralph-iter-73.
 
 ## Warnings
 
-- **REGRESSION OVERDUE (CRITICAL):** Last regression iter 64, now iter 74 (10 iterations, floor is 8). Was attempted iter 72 but tester failed. MUST run iteration 75 as testing_only.
-- Retrospective overdue — was due at iteration 70. Recommend running at iteration 75 or next testing-only iteration.
-- 5 pre-existing lint warnings in flow-canvas.tsx, journey-canvas-view.tsx, sidebar.tsx (unchanged)
+- **REGRESSION OVERDUE (CRITICAL):** Last regression iter 64, now iter 75 (11 iterations, floor is 8). MUST run iteration 75 as testing_only.
+- **PIPELINE MERGE BUG (CRITICAL):** 3rd consecutive iteration with worktree merge failure. Builder code committed to worktree path instead of main src/ (iter 71, 73, 74). Pipeline `ralph.sh` merge step needs fundamental fix.
+- Retrospective overdue — was due at iteration 70. Run at iteration 75.
+- #IMP-002 needs re-attempt — build completed but changes lost.
+- 4 pre-existing lint warnings in flow-canvas.tsx, journey-canvas-view.tsx (reduced from 5 — removed unused Plus import from sidebar.tsx)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation) — static verification only
 - Migration 014_comments.sql needs `npx supabase db push` to deploy to remote DB
-- Pipeline worktree merge issue persists — builders complete code but worktrees cleaned before merge. Reviewer manually recovered code in iter 71 and iter 73. Pipeline fix needed.
