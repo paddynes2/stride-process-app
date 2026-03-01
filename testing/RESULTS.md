@@ -1,17 +1,17 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 72
-- **Date:** 2026-02-28
-- **Suite:** Regression (planned but NOT executed)
-- **Method:** Tester agent did not execute — no regression was performed
-- **Note:** Reviewer verified typecheck (pass) and lint (pass, 5 pre-existing warnings). Full regression from iteration 64 remains the most recent complete run.
+- **Iteration:** 73
+- **Date:** 2026-03-01
+- **Suite:** Regression (static analysis)
+- **Method:** Static analysis — Playwright unavailable. Tester found builder code NOT present on disk (worktree merge failure). Baseline regression checks pass (19/19), but iter-73 code (comment-panel, hex validation) was not testable at test time. Reviewer later recovered and committed the code.
+- **Note:** Baseline code is clean. Builder code was recovered from unreachable commits and re-verified (tsc + lint pass). Full regression with committed code still recommended.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 64 (2026-02-26)
-- Result: **PASS** (19/19 checks)
+- Last run: Iteration 73 (2026-03-01) — baseline 19/19 PASS, iter-73 acceptance 0/5 FAIL (code absent at test time, recovered after)
+- Previous run: Iteration 64 (2026-02-26) — PASS (19/19)
 - Method: Static analysis via 3 parallel Explore agents + API probing via curl
 - Previous run: Iteration 56 (PASS 19/19)
 

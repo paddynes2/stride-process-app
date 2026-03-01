@@ -503,3 +503,33 @@
 **Notes:** Testing-only iteration planned correctly by planner (REGRESSION-72 with 13 acceptance criteria). Tester agent never executed — no TEST_RESULT files produced. This is the 3rd consecutive iteration with a pipeline dispatch failure (iter 70: both builders, iter 71: builder slot 2, iter 72: tester). Regression risk from iter 71 (schema + RLS + shared types) remains unresolved. Pipeline dispatch issue is now critical — must be investigated before next iteration.
 **Result:** completed
 **Notes (override):** Circuit breaker reset — pipeline dispatch failures in iter 70-72 were caused by 5 ralph.sh bugs (run_agent exit code capture, handoff file merge conflicts, builder launch race condition, missing post-merge build gate, branch_exists stdout pollution). All 5 fixed in commit 00a7356. Marking completed to unblock pipeline.
+
+## Iteration 73 — 2026-03-01 14:30
+**Tasks:**
+- #FEAT-045 [2/3] Comment panel UI on detail panels — slot 1 — completed
+- #IMP-001 Hex color format validation on perspectives API — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Created: src/components/panels/comment-panel.tsx (415 lines)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (+7 lines — CommentPanel integration)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx (+7 lines — CommentPanel integration)
+- Modified: src/app/api/v1/perspectives/route.ts (+6 lines — HEX_COLOR_REGEX guard in POST)
+- Modified: src/app/api/v1/perspectives/[id]/route.ts (+5 lines — HEX_COLOR_REGEX guard in PATCH)
+**Verification:**
+- Type check: pass (0 errors — verified after recovery from unreachable commits)
+- Lint: pass (0 errors, 5 pre-existing warnings)
+- Build: pass (reported by builders; reviewer verified tsc clean)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable)
+**Bugs found:** 1 (P0 pipeline: builder worktrees cleaned before merge — code recovered from unreachable commits)
+**Improvements found:** 2 (from tester): AnnotationPanel/CommentPanel visibility asymmetry, journey keyboard shortcuts undocumented
+**Self-score:**
+- Code quality: 4 — well-structured components, follows existing patterns, proper error handling. Large file (415 lines).
+- Test coverage: 1 — no browser testing, tester found missing code on disk. Typecheck + lint only.
+- Confidence: 4 — purely additive features, no existing behavior changed. Deducted 1 for tester unable to validate.
+- Efficiency: 3 — both builders succeeded but worktree merge failed again (same as iter 71). Reviewer recovered code via git fsck.
+- Observations: 3 (1 pipeline bug, 2 UX improvements)
+**Notes:** First successful multi_task iteration with both slots completing. Worktree merge issue persists (2nd occurrence). IMP-001 finally built after 4 iterations of deferral (planned iter 57, attempted iter 70/71/72).

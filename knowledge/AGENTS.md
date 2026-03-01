@@ -74,7 +74,7 @@ npx supabase db push     # Push migrations
 |-----------|-----------|---------|
 | `src/components/ui/` | button, input, textarea, badge, dialog, dropdown-menu, separator, tabs, skeleton, offline-banner | Design system primitives |
 | `src/components/canvas/` | flow-canvas, step-node, section-node, touchpoint-node, stage-node | React Flow canvas nodes |
-| `src/components/panels/` | step-detail-panel, section-detail-panel, touchpoint-detail-panel, stage-detail-panel, workspace-summary-panel, annotation-panel, rich-text-editor, video-embed | Right-side edit panels |
+| `src/components/panels/` | step-detail-panel, section-detail-panel, touchpoint-detail-panel, stage-detail-panel, workspace-summary-panel, annotation-panel, comment-panel, rich-text-editor, video-embed | Right-side edit panels |
 | `src/components/layout/` | sidebar, header, tab-bar | App shell layout |
 
 ### Lib

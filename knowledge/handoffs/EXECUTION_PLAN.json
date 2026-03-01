@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 72,
-  "date": "2026-02-28T19:00:00Z",
-  "mode": "testing_only",
+  "iteration": 73,
+  "date": "2026-03-01T00:00:00Z",
+  "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "8a51c0a509c80735265fdf6a0bc77adc6d0c63c8",
+    "last_commit_hash": "8b7c6071888c25675c88c5718be20f00feb332ed",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,81 +13,123 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "REGRESSION-72",
-      "description": "Full regression suite + data-integrity check. Triggered by risk score 9 (FEAT-045 [1/3] touched schema + RLS + shared types/client) AND cadence floor (8 iterations since last regression at iter 64).",
-      "source": "testing/RESULTS.md",
-      "type": "regression",
+      "id": "#FEAT-045 [2/3]",
+      "description": "Comment panel UI on step/section/touchpoint/stage detail panels — comment list with author, timestamp, category badge; add comment form with category dropdown; thread replies via parent_id; resolve button",
+      "source": "prd/FEATURES.md",
+      "type": "build",
       "phase": "Phase 4: The Living Playbook",
       "complexity": "M",
       "attempts": 1,
-      "risk_score": 9,
+      "risk_score": 2,
       "acceptance_criteria": [
-        "All 19 core regression checks pass (login, workspace, canvas, panels, list/gap/compare views, settings, teams, perspectives, exports)",
-        "Dashboard page renders correctly (added iter 63)",
-        "People page CRUD works (added iter 65)",
-        "Tools page CRUD works (added iter 67)",
-        "Search/filter on People, Tools, Teams views works (added iter 68-69)",
-        "Comments API routes respond correctly: GET /api/v1/comments (200), POST (201 or 401), PATCH/DELETE by id (401 unauthed)",
-        "Comments table structure verified: columns match migration 014 (id, workspace_id, commentable_type, commentable_id, parent_id, author_id, content, category, is_resolved, created_at, updated_at)",
-        "Comments RLS policies exist and use can_access_workspace()",
-        "Type definitions in database.ts match DB schema (Comment, CommentCategory, CommentableType)",
-        "Client wrappers in client.ts exist (fetchComments, createComment, updateComment, deleteComment)",
-        "No new TypeScript errors (npx tsc --noEmit)",
-        "No new lint errors (npm run lint)",
-        "Build succeeds (npm run build)"
+        "New comment-panel.tsx component in src/components/panels/",
+        "Comment panel rendered below detail panels in canvas-view.tsx and journey-canvas-view.tsx (similar placement to AnnotationPanel)",
+        "Comment list shows: author_id, relative timestamp (e.g. '2 hours ago'), category badge (note/decision/pain_point/idea/question), content text, reply count for threads",
+        "Add Comment form: category dropdown (default: note) + text input + submit button",
+        "Thread replies: clicking 'Reply' shows nested replies via parent_id, indented",
+        "Resolve button: toggles is_resolved, resolved comments visually dimmed (opacity or strikethrough)",
+        "Loading skeleton while comments fetch",
+        "Empty state when no comments exist ('No comments yet')",
+        "Uses existing client functions: fetchComments, createComment, updateComment, deleteComment from lib/api/client.ts"
       ],
-      "files_owned": [],
-      "files_read_only": [
-        "src/app/(auth)/login/page.tsx",
-        "src/app/(app)/workspaces/page.tsx",
+      "files_owned": [
+        "src/components/panels/comment-panel.tsx",
         "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
-        "src/components/canvas/flow-canvas.tsx",
+        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
+      ],
+      "files_read_only": [
+        "src/components/panels/annotation-panel.tsx",
         "src/components/panels/step-detail-panel.tsx",
         "src/components/panels/section-detail-panel.tsx",
-        "src/app/(app)/w/[workspaceId]/list/step-list-view.tsx",
-        "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
-        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx",
-        "src/app/(app)/w/[workspaceId]/settings/page.tsx",
-        "src/app/(app)/w/[workspaceId]/teams/teams-view.tsx",
-        "src/app/(app)/w/[workspaceId]/people/people-view.tsx",
-        "src/app/(app)/w/[workspaceId]/tools/tools-view.tsx",
-        "src/app/(app)/w/[workspaceId]/dashboard/dashboard-view.tsx",
-        "src/lib/export/pdf.ts",
-        "src/lib/export/png.ts",
-        "src/app/api/v1/comments/route.ts",
-        "src/app/api/v1/comments/[id]/route.ts",
-        "src/types/database.ts",
+        "src/components/panels/touchpoint-detail-panel.tsx",
+        "src/components/panels/stage-detail-panel.tsx",
         "src/lib/api/client.ts",
-        "supabase/migrations/014_comments.sql"
+        "src/types/database.ts"
       ],
       "context": {
-        "similar_files": [],
-        "patterns_to_follow": ["Regression suite pattern from iteration 64 (testing/RESULTS.md)"],
-        "learnings_relevant": ["Supabase RLS silent mutations (LEARNINGS.md)", "API route HTTP methods — sections/stages POST-only (LEARNINGS.md)", "WebFetch cannot access localhost (LEARNINGS.md)"],
-        "affected_urls": ["/login", "/workspaces", "/w/[id]/[tabId]", "/w/[id]/list", "/w/[id]/gap-analysis", "/w/[id]/compare", "/w/[id]/settings", "/w/[id]/teams", "/w/[id]/people", "/w/[id]/tools", "/w/[id]/dashboard"]
+        "similar_files": [
+          "src/components/panels/annotation-panel.tsx — same conditional-panel-below-detail-panel pattern, same commentable/annotatable type discrimination"
+        ],
+        "patterns_to_follow": [
+          "AnnotationPanel pattern: conditionally rendered in canvas-view.tsx when entity is selected, receives entityType + entityId props",
+          "Use useWorkspace() for workspaceId context",
+          "Category badges: reuse Badge component from ui/badge.tsx with status-style coloring",
+          "Relative timestamps: use lightweight formatting (no new deps — compute from Date diff)",
+          "Loading skeleton: match AnnotationPanel skeleton pattern",
+          "Error handling: toastError() from lib/api/toast-helpers.ts",
+          "Dark theme styling: use CSS custom properties (--text-primary, --bg-surface-secondary, etc.)"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — fetchComments returns Comment[] directly",
+          "React state immutability — sort with [...arr].sort()",
+          "TipTap SSR crash — if using rich text for comment content, must lazy-load (but plain textarea is simpler and recommended for comments)"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/[tabId] — process canvas with comment panel on selected step/section",
+          "/w/[workspaceId]/[tabId] — journey canvas with comment panel on selected touchpoint/stage"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "CommentableType reuses AnnotatableType (step/section/touchpoint/stage). Comment panel should appear BELOW the detail panel, similar to how AnnotationPanel appears below when a perspective is active. The comment panel should ALWAYS be visible when an entity is selected (not gated by perspective). Use plain textarea for comment input, NOT TipTap — keeps it lightweight and avoids SSR issues. Author display: show author_id for now (user lookup is a future enhancement). Category badge colors: note=gray, decision=blue, pain_point=red, idea=yellow, question=purple."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-001",
+      "description": "Add hex color format validation to perspectives API routes (POST create + PATCH update)",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "N/A (improvement — perspectives from Phase 2b)",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "POST /api/v1/perspectives validates color field matches /^#[0-9A-Fa-f]{6}$/i — returns 400 with 'Invalid color format. Must be a hex color like #14B8A6' if invalid",
+        "PATCH /api/v1/perspectives/[id] validates color field with same regex when color is in the update payload",
+        "Undefined/missing color field is allowed (not required) — validation only triggers when color is explicitly provided",
+        "Existing valid colors continue to work unchanged"
+      ],
+      "files_owned": [
+        "src/app/api/v1/perspectives/route.ts",
+        "src/app/api/v1/perspectives/[id]/route.ts"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [
+          "src/app/api/v1/annotations/route.ts — same validation guard pattern (VALID_ANNOTATABLE_TYPES check returns 400)"
+        ],
+        "patterns_to_follow": [
+          "Guard clause pattern: validate before DB insert, return errorResponse('validation', message, 400)",
+          "Regex: /^#[0-9A-Fa-f]{6}$/i — matches 6-digit hex with # prefix"
+        ],
+        "learnings_relevant": [
+          "BUG-014 fix shows the exact validation guard pattern to follow"
+        ],
+        "affected_urls": []
       },
       "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "This is a testing-only iteration. No code changes. Run static analysis via Explore agents (3 parallel) + API probing via curl. Check all 19 core regression items from iteration 64, plus 5 additional checks for features added since (dashboard, people, tools, search/filter, comments API). Data-integrity: verify comments migration structure, RLS policies, and type definitions match. Write results to testing/RESULTS.md."
+      "special_instructions": "Simple regex guard. POST: validate color before insert. PATCH: validate color inside the EDITABLE_FIELDS loop (or after it, before DB update). Define HEX_COLOR_REGEX as a named constant at module scope."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "next.config.ts", "tailwind.config.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
     "owner": null,
-    "note": "Testing-only iteration — no files should be modified except testing/RESULTS.md and knowledge/ handoff files."
+    "note": "types/database.ts and lib/api/client.ts are read-only — the comment data layer (FEAT-045 [1/3]) is already built. No modifications needed."
   },
-  "merge_order": [],
+  "merge_order": ["#IMP-001", "#FEAT-045 [2/3]"],
   "testing_plan": {
-    "run_acceptance": false,
+    "run_acceptance": true,
     "run_regression": true,
-    "regression_reason": "Risk score 9 from iteration 71 (schema + RLS + shared components + partial result). Cadence floor triggered (8 iterations since last regression at iter 64).",
-    "suites_to_run": ["regression", "data-integrity"],
-    "cadence_trigger": "regression (8-iteration floor)"
+    "regression_reason": "Overdue: last regression at iteration 64 (9 iterations ago, exceeds 8-iteration cadence floor). Unresolved risk score 9 from iteration 71 (schema + RLS + shared types/client touched). Iteration 72 attempted regression but tester agent did not execute.",
+    "suites_to_run": ["regression", "acceptance"],
+    "cadence_trigger": "minimum_cadence_floor_exceeded"
   },
   "status_updates": {
     "warnings_added": [
-      "Regression triggered by risk score 9 AND cadence floor. IMP-001 and FEAT-045 [2/3] deferred to iteration 73.",
-      "Builder slot 2 has failed to execute in 2 consecutive iterations (70, 71). Pipeline dispatch issue may need investigation."
+      "Declining velocity: 3 consecutive partial/blocked iterations (70-72). Pipeline fixes applied in commits 00a7356 and 8b7c607. This is iteration 73 — first build iteration after fixes.",
+      "Retrospective overdue: was due at iteration 70, still not run. Recommend running at iteration 75 or next testing-only iteration.",
+      "Migration 014_comments.sql still needs npx supabase db push to deploy to remote DB."
     ],
     "diagnoses_written": false,
     "signal_override": null

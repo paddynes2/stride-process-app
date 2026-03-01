@@ -3,13 +3,11 @@
 ## High Priority
 <!-- Agent-discovered UX/polish wins that are noticeable -->
 
-- [ ] #IMP-001 Add color format validation to perspective API — Attempts: 0
+- [x] #IMP-001 Add color format validation to perspective API — DONE iteration 73, 2026-03-01
   - **Found:** Iteration 57 (quality audit)
   - **Category:** Input validation
   - **Where:** `src/app/api/v1/perspectives/route.ts` POST, `src/app/api/v1/perspectives/[id]/route.ts` PATCH
-  - **What:** `color` field accepts any string (could be "not-a-color"). Should validate hex format.
-  - **Why it matters:** Invalid colors would break UI rendering of perspective indicators.
-  - **Suggested fix:** Add regex validation `if (color && !/^#[0-9A-Fa-f]{6}$/i.test(color)) return errorResponse("validation", "Invalid color format", 400);`
+  - **Fix applied:** `HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i` at module scope. Guard clause validates when color is defined, returns 400 with descriptive message.
 
 - [ ] #IMP-002 Color picker keyboard accessibility + ARIA in perspective settings — Attempts: 0
   - **Found:** Iteration 57 (quality audit)
@@ -48,6 +46,22 @@
   - **What:** When a step/section/touchpoint/stage is deleted, its annotations are NOT cascade-deleted. They remain in the DB orphaned (referencing non-existent entity IDs). The UI won't show them (fetch returns them but they don't match any canvas elements), but they bloat the table.
   - **Why it matters:** Data hygiene. Not urgent because orphaned records don't break anything, but accumulate over time.
   - **Suggested fix:** Add a DB trigger or periodic cleanup. FK constraints are complex here due to polymorphic annotatable_type pointing to different tables.
+
+- [ ] #IMP-006 AnnotationPanel/CommentPanel visibility asymmetry — Attempts: 0
+  - **Found:** Iteration 73 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`, `journey-canvas-view.tsx`
+  - **What:** AnnotationPanel is gated on activePerspective (hidden when none selected). CommentPanel always shows when entity selected. Users may be confused by this asymmetry.
+  - **Why it matters:** Nielsen H6 — Recognition rather than recall. Users need to understand when each panel appears.
+  - **Suggested fix:** Add empty state on AnnotationPanel area when no perspective active ("Select a perspective to add annotations").
+
+- [ ] #IMP-007 Journey canvas keyboard shortcuts undocumented in UI — Attempts: 0
+  - **Found:** Iteration 73 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx`
+  - **What:** Keyboard shortcuts 's' (new stage) and 'n' (new touchpoint) are registered globally but not shown in the UI. Users who discover them get unexpected behavior; users who don't miss efficiency.
+  - **Why it matters:** Nielsen H7 — Flexibility and efficiency of use. Shortcuts need to be discoverable.
+  - **Suggested fix:** Add keyboard shortcut legend to journey toolbar or tooltip on buttons.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

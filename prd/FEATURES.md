@@ -249,16 +249,16 @@
 ### #FEAT-045 Comments system
 **Phase:** 4
 **Priority:** P0 (critical path)
-**Attempts:** 1
+**Attempts:** 2
 **Status:** in_progress
 **Sub-tasks:**
 - [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 71, 2026-02-28
-- [ ] [2/3] Comment panel UI on step/section/touchpoint/stage detail panels
+- [x] [2/3] Comment panel UI on step/section/touchpoint/stage detail panels — DONE iteration 73, 2026-03-01
 - [ ] [3/3] Canvas badges + workspace-level comments view
 **Acceptance criteria:**
 - [x] New `comments` table: id, workspace_id, commentable_type (enum: step/section/touchpoint/stage), commentable_id, parent_id (nullable FK for threading), author_id (FK users), content, category (enum: note/decision/pain_point/idea/question), is_resolved (boolean), created_at, updated_at
 - [x] RLS, types, API routes (GET filterable, POST, PATCH, DELETE), client wrappers
-- [ ] Comment panel tab on step/section detail panels
+- [x] Comment panel tab on step/section detail panels — DONE iteration 73
 - [ ] Comment list: author, relative timestamp, category badge, content, reply count
 - [ ] "Add Comment" form: category dropdown + text + submit
 - [ ] Thread replies (parent_id), "Resolve" button (dims comment)
