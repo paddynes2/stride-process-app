@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 73,
-  "date": "2026-03-01T00:00:00Z",
+  "iteration": 74,
+  "date": "2026-03-01T15:30:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "8b7c6071888c25675c88c5718be20f00feb332ed",
+    "last_commit_hash": "a6a3adebf54a6683366985ecb968bfdeeb251027",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,123 +13,148 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-045 [2/3]",
-      "description": "Comment panel UI on step/section/touchpoint/stage detail panels — comment list with author, timestamp, category badge; add comment form with category dropdown; thread replies via parent_id; resolve button",
+      "id": "#FEAT-045",
+      "description": "FEAT-045 [3/3]: Comment count badges on canvas nodes + workspace-level comments view page",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 4: The Living Playbook",
       "complexity": "M",
-      "attempts": 1,
+      "attempts": 3,
       "risk_score": 2,
       "acceptance_criteria": [
-        "New comment-panel.tsx component in src/components/panels/",
-        "Comment panel rendered below detail panels in canvas-view.tsx and journey-canvas-view.tsx (similar placement to AnnotationPanel)",
-        "Comment list shows: author_id, relative timestamp (e.g. '2 hours ago'), category badge (note/decision/pain_point/idea/question), content text, reply count for threads",
-        "Add Comment form: category dropdown (default: note) + text input + submit button",
-        "Thread replies: clicking 'Reply' shows nested replies via parent_id, indented",
-        "Resolve button: toggles is_resolved, resolved comments visually dimmed (opacity or strikethrough)",
-        "Loading skeleton while comments fetch",
-        "Empty state when no comments exist ('No comments yet')",
-        "Uses existing client functions: fetchComments, createComment, updateComment, deleteComment from lib/api/client.ts"
+        "Comment count badge on step, section, touchpoint, and stage canvas nodes (only when count > 0)",
+        "Badge shows count of top-level comments (parent_id === null) per entity",
+        "Canvas views fetch all workspace comments once, build Map<commentable_id, count>, pass through buildNodes to node data",
+        "New workspace-level comments page at /w/[workspaceId]/comments",
+        "Comments page lists all workspace comments, filterable by category and commentable_type",
+        "Each comment shows: entity type+name context, author, category badge, content, resolved state, relative timestamp",
+        "Comments nav item in sidebar (MessageCircle icon from lucide-react)",
+        "'comments' added to reserved path segments in workspace-shell.tsx"
       ],
       "files_owned": [
-        "src/components/panels/comment-panel.tsx",
+        "src/types/canvas.ts",
+        "src/components/canvas/step-node.tsx",
+        "src/components/canvas/section-node.tsx",
+        "src/components/canvas/touchpoint-node.tsx",
+        "src/components/canvas/stage-node.tsx",
+        "src/components/canvas/flow-canvas.tsx",
         "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
-        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
+        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx",
+        "src/app/(app)/w/[workspaceId]/comments/**",
+        "src/components/layout/sidebar.tsx",
+        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
       ],
       "files_read_only": [
-        "src/components/panels/annotation-panel.tsx",
-        "src/components/panels/step-detail-panel.tsx",
-        "src/components/panels/section-detail-panel.tsx",
-        "src/components/panels/touchpoint-detail-panel.tsx",
-        "src/components/panels/stage-detail-panel.tsx",
-        "src/lib/api/client.ts",
-        "src/types/database.ts"
+        "src/components/panels/comment-panel.tsx",
+        "src/types/database.ts",
+        "src/lib/api/client.ts"
       ],
       "context": {
         "similar_files": [
-          "src/components/panels/annotation-panel.tsx — same conditional-panel-below-detail-panel pattern, same commentable/annotatable type discrimination"
+          "src/app/(app)/w/[workspaceId]/teams/teams-view.tsx — list view pattern with filters",
+          "src/app/(app)/w/[workspaceId]/people/people-view.tsx — flat table CRUD pattern",
+          "src/components/panels/comment-panel.tsx — CATEGORY_CONFIG with colors/labels for badges"
         ],
         "patterns_to_follow": [
-          "AnnotationPanel pattern: conditionally rendered in canvas-view.tsx when entity is selected, receives entityType + entityId props",
-          "Use useWorkspace() for workspaceId context",
-          "Category badges: reuse Badge component from ui/badge.tsx with status-style coloring",
-          "Relative timestamps: use lightweight formatting (no new deps — compute from Date diff)",
-          "Loading skeleton: match AnnotationPanel skeleton pattern",
-          "Error handling: toastError() from lib/api/toast-helpers.ts",
-          "Dark theme styling: use CSS custom properties (--text-primary, --bg-surface-secondary, etc.)"
+          "Annotation indicator: annotatedIds Set built from fetchAnnotations, passed through buildNodes → annotationColor on node data → conditional render in node component. Use same flow for commentCounts Map.",
+          "buildNodes in flow-canvas.tsx (lines ~83-107): receives annotatedIds/annotationColor, maps over entities to build Node[]. Add commentCounts param, lookup count per entity.",
+          "Node data types (canvas.ts): StepNodeData has annotationColor?: string | null. Add commentCount?: number to all 4 types.",
+          "Badge placement: annotation dot is absolute positioned top-right. Place comment badge at bottom-right or inline with existing indicators to avoid collision.",
+          "Sidebar NAV_ITEMS: array of { label, icon, href } objects. Add after Compare, before Teams. Use MessageCircle from lucide-react.",
+          "Reserved paths in workspace-shell.tsx: array used to determine if path is a tab ID or a named route. Add 'comments'.",
+          "View page: server page.tsx extracts workspaceId → passes to client view. Client view uses useState + useEffect + fetchComments."
         ],
         "learnings_relevant": [
+          "Canvas null guards: (arr ?? []).filter(Boolean) before .map()",
           "apiFetch unwraps envelope — fetchComments returns Comment[] directly",
-          "React state immutability — sort with [...arr].sort()",
-          "TipTap SSR crash — if using rich text for comment content, must lazy-load (but plain textarea is simpler and recommended for comments)"
+          "React state immutability — use [...arr].sort() not arr.sort()",
+          "React 19 useRef requires initial value: useRef(null)"
         ],
         "affected_urls": [
-          "/w/[workspaceId]/[tabId] — process canvas with comment panel on selected step/section",
-          "/w/[workspaceId]/[tabId] — journey canvas with comment panel on selected touchpoint/stage"
+          "/w/[workspaceId]/[tabId] — canvas nodes show comment count badges",
+          "/w/[workspaceId]/comments — new workspace comments page"
         ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "CommentableType reuses AnnotatableType (step/section/touchpoint/stage). Comment panel should appear BELOW the detail panel, similar to how AnnotationPanel appears below when a perspective is active. The comment panel should ALWAYS be visible when an entity is selected (not gated by perspective). Use plain textarea for comment input, NOT TipTap — keeps it lightweight and avoids SSR issues. Author display: show author_id for now (user lookup is a future enhancement). Category badge colors: note=gray, decision=blue, pain_point=red, idea=yellow, question=purple."
+      "special_instructions": "Canvas badge approach: In canvas-view.tsx and journey-canvas-view.tsx, fetch all workspace comments once via fetchComments(workspace.id). Build a Map<string, number> counting only top-level comments (parent_id === null) per commentable_id. Pass this map to buildNodes in flow-canvas.tsx. In buildNodes, look up count for each entity and set commentCount on node data. In each node component, render a small pill badge (MessageCircle icon + count) only when commentCount > 0. Use subtle styling — match the muted indicator pattern, not the prominent status badge. For the workspace comments page: model after teams-view.tsx. Fetch all comments, display in card list with category badges (reuse CATEGORY_CONFIG color scheme from comment-panel.tsx). Add filter bar with category dropdown and entity type dropdown. Show entity context (e.g. 'Step: Review Application') as clickable link. Sidebar placement: after Compare, before Teams."
     },
     {
       "slot": 2,
-      "id": "#IMP-001",
-      "description": "Add hex color format validation to perspectives API routes (POST create + PATCH update)",
+      "id": "#IMP-002",
+      "description": "Color picker keyboard accessibility + ARIA in perspective settings",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
-      "phase": "N/A (improvement — perspectives from Phase 2b)",
+      "phase": "Phase 2b: Perspectives",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "POST /api/v1/perspectives validates color field matches /^#[0-9A-Fa-f]{6}$/i — returns 400 with 'Invalid color format. Must be a hex color like #14B8A6' if invalid",
-        "PATCH /api/v1/perspectives/[id] validates color field with same regex when color is in the update payload",
-        "Undefined/missing color field is allowed (not required) — validation only triggers when color is explicitly provided",
-        "Existing valid colors continue to work unchanged"
+        "Color picker toggle button has aria-expanded={showColorPicker} and aria-haspopup='listbox'",
+        "Color picker popup container has role='listbox'",
+        "Each preset color button has role='option' and aria-selected matching current perspective color",
+        "Escape key closes the picker and returns focus to toggle button",
+        "Arrow keys (Left/Right/Up/Down) navigate between color options in the 4-column grid",
+        "Enter/Space on focused color selects it and closes picker",
+        "Focus moves to currently-selected color (or first) when picker opens"
       ],
       "files_owned": [
-        "src/app/api/v1/perspectives/route.ts",
-        "src/app/api/v1/perspectives/[id]/route.ts"
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
       ],
       "files_read_only": [],
       "context": {
         "similar_files": [
-          "src/app/api/v1/annotations/route.ts — same validation guard pattern (VALID_ANNOTATABLE_TYPES check returns 400)"
+          "src/components/ui/dropdown-menu.tsx — Radix ARIA pattern reference"
         ],
         "patterns_to_follow": [
-          "Guard clause pattern: validate before DB insert, return errorResponse('validation', message, 400)",
-          "Regex: /^#[0-9A-Fa-f]{6}$/i — matches 6-digit hex with # prefix"
+          "PerspectiveRow color picker: toggle button (line ~392) + conditional popup (lines ~398-416) with 8 preset colors in 4-column grid.",
+          "Existing outside-click listener (lines ~368-377) via colorRef + useEffect. Add onKeyDown alongside.",
+          "PERSPECTIVE_COLORS array defines the 8 colors. Grid is 4 columns × 2 rows. Arrow navigation: Left/Right = ±1, Up/Down = ±4, wrap at boundaries.",
+          "Track focusedIndex with useState. Use useRef array for color button refs. Call ref.current?.focus() on arrow key."
         ],
         "learnings_relevant": [
-          "BUG-014 fix shows the exact validation guard pattern to follow"
+          "React 19 useRef requires initial value: useRef(null) not bare useRef()",
+          "WCAG 2.1 Level A: keyboard operability + proper ARIA"
         ],
-        "affected_urls": []
+        "affected_urls": [
+          "/w/[workspaceId]/settings — perspectives section color picker"
+        ]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Simple regex guard. POST: validate color before insert. PATCH: validate color inside the EDITABLE_FIELDS loop (or after it, before DB update). Define HEX_COLOR_REGEX as a named constant at module scope."
+      "special_instructions": "Minimal change — only modify the PerspectiveRow component's color picker section (~30 lines of additions). Do NOT refactor the rest of settings page. Add: (1) aria-expanded and aria-haspopup to toggle button, (2) role='listbox' on popup div, (3) role='option' + aria-selected + tabIndex on color buttons, (4) onKeyDown handler for Escape/Arrow/Enter, (5) useState for focusedIndex, (6) useEffect to focus correct button when picker opens. The 8 colors are in 4-col × 2-row grid: arrows navigate accordingly."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "read_only": [
+      "package.json",
+      "tsconfig.json",
+      "src/types/database.ts",
+      "src/lib/api/client.ts",
+      "src/lib/utils.ts"
+    ],
     "owner": null,
-    "note": "types/database.ts and lib/api/client.ts are read-only — the comment data layer (FEAT-045 [1/3]) is already built. No modifications needed."
+    "note": "canvas.ts is owned by slot 1 (adds commentCount to node data types). database.ts and client.ts have Comment type and fetchComments — no modifications needed."
   },
-  "merge_order": ["#IMP-001", "#FEAT-045 [2/3]"],
+  "merge_order": [
+    "#FEAT-045",
+    "#IMP-002"
+  ],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": true,
-    "regression_reason": "Overdue: last regression at iteration 64 (9 iterations ago, exceeds 8-iteration cadence floor). Unresolved risk score 9 from iteration 71 (schema + RLS + shared types/client touched). Iteration 72 attempted regression but tester agent did not execute.",
-    "suites_to_run": ["regression", "acceptance"],
-    "cadence_trigger": "minimum_cadence_floor_exceeded"
+    "run_regression": false,
+    "regression_reason": "Overdue (last at iter 64, 10 iterations ago, cadence floor = 8). STATUS.md directs finishing FEAT-045 [3/3] first. REGRESSION MUST RUN ITERATION 75 — do NOT skip.",
+    "suites_to_run": [
+      "acceptance"
+    ],
+    "cadence_trigger": null
   },
   "status_updates": {
     "warnings_added": [
-      "Declining velocity: 3 consecutive partial/blocked iterations (70-72). Pipeline fixes applied in commits 00a7356 and 8b7c607. This is iteration 73 — first build iteration after fixes.",
-      "Retrospective overdue: was due at iteration 70, still not run. Recommend running at iteration 75 or next testing-only iteration.",
-      "Migration 014_comments.sql still needs npx supabase db push to deploy to remote DB."
+      "REGRESSION MANDATORY iter 75 — last full run was iter 64 (10 iterations ago, cadence floor = 8). Was attempted iter 72 but tester did not execute. Do NOT skip.",
+      "Retrospective overdue — was due at iteration 70. Schedule at iter 75 testing-only iteration.",
+      "Migration 014_comments.sql still needs npx supabase db push to deploy to remote DB.",
+      "Pipeline worktree merge issue persists — monitor this iteration for same failure pattern."
     ],
     "diagnoses_written": false,
     "signal_override": null

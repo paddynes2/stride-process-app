@@ -26,7 +26,7 @@ Committed as d5a549c, tagged ralph-iter-73.
 
 ## Warnings
 
-- Regression overdue — last run iteration 64 (9 iterations ago). Tester ran static analysis in iter 73 confirming baseline passes but builder code was not present at test time. Full regression with current code still needed.
+- **REGRESSION OVERDUE (CRITICAL):** Last regression iter 64, now iter 74 (10 iterations, floor is 8). Was attempted iter 72 but tester failed. MUST run iteration 75 as testing_only.
 - Retrospective overdue — was due at iteration 70. Recommend running at iteration 75 or next testing-only iteration.
 - 5 pre-existing lint warnings in flow-canvas.tsx, journey-canvas-view.tsx, sidebar.tsx (unchanged)
 - No unit test suite exists (#DEBT-001)
