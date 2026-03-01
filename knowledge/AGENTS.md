@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-78, 2026-03-01 -->
+<!-- Updated: iter-79, 2026-03-02 -->
 
 ## Project
 

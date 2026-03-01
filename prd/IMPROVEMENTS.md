@@ -85,5 +85,13 @@
   - **Why it matters:** Nielsen H8 — Aesthetic and minimalist design. Too many expanded panels reduces usability.
   - **Suggested fix:** Each panel stores collapsed state in localStorage keyed by panel type. Single collapse chevron in panel header toggles it.
 
+- [ ] #IMP-011 Journey canvas handleAddTouchpoint/handleAddStage not wrapped in useCallback — Attempts: 0
+  - **Found:** Iteration 79 (regression+acceptance tester)
+  - **Category:** Performance
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` lines 345, 363
+  - **What:** handleAddTouchpoint and handleAddStage are declared as regular functions (not useCallback) but referenced in a useCallback dependency array. This causes the keyboard shortcut handler to re-subscribe on every render.
+  - **Why it matters:** React performance: stable references in useCallback deps prevent unnecessary re-subscriptions and re-renders.
+  - **Suggested fix:** Wrap handleAddTouchpoint and handleAddStage in useCallback (same fix pattern as IMP-008 for flow-canvas.tsx handleAddStep/handleAddSection).
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->
