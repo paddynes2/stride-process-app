@@ -299,7 +299,7 @@ for k in keys:
 if val is None:
     sys.exit(1)
 print(str(val).lower() if isinstance(val, bool) else val)
-" "$file" "$path" 2>/dev/null) && { echo "$result"; return 0; }
+" "$file" "$path" 2>/dev/null | tr -d '\r') && { echo "$result"; return 0; }
   fi
 
   if command -v jq &>/dev/null; then
@@ -335,7 +335,7 @@ val = data
 for k in keys:
     val = val.get(k, []) if isinstance(val, dict) else []
 print(len(val))
-" "$file" "$path" 2>/dev/null && return 0
+" "$file" "$path" 2>/dev/null | tr -d '\r' && return 0
   fi
 
   if command -v jq &>/dev/null; then
@@ -363,7 +363,7 @@ for k in keys:
 for item in val:
     if isinstance(item, dict) and sys.argv[3] in item:
         print(item[sys.argv[3]])
-" "$file" "$array_path" "$field" 2>/dev/null && return 0
+" "$file" "$array_path" "$field" 2>/dev/null | tr -d '\r' && return 0
   fi
 
   if command -v jq &>/dev/null; then
@@ -392,7 +392,7 @@ for item in val:
     if isinstance(item, dict) and str(item.get(sys.argv[3])) == sys.argv[4]:
         print(json.dumps(item, indent=2))
         break
-" "$file" "$array_path" "$match_key" "$match_value" 2>/dev/null && return 0
+" "$file" "$array_path" "$match_key" "$match_value" 2>/dev/null | tr -d '\r' && return 0
   fi
 
   if command -v jq &>/dev/null; then
@@ -418,7 +418,7 @@ val = data
 for k in keys:
     val = val.get(k, []) if isinstance(val, dict) else []
 print(str(any(item.get(sys.argv[3], False) for item in val if isinstance(item, dict))).lower())
-" "$file" "$array_path" "$field" 2>/dev/null && return 0
+" "$file" "$array_path" "$field" 2>/dev/null | tr -d '\r' && return 0
   fi
 
   if command -v jq &>/dev/null; then
