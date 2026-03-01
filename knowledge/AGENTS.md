@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-75, 2026-03-01 -->
+<!-- Updated: iter-76, 2026-03-01 -->
 
 ## Project
 
@@ -68,6 +68,7 @@ npx supabase db push     # Push migrations
 - `perspectives/route.ts` + `[id]/route.ts` — CRUD
 - `annotations/route.ts` + `[id]/route.ts` — CRUD
 - `comments/route.ts` + `[id]/route.ts` — CRUD (GET filterable, POST, PATCH, DELETE)
+- `tasks/route.ts` + `[id]/route.ts` — CRUD (GET by step_id, POST, PATCH, DELETE)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
 
 ### Components
@@ -99,7 +100,7 @@ npx supabase db push     # Push migrations
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment + enums (CommentCategory, CommentableType) |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task + enums (CommentCategory, CommentableType) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext |
 | `src/types/index.ts` | Re-exports |
 
@@ -125,6 +126,7 @@ npx supabase db push     # Push migrations
 | 012 | Perspectives + perspective_annotations |
 | 013 | Tools table + RLS policies |
 | 014 | Comments table + comment_category enum + RLS (reuses annotatable_type) |
+| 015 | Tasks table (step-scoped checklists) + RLS + indexes + update trigger |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->

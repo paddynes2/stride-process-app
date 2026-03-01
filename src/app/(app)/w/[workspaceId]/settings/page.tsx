@@ -241,6 +241,17 @@ const PERSPECTIVE_COLORS = [
   "#22C55E", // green
 ];
 
+const COLOR_NAMES: Record<string, string> = {
+  "#3B82F6": "Blue",
+  "#14B8A6": "Teal",
+  "#A855F7": "Purple",
+  "#EC4899": "Pink",
+  "#F97316": "Orange",
+  "#EAB308": "Yellow",
+  "#EF4444": "Red",
+  "#22C55E": "Green",
+};
+
 // ---------------------------------------------------------------------------
 // Perspectives Section
 // ---------------------------------------------------------------------------
@@ -350,8 +361,11 @@ function PerspectiveRow({ perspective, onUpdate, onDelete }: PerspectiveRowProps
   const [editingName, setEditingName] = React.useState(false);
   const [nameValue, setNameValue] = React.useState(perspective.name);
   const [showColorPicker, setShowColorPicker] = React.useState(false);
+  const [focusedColorIndex, setFocusedColorIndex] = React.useState(0);
   const nameRef = React.useRef<HTMLInputElement>(null);
   const colorRef = React.useRef<HTMLDivElement>(null);
+  const triggerButtonRef = React.useRef<HTMLButtonElement>(null);
+  const colorButtonRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
 
   React.useEffect(() => {
     setNameValue(perspective.name);
@@ -376,6 +390,32 @@ function PerspectiveRow({ perspective, onUpdate, onDelete }: PerspectiveRowProps
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showColorPicker]);
 
+  React.useEffect(() => {
+    if (!showColorPicker) return;
+    const currentIdx = PERSPECTIVE_COLORS.indexOf(perspective.color);
+    const idx = currentIdx >= 0 ? currentIdx : 0;
+    setFocusedColorIndex(idx);
+    colorButtonRefs.current[idx]?.focus();
+  }, [showColorPicker, perspective.color]);
+
+  const handleColorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const next = (focusedColorIndex + 1) % PERSPECTIVE_COLORS.length;
+      setFocusedColorIndex(next);
+      colorButtonRefs.current[next]?.focus();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const prev = (focusedColorIndex - 1 + PERSPECTIVE_COLORS.length) % PERSPECTIVE_COLORS.length;
+      setFocusedColorIndex(prev);
+      colorButtonRefs.current[prev]?.focus();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setShowColorPicker(false);
+      triggerButtonRef.current?.focus();
+    }
+  };
+
   const commitName = () => {
     setEditingName(false);
     if (nameValue.trim() && nameValue.trim() !== perspective.name) {
@@ -390,18 +430,31 @@ function PerspectiveRow({ perspective, onUpdate, onDelete }: PerspectiveRowProps
       {/* Color swatch */}
       <div className="relative" ref={colorRef}>
         <button
+          ref={triggerButtonRef}
           onClick={() => setShowColorPicker(!showColorPicker)}
+          aria-expanded={showColorPicker}
+          aria-label={`Change color for ${perspective.name}`}
           className="h-6 w-6 rounded-full border-2 border-[var(--border-subtle)] shrink-0 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)]"
           style={{ backgroundColor: perspective.color }}
-          aria-label={`Change color for ${perspective.name}`}
         />
         {showColorPicker && (
-          <div className="absolute top-8 left-0 z-10 flex gap-1 p-2 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg">
-            {PERSPECTIVE_COLORS.map((color) => (
+          <div
+            role="listbox"
+            aria-label="Color options"
+            onKeyDown={handleColorKeyDown}
+            className="absolute top-8 left-0 z-10 flex gap-1 p-2 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-lg"
+          >
+            {PERSPECTIVE_COLORS.map((color, index) => (
               <button
                 key={color}
+                ref={(el) => { colorButtonRefs.current[index] = el; }}
+                role="option"
+                aria-selected={color === perspective.color}
+                aria-label={COLOR_NAMES[color] ?? color}
+                tabIndex={focusedColorIndex === index ? 0 : -1}
                 onClick={() => {
                   onUpdate({ color });
+                  triggerButtonRef.current?.focus();
                   setShowColorPicker(false);
                 }}
                 className="h-6 w-6 rounded-full border-2 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)]"
@@ -409,7 +462,6 @@ function PerspectiveRow({ perspective, onUpdate, onDelete }: PerspectiveRowProps
                   backgroundColor: color,
                   borderColor: color === perspective.color ? "var(--text-primary)" : "transparent",
                 }}
-                aria-label={`Select color ${color}`}
               />
             ))}
           </div>

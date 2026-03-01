@@ -272,7 +272,7 @@
 **Attempts:** 1
 **Status:** in_progress
 **Sub-tasks:**
-- [ ] [1/3] Data model + types + API routes + client wrappers — IN PROGRESS iteration 76
+- [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 76, 2026-03-01
 - [ ] [2/3] Tasks tab UI on step detail panel (checkbox list, inline edit, drag-to-reorder, add task input)
 - [ ] [3/3] Task count on canvas nodes + section-level rollup in section detail panel
 **Acceptance criteria:**
