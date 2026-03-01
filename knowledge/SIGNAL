@@ -1,1 +1,1 @@
-CONTINUE: REGRESSION-72 retry (risk score 9 unresolved) — pipeline dispatch issue must be investigated before next iteration
+CONTINUE: pipeline fixes applied (commit 00a7356) — retry #IMP-001 + #FEAT-045 [2/3]
