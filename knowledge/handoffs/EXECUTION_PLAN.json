@@ -1,160 +1,90 @@
 {
   "schema_version": "1.0",
-  "iteration": 74,
-  "date": "2026-03-01T15:30:00Z",
-  "mode": "multi_task",
+  "iteration": 75,
+  "date": "2026-03-01T17:00:00Z",
+  "mode": "testing_only",
   "validation": {
-    "last_commit_hash": "a6a3adebf54a6683366985ecb968bfdeeb251027",
+    "last_commit_hash": "d6bfff9a915d84c48d1cc93a7780ee5e6e4d67d1",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
     "revert_reason": null
   },
-  "tasks": [
-    {
-      "slot": 1,
-      "id": "#FEAT-045",
-      "description": "FEAT-045 [3/3]: Comment count badges on canvas nodes + workspace-level comments view page",
-      "source": "prd/FEATURES.md",
-      "type": "build",
-      "phase": "Phase 4: The Living Playbook",
-      "complexity": "M",
-      "attempts": 3,
-      "risk_score": 2,
-      "acceptance_criteria": [
-        "Comment count badge on step, section, touchpoint, and stage canvas nodes (only when count > 0)",
-        "Badge shows count of top-level comments (parent_id === null) per entity",
-        "Canvas views fetch all workspace comments once, build Map<commentable_id, count>, pass through buildNodes to node data",
-        "New workspace-level comments page at /w/[workspaceId]/comments",
-        "Comments page lists all workspace comments, filterable by category and commentable_type",
-        "Each comment shows: entity type+name context, author, category badge, content, resolved state, relative timestamp",
-        "Comments nav item in sidebar (MessageCircle icon from lucide-react)",
-        "'comments' added to reserved path segments in workspace-shell.tsx"
-      ],
-      "files_owned": [
-        "src/types/canvas.ts",
-        "src/components/canvas/step-node.tsx",
-        "src/components/canvas/section-node.tsx",
-        "src/components/canvas/touchpoint-node.tsx",
-        "src/components/canvas/stage-node.tsx",
-        "src/components/canvas/flow-canvas.tsx",
-        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
-        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx",
-        "src/app/(app)/w/[workspaceId]/comments/**",
-        "src/components/layout/sidebar.tsx",
-        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
-      ],
-      "files_read_only": [
-        "src/components/panels/comment-panel.tsx",
-        "src/types/database.ts",
-        "src/lib/api/client.ts"
-      ],
-      "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/teams/teams-view.tsx — list view pattern with filters",
-          "src/app/(app)/w/[workspaceId]/people/people-view.tsx — flat table CRUD pattern",
-          "src/components/panels/comment-panel.tsx — CATEGORY_CONFIG with colors/labels for badges"
-        ],
-        "patterns_to_follow": [
-          "Annotation indicator: annotatedIds Set built from fetchAnnotations, passed through buildNodes → annotationColor on node data → conditional render in node component. Use same flow for commentCounts Map.",
-          "buildNodes in flow-canvas.tsx (lines ~83-107): receives annotatedIds/annotationColor, maps over entities to build Node[]. Add commentCounts param, lookup count per entity.",
-          "Node data types (canvas.ts): StepNodeData has annotationColor?: string | null. Add commentCount?: number to all 4 types.",
-          "Badge placement: annotation dot is absolute positioned top-right. Place comment badge at bottom-right or inline with existing indicators to avoid collision.",
-          "Sidebar NAV_ITEMS: array of { label, icon, href } objects. Add after Compare, before Teams. Use MessageCircle from lucide-react.",
-          "Reserved paths in workspace-shell.tsx: array used to determine if path is a tab ID or a named route. Add 'comments'.",
-          "View page: server page.tsx extracts workspaceId → passes to client view. Client view uses useState + useEffect + fetchComments."
-        ],
-        "learnings_relevant": [
-          "Canvas null guards: (arr ?? []).filter(Boolean) before .map()",
-          "apiFetch unwraps envelope — fetchComments returns Comment[] directly",
-          "React state immutability — use [...arr].sort() not arr.sort()",
-          "React 19 useRef requires initial value: useRef(null)"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] — canvas nodes show comment count badges",
-          "/w/[workspaceId]/comments — new workspace comments page"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Canvas badge approach: In canvas-view.tsx and journey-canvas-view.tsx, fetch all workspace comments once via fetchComments(workspace.id). Build a Map<string, number> counting only top-level comments (parent_id === null) per commentable_id. Pass this map to buildNodes in flow-canvas.tsx. In buildNodes, look up count for each entity and set commentCount on node data. In each node component, render a small pill badge (MessageCircle icon + count) only when commentCount > 0. Use subtle styling — match the muted indicator pattern, not the prominent status badge. For the workspace comments page: model after teams-view.tsx. Fetch all comments, display in card list with category badges (reuse CATEGORY_CONFIG color scheme from comment-panel.tsx). Add filter bar with category dropdown and entity type dropdown. Show entity context (e.g. 'Step: Review Application') as clickable link. Sidebar placement: after Compare, before Teams."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-002",
-      "description": "Color picker keyboard accessibility + ARIA in perspective settings",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 2b: Perspectives",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Color picker toggle button has aria-expanded={showColorPicker} and aria-haspopup='listbox'",
-        "Color picker popup container has role='listbox'",
-        "Each preset color button has role='option' and aria-selected matching current perspective color",
-        "Escape key closes the picker and returns focus to toggle button",
-        "Arrow keys (Left/Right/Up/Down) navigate between color options in the 4-column grid",
-        "Enter/Space on focused color selects it and closes picker",
-        "Focus moves to currently-selected color (or first) when picker opens"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
-      ],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [
-          "src/components/ui/dropdown-menu.tsx — Radix ARIA pattern reference"
-        ],
-        "patterns_to_follow": [
-          "PerspectiveRow color picker: toggle button (line ~392) + conditional popup (lines ~398-416) with 8 preset colors in 4-column grid.",
-          "Existing outside-click listener (lines ~368-377) via colorRef + useEffect. Add onKeyDown alongside.",
-          "PERSPECTIVE_COLORS array defines the 8 colors. Grid is 4 columns × 2 rows. Arrow navigation: Left/Right = ±1, Up/Down = ±4, wrap at boundaries.",
-          "Track focusedIndex with useState. Use useRef array for color button refs. Call ref.current?.focus() on arrow key."
-        ],
-        "learnings_relevant": [
-          "React 19 useRef requires initial value: useRef(null) not bare useRef()",
-          "WCAG 2.1 Level A: keyboard operability + proper ARIA"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/settings — perspectives section color picker"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Minimal change — only modify the PerspectiveRow component's color picker section (~30 lines of additions). Do NOT refactor the rest of settings page. Add: (1) aria-expanded and aria-haspopup to toggle button, (2) role='listbox' on popup div, (3) role='option' + aria-selected + tabIndex on color buttons, (4) onKeyDown handler for Escape/Arrow/Enter, (5) useState for focusedIndex, (6) useEffect to focus correct button when picker opens. The 8 colors are in 4-col × 2-row grid: arrows navigate accordingly."
-    }
-  ],
+  "tasks": [],
   "shared_files": {
-    "read_only": [
-      "package.json",
-      "tsconfig.json",
-      "src/types/database.ts",
-      "src/lib/api/client.ts",
-      "src/lib/utils.ts"
-    ],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
     "owner": null,
-    "note": "canvas.ts is owned by slot 1 (adds commentCount to node data types). database.ts and client.ts have Comment type and fetchComments — no modifications needed."
+    "note": "Testing-only iteration. No source files should be modified."
   },
-  "merge_order": [
-    "#FEAT-045",
-    "#IMP-002"
-  ],
+  "merge_order": [],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": false,
-    "regression_reason": "Overdue (last at iter 64, 10 iterations ago, cadence floor = 8). STATUS.md directs finishing FEAT-045 [3/3] first. REGRESSION MUST RUN ITERATION 75 — do NOT skip.",
-    "suites_to_run": [
-      "acceptance"
-    ],
-    "cadence_trigger": null
+    "run_regression": true,
+    "regression_reason": "Cadence floor breach: last regression iter 64, current iter 75 (11 iterations, floor 8). Risk score 5 from iter 74 (11 files changed, shared components touched, partial result). Iter 73 regression had 0/5 acceptance failures (code absent at test time).",
+    "suites_to_run": ["regression", "acceptance"],
+    "cadence_trigger": "regression_overdue",
+    "regression_scope": {
+      "baseline_checks": [
+        "1. /login renders (curl 200)",
+        "2. /workspaces redirects unauthed (curl 307→login)",
+        "3. Canvas tab loads with nodes (static: canvas-view.tsx, flow-canvas.tsx)",
+        "4. Click step → detail panel (static: onNodeClick → onStepSelect)",
+        "5. Edit step name saves (static: debounced handleNameChange → updateStep)",
+        "6. Click section → panel (static: onSectionSelect → SectionDetailPanel)",
+        "7. Canvas zoom/pan (static: React Flow defaults + Controls + MiniMap)",
+        "8. Journey tab renders (static: journey-canvas-view.tsx, canvas_type check)",
+        "9. Click touchpoint → panel (static: selectedTouchpointId → TouchpointDetailPanel)",
+        "10. Click stage → panel (static: selectedStageId → StageDetailPanel)",
+        "11. Step list displays (static: step-list-view.tsx — fetch, filter, sort, render)",
+        "12. Gap analysis displays (static: gap-analysis-view.tsx — maturity gaps + visual bars)",
+        "13. Comparison view renders (static: compare-view.tsx — side-by-side + match glow)",
+        "14. Settings page loads (static: settings/page.tsx — name, sharing, perspectives)",
+        "15. Teams page loads (static: teams-view.tsx — full CRUD hierarchy)",
+        "16. Perspectives list displays (static: settings PerspectivesSection + PerspectiveRow)",
+        "17. PDF export no errors (static: pdf.ts all imports valid)",
+        "18. PNG export no errors (static: png.ts + use-canvas-export.ts)",
+        "19. No new console errors (API probing + static analysis)"
+      ],
+      "extended_checks_since_iter_64": [
+        "20. Dashboard page renders (static: dashboard/page.tsx — data transformations, all imports valid)",
+        "21. People page renders with CRUD (static: people-view.tsx — inline editing, role picker, delete confirm)",
+        "22. Tools page renders with CRUD (static: tools-view.tsx — CRUD view, imports valid)",
+        "23. Search/filter on People view (static: people-view.tsx — filter state, input binding)",
+        "24. Search/filter on Tools view (static: tools-view.tsx — filter state, input binding)",
+        "25. Search/filter on Teams view (static: teams-view.tsx — hierarchical matching logic)",
+        "26. Comments API route exists and has auth guards (curl: POST /api/v1/comments → 401)",
+        "27. Comment panel component exists (static: comment-panel.tsx — props, fetch, render)",
+        "28. Comment count badges on canvas nodes (static: step-node, section-node, stage-node, touchpoint-node — useContext(CommentCountsContext))",
+        "29. Workspace comments page renders (static: comments/comments-view.tsx — category filter, comment list)",
+        "30. Sidebar includes Comments nav item (static: sidebar.tsx — Comments entry with MessageSquare icon)",
+        "31. workspace-shell.tsx reserves 'comments' path (static: reserved paths array includes 'comments')",
+        "32. Hex color validation on perspectives API (static: perspectives route.ts — HEX_COLOR_REGEX guard)"
+      ],
+      "api_auth_probe": [
+        "workspaces → 401",
+        "steps → 401",
+        "perspectives → 401",
+        "annotations → 401",
+        "teams → 401",
+        "comments → 401",
+        "tools → 401",
+        "people → 401",
+        "sections → 405 (POST-only)",
+        "stages → 405 (POST-only)",
+        "public/shares/[id] → not_found"
+      ],
+      "data_integrity_checks": [
+        "CommentCountsContext provider wraps React Flow in both canvas-view.tsx and journey-canvas-view.tsx",
+        "Comment panel integrated in all 4 detail panels (step, section, touchpoint, stage)",
+        "All canvas node types import and use CommentCountsContext",
+        "Comments migration (014) defines proper enums and RLS policies",
+        "No orphaned imports or missing dependencies in new files"
+      ]
+    }
   },
   "status_updates": {
     "warnings_added": [
-      "REGRESSION MANDATORY iter 75 — last full run was iter 64 (10 iterations ago, cadence floor = 8). Was attempted iter 72 but tester did not execute. Do NOT skip.",
-      "Retrospective overdue — was due at iteration 70. Schedule at iter 75 testing-only iteration.",
-      "Migration 014_comments.sql still needs npx supabase db push to deploy to remote DB.",
-      "Pipeline worktree merge issue persists — monitor this iteration for same failure pattern."
+      "REGRESSION executing iteration 75 (overdue since iter 64, 11 iterations). Extended scope: 32 checks covering all features through Phase 4 FEAT-045."
     ],
     "diagnoses_written": false,
     "signal_override": null

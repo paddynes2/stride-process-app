@@ -63,5 +63,21 @@
   - **Why it matters:** Nielsen H7 — Flexibility and efficiency of use. Shortcuts need to be discoverable.
   - **Suggested fix:** Add keyboard shortcut legend to journey toolbar or tooltip on buttons.
 
+- [ ] #IMP-008 flow-canvas handleKeyDown useCallback has incomplete dependency array — Attempts: 0
+  - **Found:** Iteration 75 (regression tester)
+  - **Category:** Code maintainability
+  - **Where:** `src/components/canvas/flow-canvas.tsx` — handleKeyDown useCallback
+  - **What:** handleAddStep and handleAddSection are used inside the useCallback but not listed in the dependency array `[selectedStepId, selectedSectionId, onStepDelete, onSectionDelete]`. React hooks exhaustive-deps lint warning.
+  - **Why it matters:** Not a runtime bug currently (functions close over stable props), but could cause staleness bugs if handlers are refactored to use local state.
+  - **Suggested fix:** Add handleAddStep and handleAddSection to the dependency array, or wrap them in useCallback.
+
+- [ ] #IMP-009 Workspace comments page lacks navigation links to source entities — Attempts: 0
+  - **Found:** Iteration 75 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/comments/comments-view.tsx`
+  - **What:** CommentsView renders comments with entity type+name but no clickable link to navigate to the specific step/section/stage/touchpoint the comment belongs to.
+  - **Why it matters:** Nielsen H6 — Recognition rather than recall. Users should be able to navigate from a comment to its source entity without memorizing IDs.
+  - **Suggested fix:** Add a clickable link/button on each comment row that navigates to `/w/[id]/[tabId]` and selects the relevant entity.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

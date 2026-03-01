@@ -1233,6 +1233,12 @@ run_pipeline() {
         export PROJECT_ROOT="$wt_path"
         run_agent "builder-${slot}" "$prompt_file_path" "$BUILDER_MODEL"
 
+        # ── Health check: ensure BUILD_RESULT was produced ──
+        if [ ! -f "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" ]; then
+          printf '{"status":"failed","failure_details":"Agent process exited without producing output"}\n' \
+            > "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json"
+        fi
+
         # ── Copy BUILD_RESULT back FIRST (before cleanup) ──
         if [ -f "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" ]; then
           cp "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" \
@@ -1270,37 +1276,59 @@ run_pipeline() {
     for idx in "${!builder_pids[@]}"; do
       local pid=${builder_pids[$idx]}
       local bslot=${builder_slots[$idx]}
+      local bslot_exit=0
       if wait "$pid"; then
         log "  │   Builder #$bslot completed"
       else
-        log "  │   Builder #$bslot FAILED (exit $?)"
+        bslot_exit=$?
         any_builder_failed=true
+        log "  │   Builder #$bslot FAILED (exit $bslot_exit)"
       fi
     done
 
-    # ═══════════════════════════════════════════════════════════════
-    # STAGE 3: INTEGRATION (bash — no LLM)
-    # ═══════════════════════════════════════════════════════════════
-    log "  ├── Stage 3: INTEGRATION"
+    # ── Check builder results ──
+    local build_result_count=0
+    for ((chk_slot=1; chk_slot<=task_count; chk_slot++)); do
+      if [ -f "$PROJECT_ROOT/knowledge/handoffs/BUILD_RESULT_${chk_slot}.json" ]; then
+        build_result_count=$((build_result_count + 1))
+      else
+        log "  │   WARNING: No BUILD_RESULT for slot $chk_slot"
+      fi
+    done
+    log "  │   Build results: $build_result_count/$task_count"
 
-    if ! merge_worktrees; then
-      log "  │   └── Merge conflicts detected — reviewer will handle"
-    fi
+    local skip_testers=false
 
-    # Cleanup worktrees
-    cleanup_worktrees
-
-    # ── Post-merge build verification gate ──
-    # Catch type errors introduced by merge before reviewer runs.
-    # Result written to handoffs for reviewer to read.
-    local tsc_result_file="$PROJECT_ROOT/knowledge/handoffs/POST_MERGE_CHECK.txt"
-    log "  │   Running post-merge type check..."
-    if (cd "$PROJECT_ROOT" && npx tsc --noEmit 2>&1 | tail -30 > "$tsc_result_file"); then
-      echo "RESULT: PASS" >> "$tsc_result_file"
-      log "  │   └── Type check PASSED"
+    if [ "$build_result_count" -eq 0 ]; then
+      log "  │   ALL builders failed — skipping merge and testers"
+      cleanup_worktrees
+      skip_testers=true
     else
-      echo "RESULT: FAIL" >> "$tsc_result_file"
-      log "  │   └── WARNING: Type check FAILED after merge — reviewer will assess"
+      # ═══════════════════════════════════════════════════════════════
+      # STAGE 3: INTEGRATION (bash — no LLM)
+      # ═══════════════════════════════════════════════════════════════
+      log "  ├── Stage 3: INTEGRATION"
+
+      if ! merge_worktrees; then
+        log "  │   └── Merge conflicts detected — reviewer will handle"
+      fi
+
+      # Cleanup worktrees
+      cleanup_worktrees
+
+      # ── Post-merge build verification gate ──
+      # Catch type errors introduced by merge before reviewer runs.
+      # Result written to handoffs for reviewer to read.
+      local tsc_result_file="$PROJECT_ROOT/knowledge/handoffs/POST_MERGE_CHECK.txt"
+      log "  │   Running post-merge type check..."
+      if (cd "$PROJECT_ROOT" && npx tsc --noEmit 2>&1 | tail -30 > "$tsc_result_file"); then
+        echo "RESULT: PASS" >> "$tsc_result_file"
+        log "  │   └── Type check PASSED"
+      else
+        echo "RESULT: FAIL" >> "$tsc_result_file"
+        log "  │   └── WARNING: Type check FAILED after merge — skipping testers"
+        skip_testers=true
+      fi
     fi
   fi
 
@@ -1308,66 +1336,81 @@ run_pipeline() {
   # STAGE 4: TESTERS (parallel, Sonnet, conditional)
   # ═══════════════════════════════════════════════════════════════
 
-  # Determine if testing should run
-  local run_acceptance run_regression
-  run_acceptance=$(json_val "$plan_file" .testing_plan.run_acceptance "false")
-  run_regression=$(json_val "$plan_file" .testing_plan.run_regression "false")
-
-  # Check Playwright availability
-  local playwright_ok=false
-  if [ "$PLAYWRIGHT_AVAILABLE" = "true" ]; then
-    playwright_ok=true
-  elif [ "$PLAYWRIGHT_AVAILABLE" = "false" ]; then
-    playwright_ok=false
+  # skip_testers may already be set by builder failure or type check failure
+  if [ "${skip_testers:-false}" = true ]; then
+    log "  ├── Stage 4: TESTERS (skipped — upstream failure)"
   else
-    # Auto-detect
-    if claude mcp list 2>/dev/null | grep -qi playwright; then
+    # Determine if testing should run
+    local run_acceptance run_regression
+    run_acceptance=$(json_val "$plan_file" .testing_plan.run_acceptance "false")
+    run_regression=$(json_val "$plan_file" .testing_plan.run_regression "false")
+
+    # Check Playwright availability
+    local playwright_ok=false
+    if [ "$PLAYWRIGHT_AVAILABLE" = "true" ]; then
       playwright_ok=true
+    elif [ "$PLAYWRIGHT_AVAILABLE" = "false" ]; then
+      playwright_ok=false
+    else
+      # Auto-detect
+      if claude mcp list 2>/dev/null | grep -qi playwright; then
+        playwright_ok=true
+      fi
     fi
-  fi
 
-  # Check if any task has UI changes
-  local has_ui_changes
-  has_ui_changes=$(json_any "$plan_file" .tasks has_ui_changes)
+    # Check if any task has UI changes
+    local has_ui_changes
+    has_ui_changes=$(json_any "$plan_file" .tasks has_ui_changes)
 
-  local tester_pids=()
-  local tester_count=0
+    # In testing_only mode, the planner explicitly requested testing — honor it
+    if [ "$plan_mode" = "testing_only" ]; then
+      has_ui_changes="true"
+    fi
 
-  if [ "$playwright_ok" = true ] && [ "$run_acceptance" = "true" ] && [ "$has_ui_changes" = "true" ]; then
-    log "  ├── Stage 4: TESTERS"
+    local tester_pids=()
+    local tester_count=0
 
-    # Tester 1: Acceptance testing
-    local accept_prompt
-    accept_prompt=$(prepare_tester_prompt "acceptance" "1")
-    (run_agent "tester-acceptance" "$accept_prompt" "$TESTER_MODEL") &
-    tester_pids+=($!)
-    tester_count=$((tester_count + 1))
+    # ── Acceptance tester (requires Playwright + UI changes) ──
+    if [ "$playwright_ok" = true ] && [ "$run_acceptance" = "true" ] && [ "$has_ui_changes" = "true" ]; then
+      local accept_prompt
+      accept_prompt=$(prepare_tester_prompt "acceptance" "1")
+      (run_agent "tester-acceptance" "$accept_prompt" "$TESTER_MODEL") &
+      tester_pids+=($!)
+      tester_count=$((tester_count + 1))
+      log "  │   └── Acceptance tester launched"
+    else
+      local skip_reason=""
+      if [ "$playwright_ok" != true ]; then
+        skip_reason="Playwright unavailable"
+      elif [ "$run_acceptance" != "true" ]; then
+        skip_reason="not requested"
+      else
+        skip_reason="no UI changes"
+      fi
+      log "  │   └── Acceptance tester skipped ($skip_reason)"
+    fi
 
-    # Tester 2: Regression (if triggered)
+    # ── Regression tester (static analysis — no Playwright needed) ──
     if [ "$run_regression" = "true" ]; then
       local regress_prompt
       regress_prompt=$(prepare_tester_prompt "regression" "2")
       (run_agent "tester-regression" "$regress_prompt" "$TESTER_MODEL") &
       tester_pids+=($!)
       tester_count=$((tester_count + 1))
-    fi
-
-    log "  │   └── $tester_count testers launched"
-
-    # Wait for testers (non-fatal — reviewer always runs)
-    for pid in "${tester_pids[@]}"; do
-      wait "$pid" || log "  │   WARNING: Tester exited with error"
-    done
-  else
-    local skip_reason=""
-    if [ "$playwright_ok" != true ]; then
-      skip_reason="Playwright unavailable"
-    elif [ "$run_acceptance" != "true" ]; then
-      skip_reason="acceptance testing not requested"
+      log "  │   └── Regression tester launched"
     else
-      skip_reason="no UI changes"
+      log "  │   └── Regression tester skipped (not requested)"
     fi
-    log "  ├── Stage 4: TESTERS (skipped — $skip_reason)"
+
+    if [ "$tester_count" -gt 0 ]; then
+      log "  ├── Stage 4: TESTERS ($tester_count launched)"
+      # Wait for testers (non-fatal — reviewer always runs)
+      for pid in "${tester_pids[@]}"; do
+        wait "$pid" || log "  │   WARNING: Tester exited with error"
+      done
+    else
+      log "  ├── Stage 4: TESTERS (skipped — none triggered)"
+    fi
   fi
 
   # ═══════════════════════════════════════════════════════════════
@@ -1567,7 +1610,7 @@ for ((i=1; i<=MAX_ITERATIONS; i++)); do
   if [ "$AGENT_MODE" = "multi" ]; then
     # ── Multi-agent pipeline ──
     log "  Agent mode: multi-agent pipeline"
-    run_pipeline || true
+    run_pipeline
   else
     # ── Legacy single-agent mode ──
     log "  Agent mode: legacy (single agent)"

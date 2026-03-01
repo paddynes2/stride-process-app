@@ -1,1 +1,1 @@
-CONTINUE: #IMP-002 re-attempt (changes lost in merge), then REGRESSION (mandatory — last run iter 64, 11 iterations overdue)
+CONTINUE: #IMP-002 re-attempt (changes lost in iter 74 merge) + #FEAT-046 tasks system (step-level checklists)

@@ -1,18 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 74
+- **Iteration:** 75
 - **Date:** 2026-03-01
-- **Suite:** None (no tester ran)
-- **Method:** N/A — no TEST_RESULT files produced. Typecheck + lint verified by reviewer post-merge.
-- **Note:** FEAT-045 [3/3] code merged by reviewer from worktree commit. All verification passing (tsc 0 errors, lint 0 errors). REGRESSION OVERDUE — last full run was iteration 64 (11 iterations ago). MUST run iteration 75.
+- **Suite:** Regression (32 checks — 19 baseline + 13 extended)
+- **Method:** Static analysis + API auth probing (Playwright unavailable)
+- **Result:** 32/32 PASS — no regressions detected
+- **Note:** Comprehensive regression covering all features through Phase 4 FEAT-045. Extended scope verified dashboard, people/tools CRUD, search/filter, comments system (API, panel, badges, workspace page), sidebar nav, hex color validation. 11 API auth probes + 5 data integrity checks all pass. 2 improvements logged (IMP-008, IMP-009).
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 73 (2026-03-01) — baseline 19/19 PASS, iter-73 acceptance 0/5 FAIL (code absent at test time, recovered after)
+- Last run: Iteration 75 (2026-03-01) — 32/32 PASS (19 baseline + 13 extended)
+- Previous run: Iteration 73 (2026-03-01) — baseline 19/19 PASS, iter-73 acceptance 0/5 FAIL (code absent at test time)
 - Previous run: Iteration 64 (2026-02-26) — PASS (19/19)
-- Method: Static analysis via 3 parallel Explore agents + API probing via curl
+- Method: Static analysis + API auth probing (Playwright unavailable)
 - Previous run: Iteration 56 (PASS 19/19)
 
 #### Detailed Results (Iteration 64)
