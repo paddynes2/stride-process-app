@@ -20,7 +20,7 @@
 ## Medium Priority
 <!-- Improvements that would help but aren't urgent -->
 
-- [ ] #IMP-003 Annotation indicator dots lack semantic ARIA for screen readers — Attempts: 0
+- [ ] #IMP-003 Annotation indicator dots lack semantic ARIA for screen readers — Attempts: 1
   - **Found:** Iteration 57 (quality audit)
   - **Category:** Accessibility
   - **Where:** `src/components/canvas/step-node.tsx`, `section-node.tsx`, `touchpoint-node.tsx`, `stage-node.tsx`
@@ -78,6 +78,14 @@
   - **What:** CommentsView renders comments with entity type+name but no clickable link to navigate to the specific step/section/stage/touchpoint the comment belongs to.
   - **Why it matters:** Nielsen H6 — Recognition rather than recall. Users should be able to navigate from a comment to its source entity without memorizing IDs.
   - **Suggested fix:** Add a clickable link/button on each comment row that navigates to `/w/[id]/[tabId]` and selects the relevant entity.
+
+- [ ] #IMP-010 Collapsible side panels with persistent state — Attempts: 0
+  - **Found:** Iteration 77 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`
+  - **What:** Once TaskPanel is implemented, three stacked panels (AnnotationPanel, TaskPanel, CommentPanel) for a selected step may exceed viewport height and require scrolling.
+  - **Why it matters:** Nielsen H8 — Aesthetic and minimalist design. Too many expanded panels reduces usability.
+  - **Suggested fix:** Each panel stores collapsed state in localStorage keyed by panel type. Single collapse chevron in panel header toggles it.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

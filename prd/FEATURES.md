@@ -269,7 +269,7 @@
 ### #FEAT-046 Tasks system (step-level checklists)
 **Phase:** 4
 **Priority:** P0 (critical path)
-**Attempts:** 1
+**Attempts:** 2
 **Status:** in_progress
 **Sub-tasks:**
 - [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 76, 2026-03-01

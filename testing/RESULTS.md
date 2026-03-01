@@ -1,17 +1,18 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 75
+- **Iteration:** 77
 - **Date:** 2026-03-01
-- **Suite:** Regression (32 checks — 19 baseline + 13 extended)
-- **Method:** Static analysis + API auth probing (Playwright unavailable)
-- **Result:** 32/32 PASS — no regressions detected
-- **Note:** Comprehensive regression covering all features through Phase 4 FEAT-045. Extended scope verified dashboard, people/tools CRUD, search/filter, comments system (API, panel, badges, workspace page), sidebar nav, hex color validation. 11 API auth probes + 5 data integrity checks all pass. 2 improvements logged (IMP-008, IMP-009).
+- **Suite:** Regression (19 baseline + 6 acceptance)
+- **Method:** Static analysis (Playwright unavailable)
+- **Result:** 19/19 baseline PASS, 0/6 acceptance FAIL (all planned code absent — merge failures)
+- **Note:** Codebase unchanged from iter 76 (commit 575c7a1). Both builder slots failed to merge: slot 1 crashed, slot 2 merge conflict. All acceptance criteria fail because files don't exist. Baseline regression clean — no regressions introduced. 3 pipeline bugs logged.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 75 (2026-03-01) — 32/32 PASS (19 baseline + 13 extended)
+- Last run: Iteration 77 (2026-03-01) — 19/19 baseline PASS, 0/6 acceptance FAIL (code absent — merge failures)
+- Previous run: Iteration 75 (2026-03-01) — 32/32 PASS (19 baseline + 13 extended)
 - Previous run: Iteration 73 (2026-03-01) — baseline 19/19 PASS, iter-73 acceptance 0/5 FAIL (code absent at test time)
 - Previous run: Iteration 64 (2026-02-26) — PASS (19/19)
 - Method: Static analysis + API auth probing (Playwright unavailable)

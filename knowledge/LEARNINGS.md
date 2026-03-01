@@ -42,3 +42,5 @@
 
 - **Worktree commit path bug:** Builder's `git add -A` in worktree commits files under `autonomous-dev/.ralph/worktrees/build-N/src/` instead of main `src/`. The pipeline's merge step copies files from worktree to main but the builder commits before merge happens. Occurred iter 71, 73, 74.
 - **Lucide-react no `title` prop:** Lucide-react icon components don't accept a `title` prop (TS2322). Use `aria-label` instead for accessibility labeling.
+- **BUILD_RESULT misleading on merge failure:** BUILD_RESULT files report builder's worktree state, not main branch state. When merge fails (conflict or branch missing), BUILD_RESULT shows completed but code is absent from main. Tester/reviewer must verify files actually exist on the target branch, not trust BUILD_RESULT alone. (Iter 77)
+- **Slot 2 merge conflict recurring (G007 pattern):** Iterations 74, 77 — builder's `git add -A` in worktree stages EXECUTION_PLAN.json and BUILD_RESULT files, which conflict with main branch versions. ralph.sh must exclude `knowledge/handoffs/` from worktree commits or use `git add <specific-files>` instead of `git add -A`.

@@ -632,3 +632,29 @@
 - Efficiency: 4 — both slots delivered fully
 - Observations: 0
 **Notes:** Both tasks completed. FEAT-046 [1/3] tasks data layer ready. IMP-002 finally landed after 2 prior failed attempts (iter 74 merge loss, initial reviewer missed BUILD_RESULT_2.json). Correction commit fixes docs.
+
+## Iteration 77 — 2026-03-01 22:00
+**Tasks:**
+- #FEAT-046 [2/3] Tasks tab UI (TaskPanel component) — slot 1 — failed (builder crashed, branch never created)
+- #IMP-003 Annotation indicator ARIA labels — slot 2 — failed (merge conflict, code never merged)
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** blocked
+**Changes:** None — zero product code merged. Codebase identical to commit 575c7a1.
+**Verification:**
+- Type check: pass (vacuous — no changes)
+- Lint: pass (vacuous — no changes)
+- Build: N/A (no code to build)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (no changes to test)
+- Canary test: skipped (no changes)
+- Regression: 19/19 baseline PASS (codebase unchanged), 0/6 acceptance FAIL (all planned code absent)
+**Bugs found:** 3 pipeline bugs — (1) P1: FEAT-046 builder crashed both attempts, branch never created; (2) P1: IMP-003 merge conflict both attempts, handoff JSONs caused conflict (G007); (3) P2: root cause is git add -A in worktrees staging handoff files
+**Improvements found:** 1 — collapsible panel UX with localStorage state (from tester, logged as IMP-010)
+**Self-score:**
+- Code quality: N/A — no code produced
+- Test coverage: 3 — regression tester ran comprehensive static analysis (19 baseline + 6 acceptance checks)
+- Confidence: 1 — both tasks must be retried, pipeline merge bug must be fixed first
+- Efficiency: 1 — entire iteration wasted due to pipeline failures
+- Observations: 4 (3 pipeline bugs + 1 improvement)
+**Notes:** Third consecutive iteration with merge failures for at least one slot. Pattern: builders report success in worktrees but code never reaches main branch. G007 (handoff file conflicts) has been a known issue since iter 74. Builder crash in slot 1 is a new failure mode — ralph.log should be reviewed. BUILD_RESULT files are misleading (report completed but code is absent).
