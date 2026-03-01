@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
 
+const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i;
+
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -41,6 +43,10 @@ export async function POST(request: NextRequest) {
 
   if (!workspace_id) {
     return errorResponse("validation", "workspace_id is required", 400);
+  }
+
+  if (color !== undefined && !HEX_COLOR_REGEX.test(color)) {
+    return errorResponse("validation", "Invalid color format. Must be a hex color like #14B8A6", 400);
   }
 
   const insert: Record<string, unknown> = {

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
 
+const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i;
 const EDITABLE_FIELDS = ["name", "color", "icon"] as const;
 
 export async function PATCH(
@@ -27,6 +28,10 @@ export async function PATCH(
 
   if (Object.keys(updates).length === 0) {
     return errorResponse("validation", "No valid fields to update", 400);
+  }
+
+  if (body.color !== undefined && !HEX_COLOR_REGEX.test(body.color)) {
+    return errorResponse("validation", "Invalid color format. Must be a hex color like #14B8A6", 400);
   }
 
   const { data: perspective, error } = await supabase

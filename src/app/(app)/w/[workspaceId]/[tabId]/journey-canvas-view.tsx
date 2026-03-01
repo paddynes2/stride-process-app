@@ -27,6 +27,7 @@ import { TouchpointNode } from "@/components/canvas/touchpoint-node";
 import { StageDetailPanel } from "@/components/panels/stage-detail-panel";
 import { TouchpointDetailPanel } from "@/components/panels/touchpoint-detail-panel";
 import { AnnotationPanel } from "@/components/panels/annotation-panel";
+import { CommentPanel } from "@/components/panels/comment-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import {
   createStage,
@@ -611,6 +612,12 @@ export function JourneyCanvasView({
             annotatableId={selectedTouchpoint.id}
             onAnnotationChange={refreshAnnotatedIds}
           />
+        )}
+        {selectedStage && (
+          <CommentPanel commentableType="stage" commentableId={selectedStage.id} />
+        )}
+        {selectedTouchpoint && !selectedStage && (
+          <CommentPanel commentableType="touchpoint" commentableId={selectedTouchpoint.id} />
         )}
       </div>
     </div>

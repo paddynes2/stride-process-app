@@ -6,6 +6,7 @@ import { StepDetailPanel } from "@/components/panels/step-detail-panel";
 import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
 import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
 import { AnnotationPanel } from "@/components/panels/annotation-panel";
+import { CommentPanel } from "@/components/panels/comment-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
 import { fetchAnnotations } from "@/lib/api/client";
@@ -193,6 +194,12 @@ export function CanvasView({
             annotatableId={selectedSection.id}
             onAnnotationChange={refreshAnnotatedIds}
           />
+        )}
+        {selectedStep && (
+          <CommentPanel commentableType="step" commentableId={selectedStep.id} />
+        )}
+        {selectedSection && !selectedStep && (
+          <CommentPanel commentableType="section" commentableId={selectedSection.id} />
         )}
       </div>
     </div>
