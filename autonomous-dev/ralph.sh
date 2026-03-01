@@ -217,6 +217,28 @@ check_dev_server() {
   fi
 }
 
+RALPH_PID_FILE="$SCRIPT_DIR/.ralph/ralph.pid"
+
+acquire_lock() {
+  mkdir -p "$SCRIPT_DIR/.ralph"
+  if [ -f "$RALPH_PID_FILE" ]; then
+    local existing_pid
+    existing_pid=$(cat "$RALPH_PID_FILE" 2>/dev/null || echo "")
+    if [ -n "$existing_pid" ] && kill -0 "$existing_pid" 2>/dev/null; then
+      echo "ERROR: Another ralph instance is running (PID $existing_pid)"
+      echo "  If this is stale, remove: $RALPH_PID_FILE"
+      return 1
+    fi
+    # Stale PID file — previous instance crashed
+    rm -f "$RALPH_PID_FILE"
+  fi
+  echo "$$" > "$RALPH_PID_FILE"
+}
+
+release_lock() {
+  rm -f "$RALPH_PID_FILE" 2>/dev/null || true
+}
+
 verify_clean_git_state() {
   local status
   status=$(cd "$PROJECT_ROOT" && git status --porcelain 2>/dev/null || echo "ERROR")
@@ -977,14 +999,20 @@ merge_worktrees() {
         continue
       fi
     else
-      # No BUILD_RESULT file — builder likely crashed without producing output
-      # Check if branch has any commits beyond base; if not, skip the merge
-      local branch_exists
-      branch_exists=$(cd "$PROJECT_ROOT" && git rev-parse --verify "$branch_name" >/dev/null 2>/dev/null && echo "yes" || echo "no")
-      if [ "$branch_exists" = "no" ]; then
-        log "  │   Skipping merge for slot $slot (branch missing — builder crashed)"
-        continue
-      fi
+      log "  │   Skipping merge for slot $slot (no BUILD_RESULT)"
+      continue
+    fi
+
+    # Verify branch exists before attempting merge
+    # Even with BUILD_RESULT, the branch may be missing if:
+    # - The subshell died before git commit
+    # - A concurrent instance deleted it
+    # - The builder agent ran destructive git commands
+    local branch_exists
+    branch_exists=$(cd "$PROJECT_ROOT" && git rev-parse --verify "$branch_name" >/dev/null 2>&1 && echo "yes" || echo "no")
+    if [ "$branch_exists" = "no" ]; then
+      log "  │   Skipping merge for slot $slot (branch missing despite BUILD_RESULT)"
+      continue
     fi
 
     # Merge with --no-ff to preserve branch history
@@ -1230,20 +1258,29 @@ run_pipeline() {
       local main_handoffs_dir="$PROJECT_ROOT/knowledge/handoffs"
       local iter_num="$ITER_NUM"
       (
+        # ── CRITICAL: Disable errexit in subshell ──
+        # The parent's set -euo pipefail is inherited. Under set -e, ANY unguarded
+        # command failure kills this subshell silently — no BUILD_RESULT copy, no
+        # git commit, no diagnostic output. This was the root cause of builder slot 1's
+        # branch being consistently missing at merge time.
+        set +e
+
         export PROJECT_ROOT="$wt_path"
-        run_agent "builder-${slot}" "$prompt_file_path" "$BUILDER_MODEL"
+        agent_exit=0
+        run_agent "builder-${slot}" "$prompt_file_path" "$BUILDER_MODEL" || agent_exit=$?
 
         # ── Health check: ensure BUILD_RESULT was produced ──
+        # Agent may crash, exceed context, or simply not follow instructions.
+        # Ensure the handoffs directory exists (agent could have deleted it).
+        mkdir -p "$wt_path/knowledge/handoffs"
         if [ ! -f "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" ]; then
-          printf '{"status":"failed","failure_details":"Agent process exited without producing output"}\n' \
-            > "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json"
+          printf '{"status":"failed","failure_details":"Agent exited (code %d) without producing BUILD_RESULT"}\n' \
+            "$agent_exit" > "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json"
         fi
 
         # ── Copy BUILD_RESULT back FIRST (before cleanup) ──
-        if [ -f "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" ]; then
-          cp "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" \
-             "$main_handoffs_dir/"
-        fi
+        cp "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" \
+           "$main_handoffs_dir/" 2>/dev/null || true
 
         # ── Remove handoff files BEFORE staging ──
         # EXECUTION_PLAN.json was copied for the builder to read, but must not
@@ -1256,7 +1293,7 @@ run_pipeline() {
         # Without a commit, merge_worktrees sees "Already up to date."
         (cd "$wt_path" && git add -A) 2>/dev/null || true
         if ! (cd "$wt_path" && git diff --cached --quiet) 2>/dev/null; then
-          (cd "$wt_path" && git commit -m "ralph: builder slot $slot iteration $iter_num" --no-verify) >/dev/null 2>&1
+          (cd "$wt_path" && git commit -m "ralph: builder slot $slot iteration $iter_num" --no-verify) >/dev/null 2>&1 || true
         fi
       ) &
 
@@ -1526,18 +1563,23 @@ trap_cleanup() {
   log "Signal received — cleaning up..."
   cleanup_worktrees 2>/dev/null || true
   write_session_summary 2>/dev/null || true
+  release_lock
   log "Cleanup complete. Exiting."
   exit 130
 }
 trap trap_cleanup INT TERM
+trap release_lock EXIT
 
 # ─── Pre-Session Setup ────────────────────────────────────────────────────
 
 SESSION_START_TIME=$(date '+%Y-%m-%d %H:%M')
 SESSION_START_ITER=$(get_iteration_count)
 
+# Acquire instance lock (prevent concurrent runs)
+acquire_lock || exit 1
+
 # Verify and clean git state
-verify_clean_git_state || exit 1
+verify_clean_git_state || { release_lock; exit 1; }
 
 # Resume mode: verify existing ralph branch; otherwise create new one
 if [ "$MODE" == "resume" ]; then
