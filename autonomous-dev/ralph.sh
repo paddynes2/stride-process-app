@@ -894,12 +894,12 @@ run_agent() {
 
   # Pipe prompt via stdin
   # --no-session-persistence: prevents concurrent agents from conflicting on session files
+  # NOTE: Do NOT use `if ! (cmd); then exit_code=$?` — the `!` negation
+  # makes $? always 0 inside the then-block. Use `cmd || exit_code=$?` instead.
   # shellcheck disable=SC2086
-  if ! (cd "$PROJECT_ROOT" && cat "$prompt_file" | \
+  (cd "$PROJECT_ROOT" && cat "$prompt_file" | \
     claude --print --no-session-persistence --permission-mode bypassPermissions $model_flag \
-    2>"$stderr_file"); then
-    exit_code=$?
-  fi
+    2>"$stderr_file") || exit_code=$?
 
   end_time=$(date +%s)
   duration=$((end_time - start_time))
@@ -980,7 +980,7 @@ merge_worktrees() {
       # No BUILD_RESULT file — builder likely crashed without producing output
       # Check if branch has any commits beyond base; if not, skip the merge
       local branch_exists
-      branch_exists=$(cd "$PROJECT_ROOT" && git rev-parse --verify "$branch_name" 2>/dev/null && echo "yes" || echo "no")
+      branch_exists=$(cd "$PROJECT_ROOT" && git rev-parse --verify "$branch_name" >/dev/null 2>/dev/null && echo "yes" || echo "no")
       if [ "$branch_exists" = "no" ]; then
         log "  │   Skipping merge for slot $slot (branch missing — builder crashed)"
         continue
@@ -1233,6 +1233,17 @@ run_pipeline() {
         export PROJECT_ROOT="$wt_path"
         run_agent "builder-${slot}" "$prompt_file_path" "$BUILDER_MODEL"
 
+        # ── Copy BUILD_RESULT back FIRST (before cleanup) ──
+        if [ -f "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" ]; then
+          cp "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" \
+             "$main_handoffs_dir/"
+        fi
+
+        # ── Remove handoff files BEFORE staging ──
+        # EXECUTION_PLAN.json was copied for the builder to read, but must not
+        # be committed — it causes merge conflicts when merging worktrees back.
+        rm -f "$wt_path"/knowledge/handoffs/*.json 2>/dev/null || true
+
         # ── Stage and commit all changes ──
         # Builder may create files but miss git-adding some. Since this is a
         # disposable worktree, git add -A is safe — stage everything, then commit.
@@ -1241,17 +1252,17 @@ run_pipeline() {
         if ! (cd "$wt_path" && git diff --cached --quiet) 2>/dev/null; then
           (cd "$wt_path" && git commit -m "ralph: builder slot $slot iteration $iter_num" --no-verify) >/dev/null 2>&1
         fi
-
-        # Copy BUILD_RESULT back to main handoffs dir (NOT worktree — use captured path)
-        if [ -f "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" ]; then
-          cp "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" \
-             "$main_handoffs_dir/"
-        fi
       ) &
 
       builder_pids+=($!)
       builder_slots+=($slot)
       log "  │   └── Builder #$slot launched (PID ${builder_pids[-1]})"
+
+      # Stagger builder launches to avoid concurrent Claude CLI conflicts
+      # (builder-2 ran 0 seconds in iter 71 — likely stdin/pipe race condition)
+      if [ "$slot" -lt "$task_count" ]; then
+        sleep 3
+      fi
     done
 
     # Wait for all builders
@@ -1278,6 +1289,19 @@ run_pipeline() {
 
     # Cleanup worktrees
     cleanup_worktrees
+
+    # ── Post-merge build verification gate ──
+    # Catch type errors introduced by merge before reviewer runs.
+    # Result written to handoffs for reviewer to read.
+    local tsc_result_file="$PROJECT_ROOT/knowledge/handoffs/POST_MERGE_CHECK.txt"
+    log "  │   Running post-merge type check..."
+    if (cd "$PROJECT_ROOT" && npx tsc --noEmit 2>&1 | tail -30 > "$tsc_result_file"); then
+      echo "RESULT: PASS" >> "$tsc_result_file"
+      log "  │   └── Type check PASSED"
+    else
+      echo "RESULT: FAIL" >> "$tsc_result_file"
+      log "  │   └── WARNING: Type check FAILED after merge — reviewer will assess"
+    fi
   fi
 
   # ═══════════════════════════════════════════════════════════════

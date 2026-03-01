@@ -13,10 +13,11 @@ Read these files in order:
 1. `git diff --cached` (or `git diff` if not yet staged) — the actual code changes
 2. `knowledge/handoffs/EXECUTION_PLAN.json` — what was planned
 3. `knowledge/handoffs/BUILD_RESULT_*.json` — what was built, verification results
-4. `knowledge/handoffs/TEST_RESULT_*.json` — what was tested, bugs/improvements found
-5. All `knowledge/*.md` files — for doc updates
-6. All `prd/*.md` files — for task status updates
-7. `knowledge/TASK-COUNTER.json` — for ID assignment
+4. `knowledge/handoffs/POST_MERGE_CHECK.txt` — post-merge type check result (PASS/FAIL). If FAIL, investigate errors before committing.
+5. `knowledge/handoffs/TEST_RESULT_*.json` — what was tested, bugs/improvements found
+6. All `knowledge/*.md` files — for doc updates
+7. All `prd/*.md` files — for task status updates
+8. `knowledge/TASK-COUNTER.json` — for ID assignment
 
 ---
 
@@ -50,6 +51,7 @@ ALL must pass before committing:
 - [ ] All BUILD_RESULTs have `verification.typecheck.status=pass`
 - [ ] All BUILD_RESULTs have `verification.lint.status=pass`
 - [ ] No `ownership_violations` across any BUILD_RESULT
+- [ ] POST_MERGE_CHECK.txt shows `RESULT: PASS` (if file exists — pipeline runs `tsc --noEmit` after merge)
 - [ ] Diff reviewed and clean (this phase)
 
 If gate fails: commit with `[partial]` prefix in the message, note failures.
