@@ -1,12 +1,12 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 78
-- **Date:** 2026-03-01
-- **Suite:** N/A (no testers ran this iteration)
-- **Method:** Reviewer verification only (typecheck + lint + code review)
-- **Result:** Both tasks verified by reviewer. Type check clean. Lint clean (3 pre-existing warnings).
-- **Note:** No TEST_RESULT files present — testers may not have launched. Builder verification (typecheck, lint, build) all passed. Regression recommended for iter 79.
+- **Iteration:** 79
+- **Date:** 2026-03-02
+- **Suite:** acceptance (#FEAT-046) + regression (32 checks) — PLANNED
+- **Method:** N/A — testers did not execute
+- **Result:** BLOCKED — no TEST_RESULT files produced. 2nd tester dispatch failure in testing_only mode (also iter 72).
+- **Note:** FEAT-046 acceptance testing overdue (built in iters 76-78, never tested). Regression overdue since iter 75. Risk score 4 from shared canvas component changes across iters 76-78.
 
 ## Suite Results
 

@@ -1,19 +1,17 @@
 ## Handoff
 
-- **Iteration:** 78
-- **Date:** 2026-03-01 23:30
+- **Iteration:** 79
+- **Date:** 2026-03-02 00:30
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-046 [3/3] task count badges + section rollup (completed), #IMP-008 flow-canvas handleKeyDown deps fix (completed)
-- **Result:** completed
-- **Next task:** #FEAT-047 Runbook instances [1/3] data model + types + API + client wrappers
-- **Blockers:** None
+- **Last task(s):** Testing-only iteration (acceptance + regression for #FEAT-046). Testers did not execute. ralph.sh verbose logging added.
+- **Result:** blocked
+- **Next task:** Retry testing-only iteration (acceptance for #FEAT-046 + regression 32 checks). If testers fail to launch again, investigate pipeline tester dispatch.
+- **Blockers:** Tester agents not executing in testing_only mode (2nd occurrence — also failed in iter 72)
 
 ## Context
 
-FEAT-046 is now fully complete (3/3). TaskCountsContext added to `src/types/canvas.ts`, fetched in `canvas-view.tsx` (mirrors CommentCountsContext pattern), consumed by `step-node.tsx` (bottom-left badge: "2/5") and `section-detail-panel.tsx` (per-step task progress rollup). Tasks API GET route now accepts optional `step_id` — omitting it returns all workspace tasks. `fetchAllTasks(workspaceId)` added to `client.ts`.
-
-IMP-008 fixed — `handleAddStep` and `handleAddSection` wrapped in `useCallback`, added to `handleKeyDown` deps. Reduces pre-existing lint warnings from 4 to 3 in flow-canvas.tsx.
+Iteration 79 was planned as testing_only (acceptance for #FEAT-046 tasks system + regression suite). Neither tester launched — no TEST_RESULT files produced. The planner also added verbose logging (`vlog()`) to `autonomous-dev/ralph.sh` for pipeline diagnostics — this was committed. FEAT-046 has been fully built (iters 76-78) but never acceptance-tested. Last regression was iter 75 (32/32 PASS). Risk score has been accumulating since iter 76 (shared canvas components modified across 3 iterations).
 
 ## Dev Server
 
@@ -24,9 +22,10 @@ IMP-008 fixed — `handleAddStep` and `handleAddSection` wrapped in `useCallback
 ## Warnings
 
 - Migrations 014_comments.sql + 015_tasks.sql need `npx supabase db push` to deploy to remote DB
-- Pipeline worktree merge bug persists — 5th consecutive multi-task iteration requiring manual code recovery by reviewer. G007 (git add -A in worktrees) still unfixed in ralph.sh.
-- Regression recommended for iter 79 (risk score 4 from iter 77, shared canvas components).
+- Pipeline worktree merge bug persists — 5 consecutive multi-task iterations required manual code recovery. G007 (git add -A in worktrees) still unfixed in ralph.sh.
+- Tester dispatch failure — 2nd occurrence (iter 72, iter 79). Pipeline testing_only mode may have a dispatch bug.
 - Retrospective due at iteration 80.
 - 3 pre-existing lint warnings in flow-canvas.tsx (addEdge unused), journey-canvas-view.tsx (handleAddTouchpoint, handleAddStage)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation) — static verification only
+- FEAT-046 acceptance testing overdue (built in iters 76-78, never acceptance-tested)

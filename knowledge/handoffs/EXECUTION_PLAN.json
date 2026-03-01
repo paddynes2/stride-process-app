@@ -1,130 +1,95 @@
 {
   "schema_version": "1.0",
-  "iteration": 78,
-  "date": "2026-03-01T23:00:00Z",
-  "mode": "multi_task",
+  "iteration": 79,
+  "date": "2026-03-01T23:45:00Z",
+  "mode": "testing_only",
   "validation": {
-    "last_commit_hash": "730a01514b4a2fb3a2dfc95f3b4b6de40eed4491",
+    "last_commit_hash": "d4a1a3ab304ffc8f8853cfb3964e4a4ded14bce6",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
     "revert_reason": null
   },
-  "tasks": [
-    {
-      "slot": 1,
-      "id": "#FEAT-046",
-      "description": "Task count badges on step canvas nodes (e.g. '2/5') + section-level task rollup in section detail panel. Final sub-task [3/3] of the tasks system feature.",
-      "source": "prd/FEATURES.md",
-      "type": "build",
-      "phase": "Phase 4: The Living Playbook",
-      "complexity": "M",
-      "attempts": 1,
-      "risk_score": 2,
-      "acceptance_criteria": [
-        "Tasks API GET route accepts optional step_id — when omitted, returns all tasks for the workspace",
-        "New client function fetchAllTasks(workspaceId) returns Task[] for entire workspace",
-        "TaskCountsContext created in canvas.ts — Map<string, { completed: number; total: number }> keyed by step_id",
-        "canvas-view.tsx fetches all workspace tasks on mount, builds TaskCountsContext map, wraps ReactFlow in provider (mirrors CommentCountsContext pattern)",
-        "step-node.tsx consumes TaskCountsContext and displays 'completed/total' badge (e.g. '2/5') — only when total > 0, positioned near comment badge area",
-        "section-detail-panel.tsx shows task rollup: for each step in the section, display step name + task progress (completed/total). Summary at top: total completed / total tasks across all steps",
-        "Type check passes (npx tsc --noEmit)"
-      ],
-      "files_owned": [
-        "src/app/api/v1/tasks/route.ts",
-        "src/types/canvas.ts",
-        "src/components/canvas/step-node.tsx",
-        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
-        "src/components/panels/section-detail-panel.tsx"
-      ],
-      "files_read_only": [
-        "src/types/database.ts",
-        "src/components/panels/task-panel.tsx",
-        "src/components/panels/comment-panel.tsx",
-        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
-      ],
-      "context": {
-        "similar_files": [
-          "src/types/canvas.ts — CommentCountsContext (line 8) is the exact pattern to replicate for TaskCountsContext",
-          "src/components/canvas/step-node.tsx — comment count badge (lines 114-123) is the pattern for task count badge placement",
-          "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — comment counts fetch+provide (lines 119-136) is the pattern for task counts"
-        ],
-        "patterns_to_follow": [
-          "CommentCountsContext: createContext → canvas-view fetches all comments once → builds Map → wraps ReactFlow in Provider → node components useContext",
-          "TaskCountsContext value type is Map<string, { completed: number; total: number }> (richer than comment counts which is just number)",
-          "Badge positioning: comment badge is absolute bottom-1 right-1. Task badge should use a different position or inline placement to avoid overlap",
-          "fetchAllTasks: mirror fetchComments pattern — apiFetch<Task[]>('/api/v1/tasks?workspace_id=...')",
-          "Section rollup: section-detail-panel already receives steps prop — can consume TaskCountsContext to show per-step progress"
-        ],
-        "learnings_relevant": [
-          "apiFetch unwraps envelope — returns T directly, do NOT add nested property access",
-          "React state immutability — use [...arr].sort() not arr.sort()",
-          "Canvas null guards — (arr ?? []).filter(Boolean) before .map()",
-          "React 19 useRef requires initial value: useRef(null)"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] — process canvas view (step nodes show task badges)",
-          "/w/[workspaceId]/[tabId] — section detail panel (rollup when section selected)"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "The tasks API GET route currently REQUIRES step_id. Make it optional: when step_id is omitted, query all tasks for the workspace_id. This enables workspace-wide task fetching for the canvas badge context. Add a new fetchAllTasks(workspaceId) client function — do NOT modify the existing fetchTasks(workspaceId, stepId) signature since TaskPanel depends on it. For the task count badge on step-node, use ListTodo or CheckSquare icon (import from lucide-react). Position it to avoid overlap with the existing comment count badge — consider placing it inline in the status row or as a separate bottom-left badge. The shared_files.owner grants permission to modify client.ts."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-008",
-      "description": "Fix flow-canvas handleKeyDown useCallback with incomplete dependency array — add handleAddStep and handleAddSection to deps.",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "fix",
-      "phase": "Phase 4: The Living Playbook",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "handleKeyDown useCallback dependency array includes handleAddStep and handleAddSection",
-        "handleAddStep and handleAddSection are wrapped in useCallback (if not already) to prevent unnecessary re-renders",
-        "Type check passes (npx tsc --noEmit)",
-        "No behavioral change — keyboard shortcuts continue to work identically"
-      ],
-      "files_owned": [
-        "src/components/canvas/flow-canvas.tsx"
-      ],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "React hooks exhaustive-deps: all variables referenced inside useCallback must be in the dependency array",
-          "If handleAddStep/handleAddSection reference props, wrap them in useCallback with those props as deps"
-        ],
-        "learnings_relevant": [
-          "React 19 useRef requires initial value: useRef(null)"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] — process canvas (keyboard shortcuts)"
-        ]
-      },
-      "has_ui_changes": false,
-      "has_data_model_changes": false,
-      "special_instructions": "This is a code quality fix. Read flow-canvas.tsx fully before making changes. The handleKeyDown useCallback references handleAddStep and handleAddSection but doesn't list them in deps. Wrap those handlers in useCallback if they aren't already, then add them to handleKeyDown's dep array. Verify no infinite re-render loop — if the handlers depend on frequently-changing state, consider using refs instead."
-    }
-  ],
+  "tasks": [],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/index.ts"],
-    "owner": "#FEAT-046",
-    "note": "Slot 1 (#FEAT-046) may add fetchAllTasks function to src/lib/api/client.ts. Slot 2 must NOT modify client.ts."
+    "read_only": ["package.json", "tsconfig.json", "tailwind.config.ts", "next.config.ts"],
+    "owner": null,
+    "note": "Testing-only iteration — no builders run."
   },
-  "merge_order": ["#IMP-008", "#FEAT-046"],
+  "merge_order": [],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": false,
-    "regression_reason": "Last regression was iter 75 (32/32 PASS). Risk score 4 from iter 77 suggests regression — scheduled for iter 79 after FEAT-046 is fully complete.",
-    "suites_to_run": ["acceptance"],
-    "cadence_trigger": null
+    "run_regression": true,
+    "regression_reason": "Risk score 4 on iterations 77 and 78 (shared canvas components: step-node.tsx, section-node.tsx, section-detail-panel.tsx, flow-canvas.tsx, canvas.ts). STATUS.md flagged regression for iter 79. 3 feature iterations since last regression (iter 75).",
+    "suites_to_run": ["regression", "acceptance"],
+    "cadence_trigger": null,
+    "scope": {
+      "baseline_checks": [
+        "Login page renders (curl 200)",
+        "Workspaces redirect (unauthed → login)",
+        "Canvas tab loads with nodes (static: canvas-view.tsx)",
+        "Click step → detail panel (static: onNodeClick → onStepSelect)",
+        "Edit step name saves (static: debounced handleNameChange → updateStep)",
+        "Click section → panel (static: onSectionSelect → SectionDetailPanel)",
+        "Canvas zoom/pan (static: React Flow defaults + Controls + MiniMap)",
+        "Journey tab renders (static: journey-canvas-view.tsx, canvas_type check)",
+        "Click touchpoint → panel (static: selectedTouchpointId → TouchpointDetailPanel)",
+        "Click stage → panel (static: selectedStageId → StageDetailPanel)",
+        "Step list displays (static: step-list-view.tsx)",
+        "Gap analysis displays (static: gap-analysis-view.tsx)",
+        "Comparison view renders (static: compare-view.tsx)",
+        "Settings page loads (static: settings/page.tsx)",
+        "Teams page loads (static: teams-view.tsx)",
+        "Perspectives list displays (static: PerspectivesSection)",
+        "PDF export no errors (static: pdf.ts imports valid)",
+        "PNG export no errors (static: png.ts + use-canvas-export.ts)",
+        "No new console errors (API probing + static)",
+        "Dashboard page renders (static: dashboard-view.tsx)",
+        "People page renders (static: people-view.tsx)",
+        "Tools page renders (static: tools-view.tsx)",
+        "Search filtering works (static: filterText state + filter logic)",
+        "Comments page renders (static: comments-view.tsx)",
+        "Comment panel on detail panels (static: CommentPanel import + rendering)",
+        "CommentCountsContext provides badge data (static: canvas-view.tsx provider)",
+        "Comment count badges on canvas nodes (static: step-node, section-node useContext)"
+      ],
+      "acceptance_checks_since_iter_75": [
+        "Tasks API GET route accepts optional step_id (static: tasks/route.ts)",
+        "Tasks API supports POST/PATCH/DELETE (static: tasks/[id]/route.ts)",
+        "fetchAllTasks(workspaceId) exists in client.ts",
+        "TaskPanel component exists and renders checkbox list (static: task-panel.tsx)",
+        "TaskPanel has drag-to-reorder via native HTML DnD (static: task-panel.tsx)",
+        "TaskPanel has inline-edit for task titles (static: task-panel.tsx)",
+        "TaskCountsContext created in canvas.ts (static: createContext)",
+        "canvas-view.tsx fetches all tasks, builds counts map, wraps in TaskCountsContext.Provider",
+        "step-node.tsx shows task count badge bottom-left with ListTodo icon (static)",
+        "section-detail-panel.tsx shows per-step task rollup (static: task progress)",
+        "flow-canvas.tsx handleKeyDown deps include handleAddStep, handleAddSection (static)",
+        "IMP-002 color picker a11y: role=listbox, aria-expanded, keyboard nav (static: settings/page.tsx)",
+        "IMP-003 annotation ARIA: role=img, aria-label on all 4 node types (static)"
+      ],
+      "api_auth_probing": [
+        "GET /api/v1/workspaces → 401",
+        "GET /api/v1/steps → 401",
+        "GET /api/v1/comments → 401",
+        "GET /api/v1/tasks → 401",
+        "GET /api/v1/perspectives → 401",
+        "GET /api/v1/annotations → 401",
+        "GET /api/v1/teams → 401",
+        "GET /api/v1/people → 401",
+        "GET /api/v1/tools → 401",
+        "POST /api/v1/sections → 401",
+        "GET /api/v1/public/shares/nonexistent → not_found"
+      ],
+      "type_check": "npx tsc --noEmit",
+      "lint": "npm run lint",
+      "build": "npm run build"
+    }
   },
   "status_updates": {
     "warnings_added": [
-      "Risk score 4 from iter 77 (shared canvas components touched). Regression recommended for iter 79."
+      "Regression results pending — needed due to risk score 4 on iters 77-78 (shared canvas components).",
+      "Retrospective due at iteration 80."
     ],
     "diagnoses_written": false,
     "signal_override": null
