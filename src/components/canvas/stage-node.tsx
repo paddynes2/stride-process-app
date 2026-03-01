@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import { type NodeProps, NodeResizer } from "@xyflow/react";
+import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StageNodeData } from "@/types/canvas";
+import { CommentCountsContext } from "@/types/canvas";
 import { getPainColor } from "@/lib/pain";
 
 const CHANNEL_ICONS: Record<string, string> = {
@@ -19,6 +21,8 @@ export function StageNode({ data, selected }: NodeProps) {
   const { stage, averagePainScore, heatMapMode, annotationColor } = nodeData;
   const channelIcon = stage.channel ? CHANNEL_ICONS[stage.channel] ?? "📋" : null;
   const painColor = getPainColor(averagePainScore);
+  const commentCounts = React.useContext(CommentCountsContext);
+  const commentCount = commentCounts.get(stage.id) ?? 0;
 
   return (
     <>
@@ -84,6 +88,17 @@ export function StageNode({ data, selected }: NodeProps) {
           <p className="text-[11px] text-[var(--text-tertiary)] line-clamp-2">
             {stage.description}
           </p>
+        )}
+
+        {/* Comment count badge — bottom-right, only when count > 0 */}
+        {commentCount > 0 && (
+          <div
+            className="absolute bottom-2 right-2 flex items-center gap-0.5 bg-[var(--bg-surface-active)] rounded px-1 py-0.5"
+            title={`${commentCount} unresolved comment${commentCount !== 1 ? "s" : ""}`}
+          >
+            <MessageSquare className="h-2.5 w-2.5 text-[var(--text-tertiary)]" />
+            <span className="text-[9px] font-medium text-[var(--text-tertiary)]">{commentCount}</span>
+          </div>
         )}
       </div>
     </>

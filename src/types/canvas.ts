@@ -1,5 +1,11 @@
+import { createContext } from "react";
 import type { Node, Edge } from "@xyflow/react";
 import type { Step, Section, Stage, Touchpoint } from "./database";
+
+// Context providing unresolved top-level comment counts (entityId → count) to canvas nodes.
+// Canvas views (canvas-view, journey-canvas-view) fetch all workspace comments once and
+// provide this context, avoiding prop-drilling through FlowCanvas.
+export const CommentCountsContext = createContext<Map<string, number>>(new Map());
 
 // Custom node data types for React Flow — Process canvas
 export interface StepNodeData extends Record<string, unknown> {

@@ -9,7 +9,8 @@ import { AnnotationPanel } from "@/components/panels/annotation-panel";
 import { CommentPanel } from "@/components/panels/comment-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations } from "@/lib/api/client";
+import { fetchAnnotations, fetchComments } from "@/lib/api/client";
+import { CommentCountsContext } from "@/types/canvas";
 import type { Section, Step, Connection } from "@/types/database";
 
 interface CanvasViewProps {
@@ -114,94 +115,115 @@ export function CanvasView({
     refreshAnnotatedIds();
   }, [activePerspective, refreshAnnotatedIds]);
 
-  return (
-    <div className="flex h-full">
-      {/* Canvas */}
-      <div className="flex-1 relative">
-        <FlowCanvas
-          workspaceId={workspaceId}
-          tabId={tabId}
-          sections={sections}
-          steps={steps}
-          connections={connections}
-          selectedStepId={selectedStepId}
-          selectedSectionId={selectedSectionId}
-          annotatedIds={activePerspective ? annotatedIds : undefined}
-          annotationColor={activePerspective?.color}
-          onStepSelect={handleStepSelect}
-          onSectionSelect={handleSectionSelect}
-          onStepCreate={handleStepCreate}
-          onStepUpdate={handleStepUpdate}
-          onStepDelete={handleStepDelete}
-          onSectionCreate={handleSectionCreate}
-          onSectionUpdate={handleSectionUpdate}
-          onSectionDelete={handleSectionDelete}
-          onConnectionCreate={handleConnectionCreate}
-          onConnectionDelete={handleConnectionDelete}
-          onExportPdf={handleExportPdf}
-          onExportPng={handleExportPng}
-        />
-      </div>
+  // Fetch all workspace comments once to compute per-entity unresolved counts for badges
+  const [commentCounts, setCommentCounts] = React.useState<Map<string, number>>(new Map());
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchComments(workspaceId, { is_resolved: false })
+      .then((comments) => {
+        if (cancelled) return;
+        const counts = new Map<string, number>();
+        for (const c of comments) {
+          if (c.parent_id === null) {
+            counts.set(c.commentable_id, (counts.get(c.commentable_id) ?? 0) + 1);
+          }
+        }
+        setCommentCounts(counts);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspaceId]);
 
-      {/* Detail Panel / Summary Panel */}
-      <div
-        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
-        style={{ width: "var(--panel-width)" }}
-      >
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          {selectedStep && (
-            <StepDetailPanel
-              step={selectedStep}
-              workspaceId={workspaceId}
-              onUpdate={handleStepUpdate}
-              onDelete={handleStepDelete}
-              onClose={() => setSelectedStepId(null)}
+  return (
+    <CommentCountsContext.Provider value={commentCounts}>
+      <div className="flex h-full">
+        {/* Canvas */}
+        <div className="flex-1 relative">
+          <FlowCanvas
+            workspaceId={workspaceId}
+            tabId={tabId}
+            sections={sections}
+            steps={steps}
+            connections={connections}
+            selectedStepId={selectedStepId}
+            selectedSectionId={selectedSectionId}
+            annotatedIds={activePerspective ? annotatedIds : undefined}
+            annotationColor={activePerspective?.color}
+            onStepSelect={handleStepSelect}
+            onSectionSelect={handleSectionSelect}
+            onStepCreate={handleStepCreate}
+            onStepUpdate={handleStepUpdate}
+            onStepDelete={handleStepDelete}
+            onSectionCreate={handleSectionCreate}
+            onSectionUpdate={handleSectionUpdate}
+            onSectionDelete={handleSectionDelete}
+            onConnectionCreate={handleConnectionCreate}
+            onConnectionDelete={handleConnectionDelete}
+            onExportPdf={handleExportPdf}
+            onExportPng={handleExportPng}
+          />
+        </div>
+
+        {/* Detail Panel / Summary Panel */}
+        <div
+          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
+          style={{ width: "var(--panel-width)" }}
+        >
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {selectedStep && (
+              <StepDetailPanel
+                step={selectedStep}
+                workspaceId={workspaceId}
+                onUpdate={handleStepUpdate}
+                onDelete={handleStepDelete}
+                onClose={() => setSelectedStepId(null)}
+              />
+            )}
+            {selectedSection && !selectedStep && (
+              <SectionDetailPanel
+                section={selectedSection}
+                steps={steps.filter((s) => s.section_id === selectedSection.id)}
+                onUpdate={handleSectionUpdate}
+                onDelete={handleSectionDelete}
+                onClose={() => setSelectedSectionId(null)}
+              />
+            )}
+            {!selectedStep && !selectedSection && (
+              <WorkspaceSummaryPanel
+                sections={sections}
+                steps={steps}
+                connections={connections}
+              />
+            )}
+          </div>
+          {activePerspective && selectedStep && (
+            <AnnotationPanel
+              perspectiveId={activePerspective.id}
+              perspectiveName={activePerspective.name}
+              perspectiveColor={activePerspective.color}
+              annotatableType="step"
+              annotatableId={selectedStep.id}
+              onAnnotationChange={refreshAnnotatedIds}
             />
+          )}
+          {activePerspective && selectedSection && !selectedStep && (
+            <AnnotationPanel
+              perspectiveId={activePerspective.id}
+              perspectiveName={activePerspective.name}
+              perspectiveColor={activePerspective.color}
+              annotatableType="section"
+              annotatableId={selectedSection.id}
+              onAnnotationChange={refreshAnnotatedIds}
+            />
+          )}
+          {selectedStep && (
+            <CommentPanel commentableType="step" commentableId={selectedStep.id} />
           )}
           {selectedSection && !selectedStep && (
-            <SectionDetailPanel
-              section={selectedSection}
-              steps={steps.filter((s) => s.section_id === selectedSection.id)}
-              onUpdate={handleSectionUpdate}
-              onDelete={handleSectionDelete}
-              onClose={() => setSelectedSectionId(null)}
-            />
-          )}
-          {!selectedStep && !selectedSection && (
-            <WorkspaceSummaryPanel
-              sections={sections}
-              steps={steps}
-              connections={connections}
-            />
+            <CommentPanel commentableType="section" commentableId={selectedSection.id} />
           )}
         </div>
-        {activePerspective && selectedStep && (
-          <AnnotationPanel
-            perspectiveId={activePerspective.id}
-            perspectiveName={activePerspective.name}
-            perspectiveColor={activePerspective.color}
-            annotatableType="step"
-            annotatableId={selectedStep.id}
-            onAnnotationChange={refreshAnnotatedIds}
-          />
-        )}
-        {activePerspective && selectedSection && !selectedStep && (
-          <AnnotationPanel
-            perspectiveId={activePerspective.id}
-            perspectiveName={activePerspective.name}
-            perspectiveColor={activePerspective.color}
-            annotatableType="section"
-            annotatableId={selectedSection.id}
-            onAnnotationChange={refreshAnnotatedIds}
-          />
-        )}
-        {selectedStep && (
-          <CommentPanel commentableType="step" commentableId={selectedStep.id} />
-        )}
-        {selectedSection && !selectedStep && (
-          <CommentPanel commentableType="section" commentableId={selectedSection.id} />
-        )}
       </div>
-    </div>
+    </CommentCountsContext.Provider>
   );
 }

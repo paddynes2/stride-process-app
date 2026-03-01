@@ -34,7 +34,6 @@ function formatRelativeTime(dateString: string): string {
 }
 
 interface CommentsViewProps {
-  workspaceId: string;
   initialComments: Comment[];
   entityNames: Record<string, string>;
 }
@@ -129,9 +128,9 @@ export function CommentsView({ initialComments, entityNames }: CommentsViewProps
                     </Badge>
                     <span className="ml-auto">
                       {comment.is_resolved ? (
-                        <CheckCircle2 className="h-3.5 w-3.5 text-[var(--success)]" title="Resolved" />
+                        <CheckCircle2 className="h-3.5 w-3.5 text-[var(--success)]" aria-label="Resolved" />
                       ) : (
-                        <Circle className="h-3.5 w-3.5 text-[var(--text-quaternary)]" title="Unresolved" />
+                        <Circle className="h-3.5 w-3.5 text-[var(--text-quaternary)]" aria-label="Unresolved" />
                       )}
                     </span>
                   </div>

@@ -2,14 +2,18 @@
 
 import * as React from "react";
 import { type NodeProps, NodeResizer } from "@xyflow/react";
+import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SectionNodeData } from "@/types/canvas";
+import { CommentCountsContext } from "@/types/canvas";
 import { getMaturityColor } from "@/lib/maturity";
 
 export function SectionNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as SectionNodeData;
   const { section, averageMaturity, averageTargetMaturity, heatMapMode, annotationColor } = nodeData;
   const maturityColor = getMaturityColor(averageMaturity);
+  const commentCounts = React.useContext(CommentCountsContext);
+  const commentCount = commentCounts.get(section.id) ?? 0;
 
   return (
     <>
@@ -70,6 +74,17 @@ export function SectionNode({ data, selected }: NodeProps) {
           <p className="text-[11px] text-[var(--text-tertiary)] line-clamp-2">
             {section.summary}
           </p>
+        )}
+
+        {/* Comment count badge — bottom-right, only when count > 0 */}
+        {commentCount > 0 && (
+          <div
+            className="absolute bottom-2 right-2 flex items-center gap-0.5 bg-[var(--bg-surface-active)] rounded px-1 py-0.5"
+            title={`${commentCount} unresolved comment${commentCount !== 1 ? "s" : ""}`}
+          >
+            <MessageSquare className="h-2.5 w-2.5 text-[var(--text-tertiary)]" />
+            <span className="text-[9px] font-medium text-[var(--text-tertiary)]">{commentCount}</span>
+          </div>
         )}
       </div>
     </>

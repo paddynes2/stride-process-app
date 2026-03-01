@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { StepNodeData } from "@/types/canvas";
+import { CommentCountsContext } from "@/types/canvas";
 import { MATURITY_COLORS, MATURITY_FALLBACK_COLOR } from "@/lib/maturity";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -26,6 +28,8 @@ export function StepNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as StepNodeData;
   const { step, heatMapMode, annotationColor } = nodeData;
   const maturityColor = step.maturity_score != null ? MATURITY_COLORS[step.maturity_score] ?? MATURITY_FALLBACK_COLOR : null;
+  const commentCounts = React.useContext(CommentCountsContext);
+  const commentCount = commentCounts.get(step.id) ?? 0;
 
   return (
     <div
@@ -104,6 +108,17 @@ export function StepNode({ data, selected }: NodeProps) {
           </div>
         )}
       </div>
+
+      {/* Comment count badge — bottom-right, only when count > 0 */}
+      {commentCount > 0 && (
+        <div
+          className="absolute bottom-1 right-1 flex items-center gap-0.5 bg-[var(--bg-surface-active)] rounded px-1 py-0.5"
+          title={`${commentCount} unresolved comment${commentCount !== 1 ? "s" : ""}`}
+        >
+          <MessageSquare className="h-2.5 w-2.5 text-[var(--text-tertiary)]" />
+          <span className="text-[9px] font-medium text-[var(--text-tertiary)]">{commentCount}</span>
+        </div>
+      )}
     </div>
   );
 }

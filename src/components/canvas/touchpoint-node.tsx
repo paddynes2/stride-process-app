@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TouchpointNodeData } from "@/types/canvas";
+import { CommentCountsContext } from "@/types/canvas";
 import { PAIN_COLORS, PAIN_FALLBACK_COLOR } from "@/lib/pain";
 
 const SENTIMENT_COLORS: Record<string, string> = {
@@ -39,6 +41,9 @@ export function TouchpointNode({ data, selected }: NodeProps) {
     }
     return { backgroundColor: "var(--bg-surface)" };
   })();
+
+  const commentCounts = React.useContext(CommentCountsContext);
+  const commentCount = commentCounts.get(touchpoint.id) ?? 0;
 
   return (
     <div
@@ -127,6 +132,17 @@ export function TouchpointNode({ data, selected }: NodeProps) {
           />
         ) : null}
       </div>
+
+      {/* Comment count badge — bottom-right, only when count > 0 */}
+      {commentCount > 0 && (
+        <div
+          className="absolute bottom-1 right-1 flex items-center gap-0.5 bg-[var(--bg-surface-active)] rounded px-1 py-0.5"
+          title={`${commentCount} unresolved comment${commentCount !== 1 ? "s" : ""}`}
+        >
+          <MessageSquare className="h-2.5 w-2.5 text-[var(--text-tertiary)]" />
+          <span className="text-[9px] font-medium text-[var(--text-tertiary)]">{commentCount}</span>
+        </div>
+      )}
     </div>
   );
 }

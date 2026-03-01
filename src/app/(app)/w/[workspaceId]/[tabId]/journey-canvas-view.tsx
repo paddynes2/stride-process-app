@@ -39,9 +39,11 @@ import {
   createTouchpointConnection,
   deleteTouchpointConnection,
   fetchAnnotations,
+  fetchComments,
 } from "@/lib/api/client";
 import type { Stage, Touchpoint, TouchpointConnection } from "@/types/database";
 import type { StageNodeData, TouchpointNodeData } from "@/types/canvas";
+import { CommentCountsContext } from "@/types/canvas";
 import { toastError } from "@/lib/api/toast-helpers";
 
 const nodeTypes = {
@@ -179,6 +181,25 @@ export function JourneyCanvasView({
     }
     refreshAnnotatedIds();
   }, [activePerspective, refreshAnnotatedIds]);
+
+  // Fetch all workspace comments once to compute per-entity unresolved counts for badges
+  const [commentCounts, setCommentCounts] = React.useState<Map<string, number>>(new Map());
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchComments(workspaceId, { is_resolved: false })
+      .then((comments) => {
+        if (cancelled) return;
+        const counts = new Map<string, number>();
+        for (const c of comments) {
+          if (c.parent_id === null) {
+            counts.set(c.commentable_id, (counts.get(c.commentable_id) ?? 0) + 1);
+          }
+        }
+        setCommentCounts(counts);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspaceId]);
 
   const handleExportPdf = React.useCallback(async () => {
     if (!wrapperRef.current || exporting) return;
@@ -452,174 +473,176 @@ export function JourneyCanvasView({
   };
 
   return (
-    <div className="flex h-full">
-      <div className="flex-1 relative">
-        <div ref={wrapperRef} className="w-full h-full relative">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={handleNodesChange}
-            onEdgesChange={handleEdgesChange}
-            onConnect={handleConnect}
-            onNodeClick={handleNodeClick}
-            onPaneClick={handlePaneClick}
-            nodeTypes={nodeTypes}
-            fitView
-            fitViewOptions={{ padding: 0.2 }}
-            deleteKeyCode={null}
-            className="bg-[var(--bg-app)]"
-          >
-            <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.04)" />
-            <Controls
-              showInteractive={false}
-              className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)] !rounded-[var(--radius-md)]"
-            />
-            <MiniMap
-              nodeColor={(node) => {
-                if (node.type === "stage") return "rgba(255,255,255,0.06)";
-                return "var(--brand)";
-              }}
-              maskColor="rgba(10,10,11,0.75)"
-              className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)]"
-            />
+    <CommentCountsContext.Provider value={commentCounts}>
+      <div className="flex h-full">
+        <div className="flex-1 relative">
+          <div ref={wrapperRef} className="w-full h-full relative">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={handleNodesChange}
+              onEdgesChange={handleEdgesChange}
+              onConnect={handleConnect}
+              onNodeClick={handleNodeClick}
+              onPaneClick={handlePaneClick}
+              nodeTypes={nodeTypes}
+              fitView
+              fitViewOptions={{ padding: 0.2 }}
+              deleteKeyCode={null}
+              className="bg-[var(--bg-app)]"
+            >
+              <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.04)" />
+              <Controls
+                showInteractive={false}
+                className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)] !rounded-[var(--radius-md)]"
+              />
+              <MiniMap
+                nodeColor={(node) => {
+                  if (node.type === "stage") return "rgba(255,255,255,0.06)";
+                  return "var(--brand)";
+                }}
+                maskColor="rgba(10,10,11,0.75)"
+                className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)]"
+              />
 
-            {/* Toolbar */}
-            <Panel position="top-left" className="flex gap-1.5">
-              <Button variant="secondary" size="sm" onClick={handleAddTouchpoint}>
-                <Plus className="h-3.5 w-3.5" />
-                Touchpoint
-              </Button>
-              <Button variant="secondary" size="sm" onClick={handleAddStage}>
-                <Layers className="h-3.5 w-3.5" />
-                Stage
-              </Button>
-              <Button
-                variant={heatMapMode ? "default" : "secondary"}
-                size="sm"
-                onClick={() => setHeatMapMode((prev) => !prev)}
-                title="Toggle pain score heat map"
-              >
-                <Thermometer className="h-3.5 w-3.5" />
-                Heat Map
-              </Button>
-              <Button variant="secondary" size="sm" onClick={handleExportPdf} disabled={exporting} aria-label="Export journey as PDF">
-                <FileDown className="h-3.5 w-3.5" />
-                PDF
-              </Button>
-              <PngExportButton wrapperRef={wrapperRef} workspaceName={workspaceName} />
-            </Panel>
-
-            {/* Heat map legend */}
-            {heatMapMode && (
-              <Panel position="bottom-left">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
-                  <span className="text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide mr-1">Pain</span>
-                  {PAIN_LEVELS.map(({ level, color }) => (
-                    <div key={level} className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
-                      <span className="text-[10px] text-[var(--text-secondary)]">{level}</span>
-                    </div>
-                  ))}
-                </div>
+              {/* Toolbar */}
+              <Panel position="top-left" className="flex gap-1.5">
+                <Button variant="secondary" size="sm" onClick={handleAddTouchpoint}>
+                  <Plus className="h-3.5 w-3.5" />
+                  Touchpoint
+                </Button>
+                <Button variant="secondary" size="sm" onClick={handleAddStage}>
+                  <Layers className="h-3.5 w-3.5" />
+                  Stage
+                </Button>
+                <Button
+                  variant={heatMapMode ? "default" : "secondary"}
+                  size="sm"
+                  onClick={() => setHeatMapMode((prev) => !prev)}
+                  title="Toggle pain score heat map"
+                >
+                  <Thermometer className="h-3.5 w-3.5" />
+                  Heat Map
+                </Button>
+                <Button variant="secondary" size="sm" onClick={handleExportPdf} disabled={exporting} aria-label="Export journey as PDF">
+                  <FileDown className="h-3.5 w-3.5" />
+                  PDF
+                </Button>
+                <PngExportButton wrapperRef={wrapperRef} workspaceName={workspaceName} />
               </Panel>
+
+              {/* Heat map legend */}
+              {heatMapMode && (
+                <Panel position="bottom-left">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+                    <span className="text-[10px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide mr-1">Pain</span>
+                    {PAIN_LEVELS.map(({ level, color }) => (
+                      <div key={level} className="flex items-center gap-1">
+                        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                        <span className="text-[10px] text-[var(--text-secondary)]">{level}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Panel>
+              )}
+            </ReactFlow>
+
+            {/* Empty state overlay */}
+            {isEmpty && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                <div className="pointer-events-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center max-w-sm">
+                  <Route className="h-8 w-8 text-[var(--text-quaternary)] mx-auto mb-3" />
+                  <p className="text-[14px] text-[var(--text-secondary)] mb-1">
+                    Your journey canvas is empty
+                  </p>
+                  <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+                    Add a stage to group touchpoints, or add a touchpoint to start mapping the customer journey
+                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    <Button size="sm" onClick={handleAddStage}>
+                      <Layers className="h-3.5 w-3.5" />
+                      Add Stage
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={handleAddTouchpoint}>
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Touchpoint
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
-          </ReactFlow>
+          </div>
+        </div>
 
-          {/* Empty state overlay */}
-          {isEmpty && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <div className="pointer-events-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center max-w-sm">
-                <Route className="h-8 w-8 text-[var(--text-quaternary)] mx-auto mb-3" />
-                <p className="text-[14px] text-[var(--text-secondary)] mb-1">
-                  Your journey canvas is empty
-                </p>
-                <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
-                  Add a stage to group touchpoints, or add a touchpoint to start mapping the customer journey
-                </p>
-                <div className="flex items-center justify-center gap-2">
-                  <Button size="sm" onClick={handleAddStage}>
-                    <Layers className="h-3.5 w-3.5" />
-                    Add Stage
-                  </Button>
-                  <Button variant="secondary" size="sm" onClick={handleAddTouchpoint}>
-                    <Plus className="h-3.5 w-3.5" />
-                    Add Touchpoint
-                  </Button>
+        {/* Side panel — stage detail or journey summary */}
+        <div
+          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
+          style={{ width: "var(--panel-width)" }}
+        >
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {selectedStage ? (
+              <StageDetailPanel
+                stage={selectedStage}
+                touchpoints={stageTouchpoints}
+                onUpdate={handleStageUpdate}
+                onDelete={handleStageDelete}
+                onClose={() => setSelectedStageId(null)}
+              />
+            ) : selectedTouchpoint ? (
+              <TouchpointDetailPanel
+                touchpoint={selectedTouchpoint}
+                onUpdate={handleTouchpointUpdate}
+                onDelete={handleTouchpointDelete}
+                onClose={() => setSelectedTouchpointId(null)}
+              />
+            ) : (
+              <div className="overflow-y-auto p-4 h-full">
+                <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">Journey Summary</h2>
+                <div className="space-y-2 text-[var(--text-sm)]">
+                  <div className="flex justify-between">
+                    <span className="text-[var(--text-secondary)]">Stages</span>
+                    <span className="text-[var(--text-primary)] font-medium">{stages.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[var(--text-secondary)]">Touchpoints</span>
+                    <span className="text-[var(--text-primary)] font-medium">{touchpoints.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[var(--text-secondary)]">Connections</span>
+                    <span className="text-[var(--text-primary)] font-medium">{connections.length}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+          </div>
+          {activePerspective && selectedStage && (
+            <AnnotationPanel
+              perspectiveId={activePerspective.id}
+              perspectiveName={activePerspective.name}
+              perspectiveColor={activePerspective.color}
+              annotatableType="stage"
+              annotatableId={selectedStage.id}
+              onAnnotationChange={refreshAnnotatedIds}
+            />
+          )}
+          {activePerspective && selectedTouchpoint && !selectedStage && (
+            <AnnotationPanel
+              perspectiveId={activePerspective.id}
+              perspectiveName={activePerspective.name}
+              perspectiveColor={activePerspective.color}
+              annotatableType="touchpoint"
+              annotatableId={selectedTouchpoint.id}
+              onAnnotationChange={refreshAnnotatedIds}
+            />
+          )}
+          {selectedStage && (
+            <CommentPanel commentableType="stage" commentableId={selectedStage.id} />
+          )}
+          {selectedTouchpoint && !selectedStage && (
+            <CommentPanel commentableType="touchpoint" commentableId={selectedTouchpoint.id} />
           )}
         </div>
       </div>
-
-      {/* Side panel — stage detail or journey summary */}
-      <div
-        className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
-        style={{ width: "var(--panel-width)" }}
-      >
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          {selectedStage ? (
-            <StageDetailPanel
-              stage={selectedStage}
-              touchpoints={stageTouchpoints}
-              onUpdate={handleStageUpdate}
-              onDelete={handleStageDelete}
-              onClose={() => setSelectedStageId(null)}
-            />
-          ) : selectedTouchpoint ? (
-            <TouchpointDetailPanel
-              touchpoint={selectedTouchpoint}
-              onUpdate={handleTouchpointUpdate}
-              onDelete={handleTouchpointDelete}
-              onClose={() => setSelectedTouchpointId(null)}
-            />
-          ) : (
-            <div className="overflow-y-auto p-4 h-full">
-              <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">Journey Summary</h2>
-              <div className="space-y-2 text-[var(--text-sm)]">
-                <div className="flex justify-between">
-                  <span className="text-[var(--text-secondary)]">Stages</span>
-                  <span className="text-[var(--text-primary)] font-medium">{stages.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[var(--text-secondary)]">Touchpoints</span>
-                  <span className="text-[var(--text-primary)] font-medium">{touchpoints.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[var(--text-secondary)]">Connections</span>
-                  <span className="text-[var(--text-primary)] font-medium">{connections.length}</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        {activePerspective && selectedStage && (
-          <AnnotationPanel
-            perspectiveId={activePerspective.id}
-            perspectiveName={activePerspective.name}
-            perspectiveColor={activePerspective.color}
-            annotatableType="stage"
-            annotatableId={selectedStage.id}
-            onAnnotationChange={refreshAnnotatedIds}
-          />
-        )}
-        {activePerspective && selectedTouchpoint && !selectedStage && (
-          <AnnotationPanel
-            perspectiveId={activePerspective.id}
-            perspectiveName={activePerspective.name}
-            perspectiveColor={activePerspective.color}
-            annotatableType="touchpoint"
-            annotatableId={selectedTouchpoint.id}
-            onAnnotationChange={refreshAnnotatedIds}
-          />
-        )}
-        {selectedStage && (
-          <CommentPanel commentableType="stage" commentableId={selectedStage.id} />
-        )}
-        {selectedTouchpoint && !selectedStage && (
-          <CommentPanel commentableType="touchpoint" commentableId={selectedTouchpoint.id} />
-        )}
-      </div>
-    </div>
+    </CommentCountsContext.Provider>
   );
 }

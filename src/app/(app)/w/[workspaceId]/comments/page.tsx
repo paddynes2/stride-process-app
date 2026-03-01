@@ -40,7 +40,6 @@ export default async function CommentsPage({
 
   return (
     <CommentsView
-      workspaceId={workspaceId}
       initialComments={(comments ?? []) as Comment[]}
       entityNames={entityNames}
     />

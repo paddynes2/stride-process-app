@@ -11,11 +11,11 @@ import {
   User,
   Wrench,
   Settings,
-  Plus,
   ChevronLeft,
   List,
   TrendingDown,
   Split,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -30,13 +30,14 @@ interface SidebarProps {
 const NAV_ITEMS = [
   { label: "Dashboard", icon: BarChart3, href: "/dashboard" },
   { label: "Workflows", icon: GitBranch, href: "", active: (p: string, wsId: string) => {
-    // Active when on /w/{wsId} or /w/{wsId}/{tabId}
+    // Active when on /w/{wsId} or /w/{wsId}/{tabId} — excludes all named sub-routes
     const base = `/w/${wsId}`;
-    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list") && !p.includes("/gap-analysis") && !p.includes("/compare") && !p.includes("/dashboard"));
+    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list") && !p.includes("/gap-analysis") && !p.includes("/compare") && !p.includes("/dashboard") && !p.includes("/comments"));
   }},
   { label: "List View", icon: List, href: "/list" },
   { label: "Gap Analysis", icon: TrendingDown, href: "/gap-analysis" },
   { label: "Compare", icon: Split, href: "/compare" },
+  { label: "Comments", icon: MessageSquare, href: "/comments" },
   { label: "Teams", icon: Users, href: "/teams" },
   { label: "People", icon: User, href: "/people" },
   { label: "Tools", icon: Wrench, href: "/tools" },
