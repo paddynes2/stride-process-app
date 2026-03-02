@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 const EDITABLE_FIELDS = ["status", "assigned_to", "completed_at", "notes"] as const;
 
@@ -46,6 +47,15 @@ export async function PATCH(
   if (!step) {
     return errorResponse("forbidden", "Permission denied", 403);
   }
+
+  void (async () => {
+    const { data: runbook } = await supabase.from("runbooks").select("workspace_id, name").eq("id", step.runbook_id).single();
+    if (runbook?.workspace_id) {
+      const details: Record<string, unknown> = { changed_fields: Object.keys(updates) };
+      if (body.status !== undefined) details.status = body.status;
+      await logActivity({ supabase, workspace_id: runbook.workspace_id, user_id: user.id, action: "updated", entity_type: "runbook_steps", entity_id: step.id, entity_name: runbook.name, details });
+    }
+  })();
 
   return successResponse(step);
 }

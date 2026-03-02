@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i;
 const EDITABLE_FIELDS = ["name", "color", "icon"] as const;
@@ -48,6 +49,8 @@ export async function PATCH(
     return errorResponse("update_failed", error.message, 500);
   }
 
+  void logActivity({ supabase, workspace_id: perspective.workspace_id, user_id: user.id, action: "updated", entity_type: "perspectives", entity_id: perspective.id, entity_name: perspective.name, details: { changed_fields: Object.keys(updates) } });
+
   return successResponse(perspective);
 }
 
@@ -63,7 +66,7 @@ export async function DELETE(
     return errorResponse("unauthorized", "Not authenticated", 401);
   }
 
-  const { error } = await supabase
+  const { data: perspective, error } = await supabase
     .from("perspectives")
     .delete()
     .eq("id", id)
@@ -75,6 +78,10 @@ export async function DELETE(
       return errorResponse("not_found", "Perspective not found or not accessible", 404);
     }
     return errorResponse("delete_failed", error.message, 500);
+  }
+
+  if (perspective) {
+    void logActivity({ supabase, workspace_id: perspective.workspace_id, user_id: user.id, action: "deleted", entity_type: "perspectives", entity_id: id, entity_name: perspective.name });
   }
 
   return successResponse({ deleted: true });

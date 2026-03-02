@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 import type { AnnotatableType } from "@/types/database";
 
 const VALID_ANNOTATABLE_TYPES: AnnotatableType[] = ["step", "section", "touchpoint", "stage"];
@@ -100,6 +101,13 @@ export async function POST(request: NextRequest) {
   if (!annotation) {
     return errorResponse("forbidden", "Permission denied", 403);
   }
+
+  void (async () => {
+    const { data: perspective } = await supabase.from("perspectives").select("workspace_id").eq("id", annotation.perspective_id).single();
+    if (perspective?.workspace_id) {
+      await logActivity({ supabase, workspace_id: perspective.workspace_id, user_id: user.id, action: "created", entity_type: "perspective_annotations", entity_id: annotation.id, entity_name: `${annotation.annotatable_type} annotation` });
+    }
+  })();
 
   return successResponse(annotation, 201);
 }

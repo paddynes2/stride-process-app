@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 const EDITABLE_FIELDS = ["content", "rating"] as const;
 
@@ -47,6 +48,13 @@ export async function PATCH(
     return errorResponse("update_failed", error.message, 500);
   }
 
+  void (async () => {
+    const { data: perspective } = await supabase.from("perspectives").select("workspace_id").eq("id", annotation.perspective_id).single();
+    if (perspective?.workspace_id) {
+      await logActivity({ supabase, workspace_id: perspective.workspace_id, user_id: user.id, action: "updated", entity_type: "perspective_annotations", entity_id: annotation.id, entity_name: `${annotation.annotatable_type} annotation`, details: { changed_fields: Object.keys(updates) } });
+    }
+  })();
+
   return successResponse(annotation);
 }
 
@@ -62,7 +70,7 @@ export async function DELETE(
     return errorResponse("unauthorized", "Not authenticated", 401);
   }
 
-  const { error } = await supabase
+  const { data: annotation, error } = await supabase
     .from("perspective_annotations")
     .delete()
     .eq("id", id)
@@ -74,6 +82,15 @@ export async function DELETE(
       return errorResponse("not_found", "Annotation not found or not accessible", 404);
     }
     return errorResponse("delete_failed", error.message, 500);
+  }
+
+  if (annotation) {
+    void (async () => {
+      const { data: perspective } = await supabase.from("perspectives").select("workspace_id").eq("id", annotation.perspective_id).single();
+      if (perspective?.workspace_id) {
+        await logActivity({ supabase, workspace_id: perspective.workspace_id, user_id: user.id, action: "deleted", entity_type: "perspective_annotations", entity_id: id, entity_name: `${annotation.annotatable_type} annotation` });
+      }
+    })();
   }
 
   return successResponse({ deleted: true });

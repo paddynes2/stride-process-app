@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 import type { CommentableType, CommentCategory } from "@/types/database";
 
 const VALID_COMMENTABLE_TYPES: CommentableType[] = ["step", "section", "touchpoint", "stage"];
@@ -118,6 +119,8 @@ export async function POST(request: NextRequest) {
   if (!comment) {
     return errorResponse("forbidden", "Permission denied", 403);
   }
+
+  void logActivity({ supabase, workspace_id: comment.workspace_id, user_id: user.id, action: "commented", entity_type: "comments", entity_id: comment.id, entity_name: comment.content.slice(0, 60) });
 
   return successResponse(comment, 201);
 }

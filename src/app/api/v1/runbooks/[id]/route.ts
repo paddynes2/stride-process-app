@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 export async function GET(
   _request: NextRequest,
@@ -79,6 +80,9 @@ export async function PATCH(
     return errorResponse("forbidden", "Permission denied", 403);
   }
 
+  const action = updates.status === "completed" ? "completed" : "updated";
+  void logActivity({ supabase, workspace_id: runbook.workspace_id, user_id: user.id, action, entity_type: "runbooks", entity_id: runbook.id, entity_name: runbook.name, details: { changed_fields: Object.keys(updates) } });
+
   return successResponse(runbook);
 }
 
@@ -94,7 +98,7 @@ export async function DELETE(
     return errorResponse("unauthorized", "Not authenticated", 401);
   }
 
-  const { error } = await supabase
+  const { data: runbook, error } = await supabase
     .from("runbooks")
     .delete()
     .eq("id", id)
@@ -106,6 +110,10 @@ export async function DELETE(
       return errorResponse("not_found", "Runbook not found or not accessible", 404);
     }
     return errorResponse("delete_failed", error.message, 500);
+  }
+
+  if (runbook) {
+    void logActivity({ supabase, workspace_id: runbook.workspace_id, user_id: user.id, action: "deleted", entity_type: "runbooks", entity_id: id, entity_name: runbook.name });
   }
 
   return successResponse({ deleted: true });

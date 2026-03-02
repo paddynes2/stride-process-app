@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -72,6 +73,15 @@ export async function POST(request: NextRequest) {
     }
     return errorResponse("create_failed", error.message, 500);
   }
+
+  void (async () => {
+    const { data: step } = await supabase.from("steps").select("workspace_id").eq("id", stepRole.step_id).single();
+    if (step?.workspace_id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const roleName = (stepRole as Record<string, any>).role?.name ?? "step_role";
+      await logActivity({ supabase, workspace_id: step.workspace_id, user_id: user.id, action: "created", entity_type: "step_roles", entity_id: stepRole.id, entity_name: roleName });
+    }
+  })();
 
   return successResponse(stepRole, 201);
 }
