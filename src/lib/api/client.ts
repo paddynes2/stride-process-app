@@ -62,6 +62,10 @@ export async function deleteWorkspace(id: string): Promise<void> {
   await apiFetch(`/api/v1/workspaces/${id}`, { method: "DELETE" });
 }
 
+export async function cloneWorkspace(id: string): Promise<Workspace> {
+  return apiFetch<Workspace>(`/api/v1/workspaces/${id}/clone`, { method: "POST" });
+}
+
 // ---------------------------------------------------------------------------
 // Tabs
 // ---------------------------------------------------------------------------

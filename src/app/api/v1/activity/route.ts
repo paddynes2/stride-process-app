@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from("activity_log")
-    .select("*")
+    .select("*, users!activity_log_user_id_fkey(email)")
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);

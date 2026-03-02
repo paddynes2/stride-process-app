@@ -319,4 +319,5 @@ export interface ActivityLog {
   entity_name: string;
   details: Record<string, unknown> | null;
   created_at: string;
+  users?: { email: string } | null;
 }

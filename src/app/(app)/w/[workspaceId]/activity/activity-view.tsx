@@ -18,6 +18,28 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   shared: "Shared",
 };
 
+const ENTITY_TYPE_SINGULAR: Record<string, string> = {
+  steps: "step",
+  workspaces: "workspace",
+  sections: "section",
+  connections: "connection",
+  stages: "stage",
+  touchpoints: "touchpoint",
+  touchpoint_connections: "touchpoint connection",
+  teams: "team",
+  roles: "role",
+  people: "person",
+  tools: "tool",
+  step_roles: "role assignment",
+  perspectives: "perspective",
+  annotations: "annotation",
+  comments: "comment",
+  tasks: "task",
+  runbooks: "runbook",
+  runbook_steps: "runbook step",
+  shares: "share",
+};
+
 const ALL_ACTIONS: ActivityAction[] = [
   "created",
   "updated",
@@ -125,16 +147,16 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
           <div className="space-y-2">
             {filtered.map((entry) => {
               const tabId = entityTabMap[entry.entity_id];
+              const singular = ENTITY_TYPE_SINGULAR[entry.entity_type] ?? entry.entity_type;
               return (
                 <div
                   key={entry.id}
                   className="rounded-[var(--radius-sm)] p-3 bg-[var(--bg-surface-active)] border border-[var(--border-subtle)]"
                 >
-                  {/* Action sentence + entity type badge */}
+                  {/* Action sentence */}
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className="text-[12px] text-[var(--text-primary)]">
-                      {entry.action}{" "}
-                      {entry.entity_type}{" "}
+                      {ACTION_LABELS[entry.action]} {singular}{" "}
                       <Link
                         href={tabId ? `/w/${workspaceId}/${tabId}` : `/w/${workspaceId}`}
                         className="text-[var(--accent-blue)] hover:underline"
@@ -142,14 +164,11 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
                         &ldquo;{entry.entity_name}&rdquo;
                       </Link>
                     </span>
-                    <span className="text-[10px] text-[var(--text-quaternary)] px-1.5 py-0.5 rounded-sm bg-[var(--bg-surface)]">
-                      {entry.entity_type}
-                    </span>
                   </div>
 
                   {/* Author + timestamp */}
                   <div className="flex items-center gap-2 text-[11px] text-[var(--text-tertiary)]">
-                    <span className="font-mono">{entry.user_id.slice(0, 8)}</span>
+                    <span>{entry.users?.email ?? "Unknown"}</span>
                     <span>·</span>
                     <span>{formatRelativeTime(entry.created_at)}</span>
                   </div>
