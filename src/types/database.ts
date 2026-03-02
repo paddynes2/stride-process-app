@@ -302,3 +302,21 @@ export interface RunbookStep {
   created_at: string;
   updated_at: string;
 }
+
+// =============================================================================
+// Activity Log — append-only audit trail of workspace actions
+// =============================================================================
+
+export type ActivityAction = "created" | "updated" | "deleted" | "completed" | "assigned" | "commented" | "exported" | "shared";
+
+export interface ActivityLog {
+  id: string;
+  workspace_id: string;
+  user_id: string;
+  action: ActivityAction;
+  entity_type: string;
+  entity_id: string;
+  entity_name: string;
+  details: Record<string, unknown> | null;
+  created_at: string;
+}
