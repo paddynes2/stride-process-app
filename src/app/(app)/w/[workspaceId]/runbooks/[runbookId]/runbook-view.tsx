@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowLeft, ClipboardList } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { updateRunbookStep } from "@/lib/api/client";
+import { Button } from "@/components/ui/button";
+import { updateRunbook, updateRunbookStep } from "@/lib/api/client";
 import { toastError } from "@/lib/api/toast-helpers";
 import { cn } from "@/lib/utils";
 import type { Runbook, RunbookStep, RunbookStatus, RunbookStepStatus } from "@/types/database";
@@ -19,30 +20,48 @@ const RUNBOOK_STATUS_CONFIG: Record<RunbookStatus, { variant: React.ComponentPro
   cancelled: { variant: "destructive", label: "Cancelled" },
 };
 
-const STEP_STATUS_CONFIG: Record<RunbookStepStatus, { variant: React.ComponentProps<typeof Badge>["variant"]; label: string }> = {
-  pending: { variant: "secondary", label: "Pending" },
-  in_progress: { variant: "default", label: "In Progress" },
-  completed: { variant: "success", label: "Done" },
-  skipped: { variant: "warning", label: "Skipped" },
+const STEP_STATUS_CONFIG: Record<RunbookStepStatus, { label: string }> = {
+  pending: { label: "Pending" },
+  in_progress: { label: "In Progress" },
+  completed: { label: "Done" },
+  skipped: { label: "Skipped" },
 };
+
+const STEP_STATUS_ORDER: RunbookStepStatus[] = ["pending", "in_progress", "completed", "skipped"];
+
+const STEP_STATUS_ACTIVE_CLASS: Record<RunbookStepStatus, string> = {
+  pending: "bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border-subtle)]",
+  in_progress: "bg-[var(--signal-subtle)] text-[var(--signal)] border-[var(--signal-subtle)]",
+  completed: "bg-[var(--success-subtle)] text-[var(--success)] border-[var(--success-subtle)]",
+  skipped: "bg-[var(--warning-subtle)] text-[var(--warning)] border-[var(--warning-subtle)]",
+};
+
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
 
 interface RunbookViewProps {
   runbook: Runbook;
   initialSteps: RunbookStepEnriched[];
   workspaceId: string;
+  userId?: string;
 }
 
-export function RunbookView({ runbook, initialSteps, workspaceId }: RunbookViewProps) {
+export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId, userId }: RunbookViewProps) {
+  const [runbook, setRunbook] = React.useState(initialRunbook);
   const [steps, setSteps] = React.useState(initialSteps);
   const noteSaveTimers = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
+  const isReadOnly = runbook.status === "completed" || runbook.status === "cancelled";
   const completedCount = steps.filter((s) => s.status === "completed").length;
+  const inProgressCount = steps.filter((s) => s.status === "in_progress").length;
+  const skippedCount = steps.filter((s) => s.status === "skipped").length;
   const total = steps.length;
   const progressPct = total === 0 ? 0 : Math.round((completedCount / total) * 100);
   const statusCfg = RUNBOOK_STATUS_CONFIG[runbook.status];
 
-  const handleToggle = async (step: RunbookStepEnriched) => {
-    const newStatus: RunbookStepStatus = step.status === "completed" ? "pending" : "completed";
+  const handleStepStatus = async (step: RunbookStepEnriched, newStatus: RunbookStepStatus) => {
+    if (isReadOnly || step.status === newStatus) return;
     const completedAt = newStatus === "completed" ? new Date().toISOString() : null;
     const prev = { ...step };
     setSteps((s) =>
@@ -57,6 +76,7 @@ export function RunbookView({ runbook, initialSteps, workspaceId }: RunbookViewP
   };
 
   const handleNotesChange = (stepId: string, notes: string) => {
+    if (isReadOnly) return;
     setSteps((s) => s.map((item) => item.id === stepId ? { ...item, notes: notes || null } : item));
     clearTimeout(noteSaveTimers.current[stepId]);
     noteSaveTimers.current[stepId] = setTimeout(async () => {
@@ -67,6 +87,36 @@ export function RunbookView({ runbook, initialSteps, workspaceId }: RunbookViewP
       }
     }, 600);
   };
+
+  const handleCompleteRunbook = async () => {
+    if (!window.confirm("Mark this runbook as complete?")) return;
+    const prev = { ...runbook };
+    const now = new Date().toISOString();
+    setRunbook((r) => ({ ...r, status: "completed" as RunbookStatus, completed_at: now }));
+    try {
+      const updated = await updateRunbook(runbook.id, { status: "completed", completed_at: now });
+      setRunbook(updated);
+    } catch (err) {
+      setRunbook(prev);
+      toastError("Failed to complete runbook", { error: err });
+    }
+  };
+
+  const handleCancelRunbook = async () => {
+    if (!window.confirm("Cancel this runbook?")) return;
+    const prev = { ...runbook };
+    setRunbook((r) => ({ ...r, status: "cancelled" as RunbookStatus }));
+    try {
+      const updated = await updateRunbook(runbook.id, { status: "cancelled" });
+      setRunbook(updated);
+    } catch (err) {
+      setRunbook(prev);
+      toastError("Failed to cancel runbook", { error: err });
+    }
+  };
+
+  const createdByLabel =
+    userId && runbook.created_by === userId ? "by you" : `by ${runbook.created_by.slice(0, 8)}`;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -85,6 +135,16 @@ export function RunbookView({ runbook, initialSteps, workspaceId }: RunbookViewP
             {runbook.name}
           </h1>
           <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
+          {!isReadOnly && (
+            <div className="flex items-center gap-1.5">
+              <Button variant="destructive" size="sm" onClick={handleCancelRunbook}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleCompleteRunbook}>
+                Complete
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Progress bar */}
@@ -99,10 +159,35 @@ export function RunbookView({ runbook, initialSteps, workspaceId }: RunbookViewP
             {completedCount}/{total}
           </span>
         </div>
+
+        {/* Progress text */}
+        <p className="mt-1 text-[11px] text-[var(--text-tertiary)]">
+          {completedCount} of {total} steps completed
+          {(inProgressCount > 0 || skippedCount > 0) && (
+            <>
+              {" · "}
+              {[
+                inProgressCount > 0 && `${inProgressCount} in progress`,
+                skippedCount > 0 && `${skippedCount} skipped`,
+              ]
+                .filter(Boolean)
+                .join(", ")}
+            </>
+          )}
+        </p>
       </div>
 
       {/* Step checklist */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3">
+        {/* Read-only banner */}
+        {isReadOnly && (
+          <div className="mb-3 px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--bg-surface-active)] border border-[var(--border-subtle)] text-[12px] text-[var(--text-secondary)]">
+            {runbook.status === "completed"
+              ? `This runbook was completed${runbook.completed_at ? ` on ${formatDate(runbook.completed_at)}` : ""}`
+              : "This runbook was cancelled"}
+          </div>
+        )}
+
         {steps.length === 0 ? (
           <div className="flex items-center justify-center py-16">
             <p className="text-[13px] text-[var(--text-secondary)]">No steps in this runbook</p>
@@ -112,58 +197,70 @@ export function RunbookView({ runbook, initialSteps, workspaceId }: RunbookViewP
             {steps.map((step) => {
               const isCompleted = step.status === "completed";
               const stepName = step.steps?.name ?? "Deleted Step";
-              const stepStatusCfg = STEP_STATUS_CONFIG[step.status];
               return (
                 <div
                   key={step.id}
                   className="rounded-[var(--radius-sm)] p-3 bg-[var(--bg-surface-active)] border border-[var(--border-subtle)]"
                 >
-                  <div className="flex items-start gap-3">
-                    {/* Checkbox */}
-                    <button
-                      onClick={() => handleToggle(step)}
-                      aria-label={isCompleted ? "Mark incomplete" : "Mark complete"}
-                      className="shrink-0 mt-0.5 h-4 w-4 rounded-sm border flex items-center justify-center transition-colors"
-                      style={
-                        isCompleted
-                          ? { backgroundColor: "var(--brand)", borderColor: "var(--brand)" }
-                          : { borderColor: "var(--border-default)" }
-                      }
-                    >
-                      {isCompleted && (
-                        <svg className="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2}>
-                          <polyline points="2,6 5,9 10,3" />
-                        </svg>
-                      )}
-                    </button>
+                  {/* Step name */}
+                  <p
+                    className={cn(
+                      "text-[13px] font-medium mb-1.5",
+                      isCompleted ? "line-through text-[var(--text-tertiary)]" : "text-[var(--text-primary)]"
+                    )}
+                  >
+                    {stepName}
+                  </p>
 
-                    {/* Step name + status + notes */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span
+                  {/* Status button group */}
+                  <div className="flex items-center gap-1 flex-wrap mb-2">
+                    {STEP_STATUS_ORDER.map((s) => {
+                      const isActive = step.status === s;
+                      return (
+                        <button
+                          key={s}
+                          disabled={isReadOnly}
+                          onClick={() => handleStepStatus(step, s)}
+                          aria-label={`Set status to ${STEP_STATUS_CONFIG[s].label}`}
+                          aria-pressed={isActive}
                           className={cn(
-                            "text-[13px] font-medium truncate flex-1",
-                            isCompleted ? "line-through text-[var(--text-tertiary)]" : "text-[var(--text-primary)]"
+                            "text-[10px] px-1.5 py-0.5 rounded-sm font-medium border transition-colors",
+                            isActive
+                              ? STEP_STATUS_ACTIVE_CLASS[s]
+                              : "text-[var(--text-quaternary)] border-transparent hover:text-[var(--text-tertiary)] disabled:hover:text-[var(--text-quaternary)]"
                           )}
                         >
-                          {stepName}
-                        </span>
-                        <Badge variant={stepStatusCfg.variant}>{stepStatusCfg.label}</Badge>
-                      </div>
-                      <textarea
-                        value={step.notes ?? ""}
-                        onChange={(e) => handleNotesChange(step.id, e.target.value)}
-                        placeholder="Add notes..."
-                        rows={1}
-                        className="w-full text-[12px] bg-transparent border-b border-transparent resize-none text-[var(--text-secondary)] placeholder:text-[var(--text-quaternary)] focus:outline-none focus:border-[var(--border-subtle)] transition-colors"
-                      />
-                    </div>
+                          {STEP_STATUS_CONFIG[s].label}
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  {/* Notes */}
+                  <textarea
+                    value={step.notes ?? ""}
+                    onChange={(e) => handleNotesChange(step.id, e.target.value)}
+                    placeholder="Add notes..."
+                    rows={1}
+                    disabled={isReadOnly}
+                    className="w-full text-[12px] bg-transparent border-b border-transparent resize-none text-[var(--text-secondary)] placeholder:text-[var(--text-quaternary)] focus:outline-none focus:border-[var(--border-subtle)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  />
                 </div>
               );
             })}
           </div>
         )}
+      </div>
+
+      {/* Metadata footer */}
+      <div className="shrink-0 border-t border-[var(--border-subtle)] px-6 py-3">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[var(--text-tertiary)]">
+          <span>Started {formatDate(runbook.started_at)}</span>
+          {runbook.completed_at && (
+            <span>Completed {formatDate(runbook.completed_at)}</span>
+          )}
+          <span>Created {createdByLabel}</span>
+        </div>
       </div>
     </div>
   );

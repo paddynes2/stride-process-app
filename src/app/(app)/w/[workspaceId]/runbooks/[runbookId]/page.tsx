@@ -34,6 +34,7 @@ export default async function RunbookViewPage({
       runbook={runbook as Runbook}
       initialSteps={(steps ?? []) as RunbookStepEnriched[]}
       workspaceId={workspaceId}
+      userId={user.id}
     />
   );
 }
