@@ -1318,10 +1318,12 @@ run_pipeline() {
         cp "$wt_path/knowledge/handoffs/BUILD_RESULT_${slot}.json" \
            "$main_handoffs_dir/" 2>/dev/null || true
 
-        # ── Remove handoff files BEFORE staging ──
-        # EXECUTION_PLAN.json was copied for the builder to read, but must not
-        # be committed — it causes merge conflicts when merging worktrees back.
+        # ── Reset tracked knowledge/autonomous-dev files BEFORE staging ──
+        # Builders may modify knowledge/*.md, autonomous-dev/*.sh, or handoff
+        # files. These are tracked in git and cause merge conflicts (see G015).
+        # Restore them to HEAD so only src/supabase/prd changes get committed.
         rm -f "$wt_path"/knowledge/handoffs/*.json 2>/dev/null || true
+        (cd "$wt_path" && git checkout HEAD -- knowledge/ autonomous-dev/ 2>/dev/null || true)
 
         # ── Stage and commit all changes ──
         # Builder may create files but miss git-adding some. Since this is a
