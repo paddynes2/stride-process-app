@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import { Trash2, Link, Copy, Check, Plus, Eye, Pencil } from "lucide-react";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -30,6 +38,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
   const [cloning, setCloning] = React.useState(false);
+  const [confirmCloneOpen, setConfirmCloneOpen] = React.useState(false);
 
   // Share state
   const [share, setShare] = React.useState<PublicShare | null>(null);
@@ -131,7 +140,7 @@ export default function SettingsPage() {
   };
 
   const handleClone = async () => {
-    if (!confirm("Duplicate this workspace? A full copy will be created with all tabs, sections, steps, and connections.")) return;
+    setConfirmCloneOpen(false);
     setCloning(true);
     try {
       const newWorkspace = await cloneWorkspace(workspace.id);
@@ -160,6 +169,7 @@ export default function SettingsPage() {
   };
 
   return (
+    <>
     <div className="h-full overflow-y-auto"><div className="max-w-xl mx-auto p-8">
       <h1 className="text-[18px] font-semibold text-[var(--text-primary)] mb-6">Workspace Settings</h1>
 
@@ -234,7 +244,7 @@ export default function SettingsPage() {
         <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
           Create a full copy of this workspace, including all tabs, sections, steps, and connections.
         </p>
-        <Button variant="outline" onClick={handleClone} loading={cloning}>
+        <Button variant="outline" onClick={() => setConfirmCloneOpen(true)} loading={cloning}>
           <Copy className="h-4 w-4" />
           Duplicate Workspace
         </Button>
@@ -253,6 +263,27 @@ export default function SettingsPage() {
         </Button>
       </div>
     </div></div>
+
+    {/* Duplicate Workspace confirmation dialog */}
+    <Dialog open={confirmCloneOpen} onOpenChange={setConfirmCloneOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Duplicate Workspace</DialogTitle>
+          <DialogDescription>
+            A full copy will be created with all canvas data — tabs, sections, steps, connections, teams, roles, people, and tools.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setConfirmCloneOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleClone}>
+            Duplicate
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 
