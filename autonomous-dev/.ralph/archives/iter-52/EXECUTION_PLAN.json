@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0",
+  "iteration": 106,
+  "date": "2026-03-02T23:00:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "221345e",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-034",
+      "description": "Prioritization matrix UI [2/2] — effort/impact score selectors on step + touchpoint detail panels, new /prioritization page with quadrant chart (CSS-positioned divs), tab/section filter dropdowns, sidebar nav, workspace-shell reserved path",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "Step detail panel shows effort (1-5) and impact (1-5) score selectors below maturity section, reusing MATURITY_OPTIONS button pattern (click to set, click again to clear)",
+        "Touchpoint detail panel shows same effort/impact score selectors (reuse same pattern — touchpoint has pain_score as reference)",
+        "Score changes persist via existing PATCH routes (effort_score, impact_score fields already in EDITABLE_FIELDS)",
+        "New page at /w/[workspaceId]/prioritization with server component (page.tsx) fetching steps+touchpoints+sections+stages+tabs",
+        "Client view component (prioritization-view.tsx) renders quadrant chart using CSS absolute positioning within relative container — NO charting library",
+        "X-axis = effort (1-5), Y-axis = impact (1-5). Quadrant labels: Quick Wins (low effort, high impact), Major Projects (high effort, high impact), Fill-Ins (low effort, low impact), Deprioritize (high effort, low impact)",
+        "Items plotted as dots colored by parent section/stage using deterministic name hash → HSL palette (8 colors). Radix Tooltip on hover shows item name",
+        "Click dot navigates to correct canvas tab",
+        "Two filter dropdowns above chart: Tab (select, default All) and Section/Stage (select, filtered by selected tab, default All)",
+        "Sidebar nav link added for Prioritization (between Perspectives and Runbooks)",
+        "workspace-shell.tsx reserved paths includes 'prioritization'"
+      ],
+      "files_owned": [
+        "src/components/panels/step-detail-panel.tsx",
+        "src/components/panels/touchpoint-detail-panel.tsx",
+        "src/app/(app)/w/[workspaceId]/prioritization/**",
+        "src/components/layout/sidebar.tsx",
+        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
+      ],
+      "files_read_only": [
+        "src/types/database.ts",
+        "src/lib/api/client.ts",
+        "src/lib/maturity.ts",
+        "src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx",
+        "src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx — similar page structure (server fetch + client view)",
+          "src/app/(app)/w/[workspaceId]/gap-analysis/page.tsx — similar analysis page pattern"
+        ],
+        "patterns_to_follow": [
+          "Maturity score selector UI in step-detail-panel.tsx lines 360-382 — clickable buttons with MATURITY_OPTIONS array, click toggles value via handleFieldUpdate, selected shows colored background",
+          "Perspective comparison page pattern — server page fetches workspace data, passes to client view component",
+          "Sidebar nav items defined around line 41-46 — array of {label, icon, href} objects",
+          "workspace-shell.tsx line 47 — exclusion array for reserved path segments",
+          "Radix Tooltip already in deps — use for dot hover labels",
+          "Deterministic color: hash entity name string → pick from 8-color HSL palette. Simple string hash (sum char codes) mod 8"
+        ],
+        "learnings_relevant": [
+          "workspace-shell route exclusion list — MUST add 'prioritization' to prevent canvas view rendering",
+          "apiFetch unwraps envelope — client functions return apiFetch<T>() directly",
+          "React 19 useRef requires initial value"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/prioritization"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Data layer already done in iter 105 (migration 021, types updated, PATCH routes updated). This task is UI-only. Effort/impact selectors: define EFFORT_OPTIONS and IMPACT_OPTIONS arrays (1-5) with labels like 'Very Low'/'Low'/'Medium'/'High'/'Very High'. Place below maturity section in step panel. For touchpoint panel, add in similar location to pain_score section. Quadrant chart: use CSS grid or absolute positioning — items are positioned as percentage of container (effort_score/5 * 100% for x, inverted impact_score for y so high impact is top). Filter by tab first, then section/stage within that tab. Empty state when no items have scores."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-050",
+      "description": "Remove redundant step count display on runbook cards — metadata row shows count AND progress bar shows count",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Only ONE step count display per runbook card (keep progress bar label, remove metadata row count)",
+        "Progress bar still shows '{resolved} / {total}' text (IMP-046)",
+        "Metadata row no longer shows '{resolved}/{total} steps' text (IMP-014 removal)",
+        "Visual balance maintained — no awkward gaps from removal"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "IMP-046 added progress bar text at line ~124",
+          "IMP-014 added metadata row count at line ~114"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/runbooks"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Simple removal. Find the metadata row that shows '{resolved}/{total} steps' and remove it. Keep the progress bar label ('{resolved} / {total}'). Verify the card layout still looks balanced after removal."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-051",
+      "description": "Replace native confirm() with Radix Dialog for Delete Workspace action — match clone dialog pattern (IMP-028)",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Delete Workspace uses Radix Dialog instead of native confirm()",
+        "Dialog includes workspace name: 'Permanently delete \"{workspace.name}\"? This cannot be undone.'",
+        "Cancel button (secondary variant) and Delete button (destructive variant/red)",
+        "Follows same pattern as clone dialog (IMP-028) — confirmDeleteOpen useState boolean",
+        "Zero window.confirm() calls remain in settings page"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [
+          "Same file — clone dialog pattern from IMP-028 (confirmCloneOpen state + Radix Dialog)"
+        ],
+        "patterns_to_follow": [
+          "IMP-028 clone dialog pattern in settings/page.tsx — Dialog/DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter with useState boolean",
+          "IMP-012 runbook Complete/Cancel dialogs — same Radix Dialog pattern with destructive variant"
+        ],
+        "learnings_relevant": [
+          "BUG-023/024 — use DialogPrimitive.Title from @radix-ui/react-dialog if needed for a11y, though ui/dialog.tsx DialogTitle should work for new dialogs following existing pattern"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/settings"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Mirror the existing clone dialog pattern exactly. Add confirmDeleteOpen state. Replace the confirm() call in handleDelete with setConfirmDeleteOpen(true). Move actual delete logic into the dialog's confirm button onClick. Use destructive/red styling for the Delete button. Include workspace.name in dialog description."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "owner": null,
+    "note": "database.ts and client.ts already have effort_score/impact_score types and API wrappers from iter 105. No modifications needed."
+  },
+  "merge_order": ["#FEAT-034", "#IMP-050", "#IMP-051"],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": false,
+    "regression_reason": "Regression ran last iteration (105) at 12/12 PASS. Risk score 2 for this iteration (UI-only changes, no data model). Next regression trigger: iteration 110 (cadence floor) or risk score ≥3.",
+    "suites_to_run": ["feat-034-ui-acceptance", "imp-050-acceptance", "imp-051-acceptance"],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

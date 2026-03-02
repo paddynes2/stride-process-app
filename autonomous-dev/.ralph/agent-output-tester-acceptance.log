@@ -2,33 +2,37 @@
 
 ---
 
-## Acceptance Test — Iteration 106
+## Iteration 107 — Acceptance Test Summary
 
-**Status: PASSED** (19/20 criteria pass)
+**Status: `playwright_unavailable`** (Chrome session conflict prevented browser launch)
 
-### Key finding: Production not yet deployed
-The Vercel production URL is running a pre-iteration-106 build (sidebar has only 6 items, `/prioritization` renders as canvas view, Delete Workspace triggers native `confirm()`). All 7 Playwright actions were used to establish this. Testing pivoted to static code review of the branch source.
+All 20 acceptance criteria evaluated via static code analysis (file reads + grep).
 
----
+### #FEAT-035 — Improvement Ideas Data Layer
+**11/11 criteria: PASS**
+- Migration 022 creates correct enums and table schema
+- All FKs correct: `ON DELETE CASCADE` for workspace/created_by, `ON DELETE SET NULL` for linked_*_id
+- RLS: 4 policies all using `can_access_workspace()`
+- `update_updated_at()` trigger reused (not recreated)
+- TypeScript types match spec exactly
+- GET filtering + ordering confirmed in route code
+- POST/PATCH/DELETE validation patterns all correct
+- All mutations use `void logActivity()`
+- Client wrappers: all 4 present with correct signatures
 
-### Results by task
+### #BUG-025 — Perspective Delete Dialog
+**5/5 criteria: PASS**
+- `confirm()` eliminated — 0 occurrences remaining in settings/page.tsx
+- Dialog shows `perspectiveToDelete?.name` inline
+- Cancel (secondary) + Delete (destructive) buttons in footer
+- Consequences text matches spec exactly: "All annotations for this perspective will be permanently removed."
 
-| Task | Criteria | Result |
-|------|----------|--------|
-| **#FEAT-034** Prioritization Matrix UI | 11/11 | ✅ PASS |
-| **#IMP-050** Remove redundant step count on runbook cards | 4/4 | ✅ PASS |
-| **#IMP-051** Replace confirm() with Radix Dialog | 4/5 | ⚠️ 1 FAIL |
+### #IMP-052 — Prioritization Chart Grid Lines
+**4/4 criteria: PASS (static)**
+- Dashed grid lines at 25%/75% (V+H) using `var(--border-subtle)` at opacity 0.35
+- Existing 50% dividers preserved
+- Y-axis labels 5→1, X-axis labels 1→5, positioned outside chart area
+- Existing quadrant labels/dots/tooltips/filters code untouched
 
----
-
-### Bug found (P2)
-
-**Pre-existing `confirm()` in PerspectivesSection** — `settings/page.tsx:379` still uses native `confirm()` for perspective deletion. Criterion IMP-051 requires "zero window.confirm() calls remain in settings page" but this one was not addressed. Not introduced by IMP-051 (it predates this iteration), but technically violates the stated criterion.
-
----
-
-### Improvements logged
-
-1. **Prioritization chart:** No axis tick marks — users can't precisely read intermediate score positions
-2. **Prioritization empty state:** No CTA to navigate to a canvas to assign scores
-3. **Settings consistency:** Perspective deletion uses native `confirm()` while workspace deletion now uses Radix Dialog — jarring inconsistency (also the P2 bug)
+### Bugs Found: 0
+### Improvements Found: 2 (minor — button label specificity, axis label width)

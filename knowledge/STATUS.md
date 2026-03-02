@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 106
-- **Date:** 2026-03-02 23:30
+- **Iteration:** 107
+- **Date:** 2026-03-03 00:30
 - **Phase:** Phase 3a: Analysis Intelligence — ACTIVE
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-034 [2/2] prioritization matrix UI, #IMP-050 remove redundant runbook step count, #IMP-051 delete workspace Radix Dialog
+- **Last task(s):** #FEAT-035 [1/2] improvement ideas data layer, #BUG-025 perspective confirm() → Radix Dialog, #IMP-052 chart axis grid lines
 - **Result:** completed
-- **Next task:** #FEAT-035 Improvement ideas tracker (data layer + API + UI)
-- **Blockers:** Migration 020+021 not pushed — requires human action (`npx supabase db push`)
+- **Next task:** #FEAT-035 [2/2] improvement ideas UI (detail panel button, improvements page, sidebar count badge)
+- **Blockers:** Migrations 014-022 not pushed — requires human action (`npx supabase db push`).
 
 ## Context
 
-Iteration 106 completes FEAT-034 (prioritization matrix) with the UI layer. Step and touchpoint detail panels now have effort/impact score selectors (1-5, toggle-to-clear, matching maturity button pattern). New `/prioritization` page renders a CSS-positioned quadrant chart with deterministic-color dots, Radix Tooltips, tab/section filters, and click-to-navigate. Sidebar gained a Prioritization nav item (Target icon). workspace-shell exclusion array updated. IMP-050 removed the redundant step count from runbook card metadata rows. IMP-051 replaced native confirm() for Delete Workspace with a Radix Dialog matching the clone dialog pattern. All 3 builder slots completed cleanly, all acceptance criteria passed (19/20 — 1 pre-existing confirm() in PerspectivesSection not in scope).
+Iteration 107 completed 3 independent tasks across 3 builder slots. FEAT-035 [1/2] added the improvement_ideas data layer: migration 022 (table + 2 enums + RLS + trigger + index), TypeScript types (ImprovementIdea, ImprovementStatus, ImprovementPriority), full CRUD API routes at /api/v1/improvement-ideas with filtering, and 4 client wrappers. BUG-025 replaced the native confirm() for perspective deletion in settings/page.tsx with a Radix Dialog (also resolves IMP-054). IMP-052 added subtle dashed grid lines at 25%/75% and numeric axis labels (1-5) to the prioritization chart. All 3 builders passed typecheck and lint. POST_MERGE_CHECK PASS. Acceptance 19/19, regression 20/20.
 
 ## Dev Server
 
@@ -21,9 +21,8 @@ Iteration 106 completes FEAT-034 (prioritization matrix) with the UI layer. Step
 
 ## Warnings
 
-- **CRITICAL:** Migrations 014-021 not pushed to remote DB — `npx supabase db push` required (human action).
-- **ACCESSIBILITY CADENCE OVERDUE:** Last audit iteration 21, now iteration 106 (85 iterations). Next cadence trigger: iteration 110.
-- **BUG-025 (NEW):** Perspective deletion in settings page uses native confirm() — inconsistent with workspace delete (now Radix Dialog). Pre-existing, not introduced by IMP-051.
+- **CRITICAL:** Migrations 014-022 not pushed to remote DB — `npx supabase db push` required (human action).
+- **ACCESSIBILITY CADENCE OVERDUE:** Last audit iteration 21, now iteration 107 (86 iterations). Next cadence trigger: iteration 110.
 - Production (origin/main) is behind ralph/init-stride by 60+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)

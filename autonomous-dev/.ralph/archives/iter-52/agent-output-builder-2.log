@@ -1,0 +1,7 @@
+Done. Here's a summary of what was done for **#IMP-050**:
+
+**Change:** Removed 2 lines from `runbooks-list-view.tsx` — the `·` separator and the `{resolved}/{total} steps` span from the metadata row (lines 113-114).
+
+**Result:** Each runbook card now shows the step count exactly once — in the progress bar label (`{resolved} / {total}`). The metadata row cleanly shows: `section name · date`.
+
+**Verification:** typecheck ✓ pass, lint ✓ pass (0 errors), build N/A, unit tests N/A.

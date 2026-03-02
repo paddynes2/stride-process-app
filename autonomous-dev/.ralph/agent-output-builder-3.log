@@ -1,14 +1,15 @@
-Implementation complete. Here's a summary of what was done for **#IMP-051**:
+Done. Here's a summary of what was implemented:
 
-**Changes to `src/app/(app)/w/[workspaceId]/settings/page.tsx`:**
+**#IMP-052 — Prioritization chart grid lines & axis labels**
 
-1. **Added `confirmDeleteOpen` state** (line 42) — mirrors the existing `confirmCloneOpen` pattern
-2. **Replaced `handleDelete`** — now only calls `setConfirmDeleteOpen(true)` instead of invoking `window.confirm()`
-3. **Added `handleConfirmDelete`** — contains the actual delete logic (closes dialog, sets loading state, calls `deleteWorkspace`, navigates to `/workspaces`)
-4. **Added Delete Workspace Radix Dialog** — after the clone dialog, following the exact same pattern:
-   - `DialogTitle`: "Delete Workspace"
-   - `DialogDescription`: `Permanently delete "{workspace.name}"? This cannot be undone.`
-   - Cancel button (`variant="secondary"`)
-   - Delete button (`variant="destructive"`, `loading={deleting}`)
+Changes to `prioritization-view.tsx`:
 
-**Verification:** TypeScript (`npx tsc --noEmit`) — 0 errors. ESLint — 0 errors (1 pre-existing warning in `flow-canvas.tsx`, documented as acceptable).
+1. **Y-axis numeric labels** — Added a `w-4` column between the "Impact" title and the chart area. Shows scores `5→1` top-to-bottom, each positioned at `0/25/50/75/100%` with `translateY(-50%)` centering. Labels are outside the chart area.
+
+2. **X-axis numeric labels** — Added a `14px` row below the chart. Shows scores `1→5` left-to-right at `0/25/50/75/100%` positions with `translateX(-50%)` centering. Spacers (`w-6` + `w-4`) align with the left columns.
+
+3. **Grid lines at 25% and 75%** — 4 new absolutely-positioned `div`s inside the chart area using `borderLeft`/`borderTop: "1px dashed var(--border-subtle)"` at `opacity: 0.35`. These are distinctly more subtle than the existing solid 50% quadrant dividers.
+
+4. **Layout alignment** — Both the X-axis numeric row and the "Effort →" title row have matching `w-6 + w-4` left spacers so everything aligns with the chart area.
+
+All existing quadrant tints, divider lines, quadrant labels, dots, tooltips, and filters are unchanged.

@@ -364,13 +364,11 @@
   - **Design principle:** Nielsen H4: Consistency and standards
   - **Fix applied:** Added confirmDeleteOpen state + Radix Dialog mirroring clone dialog pattern. Dialog shows workspace name. Cancel (secondary) + Delete (destructive/red) buttons.
 
-- [ ] #IMP-052 Prioritization chart lacks axis tick marks or grid lines — Attempts: 0
+- [x] #IMP-052 Prioritization chart lacks axis tick marks or grid lines — Attempts: 1 — DONE iteration 107, 2026-03-03
   - **Found:** Iteration 106 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`
-  - **What:** Users must mentally interpolate where scores 1-4 land on the continuous chart scale. Only edges (1, 5) are implicitly anchored.
-  - **Design principle:** Nielsen H6: Recognition rather than recall
-  - **Suggested fix:** Add subtle vertical/horizontal grid lines at 25%, 50%, 75% positions or numeric labels (1-5) along chart edges.
+  - **Fix applied:** Added Y-axis numeric labels (5→1 top-to-bottom) in w-4 column, X-axis numeric labels (1→5 left-to-right) in 14px row, and subtle dashed grid lines at 25%/75% (horizontal + vertical) using var(--border-subtle) at 35% opacity. Existing 50% quadrant dividers preserved.
 
 - [ ] #IMP-053 Prioritization empty state has no CTA to navigate to canvas — Attempts: 0
   - **Found:** Iteration 106 (acceptance tester)
@@ -380,13 +378,27 @@
   - **Design principle:** Nielsen H3: User control and freedom
   - **Suggested fix:** Add a secondary action link 'Go to Canvas' pointing to the first workflow tab.
 
-- [ ] #IMP-054 Perspective deletion uses native confirm() while workspace delete uses Radix Dialog — Attempts: 0
+- [x] #IMP-054 Perspective deletion uses native confirm() while workspace delete uses Radix Dialog — Attempts: 0 — RESOLVED iteration 107, 2026-03-03
   - **Found:** Iteration 106 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` (PerspectivesSection.handleDelete, line ~379)
-  - **What:** Same settings page now has two dialog patterns: Radix Dialog for workspace operations and native confirm() for perspective deletion. Jarring UX inconsistency.
-  - **Design principle:** Nielsen H4: Consistency and standards
-  - **Suggested fix:** Replace perspective confirm() with Radix Dialog following IMP-051 pattern.
+  - **Resolution:** Fixed by BUG-025 in iteration 107. Perspective deletion now uses Radix Dialog matching workspace delete and clone patterns.
+
+- [ ] #IMP-055 Delete Perspective button label should say "Delete Perspective" for specificity — Attempts: 0
+  - **Found:** Iteration 107 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — Delete Perspective dialog footer button
+  - **What:** Delete button reads "Delete" but dialog title reads "Delete Perspective". Workspace delete dialog likely uses specific label. Minor inconsistency.
+  - **Design principle:** Nielsen H6: Recognition over recall — specific labels confirm what is being deleted
+  - **Suggested fix:** Change button label to "Delete Perspective" to match dialog title.
+
+- [ ] #IMP-056 Prioritization Y-axis label column may clip at narrow widths — Attempts: 0
+  - **Found:** Iteration 107 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`
+  - **What:** Y-axis label column uses w-4 (16px) for single-digit numbers. At very small viewports these 1-digit numbers may be clipped. Low risk since chart is desktop-only.
+  - **Design principle:** Nielsen H4: Consistency and standards — labels should remain readable
+  - **Suggested fix:** Consider w-5 or add overflow-visible if wider scores are planned in future.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

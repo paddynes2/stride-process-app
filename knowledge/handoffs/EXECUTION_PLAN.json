@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 106,
-  "date": "2026-03-02T23:00:00Z",
+  "iteration": 107,
+  "date": "2026-03-02T23:55:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "221345e",
+    "last_commit_hash": "d3fed5495b2f5bf445b2298df758beff6f850944",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,8 +13,8 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-034",
-      "description": "Prioritization matrix UI [2/2] — effort/impact score selectors on step + touchpoint detail panels, new /prioritization page with quadrant chart (CSS-positioned divs), tab/section filter dropdowns, sidebar nav, workspace-shell reserved path",
+      "id": "#FEAT-035",
+      "description": "Improvement ideas tracker — data layer: migration 022 (improvement_ideas table with improvement_status + improvement_priority enums), TypeScript types, API routes (GET filterable + POST + PATCH + DELETE), client wrappers",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 3a: Analysis Intelligence",
@@ -22,145 +22,146 @@
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "Step detail panel shows effort (1-5) and impact (1-5) score selectors below maturity section, reusing MATURITY_OPTIONS button pattern (click to set, click again to clear)",
-        "Touchpoint detail panel shows same effort/impact score selectors (reuse same pattern — touchpoint has pain_score as reference)",
-        "Score changes persist via existing PATCH routes (effort_score, impact_score fields already in EDITABLE_FIELDS)",
-        "New page at /w/[workspaceId]/prioritization with server component (page.tsx) fetching steps+touchpoints+sections+stages+tabs",
-        "Client view component (prioritization-view.tsx) renders quadrant chart using CSS absolute positioning within relative container — NO charting library",
-        "X-axis = effort (1-5), Y-axis = impact (1-5). Quadrant labels: Quick Wins (low effort, high impact), Major Projects (high effort, high impact), Fill-Ins (low effort, low impact), Deprioritize (high effort, low impact)",
-        "Items plotted as dots colored by parent section/stage using deterministic name hash → HSL palette (8 colors). Radix Tooltip on hover shows item name",
-        "Click dot navigates to correct canvas tab",
-        "Two filter dropdowns above chart: Tab (select, default All) and Section/Stage (select, filtered by selected tab, default All)",
-        "Sidebar nav link added for Prioritization (between Perspectives and Runbooks)",
-        "workspace-shell.tsx reserved paths includes 'prioritization'"
+        "New migration 022_improvement_ideas.sql creates improvement_status enum (proposed/approved/in_progress/completed/rejected) and improvement_priority enum (low/medium/high/critical)",
+        "improvement_ideas table: id UUID PK, workspace_id UUID NOT NULL FK workspaces ON DELETE CASCADE, title TEXT NOT NULL, description TEXT, status improvement_status NOT NULL DEFAULT 'proposed', priority improvement_priority NOT NULL DEFAULT 'medium', linked_step_id UUID FK steps ON DELETE SET NULL, linked_touchpoint_id UUID FK touchpoints ON DELETE SET NULL, linked_section_id UUID FK sections ON DELETE SET NULL, created_by UUID FK users NOT NULL, created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now()",
+        "RLS enabled: SELECT/INSERT/UPDATE/DELETE policies using can_access_workspace(workspace_id)",
+        "Index on workspace_id, update_updated_at trigger reused from migration 015",
+        "TypeScript types added to database.ts: ImprovementIdea interface, ImprovementStatus type, ImprovementPriority type",
+        "GET /api/v1/improvement-ideas?workspace_id=X returns all ideas for workspace, supports optional status and priority query params for filtering, ordered by created_at desc",
+        "POST /api/v1/improvement-ideas creates new idea with validation (workspace_id required, title required non-empty, status must be valid enum, priority must be valid enum, linked_*_id optional)",
+        "PATCH /api/v1/improvement-ideas/[id] updates idea (title, description, status, priority, linked_*_id). EDITABLE_FIELDS pattern.",
+        "DELETE /api/v1/improvement-ideas/[id] deletes idea with .select().single() pattern for 0-row detection",
+        "All mutation routes call void logActivity() with appropriate action (created/updated/deleted)",
+        "Client wrappers in client.ts: fetchImprovementIdeas(workspaceId, filters?), createImprovementIdea(data), updateImprovementIdea(id, data), deleteImprovementIdea(id)"
       ],
       "files_owned": [
-        "src/components/panels/step-detail-panel.tsx",
-        "src/components/panels/touchpoint-detail-panel.tsx",
-        "src/app/(app)/w/[workspaceId]/prioritization/**",
-        "src/components/layout/sidebar.tsx",
-        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
+        "supabase/migrations/022_improvement_ideas.sql",
+        "src/types/database.ts",
+        "src/app/api/v1/improvement-ideas/route.ts",
+        "src/app/api/v1/improvement-ideas/[id]/route.ts",
+        "src/lib/api/client.ts"
       ],
       "files_read_only": [
-        "src/types/database.ts",
-        "src/lib/api/client.ts",
-        "src/lib/maturity.ts",
-        "src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx",
-        "src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx"
+        "src/lib/api/response.ts",
+        "src/lib/api/activity.ts",
+        "src/lib/supabase/server.ts",
+        "supabase/migrations/019_coloring_rules.sql",
+        "src/app/api/v1/coloring-rules/route.ts",
+        "src/app/api/v1/coloring-rules/[id]/route.ts"
       ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx — similar page structure (server fetch + client view)",
-          "src/app/(app)/w/[workspaceId]/gap-analysis/page.tsx — similar analysis page pattern"
+          "supabase/migrations/019_coloring_rules.sql",
+          "src/app/api/v1/coloring-rules/route.ts",
+          "src/app/api/v1/coloring-rules/[id]/route.ts",
+          "supabase/migrations/014_comments.sql",
+          "src/app/api/v1/comments/route.ts"
         ],
         "patterns_to_follow": [
-          "Maturity score selector UI in step-detail-panel.tsx lines 360-382 — clickable buttons with MATURITY_OPTIONS array, click toggles value via handleFieldUpdate, selected shows colored background",
-          "Perspective comparison page pattern — server page fetches workspace data, passes to client view component",
-          "Sidebar nav items defined around line 41-46 — array of {label, icon, href} objects",
-          "workspace-shell.tsx line 47 — exclusion array for reserved path segments",
-          "Radix Tooltip already in deps — use for dot hover labels",
-          "Deterministic color: hash entity name string → pick from 8-color HSL palette. Simple string hash (sum char codes) mod 8"
+          "Migration pattern: CREATE TYPE enums, CREATE TABLE, update_updated_at trigger, workspace_id INDEX, RLS with can_access_workspace() — see 019_coloring_rules.sql",
+          "API route pattern: auth check, validation guards, EDITABLE_FIELDS for PATCH, .select().single() for DELETE, void logActivity() — see coloring-rules routes",
+          "Client wrapper pattern: apiFetch<Type[]> for list, apiFetch<Type> for create/update/delete — see existing wrappers in client.ts",
+          "Type pattern: interface + string literal union type for enums — see ColoringRule, CriteriaType in database.ts",
+          "FK with ON DELETE SET NULL for linked entity IDs (step, touchpoint, section) — allows deleting source entities without cascade-deleting improvement ideas"
         ],
         "learnings_relevant": [
-          "workspace-shell route exclusion list — MUST add 'prioritization' to prevent canvas view rendering",
+          "Supabase RLS silent mutations — API routes must check if data is null after mutations and return 403/404",
           "apiFetch unwraps envelope — client functions return apiFetch<T>() directly",
-          "React 19 useRef requires initial value"
+          "void logActivity() — fire-and-forget with void prefix to avoid floating promises"
         ],
         "affected_urls": [
-          "/w/[workspaceId]/prioritization"
+          "/api/v1/improvement-ideas",
+          "/api/v1/improvement-ideas/[id]"
         ]
       },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Data layer already done in iter 105 (migration 021, types updated, PATCH routes updated). This task is UI-only. Effort/impact selectors: define EFFORT_OPTIONS and IMPACT_OPTIONS arrays (1-5) with labels like 'Very Low'/'Low'/'Medium'/'High'/'Very High'. Place below maturity section in step panel. For touchpoint panel, add in similar location to pain_score section. Quadrant chart: use CSS grid or absolute positioning — items are positioned as percentage of container (effort_score/5 * 100% for x, inverted impact_score for y so high impact is top). Filter by tab first, then section/stage within that tab. Empty state when no items have scores."
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "Next migration number is 022. Reuse update_updated_at() trigger function from migration 015 (DO NOT recreate). Follow coloring_rules migration as closest pattern. linked_step_id, linked_touchpoint_id, linked_section_id should all be nullable FK with ON DELETE SET NULL so deleting a source entity orphans the idea rather than deleting it."
     },
     {
       "slot": 2,
-      "id": "#IMP-050",
-      "description": "Remove redundant step count display on runbook cards — metadata row shows count AND progress bar shows count",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 4: The Living Playbook",
+      "id": "#BUG-025",
+      "description": "Replace native confirm() for perspective deletion in settings page with Radix Dialog, following IMP-051 delete workspace dialog pattern",
+      "source": "prd/BUGS.md",
+      "type": "fix",
+      "phase": "Phase 3a: Analysis Intelligence",
       "complexity": "S",
       "attempts": 1,
-      "risk_score": 0,
+      "risk_score": 1,
       "acceptance_criteria": [
-        "Only ONE step count display per runbook card (keep progress bar label, remove metadata row count)",
-        "Progress bar still shows '{resolved} / {total}' text (IMP-046)",
-        "Metadata row no longer shows '{resolved}/{total} steps' text (IMP-014 removal)",
-        "Visual balance maintained — no awkward gaps from removal"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
-      ],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "IMP-046 added progress bar text at line ~124",
-          "IMP-014 added metadata row count at line ~114"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/runbooks"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Simple removal. Find the metadata row that shows '{resolved}/{total} steps' and remove it. Keep the progress bar label ('{resolved} / {total}'). Verify the card layout still looks balanced after removal."
-    },
-    {
-      "slot": 3,
-      "id": "#IMP-051",
-      "description": "Replace native confirm() with Radix Dialog for Delete Workspace action — match clone dialog pattern (IMP-028)",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 4: The Living Playbook",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Delete Workspace uses Radix Dialog instead of native confirm()",
-        "Dialog includes workspace name: 'Permanently delete \"{workspace.name}\"? This cannot be undone.'",
-        "Cancel button (secondary variant) and Delete button (destructive variant/red)",
-        "Follows same pattern as clone dialog (IMP-028) — confirmDeleteOpen useState boolean",
-        "Zero window.confirm() calls remain in settings page"
+        "PerspectivesSection.handleDelete no longer calls native confirm()",
+        "Radix Dialog shows perspective name in description text",
+        "Cancel (secondary variant) and Delete (destructive/red variant) buttons in dialog footer",
+        "Dialog explains consequences: 'All annotations for this perspective will be permanently removed.'",
+        "Zero native confirm() calls remain in settings/page.tsx after fix"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/settings/page.tsx"
       ],
       "files_read_only": [],
       "context": {
-        "similar_files": [
-          "Same file — clone dialog pattern from IMP-028 (confirmCloneOpen state + Radix Dialog)"
-        ],
+        "similar_files": [],
         "patterns_to_follow": [
-          "IMP-028 clone dialog pattern in settings/page.tsx — Dialog/DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter with useState boolean",
-          "IMP-012 runbook Complete/Cancel dialogs — same Radix Dialog pattern with destructive variant"
+          "IMP-051 pattern already in same file — confirmDeleteOpen state, handleConfirmDelete, Radix Dialog with DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter",
+          "IMP-028 clone dialog pattern also in same file — confirmCloneOpen"
         ],
-        "learnings_relevant": [
-          "BUG-023/024 — use DialogPrimitive.Title from @radix-ui/react-dialog if needed for a11y, though ui/dialog.tsx DialogTitle should work for new dialogs following existing pattern"
-        ],
+        "learnings_relevant": [],
         "affected_urls": [
           "/w/[workspaceId]/settings"
         ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Mirror the existing clone dialog pattern exactly. Add confirmDeleteOpen state. Replace the confirm() call in handleDelete with setConfirmDeleteOpen(true). Move actual delete logic into the dialog's confirm button onClick. Use destructive/red styling for the Delete button. Include workspace.name in dialog description."
+      "special_instructions": "The file already has two Radix Dialog patterns (clone and delete workspace). Follow the identical pattern for perspective deletion. Need confirmDeletePerspectiveOpen state + perspectiveToDelete state to track which perspective is being deleted. Also resolves IMP-054 (same issue)."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-052",
+      "description": "Add axis tick marks or grid lines to prioritization quadrant chart for better score readability",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Subtle grid lines at 25%, 50%, 75% positions (horizontal and vertical) within the chart area",
+        "Numeric labels 1-5 along left edge (impact) and bottom edge (effort) of chart",
+        "Grid lines use border-subtle or similar low-opacity color that doesn't compete with dots",
+        "Existing quadrant labels, dots, tooltips, and filters still work correctly"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "Chart uses CSS absolute positioning within relative container — grid lines should be positioned the same way",
+          "Design tokens: --border-subtle for grid lines, --text-tertiary for axis labels",
+          "Keep axis labels outside chart area to avoid overlapping dots"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/prioritization"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "CSS-only enhancement. No new dependencies. Grid lines positioned at 25%, 50%, 75% of chart width/height (mapping to scores 2, 3, 4 on the 1-5 scale). Use very subtle styling — dashed or dotted lines at low opacity."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/lib/api/response.ts", "src/lib/api/activity.ts", "src/lib/supabase/server.ts"],
     "owner": null,
-    "note": "database.ts and client.ts already have effort_score/impact_score types and API wrappers from iter 105. No modifications needed."
+    "note": "database.ts and client.ts are owned exclusively by slot 1. No other slot needs to modify them."
   },
-  "merge_order": ["#FEAT-034", "#IMP-050", "#IMP-051"],
+  "merge_order": ["#FEAT-035", "#BUG-025", "#IMP-052"],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": false,
-    "regression_reason": "Regression ran last iteration (105) at 12/12 PASS. Risk score 2 for this iteration (UI-only changes, no data model). Next regression trigger: iteration 110 (cadence floor) or risk score ≥3.",
-    "suites_to_run": ["feat-034-ui-acceptance", "imp-050-acceptance", "imp-051-acceptance"],
+    "run_regression": true,
+    "regression_reason": "Risk score 4 from iteration 106 (8 files changed, shared components modified: step-detail-panel, touchpoint-detail-panel, sidebar, workspace-shell)",
+    "suites_to_run": ["feat-035-data-layer-acceptance", "bug-025-acceptance", "imp-052-acceptance", "regression-baseline"],
     "cadence_trigger": null
   },
   "status_updates": {

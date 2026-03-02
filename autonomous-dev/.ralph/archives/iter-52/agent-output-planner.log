@@ -1,0 +1,20 @@
+**EXECUTION_PLAN.json written for iteration 106.**
+
+## Summary
+
+**Validation:** Last commit `221345e` valid. Compilation passing. No revert needed.
+
+**Mode:** `multi_task` (3 slots)
+
+| Slot | Task | Type | Complexity | Files |
+|------|------|------|------------|-------|
+| 1 | **#FEAT-034 [2/2]** — Prioritization matrix UI | build | M | step-detail-panel, touchpoint-detail-panel, prioritization/*, sidebar, workspace-shell |
+| 2 | **#IMP-050** — Remove redundant runbook step count | improve | S | runbooks-list-view.tsx |
+| 3 | **#IMP-051** — Styled delete workspace dialog | improve | S | settings/page.tsx |
+
+**Key decisions:**
+- Primary task follows SIGNAL directive (FEAT-034 [2/2])
+- Data layer already done (iter 105) — this is UI-only
+- Two S-complexity improvements fill parallel slots with zero file overlap
+- No regression needed (ran last iteration 12/12 PASS, risk score 2 for UI-only changes)
+- Accessibility cadence still overdue (84 iterations) — next trigger: iteration 110

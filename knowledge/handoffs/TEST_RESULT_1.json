@@ -1,204 +1,183 @@
 {
   "schema_version": "1.0",
-  "iteration": 106,
+  "iteration": 107,
   "test_type": "acceptance",
   "suite_name": null,
-  "status": "passed",
-  "duration_seconds": 180,
-
-  "testing_note": "Production URL (stride-five-sigma.vercel.app) is running a pre-iteration-106 build — sidebar shows only 6 nav items (Workflows, List View, Teams, People, Tools, Settings), /prioritization renders as canvas view, and Delete Workspace shows native confirm(). All 7 Playwright actions were used to confirm this. Remaining verification done via static code review of the changed source files on the current branch.",
+  "status": "playwright_unavailable",
+  "duration_seconds": 90,
+  "playwright_note": "Chrome failed to launch (existing session conflict). All acceptance criteria evaluated via static code analysis (file reads + grep). Visual browser checks not performed. Recommend static results as strong signal: all criteria structurally satisfied.",
 
   "criteria_results": [
     {
-      "criterion": "Step detail panel shows effort (1-5) and impact (1-5) score selectors below maturity section, reusing MATURITY_OPTIONS button pattern (click to set, click again to clear)",
-      "task_id": "#FEAT-034",
+      "criterion": "Migration 022 creates improvement_status enum (proposed/approved/in_progress/completed/rejected) and improvement_priority enum (low/medium/high/critical)",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "SCORE_OPTIONS array (1-5, Very Low–Very High) confirmed at step-detail-panel.tsx:57-63. Effort section at lines 435-459 using SCORE_OPTIONS with handleFieldUpdate('effort_score', ...) toggle. Impact section at lines 461-485 using same. Both placed below maturity section (after Separator at line 433). Effort uses orange #F97316, Impact uses var(--brand) — matching spec.",
+      "evidence": "022_improvement_ideas.sql line 6-9: CREATE TYPE improvement_status AS ENUM ('proposed','approved','in_progress','completed','rejected') and CREATE TYPE improvement_priority AS ENUM ('low','medium','high','critical'). Exact values match spec.",
       "screenshot_description": null
     },
     {
-      "criterion": "Touchpoint detail panel shows same effort/impact score selectors (reuse same pattern)",
-      "task_id": "#FEAT-034",
+      "criterion": "improvement_ideas table has all required columns with correct types, FKs, ON DELETE behavior",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "BUILD_RESULT_1.json confirms touchpoint-detail-panel.tsx +54 lines, 0 removed. Builder notes: 'same selectors after gain_score using pain/gain button style.' TypeScript compilation passes (0 errors).",
+      "evidence": "022_improvement_ideas.sql lines 11-24: All columns present. workspace_id FK ON DELETE CASCADE, linked_step_id/touchpoint_id/section_id ON DELETE SET NULL. created_by FK ON DELETE CASCADE (matches coloring_rules pattern). created_at/updated_at TIMESTAMPTZ NOT NULL DEFAULT now().",
       "screenshot_description": null
     },
     {
-      "criterion": "Score changes persist via existing PATCH routes (effort_score, impact_score fields already in EDITABLE_FIELDS)",
-      "task_id": "#FEAT-034",
+      "criterion": "RLS enabled: SELECT/INSERT/UPDATE/DELETE policies using can_access_workspace(workspace_id)",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "step-detail-panel.tsx line 445: handleFieldUpdate('effort_score', ...) and line 471: handleFieldUpdate('impact_score', ...). EDITABLE_FIELDS plumbing pre-existed from iter 105; no new API routes needed. TypeScript passes.",
+      "evidence": "022_improvement_ideas.sql lines 39-51: ALTER TABLE improvement_ideas ENABLE ROW LEVEL SECURITY; four policies (select/insert/update/delete) all using can_access_workspace(workspace_id).",
       "screenshot_description": null
     },
     {
-      "criterion": "New page at /w/[workspaceId]/prioritization with server component (page.tsx) fetching steps+touchpoints+sections+stages+tabs",
-      "task_id": "#FEAT-034",
+      "criterion": "Index on workspace_id, update_updated_at trigger reused from migration 015",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "prioritization/page.tsx created (+69 lines per BUILD_RESULT_1.json). Builder notes: 'server component fetches steps+touchpoints+sections+stages+tabs'. Build output confirms dynamic server-rendered route. TypeScript passes.",
+      "evidence": "Line 27-29: CREATE TRIGGER improvement_ideas_updated_at ... EXECUTE FUNCTION update_updated_at() — references existing function, does not recreate it. Line 32: CREATE INDEX idx_improvement_ideas_workspace ON improvement_ideas(workspace_id).",
       "screenshot_description": null
     },
     {
-      "criterion": "Client view component (prioritization-view.tsx) renders quadrant chart using CSS absolute positioning — NO charting library",
-      "task_id": "#FEAT-034",
+      "criterion": "TypeScript types added to database.ts: ImprovementIdea interface, ImprovementStatus type, ImprovementPriority type",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "prioritization-view.tsx: no charting library imported (only @radix-ui/react-tooltip, react, next/navigation). Chart uses CSS absolute positioning within relative container (style={{ height: '480px' }}) at line 177. Quadrant tint divs use absolute positioning at lines 179-182.",
+      "evidence": "database.ts lines 410-411: ImprovementStatus = 'proposed'|'approved'|'in_progress'|'completed'|'rejected', ImprovementPriority = 'low'|'medium'|'high'|'critical'. Line 413+: ImprovementIdea interface with all fields including all three linked_*_id nullable fields.",
       "screenshot_description": null
     },
     {
-      "criterion": "X-axis = effort (1-5), Y-axis = impact (1-5). Quadrant labels: Quick Wins, Major Projects, Fill-Ins, Deprioritize — correct mapping",
-      "task_id": "#FEAT-034",
+      "criterion": "GET /api/v1/improvement-ideas?workspace_id=X returns all ideas, supports status/priority filter, ordered by created_at desc",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "Labels confirmed at prioritization-view.tsx lines 189-200. Dot positioning: xPct=((effort-1)/4)*100 (effort 1→left, 5→right), yPct=((5-impact)/4)*100 (impact 5→top, 1→bottom). Quick Wins top-left, Major Projects top-right, Fill-Ins bottom-left, Deprioritize bottom-right — all correct.",
+      "evidence": "route.ts GET handler lines 18-46: workspace_id required guard, query.eq('status', status) applied conditionally, query.eq('priority', priority) applied conditionally, .order('created_at', { ascending: false }). Returns successResponse(ideas).",
       "screenshot_description": null
     },
     {
-      "criterion": "Items plotted as dots colored by parent section/stage using deterministic name hash → HSL palette (8 colors). Radix Tooltip on hover shows item name",
-      "task_id": "#FEAT-034",
+      "criterion": "POST /api/v1/improvement-ideas validates workspace_id required, title non-empty, optional enum validation",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "hashColor() at lines 19-23: sums char codes, mod 8, picks from 8-color HSL_PALETTE. Tooltip via TooltipPrimitive.Provider+Root+Trigger+Content at lines 203-243. Tooltip shows item name, group_name, effort/impact scores.",
+      "evidence": "POST handler lines 60-73: workspace_id required (400), title non-empty string required (400), status enum check against VALID_STATUSES if provided, priority enum check against VALID_PRIORITIES if provided.",
       "screenshot_description": null
     },
     {
-      "criterion": "Click dot navigates to correct canvas tab",
-      "task_id": "#FEAT-034",
+      "criterion": "PATCH /api/v1/improvement-ideas/[id] uses EDITABLE_FIELDS pattern with enum validation",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "prioritization-view.tsx line 219: onClick={() => router.push('/w/${workspaceId}/${item.tab_id}')}. Each PlotItem carries tab_id from its parent step/touchpoint.",
+      "evidence": "[id]/route.ts lines 6-55: EDITABLE_FIELDS const array, loop over body fields, title non-empty validation, VALID_STATUSES/VALID_PRIORITIES type guards. No empty-update allowed (400 if no valid fields).",
       "screenshot_description": null
     },
     {
-      "criterion": "Two filter dropdowns above chart: Tab (select, default All) and Section/Stage (select, filtered by selected tab, default All)",
-      "task_id": "#FEAT-034",
+      "criterion": "DELETE /api/v1/improvement-ideas/[id] uses .select().single() for 0-row detection",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "Tab select at lines 129-140, Section/Stage select at lines 142-155. groupOptions useMemo at lines 61-78 filters sections by tab_id (process canvas) or stages (journey canvas). useEffect at lines 57-59 resets selectedGroupId when selectedTabId changes.",
+      "evidence": "[id]/route.ts lines 93-98: .delete().eq('id', id).select().single(). PGRST116 error code checked at line 101 returns 404. 0-row detection confirmed.",
       "screenshot_description": null
     },
     {
-      "criterion": "Sidebar nav link added for Prioritization (between Perspectives and Runbooks)",
-      "task_id": "#FEAT-034",
+      "criterion": "All mutation routes call void logActivity() with appropriate action",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "sidebar.tsx line 45: { label: 'Prioritization', icon: Target, href: '/prioritization' }. Position: after Perspectives (line 44), before Comments (line 46) and Runbooks (line 47). Target icon imported at line 22. Active-state exclusion for /prioritization added to Workflows check (line 39).",
+      "evidence": "route.ts POST line 106: void logActivity(...action:'created'). [id]/route.ts PATCH line 76: void logActivity(...action:'updated', details:{changed_fields}). DELETE line 108: void logActivity(...action:'deleted'). All use void prefix.",
       "screenshot_description": null
     },
     {
-      "criterion": "workspace-shell.tsx reserved paths includes 'prioritization'",
-      "task_id": "#FEAT-034",
+      "criterion": "Client wrappers in client.ts: fetchImprovementIdeas, createImprovementIdea, updateImprovementIdea, deleteImprovementIdea",
+      "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "workspace-shell.tsx line 47: array includes 'prioritization' in the exclusion list. URL /w/{id}/prioritization will NOT be treated as a tabId — isCanvasView will be false, TabBar hidden. Production confirmed the OLD code WITHOUT 'prioritization' in exclusion array (canvas rendered at that URL).",
+      "evidence": "client.ts grep confirms all four functions present at lines 756, 766, 783, 791. fetchImprovementIdeas accepts workspaceId + optional filters param. updateImprovementIdea uses Partial<Pick<ImprovementIdea, ...editable fields>>. All return apiFetch<T>() directly.",
       "screenshot_description": null
     },
     {
-      "criterion": "Only ONE step count display per runbook card (keep progress bar label, remove metadata row count)",
-      "task_id": "#IMP-050",
+      "criterion": "PerspectivesSection.handleDelete no longer calls native confirm()",
+      "task_id": "#BUG-025",
       "result": "pass",
-      "evidence": "runbooks-list-view.tsx metadata row (lines 111-114): shows section name and date only — no step count. Progress bar section (lines 116-123): shows '{resolved} / {total}' text at line 122 (span.tabular-nums). BUILD_RESULT_2.json confirms 2 lines removed (the span and preceding separator dot).",
+      "evidence": "grep for 'confirm(' in settings/page.tsx returned zero matches. The previous confirm() call is fully replaced by Radix Dialog state management.",
       "screenshot_description": null
     },
     {
-      "criterion": "Progress bar still shows '{resolved} / {total}' text",
-      "task_id": "#IMP-050",
+      "criterion": "Radix Dialog shows perspective name in description text",
+      "task_id": "#BUG-025",
       "result": "pass",
-      "evidence": "runbooks-list-view.tsx line 122: <span>{resolved} / {total}</span> present alongside progress bar. Untouched.",
+      "evidence": "settings/page.tsx line 455: DialogDescription renders '{perspectiveToDelete?.name}' — perspective name interpolated from state. perspectiveToDelete state (line 355) holds the Perspective object set when delete is triggered.",
       "screenshot_description": null
     },
     {
-      "criterion": "Metadata row no longer shows '{resolved}/{total} steps' text",
-      "task_id": "#IMP-050",
+      "criterion": "Cancel (secondary variant) and Delete (destructive/red variant) buttons in dialog footer",
+      "task_id": "#BUG-025",
       "result": "pass",
-      "evidence": "Metadata row lines 111-114 only contains: section name truncated, separator dot, and formatted date. No step count span present.",
+      "evidence": "Line 459: Button variant='secondary' with onClick closing dialog. Line 462: Button variant='destructive' with onClick=handleConfirmDeletePerspective and loading={deletingPerspective} spinner state.",
       "screenshot_description": null
     },
     {
-      "criterion": "Visual balance maintained — no awkward gaps from removal",
-      "task_id": "#IMP-050",
+      "criterion": "Dialog explains consequences: 'All annotations for this perspective will be permanently removed.'",
+      "task_id": "#BUG-025",
       "result": "pass",
-      "evidence": "Metadata row: section name · date. Two-element layout is clean. Progress bar row remains below providing count context. No empty separators or orphaned dots.",
+      "evidence": "settings/page.tsx line 455: DialogDescription text includes 'All annotations for this perspective will be permanently removed.' — exact wording match to spec.",
       "screenshot_description": null
     },
     {
-      "criterion": "Delete Workspace uses Radix Dialog instead of native confirm()",
-      "task_id": "#IMP-051",
+      "criterion": "Zero native confirm() calls remain in settings/page.tsx after fix",
+      "task_id": "#BUG-025",
       "result": "pass",
-      "evidence": "settings/page.tsx lines 292-310: Dialog open={confirmDeleteOpen} with full Radix Dialog structure. handleDelete() (line 157-159) now calls setConfirmDeleteOpen(true) only. handleConfirmDelete() (lines 161-174) contains the actual delete logic. Production confirmed OLD code: native confirm() still active there, proving the new branch has the replacement.",
+      "evidence": "grep pattern 'confirm(' across settings/page.tsx: 0 matches found. Criterion satisfied.",
       "screenshot_description": null
     },
     {
-      "criterion": "Dialog includes workspace name: 'Permanently delete \"{workspace.name}\"? This cannot be undone.'",
-      "task_id": "#IMP-051",
+      "criterion": "Subtle grid lines at 25%, 50%, 75% positions (horizontal and vertical) within chart area",
+      "task_id": "#IMP-052",
       "result": "pass",
-      "evidence": "settings/page.tsx line 298: DialogDescription contains 'Permanently delete \"{workspace.name}\"? This cannot be undone.' — matches spec exactly.",
+      "evidence": "prioritization-view.tsx lines 203-204: existing 50% dividers (solid). Lines 206-223: new dashed grid lines at left:25%, left:75% (vertical) and top:25%, top:75% (horizontal) using borderLeft/borderTop:1px dashed var(--border-subtle) at opacity:0.35. 25%/50%/75% all covered.",
       "screenshot_description": null
     },
     {
-      "criterion": "Cancel button (secondary variant) and Delete button (destructive variant/red)",
-      "task_id": "#IMP-051",
+      "criterion": "Numeric labels 1-5 along left edge (impact) and bottom edge (effort) of chart",
+      "task_id": "#IMP-052",
       "result": "pass",
-      "evidence": "settings/page.tsx line 303: Button variant='secondary' for Cancel. Line 305: Button variant='destructive' loading={deleting} for Delete. Mirrors clone dialog pattern exactly.",
+      "evidence": "Line 181: Y-axis numeric labels column with scores 5→1 top-to-bottom at 0/25/50/75/100% positions. Line 285: X-axis numeric labels row with scores 1→5 left-to-right. Labels are outside the chart area — no dot overlap.",
       "screenshot_description": null
     },
     {
-      "criterion": "Follows same pattern as clone dialog (IMP-028) — confirmDeleteOpen useState boolean",
-      "task_id": "#IMP-051",
+      "criterion": "Grid lines use border-subtle or similar low-opacity color that doesn't compete with dots",
+      "task_id": "#IMP-052",
       "result": "pass",
-      "evidence": "settings/page.tsx line 42: const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false). Dialog at lines 292-310 mirrors clone dialog structure at lines 273-290.",
+      "evidence": "Lines 209/213/219/223: all new grid lines use var(--border-subtle) with opacity:0.35. Existing 50% dividers use var(--border-subtle) at full opacity (solid line, established quadrant dividers). New lines are visually subordinate.",
       "screenshot_description": null
     },
     {
-      "criterion": "Zero window.confirm() calls remain in settings page",
-      "task_id": "#IMP-051",
-      "result": "fail",
-      "evidence": "settings/page.tsx line 379 (inside PerspectivesSection.handleDelete): 'if (!confirm(\"Delete this perspective? All annotations will be permanently removed.\")) return;' — a native confirm() call remains. This is pre-existing code, not introduced by IMP-051, but technically violates the 'zero confirm() calls' criterion.",
+      "criterion": "Existing quadrant labels, dots, tooltips, and filters still work correctly",
+      "task_id": "#IMP-052",
+      "result": "pass",
+      "evidence": "Static review: grid lines are CSS-only absolutely-positioned divs inserted before existing quadrant labels/dots (line 226+). No event handlers or data props modified. Filter dropdowns at lines 137/150 untouched. Tooltip at line 264 untouched.",
       "screenshot_description": null
     }
   ],
 
   "quality_gate": {
-    "pages_checked": [
-      "https://stride-five-sigma.vercel.app/workspaces",
-      "https://stride-five-sigma.vercel.app/w/26962042-b3cd-49b9-a917-1daaf0fd25e3/cda94011-cb9b-4d15-89af-65e34693342f",
-      "https://stride-five-sigma.vercel.app/w/26962042-b3cd-49b9-a917-1daaf0fd25e3/prioritization",
-      "https://stride-five-sigma.vercel.app/w/26962042-b3cd-49b9-a917-1daaf0fd25e3/settings"
-    ],
-    "console_errors": 1,
+    "pages_checked": ["/w/[workspaceId]/settings (static)", "/w/[workspaceId]/prioritization (static)"],
+    "console_errors": 0,
     "network_errors": 0,
     "accessibility_issues": 0,
     "layout_shifts": 0,
-    "notes": "1 console error: favicon.ico 404 (pre-existing, non-blocking). Pages load correctly on production. Mega listener not injected due to production predating iteration 106 changes (testing pivoted to static review)."
+    "note": "Quality gate ran as static analysis only — Playwright unavailable. Console/network/a11y figures are from code inspection, not live browser capture."
   },
 
-  "bugs_found": [
-    {
-      "severity": "P2",
-      "page": "/w/[workspaceId]/settings",
-      "description": "Native confirm() still used for perspective deletion (PerspectivesSection.handleDelete at settings/page.tsx line 379). Criterion IMP-051 specifies 'zero window.confirm() calls remain in settings page' but one remains. Pre-existing issue, not introduced by IMP-051.",
-      "steps_to_reproduce": "1. Navigate to workspace settings. 2. Add a perspective. 3. Click the delete (trash) icon on the perspective row. 4. Observe: native browser confirm() dialog appears instead of Radix Dialog.",
-      "related_task": "#IMP-051"
-    }
-  ],
+  "bugs_found": [],
 
   "improvements_found": [
     {
       "category": "usability",
-      "page": "/w/[workspaceId]/prioritization",
-      "observation": "Prioritization chart has no axis tick marks or grid lines — users must mentally interpolate where scores 1-4 land on the continuous scale. Only score 1 (leftmost) and score 5 (rightmost) are implicitly anchored at edges.",
-      "design_principle": "Nielsen H6: Recognition rather than recall — visible reference points reduce cognitive load",
-      "suggested_approach": "Add subtle vertical/horizontal grid lines at 25%, 50%, 75% positions or numeric labels (1–5) along chart edges."
-    },
-    {
-      "category": "usability",
-      "page": "/w/[workspaceId]/prioritization",
-      "observation": "When no items have scores, the empty state message is helpful but there's no direct link or CTA to navigate to a step/canvas to assign scores — user must manually navigate.",
-      "design_principle": "Nielsen H3: User control and freedom — reduce friction for completing prerequisite actions",
-      "suggested_approach": "Add a secondary action link 'Go to Canvas' pointing to the first workflow tab so users can quickly open a step panel."
-    },
-    {
-      "category": "usability",
       "page": "/w/[workspaceId]/settings",
-      "observation": "Perspective deletion uses native confirm() while workspace delete now uses a polished Radix Dialog — inconsistency within the same settings page creates jarring UX variation.",
-      "design_principle": "Nielsen H4: Consistency and standards — dialogs should use the same pattern throughout the product",
-      "suggested_approach": "Replace the perspective confirm() at settings/page.tsx line 379 with a Radix Dialog following the same IMP-051 pattern. Would also resolve the P2 bug above."
+      "observation": "The Delete Perspective dialog's action button reads 'Delete' but the dialog title reads 'Delete Perspective'. The workspace delete dialog likely uses 'Delete Workspace' for specificity. Minor inconsistency but low friction.",
+      "design_principle": "Nielsen H6: Recognition over recall — specific labels help users confirm they are deleting the right entity type",
+      "suggested_approach": "Change the Delete button label to 'Delete Perspective' to match the workspace delete dialog pattern and reinforce what is being deleted."
+    },
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/prioritization",
+      "observation": "Y-axis label column uses w-4 (16px) for 5 labels — at small viewports these 1-digit numbers may be clipped. Low risk since the chart is likely desktop-only, but worth noting.",
+      "design_principle": "Nielsen H4: Consistency and standards — axis labels should remain readable at all expected viewport sizes",
+      "suggested_approach": "Consider w-5 or w-6 if any 2-digit scores are planned in future (maturity scale), or add overflow-visible to prevent clip."
     }
   ],
 
-  "actions_used": 7,
+  "actions_used": 4,
   "action_budget": 10
 }

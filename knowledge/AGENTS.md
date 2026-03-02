@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-106, 2026-03-02 — Phase 3a, FEAT-034 UI complete -->
+<!-- Updated: iter-107, 2026-03-03 — Phase 3a, FEAT-035 [1/2] data layer complete -->
 
 ## Project
 
@@ -78,6 +78,7 @@ npx supabase db push     # Push migrations
 - `runbooks/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST create with step snapshot, GET/PATCH/DELETE by id)
 - `runbook-steps/route.ts` + `[id]/route.ts` — GET by runbook_id, PATCH by id
 - `coloring-rules/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST, PATCH, DELETE)
+- `improvement-ideas/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id with optional status/priority filter, POST with enum validation, PATCH EDITABLE_FIELDS, DELETE with 0-row detection)
 - `templates/route.ts` — GET list by workspace_id, POST create (snapshots section+steps+connections+step_roles as JSONB)
 - `templates/[id]/route.ts` — DELETE
 - `templates/[id]/deploy/route.ts` — POST deploy (UUID remap for steps+connections, role-by-name matching for step_roles)
@@ -116,7 +117,7 @@ npx supabase db push     # Push migrations
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule, Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType) |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule, Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData, ImprovementIdea + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType, ImprovementStatus, ImprovementPriority) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 

@@ -1641,3 +1641,39 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed, clean merges, zero recovery needed.
 - Observations: 4 (1 bug + 3 improvements)
 **Notes:** FEAT-034 is fully complete (both sub-tasks). Next Phase 3a feature is FEAT-035 (improvement ideas tracker). 3 new improvements found in the prioritization page — chart polish items for a future iteration.
+
+## Iteration 107 — 2026-03-03 00:30
+**Tasks:**
+- #FEAT-035 [1/2] Improvement ideas data layer (migration 022, types, API routes, client wrappers) — slot 1 — completed
+- #BUG-025 Replace native confirm() with Radix Dialog for perspective deletion — slot 2 — completed
+- #IMP-052 Add axis grid lines and numeric labels to prioritization chart — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/BUGS.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- supabase/migrations/022_improvement_ideas.sql (created — 52 lines, enums + table + trigger + index + RLS)
+- src/types/database.ts (modified — +22 lines, ImprovementStatus, ImprovementPriority, ImprovementIdea)
+- src/app/api/v1/improvement-ideas/route.ts (created — 109 lines, GET with filters + POST with validation)
+- src/app/api/v1/improvement-ideas/[id]/route.ts (created — 112 lines, PATCH EDITABLE_FIELDS + DELETE with 0-row detection)
+- src/lib/api/client.ts (modified — +45/-1 lines, 4 client wrappers)
+- src/app/(app)/w/[workspaceId]/settings/page.tsx (modified — +78/-42 lines, Radix Dialog for perspective delete)
+- src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx (modified — +60/-4 lines, grid lines + axis labels)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs — 0 errors)
+- Lint: pass (all 3 BUILD_RESULTs — 0 errors, 1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: regression tester used Playwright (20/20 PASS); acceptance tester used static analysis (Playwright unavailable)
+- Canary test: skipped (Playwright only for regression)
+- Acceptance test: 19/19 PASS (11 FEAT-035 + 5 BUG-025 + 4 IMP-052 — static code analysis)
+- Regression test: 20/20 PASS (baseline 15 + BUG-025 2 + FEAT-035 2 + IMP-052 1 — Playwright browser)
+- POST_MERGE_CHECK: PASS
+**Bugs found:** None
+**Improvements found:** 2 — IMP-055 (delete perspective button label specificity), IMP-056 (Y-axis label width)
+**Self-score:**
+- Code quality: 5 — Migration follows coloring_rules pattern exactly. API routes follow established CRUD patterns. Radix Dialog follows IMP-051 pattern. Grid lines are CSS-only, non-invasive.
+- Test coverage: 4 — 19/19 acceptance + 20/20 regression. Regression used live Playwright browser. No browser acceptance (static only).
+- Confidence: 5 — All 3 tasks completed first attempt, all gates pass. Data layer changes are purely additive. BUG-025 follows proven pattern (3rd Radix Dialog on same page). IMP-052 is CSS-only.
+- Efficiency: 5 — All 3 builders completed, clean merges, zero recovery needed.
+- Observations: 2 (2 new improvements)
+**Notes:** FEAT-035 [1/2] completes the improvement ideas data foundation. [2/2] will add UI: "Add Improvement" buttons on detail panels, improvements page, sidebar count badge. BUG-025 resolves IMP-054 (same issue). Zero native confirm() calls remain in settings/page.tsx. Migration 022 needs `npx supabase db push`.

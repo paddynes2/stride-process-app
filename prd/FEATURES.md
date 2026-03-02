@@ -98,18 +98,18 @@
 ### #FEAT-035 Improvement ideas tracker
 **Phase:** 3a
 **Priority:** P1 (important)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in progress — [1/2] data layer DONE iteration 107, 2026-03-03
 **Acceptance criteria:**
-- [ ] New `improvement_ideas` table: id, workspace_id, title, description, status (enum `improvement_status`: proposed/approved/in_progress/completed/rejected), priority (enum `improvement_priority`: low/medium/high/critical), linked_step_id (nullable FK), linked_touchpoint_id (nullable FK), linked_section_id (nullable FK), created_by (FK users), created_at, updated_at
-- [ ] RLS via `can_access_workspace()`, types, API routes (GET list filterable, POST, PATCH, DELETE), client wrappers
+- [x] New `improvement_ideas` table: id, workspace_id, title, description, status (enum `improvement_status`: proposed/approved/in_progress/completed/rejected), priority (enum `improvement_priority`: low/medium/high/critical), linked_step_id (nullable FK), linked_touchpoint_id (nullable FK), linked_section_id (nullable FK), created_by (FK users), created_at, updated_at
+- [x] RLS via `can_access_workspace()`, types, API routes (GET list filterable, POST, PATCH, DELETE), client wrappers
 - [ ] "Add Improvement" button on step/section/touchpoint detail panels — dialog with title, description, priority. Pre-fills linked entity.
 - [ ] "Improvements" page at `/w/[workspaceId]/improvements` — filterable list view by status/priority
 - [ ] Each card: title, status badge, priority badge, linked element (clickable), description preview
 - [ ] Inline status change via dropdown
 - [ ] Count badge on sidebar nav showing open ideas count. Open count = status NOT IN ('completed', 'rejected').
 **Sub-tasks:**
-- [ ] [1/2] Data layer: migration (improvement_ideas table + `improvement_status` and `improvement_priority` enums), types, API routes, client wrappers
+- [x] [1/2] Data layer: migration (improvement_ideas table + `improvement_status` and `improvement_priority` enums), types, API routes, client wrappers — DONE iteration 107
 - [ ] [2/2] UI: "Add Improvement" on detail panels, improvements page, sidebar count badge
 **Notes:** Replaces consultant sticky notes and spreadsheets. Status lifecycle: proposed → approved → in_progress → completed (or rejected). Link to source element provides traceability.
 

@@ -1,0 +1,14 @@
+Implementation complete. Here's a summary of what was done for **#IMP-051**:
+
+**Changes to `src/app/(app)/w/[workspaceId]/settings/page.tsx`:**
+
+1. **Added `confirmDeleteOpen` state** (line 42) — mirrors the existing `confirmCloneOpen` pattern
+2. **Replaced `handleDelete`** — now only calls `setConfirmDeleteOpen(true)` instead of invoking `window.confirm()`
+3. **Added `handleConfirmDelete`** — contains the actual delete logic (closes dialog, sets loading state, calls `deleteWorkspace`, navigates to `/workspaces`)
+4. **Added Delete Workspace Radix Dialog** — after the clone dialog, following the exact same pattern:
+   - `DialogTitle`: "Delete Workspace"
+   - `DialogDescription`: `Permanently delete "{workspace.name}"? This cannot be undone.`
+   - Cancel button (`variant="secondary"`)
+   - Delete button (`variant="destructive"`, `loading={deleting}`)
+
+**Verification:** TypeScript (`npx tsc --noEmit`) — 0 errors. ESLint — 0 errors (1 pre-existing warning in `flow-canvas.tsx`, documented as acceptable).

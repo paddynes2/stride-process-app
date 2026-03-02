@@ -1,7 +1,21 @@
-Done. Here's a summary of what was done for **#IMP-050**:
+Done. Here's a summary of what was done:
 
-**Change:** Removed 2 lines from `runbooks-list-view.tsx` — the `·` separator and the `{resolved}/{total} steps` span from the metadata row (lines 113-114).
+**Task #BUG-025 — Complete**
 
-**Result:** Each runbook card now shows the step count exactly once — in the progress bar label (`{resolved} / {total}`). The metadata row cleanly shows: `section name · date`.
+**Changes to `src/app/(app)/w/[workspaceId]/settings/page.tsx`:**
 
-**Verification:** typecheck ✓ pass, lint ✓ pass (0 errors), build N/A, unit tests N/A.
+1. Added 3 new states to `PerspectivesSection`:
+   - `confirmDeletePerspectiveOpen` — controls dialog visibility
+   - `perspectiveToDelete` — tracks which perspective is being deleted (for name display)
+   - `deletingPerspective` — loading state for the Delete button
+
+2. Replaced `handleDelete` (which called native `confirm()`) with a version that looks up the perspective and opens the dialog
+
+3. Added `handleConfirmDeletePerspective` for the actual async deletion
+
+4. Changed `PerspectivesSection` return to a fragment with the Delete Perspective Radix Dialog appended — dialog shows the perspective name and consequence message: *"All annotations for this perspective will be permanently removed."*
+
+**Verification:**
+- TypeScript: 0 errors
+- Lint: 0 errors (1 pre-existing warning in unrelated file)
+- Zero `confirm()` calls remain in `settings/page.tsx`

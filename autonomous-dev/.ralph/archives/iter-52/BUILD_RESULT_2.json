@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "iteration": 106,
+  "slot": 2,
+  "task_id": "#IMP-050",
+  "status": "completed",
+  "duration_seconds": 45,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+      "action": "modified",
+      "lines_added": 0,
+      "lines_removed": 2
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated), 0 errors" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Removed the '{resolved}/{total} steps' span and its preceding separator dot from the metadata row (old lines 113-114). Progress bar label '{resolved} / {total}' at line 124 is untouched. Metadata row now shows: section name · date — clean and balanced.",
+
+  "failure_details": null
+}

@@ -91,9 +91,8 @@
   - **What:** Same root cause as BUG-023 — custom ui/dialog.tsx DialogTitle wraps `<h2>` not `DialogPrimitive.Title`. Radix a11y check fires console.error when dialog opens.
   - **Fix applied:** Imported `DialogPrimitive` from `@radix-ui/react-dialog` and replaced `<DialogTitle>` with `<DialogPrimitive.Title>` preserving identical styling classes. BUG-024 comment added matching BUG-023 pattern.
 
-- [ ] #BUG-025 Perspective deletion in settings page uses native confirm() dialog (P2) — Attempts: 0
+- [x] #BUG-025 Perspective deletion in settings page uses native confirm() dialog (P2) — Attempts: 1 — DONE iteration 107, 2026-03-03
   - **Found:** Iteration 106 (acceptance tester)
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — PerspectivesSection.handleDelete (line ~379)
   - **What:** Native `confirm("Delete this perspective? All annotations will be permanently removed.")` call. Pre-existing, not introduced by IMP-051. Now inconsistent with workspace delete (Radix Dialog) and clone (Radix Dialog) on same page.
-  - **Steps to reproduce:** Navigate to workspace settings → add a perspective → click delete (trash icon) → native browser confirm() appears.
-  - **Suggested fix:** Replace with Radix Dialog following IMP-051 pattern. Also tracked as IMP-054.
+  - **Fix applied:** Replaced with Radix Dialog following IMP-051 pattern. Added confirmDeletePerspectiveOpen + perspectiveToDelete + deletingPerspective state. Dialog shows perspective name, explains consequences ("All annotations for this perspective will be permanently removed."), Cancel (secondary) + Delete (destructive) buttons. Zero confirm() calls remain in settings/page.tsx. Also resolves IMP-054.

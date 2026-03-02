@@ -1,0 +1,26 @@
+All tasks complete. Here's the summary:
+
+**#FEAT-034 — Prioritization Matrix UI [2/2] — COMPLETED**
+
+**Files changed (6):**
+
+1. **`step-detail-panel.tsx`** — Added `SCORE_OPTIONS` array (1-5, Very Low→Very High), Effort Score (orange) and Impact Score (teal) selectors below maturity section using the maturity button pattern (click sets, click again clears)
+
+2. **`touchpoint-detail-panel.tsx`** — Same effort/impact selectors added after gain_score section, using pain/gain button style with matching orange/teal colors
+
+3. **`prioritization/page.tsx`** (new) — Server component fetching steps, touchpoints, sections, stages, tabs for the workspace
+
+4. **`prioritization/prioritization-view.tsx`** (new) — Client view with:
+   - Tab and Section/Stage filter dropdowns
+   - CSS absolute-positioned quadrant chart (no charting library)
+   - Quadrant labels: Quick Wins, Major Projects, Fill-Ins, Deprioritize
+   - Dots colored via deterministic name hash → 8-color HSL palette
+   - Radix Tooltip on hover showing name, group, scores
+   - Click navigates to correct canvas tab
+   - Empty state when no items have both scores
+
+5. **`sidebar.tsx`** — Added `Target` icon import, Prioritization nav item between Perspectives and Comments, `!p.includes("/prioritization")` to Workflows active exclusion
+
+6. **`workspace-shell.tsx`** — Added `"prioritization"` to reserved path segment array
+
+**Verification:** typecheck ✓, lint ✓ (pre-existing warning only), build ✓ (route appears in build output)

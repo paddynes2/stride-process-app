@@ -1,33 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 106,
+  "iteration": 107,
   "slot": 2,
-  "task_id": "#IMP-050",
+  "task_id": "#BUG-025",
   "status": "completed",
-  "duration_seconds": 45,
+  "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/settings/page.tsx",
       "action": "modified",
-      "lines_added": 0,
-      "lines_removed": 2
+      "lines_added": 78,
+      "lines_removed": 42
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated), 0 errors" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge import) — documented in LEARNINGS.md" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
+    "src/app/(app)/w/[workspaceId]/settings/page.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Removed the '{resolved}/{total} steps' span and its preceding separator dot from the metadata row (old lines 113-114). Progress bar label '{resolved} / {total}' at line 124 is untouched. Metadata row now shows: section name · date — clean and balanced.",
+  "notes": "Replaced native confirm() in PerspectivesSection.handleDelete with Radix Dialog following IMP-051/IMP-028 patterns already in the same file. Added confirmDeletePerspectiveOpen state, perspectiveToDelete state, deletingPerspective state, and handleConfirmDeletePerspective handler. PerspectivesSection now returns a fragment with the Delete Perspective dialog appended. Zero confirm() calls remain in settings/page.tsx. Also resolves IMP-054.",
 
   "failure_details": null
 }
