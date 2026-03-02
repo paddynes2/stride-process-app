@@ -39,6 +39,7 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = React.useState(false);
   const [cloning, setCloning] = React.useState(false);
   const [confirmCloneOpen, setConfirmCloneOpen] = React.useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
 
   // Share state
   const [share, setShare] = React.useState<PublicShare | null>(null);
@@ -153,8 +154,12 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this workspace? This action cannot be undone.")) return;
+  const handleDelete = () => {
+    setConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setConfirmDeleteOpen(false);
     setDeleting(true);
     try {
       await deleteWorkspace(workspace.id);
@@ -279,6 +284,26 @@ export default function SettingsPage() {
           </Button>
           <Button onClick={handleClone}>
             Duplicate
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Delete Workspace confirmation dialog */}
+    <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Workspace</DialogTitle>
+          <DialogDescription>
+            Permanently delete &quot;{workspace.name}&quot;? This cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setConfirmDeleteOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleConfirmDelete} loading={deleting}>
+            Delete
           </Button>
         </DialogFooter>
       </DialogContent>
