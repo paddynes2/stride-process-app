@@ -111,8 +111,6 @@ export function RunbooksListView({ runbooks, workspaceId }: RunbooksListViewProp
                   <div className="flex items-center gap-2 text-[11px] text-[var(--text-tertiary)]">
                     <span className="truncate max-w-[120px]">{runbook.sections?.name ?? "—"}</span>
                     <span>·</span>
-                    <span className="font-medium text-[var(--text-secondary)] shrink-0">{resolved}/{total} steps</span>
-                    <span>·</span>
                     <span className="shrink-0">{formatDate(runbook.created_at)}</span>
                   </div>
                   <div className="mt-1.5 flex items-center gap-2">
