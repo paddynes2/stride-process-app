@@ -43,6 +43,7 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
     if (!currentStep || isUpdating || isReadOnly) return;
     const now = new Date().toISOString();
     const prev = { ...currentStep };
+    const prevIndex = currentIndex;
     setIsUpdating(true);
 
     const updatedSteps = steps.map((item) =>
@@ -64,7 +65,38 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
       await updateRunbookStep(currentStep.id, { status: "completed", completed_at: now });
     } catch (err) {
       setSteps((s) => s.map((item) => (item.id === currentStep.id ? prev : item)));
+      setCurrentIndex(prevIndex);
       toastError("Failed to update step", { error: err });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    if (!currentStep || isUpdating || isReadOnly) return;
+    const prev = { ...currentStep };
+    const prevIndex = currentIndex;
+    setIsUpdating(true);
+
+    const updatedSteps = steps.map((item) =>
+      item.id === currentStep.id ? { ...item, status: "skipped" as const } : item
+    );
+    setSteps(updatedSteps);
+
+    // Auto-advance to next pending/in_progress step
+    const nextIdx = updatedSteps.findIndex(
+      (s, i) => i > currentIndex && (s.status === "pending" || s.status === "in_progress")
+    );
+    if (nextIdx !== -1) {
+      setCurrentIndex(nextIdx);
+    }
+
+    try {
+      await updateRunbookStep(currentStep.id, { status: "skipped" });
+    } catch (err) {
+      setSteps((s) => s.map((item) => (item.id === currentStep.id ? prev : item)));
+      setCurrentIndex(prevIndex);
+      toastError("Failed to skip step", { error: err });
     } finally {
       setIsUpdating(false);
     }
@@ -153,16 +185,27 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
           </h2>
 
           {/* Primary action */}
-          {!isCompleted && !isReadOnly && (
-            <Button
-              size="xl"
-              className="w-full mb-4"
-              onClick={handleMarkComplete}
-              disabled={isUpdating}
-              loading={isUpdating}
-            >
-              Mark Complete &amp; Next
-            </Button>
+          {!isCompleted && currentStep?.status !== "skipped" && !isReadOnly && (
+            <>
+              <Button
+                size="xl"
+                className="w-full mb-2"
+                onClick={handleMarkComplete}
+                disabled={isUpdating}
+                loading={isUpdating}
+              >
+                Mark Complete &amp; Next
+              </Button>
+              <Button
+                variant="secondary"
+                size="default"
+                className="w-full mb-4"
+                onClick={handleSkip}
+                disabled={isUpdating}
+              >
+                Skip
+              </Button>
+            </>
           )}
 
           {/* Prev / Next navigation */}
