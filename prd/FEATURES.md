@@ -306,8 +306,8 @@
 ### #FEAT-048 Playbook mode
 **Phase:** 4
 **Priority:** P1 (important)
-**Attempts:** 1
-**Status:** pending (attempt 1 failed — pipeline merge failure, code lost. Re-attempt needed.)
+**Attempts:** 2
+**Status:** pending (attempts 1-2 failed — pipeline merge failures, code lost both times. Pipeline fix required before attempt 3.)
 **Acceptance criteria:**
 - [ ] Distraction-free view for active runbooks: shows current step large/centered with name, description, assigned person, tools, tasks
 - [ ] "Mark Complete & Next" button advances to next step

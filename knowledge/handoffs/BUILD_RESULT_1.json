@@ -1,47 +1,57 @@
 {
   "schema_version": "1.0",
-  "iteration": 82,
+  "iteration": 85,
   "slot": 1,
-  "task_id": "#FEAT-047",
+  "task_id": "#FEAT-048",
   "status": "completed",
   "duration_seconds": 420,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
-      "action": "modified",
-      "lines_added": 183,
-      "lines_removed": 50
+      "path": "src/app/(app)/w/[workspaceId]/playbook/page.tsx",
+      "action": "created",
+      "lines_added": 45,
+      "lines_removed": 0
     },
     {
-      "path": "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
-      "action": "modified",
-      "lines_added": 41,
-      "lines_removed": 10
+      "path": "src/app/(app)/w/[workspaceId]/playbook/playbook-view.tsx",
+      "action": "created",
+      "lines_added": 235,
+      "lines_removed": 0
     },
     {
-      "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
+      "action": "modified",
+      "lines_added": 15,
+      "lines_removed": 1
+    },
+    {
+      "path": "src/components/layout/sidebar.tsx",
       "action": "modified",
       "lines_added": 1,
-      "lines_removed": 0
+      "lines_removed": 1
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit: no output, exit 0" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused). No new errors or warnings introduced." },
-    "build": { "status": "pass", "output": "npm run build: compiled successfully. Pre-existing Turbopack workspace root warning only. All runbook routes listed in build output." },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for this area." }
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused) — known acceptable per LEARNINGS.md. Zero new warnings." },
+    "build": { "status": "not_applicable", "output": "No separate build step run; tsc covers type correctness" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests exist for UI route components" }
   },
 
   "dependencies_added": [],
+
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
-    "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
-    "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx"
+    "src/app/(app)/w/[workspaceId]/playbook/page.tsx",
+    "src/app/(app)/w/[workspaceId]/playbook/playbook-view.tsx",
+    "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
+    "src/components/layout/sidebar.tsx"
   ],
+
   "ownership_violations": [],
-  "notes": "All 7 acceptance criteria implemented. (1) Complete Runbook button calls updateRunbook with status=completed + completed_at, requires window.confirm. (2) Cancel Runbook button calls updateRunbook with status=cancelled, requires window.confirm. Both buttons hidden when isReadOnly. (3) Checkbox replaced with 4-button status group (pending/in_progress/completed/skipped); completed sets completed_at, others clear it. (4) Read-only banner shown for completed/cancelled runbooks; step buttons + notes textarea disabled. (5) Progress text 'X of Y steps completed · N in progress, N skipped' below progress bar. (6) Metadata footer with started_at, completed_at (if set), created_by (shows 'by you' when userId matches). (7) List view has All/Active/Completed/Cancelled filter tabs with client-side filtering; count updates with filter.",
+
+  "notes": "Playbook mode implemented as distraction-free view. workspace-shell.tsx detects /playbook path and early-returns with WorkspaceProvider only (no Sidebar, Header, or TabBar) — all React hooks are called unconditionally before the conditional return, no hook-order violation. PlaybookView shows one step at a time large/centered with: progress bar + N/M counter, dot navigation (green=completed, white=current, muted=pending), Prev/Next arrow buttons, Mark Complete & Next primary action (xl Button), green CheckCircle2 + completion timestamp for completed steps, back link to runbook view. Mobile-responsive via sm: breakpoints. Server page.tsx reads runbookId from searchParams, fetches runbook + runbook_steps joined to steps(id,name). RunbookStepEnriched type defined locally (same shape as runbook-view.tsx). sidebar.tsx Workflows active function updated to exclude /playbook. 'playbook' added to workspace-shell reserved paths array.",
 
   "failure_details": null
 }

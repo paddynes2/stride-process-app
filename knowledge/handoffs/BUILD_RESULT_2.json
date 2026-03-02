@@ -1,40 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 82,
+  "iteration": 85,
   "slot": 2,
-  "task_id": "#IMP-006",
+  "task_id": "#IMP-012",
   "status": "completed",
   "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
       "action": "modified",
-      "lines_added": 20,
-      "lines_removed": 10
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx",
-      "action": "modified",
-      "lines_added": 20,
-      "lines_removed": 10
+      "lines_added": 42,
+      "lines_removed": 6
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known, documented in LEARNINGS.md). 0 errors." },
-    "build": { "status": "pass", "output": "Compiled successfully in 5.4s, 29/29 static pages generated" },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for canvas view components" }
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated, known)" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
-    "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
+    "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Minimal change: replaced `{activePerspective && selectedStep && <AnnotationPanel />}` pattern with ternary `{selectedStep && (activePerspective ? <AnnotationPanel /> : <empty-state div />)}` in both canvas views. The empty state div uses `border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center` matching the design system conventions. Same change applied for section/stage/touchpoint selection cases. When nothing is selected, panels still don't show at all — unchanged behavior.",
+  "notes": "Replaced both window.confirm() calls with controlled Radix Dialog components. Added completeDialogOpen and cancelDialogOpen useState booleans. Complete dialog uses brand variant button (teal, primary action). Cancel dialog uses destructive variant button (red). Both dialogs explain consequences. Extracted confirmComplete() and confirmCancel() handlers for the actual API calls. Wrapped return JSX in React Fragment to host two dialogs alongside main content div. Zero window.confirm() calls remain.",
 
   "failure_details": null
 }

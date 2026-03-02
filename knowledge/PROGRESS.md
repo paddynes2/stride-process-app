@@ -875,3 +875,29 @@
 - Efficiency: 1 — entire iteration lost to pipeline merge failure
 - Observations: 1 (pipeline merge step failure)
 **Notes:** Pipeline infrastructure failure. Both BUILD_RESULTs report `status: completed` with passing typecheck/lint, but no builder branches exist for iteration 84, no merge commits in reflog, and source files don't exist on disk. Stash `ralph-auto-stash-1772431205` (pre-merge stash) was never popped, confirming the merge step crashed or was never reached. Builder worktrees cleaned up without merging. All builder work lost. Tasks need re-attempt in iteration 85.
+
+## Iteration 85 — 2026-03-02 21:30
+**Tasks:**
+- #FEAT-048 Playbook mode — slot 1 — failed (builder code not merged, attempt 2)
+- #IMP-012 Styled confirm dialog — slot 2 — failed (builder code not merged, attempt 2)
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** reverted
+**Changes:** [none — builder worktrees cleaned up without merge, identical to iter 84]
+**Verification:**
+- Type check: N/A (no code merged)
+- Lint: N/A (no code merged)
+- Build: N/A
+- Unit tests: N/A
+- Browser test: N/A
+- Canary test: N/A
+- POST_MERGE_CHECK: PASS (pre-existing code only, not new changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 0 — no code delivered to session branch
+- Test coverage: 0 — nothing to test
+- Confidence: 1 — pipeline merge infrastructure failure; 2nd consecutive identical failure
+- Efficiency: 0 — entire iteration wasted on known-broken pipeline
+- Observations: 1 (pipeline merge step is consistently broken — must be fixed before next build iteration)
+**Notes:** Exact repeat of iter 84 failure. Both BUILD_RESULTs report `status: completed` with passing typecheck/lint, but no source files exist on filesystem. Playbook directory absent, window.confirm() still 2x in runbook-view.tsx. No builder branches exist. Pipeline merge step in ralph.sh is broken — builders complete work in worktrees but code never reaches session branch. 3 consecutive non-productive iterations (83 partial, 84 reverted, 85 reverted). Pipeline fix required before re-attempt.

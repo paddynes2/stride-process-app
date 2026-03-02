@@ -1,21 +1,19 @@
 ## Handoff
 
-- **Iteration:** 84
-- **Date:** 2026-03-02 20:00
+- **Iteration:** 85
+- **Date:** 2026-03-02 21:30
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-048 Playbook mode (slot 1) + #IMP-012 Styled confirm dialog (slot 2) — both builders reported success but merge step failed
+- **Last task(s):** #FEAT-048 Playbook mode (slot 1) + #IMP-012 Styled confirm dialog (slot 2) — both builders reported success but merge step failed AGAIN
 - **Result:** reverted
-- **Next task:** Re-attempt #FEAT-048 Playbook mode + #IMP-012 Styled confirm dialog (same tasks, attempt 2)
-- **Blockers:** Pipeline merge failure — builder worktrees cleaned up without merging code to session branch
+- **Next task:** CRITICAL: Fix pipeline merge infrastructure before re-attempting #FEAT-048 + #IMP-012. Three consecutive non-productive iterations (83 partial, 84 reverted, 85 reverted). Pipeline merge step is broken — builders complete work in worktrees but code never reaches session branch.
+- **Blockers:** Pipeline merge step in ralph.sh is broken. Builder worktrees are cleaned up without merging code to session branch. This is the 2nd consecutive total loss of builder work (iter 84 + 85). No point re-attempting tasks until pipeline is fixed.
 
 ## Context
 
-Iteration 84 was a multi_task build iteration. Both builders reported `status: completed` with passing typecheck/lint in BUILD_RESULT files. However, the ralph.sh merge step never executed — no builder branches exist for iter 84, no merge commits in reflog, and playbook source files do not exist on the filesystem. A stale stash `ralph-auto-stash-1772431205` confirms the pre-merge stash was created but never popped, indicating the merge step crashed or was never reached.
+Iteration 85 was an exact repeat of iter 84's failure mode. Both BUILD_RESULTs report `status: completed` with passing typecheck/lint, but: (1) playbook directory does not exist on filesystem, (2) `window.confirm()` still appears 2x in runbook-view.tsx, (3) no builder branches exist for iter 85, (4) POST_MERGE_CHECK.txt says PASS but that's checking pre-existing code. The builder-to-session-branch merge step in ralph.sh is consistently failing — builders produce valid code in worktrees but the merge never executes, and worktrees are cleaned up, destroying the work.
 
-Slot 1 (#FEAT-048) created `playbook/page.tsx` + `playbook/playbook-view.tsx` in worktree — distraction-free runbook execution view. Slot 2 (#IMP-012) replaced `window.confirm()` with styled Radix Dialog in `runbook-view.tsx` and added a Playbook link. All work lost when worktrees were cleaned up without merge.
-
-No code committed this iteration. Tasks need re-attempt.
+Stash `ralph-auto-stash-1772431205` from iter 84 still exists and was never popped.
 
 ## Dev Server
 
@@ -25,8 +23,11 @@ No code committed this iteration. Tasks need re-attempt.
 
 ## Warnings
 
-- Pipeline merge failure: builders' work lost. Stash `ralph-auto-stash-1772431205` may contain unrelated ralph.sh improvements — investigate before dropping.
-- Acceptance testing for #FEAT-047 still needed (3 prior dispatch failures — iter 84, iter 83, iter 72)
+- **CRITICAL: Pipeline merge broken** — 2 consecutive iterations (84, 85) lost ALL builder work. 3 consecutive non-productive iterations total (83 partial, 84 reverted, 85 reverted). Pipeline infrastructure must be fixed before any more build iterations.
+- Stash `ralph-auto-stash-1772431205` from iter 84 still exists — investigate before dropping.
+- Acceptance testing for #FEAT-047 still needed (5 prior dispatch failures — iter 72, 79, 83, 84, 85)
+- #FEAT-048 now at 2 failed attempts (both pipeline merge failures, not code failures)
+- #IMP-012 now at 2 failed attempts (both pipeline merge failures, not code failures)
 - Migrations 014-016 need `npx supabase db push` to deploy to remote DB
 - Production (origin/main) is behind ralph/init-stride
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
