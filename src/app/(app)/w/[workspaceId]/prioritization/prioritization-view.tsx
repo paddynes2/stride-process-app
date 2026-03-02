@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Tab, Section, Stage, Step, Touchpoint } from "@/types/database";
 
@@ -161,8 +162,16 @@ export function PrioritizationView({
 
         {/* Chart */}
         {plotItems.length === 0 ? (
-          <div className="flex items-center justify-center h-64 rounded-[var(--radius-md)] border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] text-[13px]">
-            No items with both effort and impact scores. Open a step or touchpoint and assign scores in the detail panel.
+          <div className="flex flex-col items-center justify-center gap-2 h-64 rounded-[var(--radius-md)] border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] text-[13px]">
+            <span>No items with both effort and impact scores. Open a step or touchpoint and assign scores in the detail panel.</span>
+            {tabs.length > 0 && (
+              <Link
+                href={`/w/${workspaceId}/${tabs[0].id}`}
+                className="text-[var(--accent-blue)] hover:underline"
+              >
+                Go to Canvas
+              </Link>
+            )}
           </div>
         ) : (
           <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden">
