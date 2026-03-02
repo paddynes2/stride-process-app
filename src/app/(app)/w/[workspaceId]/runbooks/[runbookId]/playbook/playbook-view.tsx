@@ -32,7 +32,9 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
 
   const total = steps.length;
   const completedCount = steps.filter((s) => s.status === "completed").length;
-  const progressPct = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+  const skippedCount = steps.filter((s) => s.status === "skipped").length;
+  const resolvedCount = completedCount + skippedCount;
+  const progressPct = total === 0 ? 0 : Math.round((resolvedCount / total) * 100);
 
   const currentStep = steps[currentIndex] ?? null;
   const stepName = currentStep?.steps?.name ?? "Deleted Step";
@@ -254,7 +256,7 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
           ))}
         </div>
         <p className="text-center text-[11px] text-[var(--text-tertiary)] mt-2">
-          {completedCount} of {total} steps completed
+          {resolvedCount} of {total} resolved
         </p>
       </div>
     </div>
