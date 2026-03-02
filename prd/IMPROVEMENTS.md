@@ -119,5 +119,47 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
   - **Fix applied:** Moved Playbook button outside `!isReadOnly` guard. Cancel and Complete buttons remain inside the guard. Button container div always renders; only action buttons are conditionally hidden.
 
+- [ ] #IMP-017 Activity filter should re-fetch from server instead of client-side filtering — Attempts: 0
+  - **Found:** Iteration 91 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** Filter tabs filter client-side on already-fetched entries. When Load More is used and then a filter applied, the filter only applies to loaded entries — DB may have matching entries not yet fetched.
+  - **Suggested fix:** When a filter tab is activated, reset entries and re-fetch from API with the action= filter param. Ensures pagination aligns with selected filter.
+
+- [ ] #IMP-018 Activity empty state guidance text — Attempts: 0
+  - **Found:** Iteration 91 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** Empty state shows Clock icon and "No activity yet" but no guidance on what generates activity.
+  - **Suggested fix:** Add hint: "Actions like creating steps, adding comments, and completing runbooks appear here."
+
+- [ ] #IMP-019 Entity type human-readable labels in activity entries — Attempts: 0
+  - **Found:** Iteration 91 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** Entity type badges show raw DB table names (e.g., 'steps', 'runbook_steps'). Should use human-readable mapping.
+  - **Suggested fix:** Add ENTITY_TYPE_LABELS map (e.g., 'steps' → 'Step', 'runbook_steps' → 'Runbook Step') similar to ACTION_LABELS.
+
+- [ ] #IMP-020 Load More skeleton placeholders for activity pagination — Attempts: 0
+  - **Found:** Iteration 91 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** Load More shows 'Loading...' but no skeleton placeholders for expected new items.
+  - **Suggested fix:** Add 2-3 skeleton activity row placeholders below Load More button when loading.
+
+- [ ] #IMP-021 Activity filter tab scroll affordance gradient — Attempts: 0
+  - **Found:** Iteration 91 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** Filter tabs are scrollable (overflow-x-auto) but no visual affordance indicates more tabs exist on narrow viewports.
+  - **Suggested fix:** Add right-side fade gradient overlay on filter tab container when scroll is possible.
+
+- [ ] #IMP-022 Actor type field for activity audit trail — Attempts: 0
+  - **Found:** Iteration 91 (regression tester)
+  - **Category:** Data model
+  - **Where:** `src/lib/api/activity.ts`, `supabase/migrations/017_activity_log.sql`
+  - **What:** No distinction between user-initiated and automated/system actions. Future audit trail may need actor_type.
+  - **Suggested fix:** Add optional actor_type:'user'|'system' to LogActivityParams in a future migration.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

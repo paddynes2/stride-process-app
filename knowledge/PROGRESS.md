@@ -1079,3 +1079,45 @@ Slot 2 (22 files modified):
 - Efficiency: 5 — Both slots succeeded on first attempt. 6th consecutive clean merge (iters 86-90).
 - Observations: 0
 **Notes:** FEAT-049 fully complete (3/3): data layer (iter 88), page UI (iter 89), API route integration (iter 90). IMP-016 resolved — Playbook button now visible for completed/cancelled runbooks while Cancel/Complete buttons remain guarded. Minor style inconsistency: slot 1 uses bare `logActivity()` without `void` prefix, slot 2 uses `void logActivity()`. Both pass lint. Functional behavior identical. FEAT-049 acceptance testing + regression recommended for iter 91.
+
+## Iteration 91 — 2026-03-03 05:30
+**Tasks:**
+- #FEAT-049 acceptance testing (20 checks) — passed (20/20)
+- Regression baseline (37 checks) — passed (37/37)
+**Source:** EXECUTION_PLAN.json (testing_only mode, risk_score_override)
+**Mode:** testing_only
+**Result:** completed
+**Changes:** Documentation only (testing iteration — no app code changes)
+- knowledge/STATUS.md (updated handoff)
+- knowledge/PROGRESS.md (this entry)
+- knowledge/METRICS.jsonl (appended)
+- testing/RESULTS.md (updated with iter 91 results)
+- prd/BUGS.md (added BUG-018, BUG-019)
+- prd/IMPROVEMENTS.md (added IMP-017 through IMP-022)
+- knowledge/TASK-COUNTER.json (updated counters)
+**Verification:**
+- Type check: pass (POST_MERGE_CHECK.txt: PASS, tester confirmed tsc 0 errors)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx, 0 errors)
+- Build: N/A (testing-only iteration)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable — Chrome launch conflict)
+- Canary test: skipped (no code changes this iteration)
+- Acceptance test: 20/20 PASS (FEAT-049 activity log — static analysis)
+- Regression test: 37/37 PASS (full baseline through Phase 4 — static analysis)
+**Bugs found:** 2
+- BUG-018 (P2): logActivity() called without `void` keyword in several routes (steps, connections, workspaces, etc.) — inconsistent with `void logActivity()` in comments, runbooks. Floating promise, lint-safe only because @typescript-eslint/no-floating-promises not enabled.
+- BUG-019 (P2): Activity entries display user_id.slice(0,8) instead of user name/email — no users table join in activity page fetch. Users see UUID fragment as author.
+**Improvements found:** 6
+- IMP-017: Server-side action filter re-fetch (client-side filtering misses un-fetched entries)
+- IMP-018: Activity empty state guidance (hint text for what generates activity)
+- IMP-019: Entity type human-readable labels (steps → Step, runbook_steps → Runbook Step)
+- IMP-020: Load More skeleton placeholders (visual feedback during pagination fetch)
+- IMP-021: Filter tab scroll affordance gradient (indicate more tabs exist on narrow viewports)
+- IMP-022: Actor type field for audit trail (distinguish user vs system actions)
+**Self-score:**
+- Code quality: N/A — no app code produced
+- Test coverage: 5 — 57/57 checks across 2 suites (20 acceptance + 37 regression), comprehensive static analysis
+- Confidence: 5 — all FEAT-049 acceptance criteria verified, full regression clean, TypeScript 0 errors
+- Efficiency: 5 — both testers executed successfully in single iteration
+- Observations: 8 (2 bugs + 6 improvements)
+**Notes:** Iteration 91 validated FEAT-049 after 40 API route files were modified in iter 90. Both acceptance and regression passed all criteria via static analysis (Playwright unavailable — Chrome launch conflict). Acceptance verified: migration schema, RLS, API route, logActivity utility, activity page UI components, sidebar nav, special actions, parent-chain traversal. Regression covered all features through Phase 4. 2 P2 bugs and 6 improvements logged for future iterations. BUILD_RESULT_1.json contained stale iter 94 FEAT-050 data from a builder worktree — not relevant to this testing-only iteration. Risk score 4 from iter 90 is now cleared. Next: FEAT-050 Workspace cloning.

@@ -1,19 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 87 (no tests ran in iters 88-90 — build-only iterations)
-- **Date:** 2026-03-02
-- **Suite:** regression (5 checks) + acceptance #FEAT-047 (16 checks) + acceptance #FEAT-048 (12 checks)
-- **Method:** Static analysis + TypeScript + ESLint + code review (Playwright unavailable)
-- **Result:** **33/33 ALL PASS**
-- **Bugs found:** 1 (BUG-017 P2 — FIXED iter 88)
-- **Improvements found:** 3 (IMP-014 DONE iter 89, IMP-015 DONE iter 88, IMP-016 DONE iter 90)
-- **Note:** FEAT-049 fully complete (iter 90). Acceptance testing for FEAT-049 + regression recommended for iter 91.
+- **Iteration:** 91
+- **Date:** 2026-03-03
+- **Suite:** acceptance #FEAT-049 (20 checks) + regression baseline (37 checks)
+- **Method:** Static analysis + TypeScript + ESLint + code review (Playwright unavailable — Chrome launch conflict)
+- **Result:** **57/57 ALL PASS**
+- **Bugs found:** 2 (BUG-018 P2 void keyword, BUG-019 P2 user display)
+- **Improvements found:** 6 (IMP-017 through IMP-022 — activity page usability)
+- **Note:** FEAT-049 fully acceptance-tested. Full regression clean. Risk score 4 from iter 90 cleared.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 87 (2026-03-02) — 33/33 PASS (5 regression + 16 FEAT-047 acceptance + 12 FEAT-048 acceptance)
+- Last run: Iteration 91 (2026-03-03) — 57/57 PASS (20 FEAT-049 acceptance + 37 regression baseline, static analysis)
+- Previous run: Iteration 87 (2026-03-02) — 33/33 PASS (5 regression + 16 FEAT-047 acceptance + 12 FEAT-048 acceptance)
 - Previous run: Iteration 83 (2026-03-02) — 23/23 PASS (static analysis + curl + API probing)
 - Previous run: Iteration 79 (2026-03-02) — 40/40 PASS (27 baseline + 13 acceptance, static analysis)
 - Previous run: Iteration 77 (2026-03-01) — 19/19 baseline PASS, 0/6 acceptance FAIL (code absent — merge failures)

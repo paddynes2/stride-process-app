@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 90
-- **Date:** 2026-03-03 04:30
+- **Iteration:** 91
+- **Date:** 2026-03-03 05:30
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-049 [3/3] logActivity() across all API routes (slot 1: canvas/journey/share, slot 2: org/overlay), #IMP-016 Playbook button on read-only runbooks
+- **Last task(s):** Testing-only iteration — FEAT-049 acceptance (20/20 PASS) + full regression (37/37 PASS)
 - **Result:** completed
-- **Next task:** #FEAT-050 Workspace cloning (deep copy for reuse) or Phase 4 testing gate (FEAT-049 acceptance + regression)
+- **Next task:** #FEAT-050 Workspace cloning [1/2] data layer (migration 018 clone_workspace + API route + client wrapper)
 - **Blockers:** None
 
 ## Context
 
-Iteration 90 completed FEAT-049 [3/3] — the final sub-task integrating logActivity() fire-and-forget calls into all existing POST/PATCH/DELETE API route handlers across 40 files (18 route files slot 1, 22 route files slot 2). Slot 1 covered core canvas + journey + share routes (workspaces, tabs, sections, steps, connections, stages, touchpoints, touchpoint-connections, shares). Slot 2 covered org/overlay routes (teams, roles, people, tools, step-roles, perspectives, annotations, comments, tasks, runbooks, runbook-steps) plus IMP-016 fix. Entities without direct workspace_id (roles, people, step-roles, annotations, runbook-steps) use async IIFE fire-and-forget to traverse parent chain. Special actions: comments POST='commented', runbooks PATCH to completed='completed', shares POST='shared'. IMP-016 moved Playbook button outside the isReadOnly guard in runbook-view.tsx.
+Iteration 91 was a testing-only iteration to validate FEAT-049 (Activity Log) after 40 API route files were modified in iteration 90. Both acceptance and regression testing passed all criteria via static analysis (Playwright unavailable). Acceptance tester verified migration 017 schema, RLS policies, API route, logActivity utility, activity page UI, sidebar nav, special actions (commented/completed/shared), and parent-chain traversal for entities without workspace_id. Regression tester confirmed all existing features (canvas, journey, gap analysis, comparison, dashboard, teams/people/tools, comments, tasks, runbooks, playbook, activity) remain functional. TypeScript 0 errors, lint 0 errors. 2 P2 bugs and 6 improvements logged for activity page.
 
 ## Dev Server
 
@@ -26,5 +26,6 @@ Iteration 90 completed FEAT-049 [3/3] — the final sub-task integrating logActi
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation)
-- Risk score 4 from iter 89 — regression recommended for iter 91
-- Accessibility cadence floor approaching (last accessibility audit was iteration 21)
+- BUG-018: Inconsistent `void` keyword on logActivity() calls — P2 lint hygiene
+- BUG-019: Activity page shows user UUID prefix instead of name — P2 usability
+- **Accessibility cadence severely overdue** — last audit iteration 21, now iteration 91 (70 iterations). Schedule for iter 92 or 93.

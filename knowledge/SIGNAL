@@ -1,1 +1,1 @@
-CONTINUE: FEAT-049 acceptance testing + regression (risk score 4, 40 files changed), then #FEAT-050 Workspace cloning
+CONTINUE: #FEAT-050 Workspace cloning [1/2] data layer (migration 018 clone_workspace SECURITY DEFINER + API route POST /workspaces/[id]/clone + cloneWorkspace client wrapper)

@@ -44,3 +44,15 @@
   - **Found:** Iteration 87 (acceptance tester)
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx` — handleMarkComplete
   - **Fix applied:** Added `const prevIndex = currentIndex` before auto-advance, and `setCurrentIndex(prevIndex)` in catch block. Same pattern applied to new handleSkip function (IMP-015).
+
+- [ ] #BUG-018 Inconsistent `void` keyword on logActivity() calls across API routes — Attempts: 0
+  - **Found:** Iteration 91 (regression tester)
+  - **Where:** Multiple API route files (steps/route.ts, connections/route.ts, workspaces/route.ts, etc.)
+  - **What:** Some routes use `void logActivity()` (comments, runbooks) while others use bare `logActivity()` without `void` prefix. Both are functionally fire-and-forget since logActivity() handles its own errors, but bare calls create floating promises that will trigger `@typescript-eslint/no-floating-promises` warnings when that lint rule is enabled.
+  - **Steps to reproduce:** Search for bare `logActivity(` in src/app/api without preceding `void` or `await`. Compare steps/route.ts (bare) vs comments/route.ts (void).
+
+- [ ] #BUG-019 Activity page displays user_id.slice(0,8) instead of user name — Attempts: 0
+  - **Found:** Iteration 91 (acceptance + regression tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx` line ~152
+  - **What:** Activity entries show a UUID prefix (e.g., 'a3f2b1c0') as the author identifier instead of the user's name or email. The activity_log table stores user_id but the page fetch doesn't join the users table.
+  - **Suggested fix:** Join activity_log to users table in page.tsx server fetch (add `.select('*, users(email, full_name)')` if Supabase supports it), or add a user_email/user_name column to activity_log at insert time.
