@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   updateWorkspace,
   deleteWorkspace,
+  cloneWorkspace,
   fetchShares,
   createShare,
   updateShare,
@@ -28,6 +29,7 @@ export default function SettingsPage() {
   const [name, setName] = React.useState(workspace.name);
   const [saving, setSaving] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
+  const [cloning, setCloning] = React.useState(false);
 
   // Share state
   const [share, setShare] = React.useState<PublicShare | null>(null);
@@ -128,6 +130,20 @@ export default function SettingsPage() {
     }
   };
 
+  const handleClone = async () => {
+    if (!confirm("Duplicate this workspace? A full copy will be created with all tabs, sections, steps, and connections.")) return;
+    setCloning(true);
+    try {
+      const newWorkspace = await cloneWorkspace(workspace.id);
+      toast.success("Workspace duplicated");
+      router.push(`/w/${newWorkspace.id}`);
+    } catch (err) {
+      toastError("Failed to duplicate workspace", { error: err });
+    } finally {
+      setCloning(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this workspace? This action cannot be undone.")) return;
     setDeleting(true);
@@ -209,6 +225,20 @@ export default function SettingsPage() {
         setPerspectives={setPerspectives}
         loading={perspectivesLoading}
       />
+
+      <Separator className="my-8" />
+
+      {/* Duplicate Workspace */}
+      <div>
+        <h2 className="text-[14px] font-semibold text-[var(--text-primary)] mb-2">Duplicate Workspace</h2>
+        <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+          Create a full copy of this workspace, including all tabs, sections, steps, and connections.
+        </p>
+        <Button variant="outline" onClick={handleClone} loading={cloning}>
+          <Copy className="h-4 w-4" />
+          Duplicate Workspace
+        </Button>
+      </div>
 
       <Separator className="my-8" />
 
