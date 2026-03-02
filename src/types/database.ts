@@ -340,3 +340,61 @@ export interface ColoringRule {
   created_at: string;
   updated_at: string;
 }
+
+// =============================================================================
+// Templates — reusable section+steps snapshots
+// =============================================================================
+
+export interface TemplateSectionData {
+  name: string;
+  summary?: string | null;
+  width?: number;
+  height?: number;
+  notes?: string | null;
+}
+
+export interface TemplateStepData {
+  id?: string;
+  name: string;
+  position_x: number;
+  position_y: number;
+  status?: string;
+  step_type?: string | null;
+  executor?: string;
+  notes?: string | null;
+  video_url?: string | null;
+  attributes?: Record<string, unknown>;
+  time_minutes?: number | null;
+  frequency_per_month?: number | null;
+  maturity_score?: number | null;
+  target_maturity?: number | null;
+}
+
+export interface TemplateConnectionData {
+  source_step_id: string;
+  target_step_id: string;
+}
+
+export interface TemplateStepRoleData {
+  step_id: string;
+  role_name: string;
+}
+
+export interface TemplateData {
+  section: TemplateSectionData;
+  steps: TemplateStepData[];
+  connections: TemplateConnectionData[];
+  step_roles: TemplateStepRoleData[];
+}
+
+export interface Template {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  template_data: TemplateData;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}

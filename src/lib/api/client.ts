@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -709,4 +709,42 @@ export async function updateColoringRule(id: string, data: Partial<Pick<Coloring
 
 export async function deleteColoringRule(id: string): Promise<void> {
   await apiFetch(`/api/v1/coloring-rules/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Templates
+// ---------------------------------------------------------------------------
+
+export async function fetchTemplates(workspaceId: string): Promise<Template[]> {
+  return apiFetch<Template[]>(`/api/v1/templates?workspace_id=${workspaceId}`);
+}
+
+export async function createTemplate(data: {
+  workspace_id: string;
+  section_id: string;
+  name: string;
+  description?: string;
+  category?: string;
+}): Promise<Template> {
+  return apiFetch<Template>("/api/v1/templates", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deployTemplate(id: string, data: {
+  tab_id: string;
+  position_x?: number;
+  position_y?: number;
+}): Promise<{ section_id: string }> {
+  return apiFetch<{ section_id: string }>(`/api/v1/templates/${id}/deploy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTemplate(id: string): Promise<void> {
+  await apiFetch(`/api/v1/templates/${id}`, { method: "DELETE" });
 }
