@@ -198,12 +198,18 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — handleClone
   - **Fix applied:** Replaced `window.confirm()` with Radix Dialog matching IMP-012 pattern. `confirmCloneOpen` useState boolean, Dialog/DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter. Cancel (secondary) and Duplicate (default) buttons. Zero `window.confirm()` calls remain for clone.
 
-- [ ] #IMP-029 Settings page body text inconsistent with clone dialog description — Attempts: 0
+- [x] #IMP-029 Settings page body text inconsistent with clone dialog description — Attempts: 1 — DONE iteration 99, 2026-03-02
   - **Found:** Iteration 98 (acceptance tester)
   - **Category:** Content
-  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — line 244-245
-  - **What:** Page body paragraph still says "Create a full copy of this workspace, including all tabs, sections, steps, and connections" while the Radix Dialog correctly says "tabs, sections, steps, connections, teams, roles, people, and tools." Minor inconsistency between page description and dialog description.
-  - **Suggested fix:** Update paragraph to match dialog text.
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — line 245
+  - **Fix applied:** Updated paragraph to "including all tabs, sections, steps, connections, teams, roles, people, and tools" matching the Radix Dialog description.
+
+- [ ] #IMP-030 Canvas toolbar icon-only buttons lack aria-label — Attempts: 0
+  - **Found:** Iteration 99 (acceptance tester)
+  - **Category:** Accessibility
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`, `src/components/layout/tab-bar.tsx`
+  - **What:** 4 icon-only buttons on canvas toolbar/tab-bar lack aria-label attributes. Pre-existing issue, not introduced by iter 99.
+  - **Suggested fix:** Add aria-label to: add-tab button, canvas toolbar expand/collapse buttons.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

@@ -109,7 +109,7 @@ Core consulting insight features:
   - [x] [3/3] API route integration — DONE iter 90
 - [x] #FEAT-050 Workspace cloning (deep copy for reuse) — [1/2] DONE iter 92, [2/2] DONE iter 93
 - [x] #FEAT-051 Conditional step coloring (rule-based canvas highlighting) — [1/2] DONE iter 94, [2/2] DONE iter 96
-- [ ] #FEAT-052 Section templates (save & deploy)
+- [ ] #FEAT-052 Section templates (save & deploy) — [1/2] DONE iter 99
 - [ ] #FEAT-053 Phase 4 testing gate
 
 Deferred indefinitely:
@@ -160,3 +160,4 @@ Deferred indefinitely:
 - [2026-03-03] Iteration 96: #BUG-019 resolved (attempt 3 — page.tsx select join). #IMP-018 done (activity empty state guidance). #FEAT-051 [2/2] done (coloring panel UI, step node tint, API validation). FEAT-051 fully complete. 3 new improvements logged (IMP-023-025). Next: iter 97 MUST be testing_only.
 - [2026-03-03] Iteration 97: Testing-only — 87/87 ALL PASS across 4 suites (regression + FEAT-050 acceptance + FEAT-051 verify + BUG-019 verify). FEAT-050 first acceptance test. Risk score fully resolved. 1 new bug (BUG-020 has_role) + 3 new improvements (IMP-026-028). Next: FEAT-052 section templates or FEAT-053 testing gate.
 - [2026-03-02] Iteration 98: PARTIAL — #IMP-028 done (clone dialog), #IMP-026 done (dialog text). #FEAT-052 [1/2] FAILED (builder committed to worktree paths). #BUG-020 FAILED (never committed). 1 new improvement (IMP-029). Next: re-attempt FEAT-052 [1/2] + BUG-020.
+- [2026-03-02] Iteration 99: COMPLETED — #FEAT-052 [1/2] data layer done (migration 020, types, 3 API routes, client wrappers, STARTER_TEMPLATES). #BUG-020 resolved (has_role disabled in dropdown). #IMP-029 resolved (settings text). All 3 slots merged cleanly. Next: FEAT-052 [2/2] UI.

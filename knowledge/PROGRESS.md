@@ -1373,3 +1373,43 @@ Slot 2 (#BUG-020 — never committed):
 - Efficiency: 2 — 2 of 3 tasks lost to pipeline failures. Only slot 3 produced working code.
 - Observations: 3 (2 pipeline bugs + 1 content improvement)
 **Notes:** Pipeline reliability continues to be inconsistent. Slot 1 used `git add -f` to force-add worktree-relative paths (bypassing .gitignore), committing FEAT-052 code under `autonomous-dev/.ralph/worktrees/build-1/src/` instead of `src/`. Slot 2 had no commit or merge at all. Only slot 3 (IMP-028) merged cleanly. The FEAT-052 code itself (readable via `git show`) is well-structured and follows patterns — just needs to be rebuilt at correct paths. BUG-020 is a trivial 3-change fix (disable option, disabled attribute, warning text). Both tasks should be re-attempted next iteration.
+
+## Iteration 99 — 2026-03-02 21:00
+**Tasks:**
+- #FEAT-052 [1/2] Section templates data layer — slot 1 — completed
+- #BUG-020 Disable has_role in coloring panel — slot 2 — completed
+- #IMP-029 Settings page body text match clone dialog — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/BUGS.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+Slot 1 (#FEAT-052 [1/2] — 7 files):
+- Created: supabase/migrations/020_section_templates.sql (42 lines — templates table, JSONB template_data, RLS, index, trigger)
+- Created: src/app/api/v1/templates/route.ts (179 lines — GET list + POST create from section snapshot)
+- Created: src/app/api/v1/templates/[id]/route.ts (37 lines — DELETE)
+- Created: src/app/api/v1/templates/[id]/deploy/route.ts (168 lines — POST deploy with UUID remap + role name matching)
+- Created: src/lib/templates.ts (90 lines — STARTER_TEMPLATES constant, 4 templates × 5 steps)
+- Modified: src/types/database.ts (+61 lines — Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData)
+- Modified: src/lib/api/client.ts (+41 lines — fetchTemplates, createTemplate, deployTemplate, deleteTemplate)
+Slot 2 (#BUG-020 — 1 file):
+- Modified: src/components/canvas/coloring-panel.tsx (+4/-3 — CRITERIA_OPTIONS disabled property, has_role label + disabled, option disabled attribute, rule display uses label lookup)
+Slot 3 (#IMP-029 — 1 file):
+- Modified: src/app/(app)/w/[workspaceId]/settings/page.tsx (+1/-1 — body text lists all 8 entity types)
+**Verification:**
+- Type check: pass (all 3 builders + POST_MERGE_CHECK: PASS)
+- Lint: pass (all 3 builders: 0 errors, 1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — BUG-020 and IMP-029 have UI changes)
+- Acceptance test: 16/16 PASS (FEAT-052 10, BUG-020 4, IMP-029 2 — all via static code analysis)
+**Bugs found:** None
+**Improvements found:** 1
+- Accessibility: 4 icon-only buttons on canvas toolbar lack aria-label (pre-existing, not introduced by iter 99)
+**Self-score:**
+- Code quality: 5 — FEAT-052 follows coloring-rules pattern exactly (migration, RLS, types, API envelope, client wrappers). Deploy route uses clean UUID remap via Map. STARTER_TEMPLATES use factory function. BUG-020 is minimal and correct. IMP-029 is a 1-line text fix.
+- Test coverage: 3 — 16/16 acceptance via static analysis. Typecheck + lint pass. No browser testing.
+- Confidence: 5 — All files at correct src/ paths (critical fix from iter 98 failure). All builders merged cleanly. POST_MERGE_CHECK pass. Acceptance 16/16.
+- Efficiency: 5 — All 3 slots succeeded on first attempt. All 3 merges clean. 0 pipeline failures.
+- Observations: 1 (accessibility improvement — pre-existing)
+**Notes:** Clean 3-slot iteration — all builders completed and merged successfully. FEAT-052 [1/2] re-attempted after iter 98 path failure — this time all 7 files written to correct src/ paths. Templates data layer is complete: migration 020, 6 TypeScript types, 3 API routes (GET/POST/DELETE + deploy), 4 starter templates, 4 client wrappers. BUG-020 re-attempted after iter 98 merge failure — has_role now disabled in dropdown with "(coming soon)" suffix. IMP-029 resolves the text mismatch noted in iter 98. Next: FEAT-052 [2/2] section templates UI.

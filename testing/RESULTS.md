@@ -1,19 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 98
+- **Iteration:** 99
 - **Date:** 2026-03-02
-- **Suite:** Acceptance testing for IMP-028, BUG-020, FEAT-052
+- **Suite:** Acceptance testing for FEAT-052 [1/2], BUG-020, IMP-029
 - **Method:** Static code analysis (Playwright unavailable)
-- **Result:** **IMP-028: 7/7 PASS, BUG-020: 0/4 FAIL (not merged), FEAT-052: all PASS (static, files at wrong paths)**
-- **Bugs found:** 2 (pipeline issues: BUG-020 never committed, FEAT-052 at wrong paths)
-- **Improvements found:** 3 (IMP-029 body text mismatch, 2 FEAT-052 spec deviations)
-- **Note:** Only IMP-028 produced working code. FEAT-052 and BUG-020 are pipeline failures requiring re-attempt.
+- **Result:** **16/16 PASS** (FEAT-052 10/10, BUG-020 4/4, IMP-029 2/2)
+- **Bugs found:** 0
+- **Improvements found:** 1 (IMP-030 canvas toolbar aria-labels — pre-existing)
+- **Note:** All 3 tasks completed successfully. Files at correct src/ paths (critical fix from iter 98 failure).
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 98 (2026-03-02) — IMP-028 7/7 PASS, BUG-020 0/4 FAIL (not merged), FEAT-052 all PASS (static, wrong paths)
+- Last run: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 10, BUG-020 4, IMP-029 2 — static code analysis)
+- Previous run: Iteration 98 (2026-03-02) — IMP-028 7/7 PASS, BUG-020 0/4 FAIL (not merged), FEAT-052 all PASS (static, wrong paths)
 - Previous run: Iteration 97 (2026-03-03) — 87/87 PASS (35 regression baseline + 13 FEAT-050 acceptance + 10 FEAT-051 verify + 5 BUG-019 verify, static analysis)
 - Previous run: Iteration 96 (2026-03-03) — 19/19 PASS (6 BUG-019 + 1 IMP-018 + 12 FEAT-051 acceptance, static analysis + production quality gate)
 - Previous run: Iteration 91 (2026-03-03) — 57/57 PASS (20 FEAT-049 acceptance + 37 regression baseline, static analysis)

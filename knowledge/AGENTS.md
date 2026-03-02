@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-96, 2026-03-03 -->
+<!-- Updated: iter-99, 2026-03-02 -->
 
 ## Project
 
@@ -76,6 +76,9 @@ npx supabase db push     # Push migrations
 - `runbooks/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST create with step snapshot, GET/PATCH/DELETE by id)
 - `runbook-steps/route.ts` + `[id]/route.ts` — GET by runbook_id, PATCH by id
 - `coloring-rules/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST, PATCH, DELETE)
+- `templates/route.ts` — GET list by workspace_id, POST create (snapshots section+steps+connections+step_roles as JSONB)
+- `templates/[id]/route.ts` — DELETE
+- `templates/[id]/deploy/route.ts` — POST deploy (UUID remap for steps+connections, role-by-name matching for step_roles)
 - `activity/route.ts` — GET (workspace_id required, optional filters: user_id, action, entity_type, from/to, limit/offset). Joins users table via FK for email display.
 - `workspaces/[id]/clone/route.ts` — POST (deep clone workspace via clone_workspace RPC)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
@@ -105,12 +108,13 @@ npx supabase db push     # Push migrations
 | `src/lib/export/journey-pdf.ts` | Journey PDF export |
 | `src/lib/maturity.ts` | Maturity scoring calculations |
 | `src/lib/pain.ts` | Pain/gain score calculations |
+| `src/lib/templates.ts` | STARTER_TEMPLATES constant (4 hardcoded section templates) |
 | `src/lib/utils.ts` | cn() classname merge |
 
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType) |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule, Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 
@@ -141,6 +145,7 @@ npx supabase db push     # Push migrations
 | 017 | Activity log (activity_action enum + activity_log table, append-only, SELECT+INSERT RLS, workspace+created_at index) |
 | 018 | clone_workspace() SECURITY DEFINER function (deep-copies workspace + 12 child table types with UUID remapping via temp tables) |
 | 019 | Coloring rules (criteria_type enum + coloring_rules table + RLS + index + update_updated_at trigger) |
+| 020 | Section templates (templates table with JSONB template_data + RLS via can_access_workspace + index + update_updated_at trigger) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->
