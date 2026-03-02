@@ -849,3 +849,29 @@
 - Efficiency: 2 — acceptance tester failed to dispatch (recurring issue — also occurred iter 72, 79 initially)
 - Observations: 3 (2 improvements + 1 deployment lag observation)
 **Notes:** Acceptance tester failed to produce output — 3rd testing_only iteration with partial tester dispatch (iter 72 blocked, iter 79 initial failure, iter 83 acceptance missing). Regression tester did verify runbook components exist via static analysis (included in its 23 checks). FEAT-047 acceptance testing must be reattempted next iteration. Two new improvements logged from regression tester observations.
+
+## Iteration 84 — 2026-03-02 20:00
+**Tasks:**
+- #FEAT-048 Playbook mode — slot 1 — failed (builder code not merged)
+- #IMP-012 Styled confirm dialog — slot 2 — failed (builder code not merged)
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** reverted
+**Changes:** [none — builder worktrees cleaned up without merge]
+**Verification:**
+- Type check: N/A (no code merged)
+- Lint: N/A (no code merged)
+- Build: N/A
+- Unit tests: N/A
+- Browser test: N/A
+- Canary test: N/A
+- POST_MERGE_CHECK: PASS (but for pre-existing code, not new changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 0 — no code delivered to session branch
+- Test coverage: 0 — nothing to test
+- Confidence: 1 — pipeline infrastructure failure; both builders claimed success but merge never executed
+- Efficiency: 1 — entire iteration lost to pipeline merge failure
+- Observations: 1 (pipeline merge step failure)
+**Notes:** Pipeline infrastructure failure. Both BUILD_RESULTs report `status: completed` with passing typecheck/lint, but no builder branches exist for iteration 84, no merge commits in reflog, and source files don't exist on disk. Stash `ralph-auto-stash-1772431205` (pre-merge stash) was never popped, confirming the merge step crashed or was never reached. Builder worktrees cleaned up without merging. All builder work lost. Tasks need re-attempt in iteration 85.

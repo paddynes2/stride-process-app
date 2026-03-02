@@ -89,7 +89,7 @@
   - **Why it matters:** React performance: stable references in useCallback deps prevent unnecessary re-subscriptions and re-renders.
   - **Suggested fix:** Wrap handleAddTouchpoint and handleAddStage in useCallback (same fix pattern as IMP-008 for flow-canvas.tsx handleAddStep/handleAddSection).
 
-- [ ] #IMP-012 Styled confirmation dialog for runbook Complete/Cancel — Attempts: 0
+- [ ] #IMP-012 Styled confirmation dialog for runbook Complete/Cancel — Attempts: 1 (attempt 1 failed — pipeline merge failure, code lost)
   - **Found:** Iteration 83 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`

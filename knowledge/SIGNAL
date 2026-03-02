@@ -1,1 +1,1 @@
-CONTINUE: Re-attempt acceptance testing for #FEAT-047 (all 3 sub-tasks, 18 checks — not executed iter 83). Then build #FEAT-048 Playbook mode.
+CONTINUE: Re-attempt #FEAT-048 Playbook mode + #IMP-012 Styled confirm dialog (attempt 2 — pipeline merge failure lost all builder work in iter 84)
