@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, ListTodo } from "lucide-react";
+import { X, Trash2, ListTodo, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +18,8 @@ const RichTextEditor = dynamic(
     ),
   }
 );
-import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch } from "@/lib/api/client";
+import { useRouter } from "next/navigation";
+import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch, createRunbook } from "@/lib/api/client";
 import type { StepRoleWithDetails } from "@/lib/api/client";
 import type { Section, Step } from "@/types/database";
 import { TaskCountsContext } from "@/types/canvas";
@@ -34,9 +35,11 @@ interface SectionDetailPanelProps {
 }
 
 export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose }: SectionDetailPanelProps) {
+  const router = useRouter();
   const [name, setName] = React.useState(section.name);
   const nameTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   const [stepRolesMap, setStepRolesMap] = React.useState<Record<string, StepRoleWithDetails[]>>({});
+  const [creating, setCreating] = React.useState(false);
 
   React.useEffect(() => {
     setName(section.name);
@@ -88,6 +91,24 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
       toast.success("Section deleted");
     } catch (err) {
       toastError("Failed to delete section", { error: err });
+    }
+  };
+
+  const handleRunAsChecklist = async () => {
+    if (creating) return;
+    setCreating(true);
+    try {
+      const name = `${section.name} — ${new Date().toLocaleDateString()}`;
+      const runbook = await createRunbook({
+        workspace_id: section.workspace_id,
+        section_id: section.id,
+        name,
+      });
+      router.push(`/w/${section.workspace_id}/runbooks/${runbook.id}`);
+    } catch (err) {
+      toastError("Failed to create runbook", { error: err });
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -305,7 +326,11 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
         </div>
       </div>
 
-      <div className="px-4 py-3 border-t border-[var(--border-subtle)]">
+      <div className="px-4 py-3 border-t border-[var(--border-subtle)] space-y-2">
+        <Button variant="default" size="sm" onClick={handleRunAsChecklist} disabled={creating} className="w-full">
+          <Play className="h-3.5 w-3.5" />
+          {creating ? "Creating..." : "Run as Checklist"}
+        </Button>
         <Button variant="destructive" size="sm" onClick={handleDelete} className="w-full">
           <Trash2 className="h-3.5 w-3.5" />
           Delete Section
