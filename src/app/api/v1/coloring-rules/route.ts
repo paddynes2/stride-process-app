@@ -5,6 +5,7 @@ import { logActivity } from "@/lib/api/activity";
 import type { CriteriaType } from "@/types/database";
 
 const VALID_CRITERIA_TYPES: CriteriaType[] = ["status", "executor", "step_type", "has_role", "maturity_below", "maturity_above"];
+const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i;
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -54,6 +55,10 @@ export async function POST(request: NextRequest) {
 
   if (!color || typeof color !== "string" || color.trim() === "") {
     return errorResponse("validation", "color is required", 400);
+  }
+
+  if (!HEX_COLOR_REGEX.test(color)) {
+    return errorResponse("validation", "Invalid color format. Must be a hex color like #14B8A6", 400);
   }
 
   if (!criteria_type) {

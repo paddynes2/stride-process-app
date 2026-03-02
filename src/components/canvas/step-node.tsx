@@ -6,7 +6,7 @@ import { MessageSquare, ListTodo } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { StepNodeData } from "@/types/canvas";
-import { CommentCountsContext, TaskCountsContext } from "@/types/canvas";
+import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
 import { MATURITY_COLORS, MATURITY_FALLBACK_COLOR } from "@/lib/maturity";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -32,6 +32,8 @@ export function StepNode({ data, selected }: NodeProps) {
   const commentCount = commentCounts.get(step.id) ?? 0;
   const taskCounts = React.useContext(TaskCountsContext);
   const taskCount = taskCounts.get(step.id);
+  const coloringTints = React.useContext(ColoringTintContext);
+  const coloringTint = coloringTints.get(step.id) ?? null;
 
   return (
     <div
@@ -47,6 +49,8 @@ export function StepNode({ data, selected }: NodeProps) {
       style={
         heatMapMode && maturityColor
           ? { backgroundColor: `${maturityColor}15`, borderColor: selected ? undefined : `${maturityColor}60` }
+          : coloringTint
+          ? { backgroundColor: `${coloringTint}26` }
           : { backgroundColor: "var(--bg-surface)" }
       }
     >

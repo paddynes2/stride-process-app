@@ -2,8 +2,10 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
 import { logActivity } from "@/lib/api/activity";
-
 const EDITABLE_FIELDS = ["name", "color", "criteria_type", "criteria_value", "is_active", "position"] as const;
+const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i;
+const VALID_CRITERIA_TYPES = ["status", "executor", "step_type", "has_role", "maturity_below", "maturity_above"] as const;
+type ValidCriteriaType = typeof VALID_CRITERIA_TYPES[number];
 
 export async function PATCH(
   request: NextRequest,
@@ -28,6 +30,21 @@ export async function PATCH(
 
   if (Object.keys(updates).length === 0) {
     return errorResponse("validation", "No valid fields to update", 400);
+  }
+
+  if (updates.color !== undefined && !HEX_COLOR_REGEX.test(updates.color as string)) {
+    return errorResponse("validation", "Invalid color format. Must be a hex color like #14B8A6", 400);
+  }
+
+  if (
+    updates.criteria_type !== undefined &&
+    !VALID_CRITERIA_TYPES.includes(updates.criteria_type as ValidCriteriaType)
+  ) {
+    return errorResponse(
+      "validation",
+      `Invalid criteria_type. Must be one of: ${VALID_CRITERIA_TYPES.join(", ")}`,
+      400
+    );
   }
 
   const { data: rule, error } = await supabase

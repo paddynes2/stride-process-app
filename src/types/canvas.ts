@@ -11,6 +11,11 @@ export const CommentCountsContext = createContext<Map<string, number>>(new Map()
 // canvas-view fetches all workspace tasks once, builds this map, and provides it to node components.
 export const TaskCountsContext = createContext<Map<string, { completed: number; total: number }>>(new Map());
 
+// Context providing coloring rule tints (stepId → hex color) to canvas step nodes.
+// canvas-view evaluates workspace coloring rules against steps and provides this context,
+// avoiding prop-drilling through FlowCanvas (same pattern as CommentCountsContext).
+export const ColoringTintContext = createContext<Map<string, string>>(new Map());
+
 // Custom node data types for React Flow — Process canvas
 export interface StepNodeData extends Record<string, unknown> {
   step: Step;
