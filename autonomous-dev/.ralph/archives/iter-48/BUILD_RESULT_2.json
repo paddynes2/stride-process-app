@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "iteration": 102,
+  "slot": 2,
+  "task_id": "#IMP-020",
+  "status": "completed",
+  "duration_seconds": 120,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
+      "action": "modified",
+      "lines_added": 10,
+      "lines_removed": 1
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not in owned files)" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Added 3 skeleton rows inside the space-y-2 list div that appear when loading=true (after filtered.map). Each skeleton row matches the real entry container (same border/bg/padding) with two animate-pulse bars — h-3 w-3/4 for the action sentence line and h-2.5 w-2/5 for the author/timestamp line, using bg-[var(--bg-surface-secondary)] rounded-[var(--radius-md)] per the canvas-view.tsx pattern. Skeletons disappear when loading completes. The Load More button text was simplified to 'Load More' (removed conditional 'Loading...' text) since the skeleton rows serve as the visual loading indicator. No layout shift: existing entries are unaffected, skeletons are appended below them.",
+
+  "failure_details": null
+}

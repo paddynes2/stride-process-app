@@ -348,21 +348,45 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** If deep-linking to specific canvas nodes is supported in future (e.g. via URL hash or query param), pre-select the element on navigation. Current behaviour is functional but not optimal.
 
-- [ ] #IMP-050 Redundant step count display on runbook cards — Attempts: 0
+- [x] #IMP-050 Redundant step count display on runbook cards — Attempts: 1 — DONE iteration 106, 2026-03-02
   - **Found:** Iteration 105 (acceptance + regression testers)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
   - **What:** Step count now appears twice per runbook card: once in metadata row as '{resolved}/{total} steps' (IMP-014, line 114) and again next to progress bar as '{resolved} / {total}' (IMP-046, line 124). Visually redundant.
   - **Design principle:** Nielsen H8: Aesthetic and minimalist design
-  - **Suggested fix:** Remove the metadata row count ('{resolved}/{total} steps') and keep only the progress bar label, or make formats consistent.
+  - **Fix applied:** Removed metadata row step count span and preceding separator dot. Progress bar label retained.
 
-- [ ] #IMP-051 Delete Workspace action uses native browser confirm() dialog — Attempts: 0
+- [x] #IMP-051 Delete Workspace action uses native browser confirm() dialog — Attempts: 1 — DONE iteration 106, 2026-03-02
   - **Found:** Iteration 105 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`
   - **What:** Delete Workspace still uses native `confirm()` while Duplicate Workspace uses polished Radix Dialog (IMP-028). Inconsistent destructive action UX.
   - **Design principle:** Nielsen H4: Consistency and standards
-  - **Suggested fix:** Add confirmDeleteOpen state + Radix Dialog for delete, mirroring clone dialog pattern. Include workspace name: 'Permanently delete "{workspace.name}"? This cannot be undone.'
+  - **Fix applied:** Added confirmDeleteOpen state + Radix Dialog mirroring clone dialog pattern. Dialog shows workspace name. Cancel (secondary) + Delete (destructive/red) buttons.
+
+- [ ] #IMP-052 Prioritization chart lacks axis tick marks or grid lines — Attempts: 0
+  - **Found:** Iteration 106 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`
+  - **What:** Users must mentally interpolate where scores 1-4 land on the continuous chart scale. Only edges (1, 5) are implicitly anchored.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Add subtle vertical/horizontal grid lines at 25%, 50%, 75% positions or numeric labels (1-5) along chart edges.
+
+- [ ] #IMP-053 Prioritization empty state has no CTA to navigate to canvas — Attempts: 0
+  - **Found:** Iteration 106 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`
+  - **What:** When no items have scores, the empty state message is helpful but there's no direct link to navigate to a step/canvas to assign scores.
+  - **Design principle:** Nielsen H3: User control and freedom
+  - **Suggested fix:** Add a secondary action link 'Go to Canvas' pointing to the first workflow tab.
+
+- [ ] #IMP-054 Perspective deletion uses native confirm() while workspace delete uses Radix Dialog — Attempts: 0
+  - **Found:** Iteration 106 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` (PerspectivesSection.handleDelete, line ~379)
+  - **What:** Same settings page now has two dialog patterns: Radix Dialog for workspace operations and native confirm() for perspective deletion. Jarring UX inconsistency.
+  - **Design principle:** Nielsen H4: Consistency and standards
+  - **Suggested fix:** Replace perspective confirm() with Radix Dialog following IMP-051 pattern.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

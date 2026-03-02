@@ -1,0 +1,11 @@
+Done. Here's a summary of what was done for **#BUG-024**:
+
+**File modified:** `src/components/panels/section-detail-panel.tsx`
+
+**Changes:**
+1. Added `import * as DialogPrimitive from "@radix-ui/react-dialog"` (already a transitive dep via `ui/dialog.tsx`)
+2. Added the BUG-024 comment explaining the root cause (same pattern as BUG-023 in `canvas-view.tsx`)
+3. Removed `DialogTitle` from the `@/components/ui/dialog` import (no longer used)
+4. Replaced `<DialogTitle>Save as Template</DialogTitle>` with `<DialogPrimitive.Title className="text-[16px] font-semibold text-[var(--text-primary)] tracking-[-0.01em]">Save as Template</DialogPrimitive.Title>` — identical classes to the `ui/dialog.tsx` wrapper, so visual output is unchanged
+
+**Verification:** TypeCheck ✓ (0 errors) | Lint ✓ (0 errors, 1 pre-existing warning in unrelated file)

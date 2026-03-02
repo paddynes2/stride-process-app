@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0",
+  "iteration": 105,
+  "test_type": "acceptance",
+  "suite_name": null,
+  "status": "passed",
+  "duration_seconds": 210,
+
+  "criteria_results": [
+    {
+      "criterion": "Migration file 021_prioritization_scores.sql adds effort_score INT CHECK (1-5) nullable and impact_score INT CHECK (1-5) nullable to both steps AND touchpoints tables",
+      "task_id": "#FEAT-034 [1/2]",
+      "result": "pass",
+      "evidence": "File read: two ALTER TABLE statements present. Steps: ADD COLUMN effort_score INT CHECK (effort_score BETWEEN 1 AND 5), ADD COLUMN impact_score INT CHECK (impact_score BETWEEN 1 AND 5). Touchpoints: identical pattern. No DEFAULT clause = nullable by default. Exact pattern match with migration 007.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Step interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+      "task_id": "#FEAT-034 [1/2]",
+      "result": "pass",
+      "evidence": "Grep confirmed: lines 93-94 in database.ts — effort_score: number | null; impact_score: number | null — placed after target_maturity (line 92) per special_instructions.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Touchpoint interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+      "task_id": "#FEAT-034 [1/2]",
+      "result": "pass",
+      "evidence": "Grep confirmed: lines 197-198 in database.ts — effort_score: number | null; impact_score: number | null — placed after position_y (line 196) and before created_at (line 199) per special_instructions.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Steps PATCH route (src/app/api/v1/steps/[id]/route.ts) includes effort_score and impact_score in EDITABLE_FIELDS",
+      "task_id": "#FEAT-034 [1/2]",
+      "result": "pass",
+      "evidence": "Grep confirmed: lines 21-22 in steps/[id]/route.ts — \"effort_score\" and \"impact_score\" present in EDITABLE_FIELDS array.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Touchpoints PATCH route (src/app/api/v1/touchpoints/[id]/route.ts) includes effort_score and impact_score in EDITABLE_FIELDS",
+      "task_id": "#FEAT-034 [1/2]",
+      "result": "pass",
+      "evidence": "Grep confirmed: lines 16-17 in touchpoints/[id]/route.ts — \"effort_score\" and \"impact_score\" present in EDITABLE_FIELDS array.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "npx tsc --noEmit passes cleanly after changes",
+      "task_id": "#FEAT-034 [1/2]",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_1.json reports typecheck status=pass, errors=0. 1 pre-existing warning (addEdge unused in flow-canvas.tsx) — not in owned files, documented.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "DialogDescription in the Duplicate Workspace dialog includes the workspace name dynamically",
+      "task_id": "#IMP-042",
+      "result": "pass",
+      "evidence": "Source read: settings/page.tsx line 273 — DialogDescription contains: 'A full copy of &quot;{workspace.name}&quot; will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.' workspace.name sourced from useWorkspace() hook at line 36.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Text reads something like: 'A full copy of \"[workspace name]\" will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.'",
+      "task_id": "#IMP-042",
+      "result": "pass",
+      "evidence": "Exact match. Uses JSX &quot; HTML entities for surrounding quotes. Template literal interpolates workspace.name dynamically.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "The settings page body text paragraph also includes the workspace name for consistency",
+      "task_id": "#IMP-042",
+      "result": "pass",
+      "evidence": "Source read: settings/page.tsx line 245 — body paragraph reads: 'Create a full copy of &quot;{workspace.name}&quot;, including all tabs, sections, steps, connections, teams, roles, people, and tools.'",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "No TypeScript errors (#IMP-042)",
+      "task_id": "#IMP-042",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2.json reports typecheck status=pass, 0 errors. npx tsc --noEmit exited 0.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Each runbook card in the list view shows a text label like '3 / 5' next to or below the progress bar",
+      "task_id": "#IMP-046",
+      "result": "pass",
+      "evidence": "Source read: runbooks-list-view.tsx lines 118-125 — progress bar wrapped in flex items-center gap-2 container. Bar div has flex-1. Span at line 124: className='text-[11px] text-[var(--text-tertiary)] shrink-0 tabular-nums' shows '{resolved} / {total}'.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Text uses existing text hierarchy (text-[var(--text-secondary)] or text-[var(--text-tertiary)])",
+      "task_id": "#IMP-046",
+      "result": "pass",
+      "evidence": "Span uses text-[var(--text-tertiary)] matching the card's secondary text style.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Text shows resolved count (completed + skipped) out of total, matching playbook-view.tsx pattern",
+      "task_id": "#IMP-046",
+      "result": "pass",
+      "evidence": "resolved = completed + skipped computed at line 94 (from IMP-014). total = steps.length. Label shows '{resolved} / {total}' with space-padded slash, matching compact fraction format.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "No TypeScript errors (#IMP-046)",
+      "task_id": "#IMP-046",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_3.json reports typecheck status=pass, 0 errors. npx tsc --noEmit exited 0.",
+      "screenshot_description": null
+    }
+  ],
+
+  "quality_gate": {
+    "pages_checked": [
+      "/workspaces",
+      "/w/[workspaceId]/[tabId] (canvas)",
+      "/w/[workspaceId]/settings",
+      "/w/[workspaceId]/runbooks"
+    ],
+    "console_errors": 0,
+    "network_errors": 0,
+    "accessibility_issues": 0,
+    "layout_shifts": 0,
+    "note": "Browser testing performed against production (stride-five-sigma.vercel.app). Production confirmed running pre-IMP-028 version — Duplicate Workspace section absent from settings page; runbooks route renders canvas. Iteration 105 changes verified via static source analysis on ralph/init-stride branch. All 14 acceptance criteria pass. 0 console errors observed across all visited pages."
+  },
+
+  "bugs_found": [],
+
+  "improvements_found": [
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/runbooks",
+      "observation": "The resolved/total step count now appears twice per runbook card: once in the metadata row as '{resolved}/{total} steps' (line 114, pre-existing from IMP-014) and again as '{resolved} / {total}' next to the progress bar (new from IMP-046). The information is visually redundant — a user sees the same fraction in two adjacent locations.",
+      "design_principle": "Nielsen H8: Aesthetic and minimalist design — every piece of information competes for the user's attention; duplication adds cognitive noise without adding value.",
+      "suggested_approach": "Remove the '{resolved}/{total} steps' span from the metadata row (line 114) now that the progress bar label communicates it more visually. Replace with section name + date only, which provides non-redundant context."
+    }
+  ],
+
+  "actions_used": 9,
+  "action_budget": 10
+}

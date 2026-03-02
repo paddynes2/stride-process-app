@@ -1,0 +1,6 @@
+Done. Summary:
+
+- **Changed:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx` line 176 — replaced `"Unknown"` with `"[Deleted User]"` as the null-coalescence fallback for `entry.users?.email`.
+- **Typecheck:** pass (0 errors)
+- **Lint:** pass (0 errors, 1 pre-existing unrelated warning)
+- **Staged:** the single file

@@ -1,0 +1,14 @@
+Done. Here's a summary of what was implemented for **#BUG-020**:
+
+**File modified:** `src/components/canvas/coloring-panel.tsx`
+
+**Changes (4 lines added, 3 removed):**
+
+1. `CRITERIA_OPTIONS` type extended with `disabled?: boolean`
+2. `has_role` entry updated: `label: "Has Role (coming soon)"`, `disabled: true`
+3. Both `<select>` elements (add form + edit form) now render `<option disabled={opt.disabled}>` — browser natively prevents selection and grays out the option
+4. Rule list display updated to show the human-readable label from `CRITERIA_OPTIONS` (with raw `criteria_type` fallback) — existing `has_role` rules show `"Has Role (coming soon): <value>"`
+
+**`CRITERIA_VALUE_HINTS` for `has_role` kept intact** — no TS errors introduced.
+
+**Verification:** typecheck ✓ (0 errors), lint ✓ (0 new warnings), staged only `coloring-panel.tsx`.

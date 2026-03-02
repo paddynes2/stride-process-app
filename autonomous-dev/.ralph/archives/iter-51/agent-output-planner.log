@@ -1,0 +1,28 @@
+EXECUTION_PLAN.json written. Here's the summary:
+
+---
+
+## Iteration 105 — Plan Summary
+
+**Mode:** `multi_task` (3 parallel builder slots + regression testing)
+
+### Validation
+- Last commit `1099b6e` is valid, compilation passing, no revert needed.
+
+### Tasks
+
+| Slot | ID | Description | Complexity | Files |
+|------|----|-------------|-----------|-------|
+| 1 | **#FEAT-034 [1/2]** | Prioritization matrix data layer — migration 021 (effort_score + impact_score on steps & touchpoints), TypeScript types, API PATCH support | M | 4 files |
+| 2 | **#IMP-042** | Clone dialog includes workspace name in description text | S | 1 file |
+| 3 | **#IMP-046** | Runbooks list progress bar shows step count text (e.g. "3 / 5") | S | 1 file |
+
+All three tasks have **zero file overlap** — safe for parallel execution.
+
+### Testing Plan
+- **Acceptance:** Yes (verify all 3 tasks)
+- **Regression:** Yes — risk score 4 from iteration 104 (7 files changed including shared components sidebar.tsx, workspace-shell.tsx)
+
+### Risk Notes
+- Migration 021 will also need `npx supabase db push` (human action, same blocker as migration 020)
+- Accessibility audit overdue by 84 iterations — next cadence trigger at iteration 110

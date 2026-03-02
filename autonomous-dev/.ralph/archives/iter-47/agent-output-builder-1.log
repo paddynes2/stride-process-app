@@ -1,0 +1,20 @@
+**#FEAT-052 complete.** Here's a summary of what was built:
+
+### section-detail-panel.tsx
+- Added `BookTemplate` icon + `createTemplate` API import + Radix Dialog imports
+- 5 state vars for the Save as Template dialog (`showSaveDialog`, `saveTemplateName`, `saveTemplateDesc`, `saveTemplateCat`, `savingTemplate`)
+- `handleOpenSaveDialog` pre-fills the name from `section.name`
+- `handleSaveTemplate` calls `createTemplate({ workspace_id, section_id, name, description, category })`, shows success toast, closes dialog
+- **Save as Template** button (secondary variant) placed ABOVE Run as Checklist in the footer
+- Radix Dialog with name/description/category inputs
+
+### canvas-view.tsx
+- Added `useRouter`, `Button`, `Badge`, Dialog components, `STARTER_TEMPLATES`, `LayoutTemplate`, `Trash2`, `toast`, `toastError` imports
+- Template state: `showTemplateDialog`, `dbTemplates`, `loadingTemplates`, `templateError`, `deployingKey`, `deletingId`
+- `useEffect` fetches DB templates when dialog opens
+- `handleDeployTemplate`: DB templates → `deployTemplate(id, { tab_id, position_x, position_y })`; Starters → direct `createSection` + `createStep` (API deviation noted — server requires `section_id` for `createTemplate`)
+- `handleDeleteTemplate`: calls `deleteTemplate(id)`, removes from local state
+- **Templates** button (next to Color button, top-right canvas overlay)
+- Inline dialog: loading skeletons, error state, grid of cards (DB templates + starters), each card shows name/description/category badge/step count, deploy button, trash button (DB only)
+
+**Verification:** TypeScript ✅ (0 errors) · Lint ✅ (0 errors, 1 pre-existing warning in flow-canvas.tsx)

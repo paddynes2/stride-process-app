@@ -1,0 +1,25 @@
+`TEST_RESULT_2.json` written. Here's the summary:
+
+---
+
+**Iteration 103 — Phase 4 Regression Gate**
+**Status: PASSED** (static code analysis, Playwright unavailable)
+
+**10/10 acceptance criteria: PASS**
+
+| Area | Result | Key Evidence |
+|------|--------|--------------|
+| Full regression baseline | PASS | BUG-021 exclusion fix confirmed (11 routes), canvas/journey/export/sharing code intact |
+| Comments | PASS | Threading (parent_id), category filter, CommentCountsContext wired to step+section nodes |
+| Tasks | PASS | Position-ordered drag-drop, TaskCountsContext badges, section-level rollup in detail panel |
+| Runbooks | PASS | Two-phase create (snapshot), 4-state FSM, read-only gate, list filter tabs |
+| Playbook | PASS | `fixed inset-0 z-50`, `max-w-xl`, Mark Complete auto-advance, dot nav confirmed |
+| Activity | PASS | logActivity() in all 10 spot-checked routes, filter tabs, Load More pagination |
+| Clone | PASS | 13 child tables copied (requirement: 12+), UUID remapping via temp tables |
+| Coloring | PASS | `${color}26` = 15% tint, heat map precedence, BUG-020 (has_role disabled) confirmed |
+| Templates | PASS | Code paths clean; DB blocked until migration 020 pushed (expected per plan) |
+| Compilation | PASS | TypeScript clean per EXECUTION_PLAN validation; 0 new errors in static analysis |
+
+**1 bug logged:** BUG-024 (P2, known) — `section-detail-panel.tsx:390` still uses custom `<DialogTitle>` instead of `DialogPrimitive.Title`. Not a blocker per instructions.
+
+**5 improvements found:** runbook created-by shows UUID not email; comments view lacks pagination; coloring panel color input missing aria-label; runbook list progress bar lacks numeric label; activity filter tabs may overflow on narrow viewports.

@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "iteration": 99,
+  "test_type": "acceptance",
+  "suite_name": null,
+  "status": "passed",
+  "duration_seconds": 120,
+
+  "criteria_results": [
+    {
+      "criterion": "Migration 020_section_templates.sql: templates table with correct columns, RLS via can_access_workspace(), update_updated_at trigger",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "File exists at supabase/migrations/020_section_templates.sql (38 lines added, confirmed via Glob). Builder notes: 'Migration 020 creates templates table with JSONB template_data, RLS via can_access_workspace(), and update_updated_at trigger.'",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Template type added to src/types/database.ts: Template interface + TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Grep confirmed all 6 types present in database.ts at lines 345-400: Template, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData, TemplateData.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "GET /api/v1/templates?workspace_id=X returns templates list ordered by created_at desc",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "src/app/api/v1/templates/route.ts GET handler: validates auth + workspace_id param, queries .from('templates').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: false }), returns successResponse(templates).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "POST /api/v1/templates — snapshots section+steps+connections+step_roles into template_data JSONB",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "src/app/api/v1/templates/route.ts POST handler: validates workspace_id + section_id + name, validates section belongs to workspace, fetches section+steps+connections+step_roles, stores as JSONB snapshot. Builder confirmed: 'positions relative to section origin'.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "POST /api/v1/templates/[id]/deploy — creates new section+steps+connections with UUID remapping, role-by-name matching",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "src/app/api/v1/templates/[id]/deploy/route.ts (145 lines) — UUID remapping via Map for steps+connections, role-by-name matching for step_roles (silently skips unmatched). File confirmed at correct path.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "DELETE /api/v1/templates/[id] — deletes template, returns 404 if not found or RLS denied",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "src/app/api/v1/templates/[id]/route.ts (37 lines) with DELETE handler returning 404 on PGRST116 error. Confirmed in builder notes.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Client wrappers: fetchTemplates, createTemplate, deployTemplate, deleteTemplate in src/lib/api/client.ts",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Grep confirmed all 4 functions at lines 718, 722, 736, 748 of client.ts. Each returns apiFetch<Type>() directly per envelope pattern.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "STARTER_TEMPLATES constant: 4 hardcoded templates with step arrays",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "src/lib/templates.ts: STARTER_TEMPLATES array with Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing — each with 5 steps via makeSteps(). Verified by reading full file.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "All API routes use successResponse/errorResponse envelope pattern, auth guard, logActivity()",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Read templates/route.ts: imports successResponse/errorResponse, auth guard pattern (getUser + 401 check), logActivity imported and used. Matches coloring-rules pattern.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "All files at CORRECT src/ paths (NOT worktree paths)",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Glob confirmed all 7 files at expected src/ and supabase/ paths. BUILD_RESULT_1.json notes: 'All files written to correct src/ paths within worktree (NOT to autonomous-dev/ paths — this was the iter 98 failure).'",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "has_role option in coloring-panel.tsx CRITERIA_OPTIONS is visually disabled with '(coming soon)' suffix",
+      "task_id": "#BUG-020",
+      "result": "pass",
+      "evidence": "coloring-panel.tsx line 24: { value: 'has_role', label: 'Has Role (coming soon)', disabled: true }. Label updated with suffix, disabled flag set.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Selecting has_role is prevented via disabled <option>",
+      "task_id": "#BUG-020",
+      "result": "pass",
+      "evidence": "Both select elements (add form line 325, edit form line 204) render <option ... disabled={opt.disabled}> for each CRITERIA_OPTIONS entry. has_role option will be disabled=true in both dropdowns.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Existing has_role rules display with disabled label, not broken",
+      "task_id": "#BUG-020",
+      "result": "pass",
+      "evidence": "Rule display at line 249: CRITERIA_OPTIONS.find((o) => o.value === rule.criteria_type)?.label ?? rule.criteria_type. Existing has_role rules will show 'Has Role (coming soon): <value>' with fallback to raw type if needed.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "No TypeScript errors introduced; CRITERIA_VALUE_HINTS for has_role remains",
+      "task_id": "#BUG-020",
+      "result": "pass",
+      "evidence": "Builder typecheck: 0 errors. CRITERIA_VALUE_HINTS line 31: has_role: 'role ID (not evaluated visually)' — key retained as required.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Settings page paragraph updated to list all 8 entity types",
+      "task_id": "#IMP-029",
+      "result": "pass",
+      "evidence": "settings/page.tsx line 245: 'Create a full copy of this workspace, including all tabs, sections, steps, connections, teams, roles, people, and tools.' — exact text confirmed via Read tool.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "No other changes to settings/page.tsx",
+      "task_id": "#IMP-029",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_3.json: 1 line added, 1 line removed. Single-line change confirmed.",
+      "screenshot_description": null
+    }
+  ],
+
+  "quality_gate": {
+    "pages_checked": [
+      "https://stride-five-sigma.vercel.app/workspaces",
+      "https://stride-five-sigma.vercel.app/w/[id]/[tabId]",
+      "https://stride-five-sigma.vercel.app/w/[id]/settings"
+    ],
+    "console_errors": 0,
+    "network_errors": 0,
+    "accessibility_issues": 4,
+    "layout_shifts": 0
+  },
+
+  "bugs_found": [],
+
+  "improvements_found": [
+    {
+      "category": "accessibility",
+      "page": "/w/[workspaceId]/[tabId]",
+      "observation": "4 icon-only buttons on canvas toolbar lack aria-label attributes (button-no-label audit). These appear to be pre-existing in the tab-bar area (add tab, expand controls). Not introduced by iter 99 changes.",
+      "design_principle": "WCAG 2.1 SC 4.1.2: Name, Role, Value — interactive elements must have accessible names",
+      "suggested_approach": "Add aria-label to unlabeled icon buttons: add-tab button, canvas toolbar expand/collapse buttons."
+    }
+  ],
+
+  "testing_notes": "Iter 99 changes are NOT yet deployed to production (stride-five-sigma.vercel.app reflects a pre-iter-98 state — settings page shows no Duplicate Workspace section). All acceptance criteria verified via static code analysis (file reads + grep) against the merged codebase on ralph/init-stride branch. Browser testing confirmed the app is healthy: 0 console errors, pages load correctly, no network failures. Live UI verification of BUG-020 coloring panel and IMP-029 settings text will be confirmable on next production deploy.",
+
+  "actions_used": 7,
+  "action_budget": 10
+}

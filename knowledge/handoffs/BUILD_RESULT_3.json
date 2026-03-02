@@ -1,33 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 105,
+  "iteration": 106,
   "slot": 3,
-  "task_id": "#IMP-046",
+  "task_id": "#IMP-051",
   "status": "completed",
   "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/settings/page.tsx",
       "action": "modified",
-      "lines_added": 6,
-      "lines_removed": 4
+      "lines_added": 22,
+      "lines_removed": 5
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — exit 0, no errors" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning (addEdge unused in flow-canvas.tsx) — 0 errors, not in owned files" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known acceptable per LEARNINGS.md) — 0 errors" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
+    "src/app/(app)/w/[workspaceId]/settings/page.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Wrapped the segmented progress bar in a flex container (flex items-center gap-2), added flex-1 to the bar div so it fills remaining space, then appended a shrink-0 span showing '{resolved} / {total}' in text-[11px] text-[var(--text-tertiary)] with tabular-nums for stable digit width. The resolved variable (completed + skipped) was already computed on line 94 from IMP-014. No new logic needed.",
+  "notes": "Added confirmDeleteOpen useState boolean (line 42). Replaced native confirm() in handleDelete with setConfirmDeleteOpen(true). Extracted actual delete logic into handleConfirmDelete (closes dialog, sets deleting, calls deleteWorkspace, navigates). Added Delete Workspace Radix Dialog after the clone dialog, mirroring clone dialog pattern exactly: DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter with Cancel (secondary variant) and Delete (destructive variant, loading={deleting}) buttons. Dialog description: 'Permanently delete \"{workspace.name}\"? This cannot be undone.' Zero window.confirm() calls remain in settings page.",
 
   "failure_details": null
 }

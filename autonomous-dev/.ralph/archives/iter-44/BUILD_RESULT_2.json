@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "iteration": 98,
+  "slot": 2,
+  "task_id": "#BUG-020",
+  "status": "completed",
+  "duration_seconds": 180,
+
+  "files_changed": [
+    {
+      "path": "src/components/canvas/coloring-panel.tsx",
+      "action": "modified",
+      "lines_added": 6,
+      "lines_removed": 3
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0 with no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (documented in LEARNINGS.md). 0 new errors or warnings." },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": ["src/components/canvas/coloring-panel.tsx"],
+  "ownership_violations": [],
+  "notes": "Three targeted changes: (1) CRITERIA_OPTIONS type extended with optional disabled field; has_role entry marked disabled:true with label 'Has Role (coming soon)'. (2) Both <select> elements (Add form + Edit form) now pass disabled={opt.disabled} to <option>. (3) Display mode for existing rules shows amber warning 'Not yet supported' below criteria line when criteria_type === 'has_role'. canvas-view.tsx not touched.",
+
+  "failure_details": null
+}

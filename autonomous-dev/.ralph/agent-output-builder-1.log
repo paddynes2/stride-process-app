@@ -1,19 +1,26 @@
-Done. Here's a summary of what was done:
+All tasks complete. Here's the summary:
 
----
+**#FEAT-034 — Prioritization Matrix UI [2/2] — COMPLETED**
 
-**BUG-023 — DialogTitle a11y warning**
+**Files changed (6):**
 
-Root cause: The custom `DialogTitle` in `ui/dialog.tsx` renders a plain `<h2>` — not `DialogPrimitive.Title`. Radix's `DialogContent` wraps `DialogPrimitive.Content`, which uses React context to check at mount whether a `DialogPrimitive.Title` has registered itself. A plain `<h2>` is invisible to this check, so the console.error fires regardless of visual title presence.
+1. **`step-detail-panel.tsx`** — Added `SCORE_OPTIONS` array (1-5, Very Low→Very High), Effort Score (orange) and Impact Score (teal) selectors below maturity section using the maturity button pattern (click sets, click again clears)
 
-Fix: In `canvas-view.tsx`, import `* as DialogPrimitive from "@radix-ui/react-dialog"` and use `<DialogPrimitive.Title className="...">` directly (styled to match the existing visual). Added a comment documenting the root cause and that `section-detail-panel.tsx` has the same issue (read-only, not fixable in this task).
+2. **`touchpoint-detail-panel.tsx`** — Same effort/impact selectors added after gain_score section, using pain/gain button style with matching orange/teal colors
 
-**IMP-036 — Starters hidden on DB error**
+3. **`prioritization/page.tsx`** (new) — Server component fetching steps, touchpoints, sections, stages, tabs for the workspace
 
-Restructured the `loadingTemplates ? ... : templateError ? ... : ...` ternary into a two-branch form: loading=skeletons; non-loading=grid. Inside the grid: error message appears at top (conditional), DB templates hidden on error, starters always render. Empty state only shown when no error and both lists are empty.
+4. **`prioritization/prioritization-view.tsx`** (new) — Client view with:
+   - Tab and Section/Stage filter dropdowns
+   - CSS absolute-positioned quadrant chart (no charting library)
+   - Quadrant labels: Quick Wins, Major Projects, Fill-Ins, Deprioritize
+   - Dots colored via deterministic name hash → 8-color HSL palette
+   - Radix Tooltip on hover showing name, group, scores
+   - Click navigates to correct canvas tab
+   - Empty state when no items have both scores
 
-**IMP-030 — Icon button aria-labels**
+5. **`sidebar.tsx`** — Added `Target` icon import, Prioritization nav item between Perspectives and Comments, `!p.includes("/prioritization")` to Workflows active exclusion
 
-Audited both owned files. All icon-only buttons already had `aria-label`: Templates (`"Browse templates"`), Color (`"Toggle coloring rules"`), Delete template (`"Delete template"`), Close tab (`"Close ${tab.name} tab"`), Add tab (`"Add new tab"`). No changes needed.
+6. **`workspace-shell.tsx`** — Added `"prioritization"` to reserved path segment array
 
-**Verification:** TypeScript clean (0 errors), lint clean (0 errors, 1 pre-existing warning in unowned file).
+**Verification:** typecheck ✓, lint ✓ (pre-existing warning only), build ✓ (route appears in build output)

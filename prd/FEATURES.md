@@ -77,22 +77,22 @@
 ### #FEAT-034 Prioritization matrix
 **Phase:** 3a
 **Priority:** P0 (critical path)
-**Attempts:** 1
-**Status:** in_progress — [1/2] data layer DONE iteration 105, 2026-03-02
+**Attempts:** 2
+**Status:** DONE — [1/2] data layer iteration 105, [2/2] UI iteration 106, 2026-03-02
 **Acceptance criteria:**
-- [ ] New columns on `steps` table: `effort_score` (integer 1-5 nullable), `impact_score` (integer 1-5 nullable) — via Supabase migration
-- [ ] Same columns on `touchpoints` table
-- [ ] Step detail panel + touchpoint detail panel show effort/impact score selectors (1-5 scale, reuse maturity scoring UI pattern)
-- [ ] New "Prioritization" page at `/w/[workspaceId]/prioritization`
-- [ ] Quadrant chart: X=effort (1-5), Y=impact (1-5), items plotted as dots
-- [ ] Quadrants labeled: "Quick Wins" (low effort, high impact), "Major Projects" (high effort, high impact), "Fill-Ins" (low effort, low impact), "Deprioritize" (high effort, low impact)
-- [ ] Dots show name on hover, colored by section/stage. Click navigates to canvas. Section/stage color derived from deterministic hash of entity name → HSL palette (8 colors). Tooltips use Radix Tooltip (already in deps).
-- [ ] Filters: two dropdowns above chart — Tab (select) and Section/Stage (select, filtered by tab). Default: All.
-- [ ] Render quadrant chart using positioned divs (CSS absolute positioning within relative container). No charting library.
-- [ ] TypeScript types updated, API routes updated for new columns
+- [x] New columns on `steps` table: `effort_score` (integer 1-5 nullable), `impact_score` (integer 1-5 nullable) — via Supabase migration
+- [x] Same columns on `touchpoints` table
+- [x] Step detail panel + touchpoint detail panel show effort/impact score selectors (1-5 scale, reuse maturity scoring UI pattern)
+- [x] New "Prioritization" page at `/w/[workspaceId]/prioritization`
+- [x] Quadrant chart: X=effort (1-5), Y=impact (1-5), items plotted as dots
+- [x] Quadrants labeled: "Quick Wins" (low effort, high impact), "Major Projects" (high effort, high impact), "Fill-Ins" (low effort, low impact), "Deprioritize" (high effort, low impact)
+- [x] Dots show name on hover, colored by section/stage. Click navigates to canvas. Section/stage color derived from deterministic hash of entity name → HSL palette (8 colors). Tooltips use Radix Tooltip (already in deps).
+- [x] Filters: two dropdowns above chart — Tab (select) and Section/Stage (select, filtered by tab). Default: All.
+- [x] Render quadrant chart using positioned divs (CSS absolute positioning within relative container). No charting library.
+- [x] TypeScript types updated, API routes updated for new columns
 **Sub-tasks:**
-- [ ] [1/2] Data layer: migration (effort_score + impact_score on steps and touchpoints), types, API PATCH support
-- [ ] [2/2] UI: Score selectors on detail panels + prioritization page with quadrant chart
+- [x] [1/2] Data layer: migration (effort_score + impact_score on steps and touchpoints), types, API PATCH support — DONE iteration 105
+- [x] [2/2] UI: Score selectors on detail panels + prioritization page with quadrant chart — DONE iteration 106
 **Notes:** Standard consulting deliverable. Position computed from scores — no drag-to-reposition. Reuse scoring UI pattern from maturity scoring (FEAT-001). Migration adds nullable columns — zero risk to existing data.
 
 ### #FEAT-035 Improvement ideas tracker

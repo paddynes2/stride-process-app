@@ -73,7 +73,7 @@ Prioritized features:
 
 Core consulting insight features:
 - [x] #FEAT-033 Perspective comparison view — DONE iteration 104
-- [ ] #FEAT-034 Prioritization matrix (effort/impact scoring + quadrant chart) — [1/2] data layer DONE iteration 105
+- [x] #FEAT-034 Prioritization matrix (effort/impact scoring + quadrant chart) — [1/2] data layer DONE iteration 105, [2/2] UI DONE iteration 106
 - [ ] #FEAT-035 Improvement ideas tracker (proposals → approval → completion)
 - [ ] #FEAT-036 AI process analysis (Anthropic API, structured bottleneck/redundancy/automation analysis)
 - [ ] #FEAT-037 AI gap narrative generator (consulting-grade summary text)

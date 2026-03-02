@@ -1,0 +1,6 @@
+Done. Summary:
+
+- **Task:** `#IMP-029` — update settings page body text for Duplicate Workspace
+- **Change:** Line 245 of `settings/page.tsx` updated from `"including all tabs, sections, steps, and connections"` to `"including all tabs, sections, steps, connections, teams, roles, people, and tools"`
+- **Verification:** TypeCheck ✓ (0 errors), Lint ✓ (0 errors, 1 pre-existing warning)
+- **Staged:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`

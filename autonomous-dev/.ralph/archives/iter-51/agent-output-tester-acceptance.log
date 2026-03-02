@@ -1,0 +1,26 @@
+TEST_RESULT_1.json written. Here's the summary:
+
+---
+
+**Iteration 105 — Acceptance Test Result: PASSED**
+
+All 14 criteria across 3 tasks verified via static source analysis. 0 bugs found.
+
+**#FEAT-034 [1/2] — Data Layer (6/6 pass)**
+- Migration `021_prioritization_scores.sql` correct: two `ALTER TABLE` statements, nullable `INT CHECK (col BETWEEN 1 AND 5)` for both `steps` and `touchpoints`
+- `database.ts`: fields added at correct positions (Step after `target_maturity`; Touchpoint after `position_y`, before `created_at`)
+- Both PATCH routes: `effort_score` and `impact_score` present in `EDITABLE_FIELDS`
+- TypeScript: 0 errors
+
+**#IMP-042 — Clone Dialog Workspace Name (4/4 pass)**
+- `DialogDescription` at line 273: `A full copy of "{workspace.name}" will be created...`
+- Body paragraph at line 245: `Create a full copy of "{workspace.name}", including...`
+- TypeScript: 0 errors
+
+**#IMP-046 — Runbooks Progress Bar Count (4/4 pass)**
+- Progress bar wrapped in `flex items-center gap-2`, bar has `flex-1`, span shows `{resolved} / {total}` with `tabular-nums text-[var(--text-tertiary)]`
+- TypeScript: 0 errors
+
+**Browser testing note:** Production (`stride-five-sigma.vercel.app`) is running a pre-IMP-028 version (no Duplicate Workspace section, no runbooks route). Local dev port 3000 runs a different app. All UI criteria verified via static source analysis. 0 console/network errors on production pages visited.
+
+**1 improvement logged:** Resolved count is now displayed twice per runbook card (metadata row + progress bar label). Suggested removing the metadata row duplicate.

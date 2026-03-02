@@ -1,0 +1,11 @@
+EXECUTION_PLAN.json written for iteration 99.
+
+**Summary:**
+- **Mode:** multi_task (3 slots)
+- **Validation:** Last commit valid, typecheck passing, no revert needed
+- **Slot 1:** `#FEAT-052` [1/2] Section templates data layer (attempt 2) — migration, types, API routes, client wrappers, STARTER_TEMPLATES. Builder has reference code from iter 98 in git history. Special instruction: files MUST go to `src/` not worktree paths.
+- **Slot 2:** `#BUG-020` Disable has_role in coloring panel dropdown (attempt 2) — UI-only fix, add "(coming soon)" label and disabled state.
+- **Slot 3:** `#IMP-029` Settings page body text fix — single line change to match clone dialog description.
+- **Merge order:** FEAT-052 first (owns shared files database.ts + client.ts), then BUG-020, then IMP-029
+- **Risk score:** 1 (last iteration was partial). No cadence triggers.
+- **Testing plan:** Acceptance for FEAT-052, verify for BUG-020 and IMP-029

@@ -1,0 +1,13 @@
+Done. Here's a summary of what was done for **#IMP-042**:
+
+**Changes made** to `src/app/(app)/w/[workspaceId]/settings/page.tsx`:
+
+1. **`DialogDescription`** (clone confirmation dialog): Changed from generic text to include workspace name:
+   > `A full copy of "{workspace.name}" will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.`
+
+2. **Body paragraph** ("Duplicate Workspace" section): Changed to include workspace name:
+   > `Create a full copy of "{workspace.name}", including all tabs, sections, steps, connections, teams, roles, people, and tools.`
+
+Both use `&quot;` JSX entities to render literal quote marks around the name. The `workspace` object was already available via `useWorkspace()` at the top of the component.
+
+**Verification**: `npx tsc --noEmit` → 0 errors. `npm run lint` → 0 errors (1 pre-existing warning in unrelated file). File staged.

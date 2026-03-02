@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "iteration": 99,
+  "slot": 1,
+  "task_id": "#FEAT-052",
+  "status": "completed",
+  "duration_seconds": 420,
+
+  "files_changed": [
+    {
+      "path": "supabase/migrations/020_section_templates.sql",
+      "action": "created",
+      "lines_added": 38,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/types/database.ts",
+      "action": "modified",
+      "lines_added": 61,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/templates/route.ts",
+      "action": "created",
+      "lines_added": 143,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/templates/[id]/route.ts",
+      "action": "created",
+      "lines_added": 37,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/templates/[id]/deploy/route.ts",
+      "action": "created",
+      "lines_added": 145,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/lib/templates.ts",
+      "action": "created",
+      "lines_added": 77,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/lib/api/client.ts",
+      "action": "modified",
+      "lines_added": 37,
+      "lines_removed": 1
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit: 0 errors, no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not owned, documented in LEARNINGS.md); 0 errors or new warnings" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "supabase/migrations/020_section_templates.sql",
+    "src/app/api/v1/templates/route.ts",
+    "src/app/api/v1/templates/[id]/route.ts",
+    "src/app/api/v1/templates/[id]/deploy/route.ts",
+    "src/lib/templates.ts",
+    "src/types/database.ts",
+    "src/lib/api/client.ts"
+  ],
+  "ownership_violations": [],
+  "notes": "All files written to correct src/ paths within worktree (NOT to autonomous-dev/ paths — this was the iter 98 failure). No git add -f used. Migration 020 creates templates table with JSONB template_data, RLS via can_access_workspace(), and update_updated_at trigger. Template types (Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData) added to database.ts. POST /api/v1/templates: validates section belongs to workspace, snapshots section+steps+connections+step_roles as JSONB (positions relative to section origin). POST /api/v1/templates/[id]/deploy: UUID remapping via Map for steps+connections, role-by-name matching for step_roles (silently skips unmatched). DELETE /api/v1/templates/[id]: returns 404 on PGRST116. STARTER_TEMPLATES has 4 entries (Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing) with 5 steps each. Client wrappers: fetchTemplates, createTemplate, deployTemplate, deleteTemplate.",
+
+  "failure_details": null
+}

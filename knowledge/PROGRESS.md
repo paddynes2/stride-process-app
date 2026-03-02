@@ -1605,3 +1605,39 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed, clean merges, zero recovery needed.
 - Observations: 2 (2 new improvements)
 **Notes:** FEAT-034 [1/2] completes the data foundation for the prioritization matrix. [2/2] will add detail panel score selectors, the quadrant chart page at /w/[workspaceId]/prioritization, and sidebar navigation. Migration 021 needs `npx supabase db push` (same blocker as 014-020).
+
+## Iteration 106 — 2026-03-02 23:30
+**Tasks:**
+- #FEAT-034 [2/2] Prioritization matrix UI (score selectors on panels, quadrant chart page, sidebar nav) — slot 1 — completed
+- #IMP-050 Remove redundant step count display on runbook cards — slot 2 — completed
+- #IMP-051 Replace native confirm() with Radix Dialog for Delete Workspace — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/components/panels/step-detail-panel.tsx (modified — +63/-1, SCORE_OPTIONS array, Effort/Impact score selectors)
+- src/components/panels/touchpoint-detail-panel.tsx (modified — +54/-1, Effort/Impact score selectors)
+- src/app/(app)/w/[workspaceId]/prioritization/page.tsx (created — 69 lines, server component fetching steps+touchpoints+sections+stages+tabs)
+- src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx (created — 261 lines, quadrant chart with CSS positioning, Radix Tooltips, filters)
+- src/components/layout/sidebar.tsx (modified — +3/-1, Target icon import, Prioritization nav item, Workflows active exclusion)
+- src/app/(app)/w/[workspaceId]/workspace-shell.tsx (modified — +1/-1, 'prioritization' added to exclusion array)
+- src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx (modified — -2 lines, removed metadata row step count span + separator)
+- src/app/(app)/w/[workspaceId]/settings/page.tsx (modified — +22/-5, confirmDeleteOpen state, handleConfirmDelete, Radix Dialog)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs — 0 errors)
+- Lint: pass (all 3 BUILD_RESULTs — 0 errors, 1 pre-existing warning in flow-canvas.tsx)
+- Build: pass (FEAT-034 — prioritization appears as dynamic server-rendered route)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (production behind — static code analysis for acceptance)
+- Canary test: skipped (production behind)
+- Acceptance test: 19/20 PASS (FEAT-034 11/11, IMP-050 4/4, IMP-051 4/5 — 1 fail is pre-existing confirm() in PerspectivesSection, not in scope)
+- POST_MERGE_CHECK: PASS
+**Bugs found:** 1 — BUG-025 (perspective deletion uses native confirm(), pre-existing, P2)
+**Improvements found:** 3 — IMP-052 (chart lacks axis ticks), IMP-053 (empty state no CTA), IMP-054 (perspective confirm inconsistency)
+**Self-score:**
+- Code quality: 5 — Prioritization page follows existing page patterns (gap-analysis, compare). CSS chart is clean and minimal. Score selectors match maturity pattern. Delete dialog mirrors clone dialog exactly.
+- Test coverage: 4 — 19/20 acceptance criteria pass via static code review. 1 fail is pre-existing (not in scope). No browser testing available.
+- Confidence: 5 — All 3 tasks completed first attempt, all gates pass, POST_MERGE_CHECK PASS. No structural risks.
+- Efficiency: 5 — All 3 builders completed, clean merges, zero recovery needed.
+- Observations: 4 (1 bug + 3 improvements)
+**Notes:** FEAT-034 is fully complete (both sub-tasks). Next Phase 3a feature is FEAT-035 (improvement ideas tracker). 3 new improvements found in the prioritization page — chart polish items for a future iteration.

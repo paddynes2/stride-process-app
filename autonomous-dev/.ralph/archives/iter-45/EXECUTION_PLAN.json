@@ -1,0 +1,175 @@
+{
+  "schema_version": "1.0",
+  "iteration": 99,
+  "date": "2026-03-02T20:00:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "53650b352d82d05bea66a210d667407b2046d72e",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-052",
+      "description": "Section templates data layer [1/2]: migration (templates table), types, API routes (GET list, POST from section_id, POST deploy, DELETE), client wrappers, STARTER_TEMPLATES constant",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
+      "attempts": 2,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "New migration 020_section_templates.sql: templates table with id (uuid PK), workspace_id (uuid NOT NULL FK), name (text NOT NULL), description (text), category (text), template_data (jsonb NOT NULL), created_by (uuid FK users), created_at (timestamptz), updated_at (timestamptz). RLS via can_access_workspace(). update_updated_at trigger.",
+        "Template type added to src/types/database.ts: Template interface matching table columns",
+        "GET /api/v1/templates?workspace_id=X — returns templates list ordered by created_at desc",
+        "POST /api/v1/templates — body: { section_id, name, description?, category? } — snapshots section + steps + connections + step_roles into template_data JSONB",
+        "POST /api/v1/templates/[id]/deploy — body: { tab_id, position_x, position_y } — creates new section + steps + connections with new UUIDs, remaps connection source/target IDs, matches role assignments by name",
+        "DELETE /api/v1/templates/[id] — deletes template, returns 404 if not found or RLS denied",
+        "Client wrappers in src/lib/api/client.ts: fetchTemplates, createTemplate, deployTemplate, deleteTemplate",
+        "STARTER_TEMPLATES constant in src/lib/templates.ts: 4 hardcoded templates (Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing) with step arrays",
+        "All API routes use successResponse/errorResponse envelope pattern, auth guard, logActivity()",
+        "All files at CORRECT src/ paths (NOT worktree paths)"
+      ],
+      "files_owned": [
+        "supabase/migrations/020_section_templates.sql",
+        "src/app/api/v1/templates/route.ts",
+        "src/app/api/v1/templates/[id]/route.ts",
+        "src/app/api/v1/templates/[id]/deploy/route.ts",
+        "src/lib/templates.ts",
+        "src/types/database.ts",
+        "src/lib/api/client.ts"
+      ],
+      "files_read_only": [
+        "src/lib/api/response.ts",
+        "src/lib/api/activity.ts",
+        "src/lib/supabase/server.ts",
+        "src/app/api/v1/coloring-rules/route.ts",
+        "src/app/api/v1/coloring-rules/[id]/route.ts",
+        "supabase/migrations/019_coloring_rules.sql"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/api/v1/coloring-rules/route.ts (most recent data-layer feature — follow same GET/POST pattern)",
+          "src/app/api/v1/coloring-rules/[id]/route.ts (DELETE pattern)",
+          "src/app/api/v1/workspaces/[id]/clone/route.ts (UUID remapping pattern for deploy route)",
+          "supabase/migrations/019_coloring_rules.sql (recent migration pattern — RLS, triggers, indexes)"
+        ],
+        "patterns_to_follow": [
+          "API envelope: successResponse(data) / errorResponse(code, message)",
+          "Auth guard: const { data: { user } } = await supabase.auth.getUser(); if (!user) return errorResponse('unauthorized', 'Not authenticated', 401)",
+          "RLS policy: USING (can_access_workspace(workspace_id))",
+          "Client wrapper: export async function fetchTemplates(workspaceId: string) { return apiFetch<Template[]>(`/api/v1/templates?workspace_id=${workspaceId}`); }",
+          "logActivity() fire-and-forget with void prefix: void logActivity(supabase, { ... })",
+          "JSONB snapshot: capture section + steps + connections as self-contained JSON, NOT live references",
+          "Deploy UUID remapping: create oldId→newId map, use it to remap connection source_id/target_id (same pattern as clone_workspace migration 018)"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — client functions return apiFetch<Type>() directly, do NOT add nested property access",
+          "Supabase RLS + INSERT RETURNING: .insert().select() requires SELECT policies. All entity tables already have SELECT RLS.",
+          "CRITICAL: Write ALL files to src/ paths, NOT to worktree-relative paths. Iter 98 builder committed to autonomous-dev/.ralph/worktrees/build-1/src/ which is WRONG."
+        ],
+        "affected_urls": [
+          "/api/v1/templates",
+          "/api/v1/templates/[id]",
+          "/api/v1/templates/[id]/deploy"
+        ]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "CRITICAL: All files MUST be written to correct paths under src/ and supabase/. Do NOT use git add -f. If any path contains 'worktree' or 'autonomous-dev' you are writing to the WRONG location.\n\nReference code from iter 98 builder (committed at wrong paths, since deleted) is available via: git show 16a19b6:autonomous-dev/.ralph/worktrees/build-1/src/app/api/v1/templates/route.ts (and similar paths for other files). Use as reference but write fresh to correct paths.\n\nDeploy route must: (1) fetch template_data JSONB, (2) create section with new UUID at given position, (3) create steps with new UUIDs mapped from template step IDs, (4) create connections with new UUIDs remapping source_id/target_id using old→new step ID map, (5) match role assignments by role name (query roles table by name, skip if not found).\n\nPOST create template route must: (1) validate section_id belongs to workspace, (2) fetch section + steps + connections + step_roles for that section, (3) store as JSONB snapshot in template_data.\n\nSTARTER_TEMPLATES: each entry needs { name, description, category, template_data } where template_data matches the same JSONB shape as DB templates. Starters are NOT stored in DB — shown alongside DB templates in the browser UI (phase [2/2])."
+    },
+    {
+      "slot": 2,
+      "id": "#BUG-020",
+      "description": "Disable has_role criteria type in coloring panel dropdown — users can select it but it has no visual effect, causing confusion",
+      "source": "prd/BUGS.md",
+      "type": "fix",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 2,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "has_role option in coloring-panel.tsx CRITERIA_OPTIONS is visually disabled (grayed out) with '(coming soon)' suffix in label",
+        "Selecting has_role is prevented — either via disabled <option> or by filtering it from the selectable list",
+        "Existing has_role rules already saved in DB are not broken — they still render in the rule list but show the disabled label",
+        "No TypeScript errors introduced",
+        "CRITERIA_VALUE_HINTS for has_role remains (no removal of the key to avoid TS errors)"
+      ],
+      "files_owned": [
+        "src/components/canvas/coloring-panel.tsx"
+      ],
+      "files_read_only": [
+        "src/types/database.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "src/components/canvas/coloring-panel.tsx (the file being modified — read it fully)"
+        ],
+        "patterns_to_follow": [
+          "Keep CRITERIA_OPTIONS array structure but add disabled: true and update label to 'Has Role (coming soon)'",
+          "In the <select> or dropdown rendering, add disabled attribute for has_role option",
+          "Use text-white/30 for disabled option text (design system quaternary for decorative/disabled elements)"
+        ],
+        "learnings_relevant": [
+          "has_role criteria type is in CriteriaType enum and in VALID_CRITERIA_TYPES on the API side — do NOT remove from those. Only disable in the UI dropdown."
+        ],
+        "affected_urls": []
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Read coloring-panel.tsx fully before modifying. The fix is UI-only — disable has_role in the dropdown so users cannot create new has_role rules. Existing has_role rules in the DB should still display in the rules list (just with the updated label). Do NOT modify the API routes or database schema."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-029",
+      "description": "Update settings page body text to match clone dialog description — list all 8 cloned entity types",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Settings page paragraph (line ~244-245) updated from 'all tabs, sections, steps, and connections' to 'all tabs, sections, steps, connections, teams, roles, people, and tools'",
+        "Text matches the Radix Dialog description exactly",
+        "No other changes to settings/page.tsx"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/settings"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Single line change. Find the paragraph text that says 'including all tabs, sections, steps, and connections' and update to 'including all tabs, sections, steps, connections, teams, roles, people, and tools' to match the Radix Dialog description that was added in IMP-028 (iter 98)."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/lib/api/response.ts", "src/lib/api/activity.ts", "src/lib/supabase/server.ts"],
+    "owner": "#FEAT-052",
+    "note": "FEAT-052 has exclusive write access to src/types/database.ts and src/lib/api/client.ts. Other slots must not modify these files."
+  },
+  "merge_order": ["#FEAT-052", "#BUG-020", "#IMP-029"],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": false,
+    "regression_reason": null,
+    "suites_to_run": ["FEAT-052-acceptance", "BUG-020-verify", "IMP-029-verify"],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

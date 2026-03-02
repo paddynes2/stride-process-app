@@ -1,0 +1,175 @@
+{
+  "schema_version": "1.0",
+  "iteration": 104,
+  "date": "2026-03-02T23:59:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "f0a03bd45755af84ce2968d53be7f12fc70178c2",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-033",
+      "description": "Perspective comparison view — new page at /w/[workspaceId]/perspectives/compare with two perspective dropdowns, comparison table, divergence highlighting, summary stats, element navigation links, and PDF export",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "New page at /w/[workspaceId]/perspectives/compare — shows empty state when <2 perspectives with annotations",
+        "Two dropdown selectors to pick which perspectives to compare",
+        "Table layout: rows = annotated elements (steps/sections/touchpoints/stages), columns = each perspective's annotation text + rating",
+        "Divergence highlighting: rows where ratings differ by 2+ points get amber background",
+        "Summary stats at top: annotation count per perspective, average rating, divergence count, top 3 most divergent elements",
+        "Clicking element name navigates to that element on the correct canvas tab",
+        "Export comparison as standalone PDF using jsPDF (title + summary stats + comparison table)",
+        "Sidebar nav link added (with Eye or similar icon, positioned after Compare)",
+        "workspace-shell.tsx exclusion list updated with 'perspectives' segment",
+        "Workflows sidebar active check excludes /perspectives path"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/perspectives/**",
+        "src/components/layout/sidebar.tsx",
+        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
+      ],
+      "files_read_only": [
+        "src/lib/api/client.ts",
+        "src/types/database.ts",
+        "src/lib/export/comparison-pdf.ts",
+        "src/app/(app)/w/[workspaceId]/compare/page.tsx",
+        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx",
+        "src/lib/context/workspace-context.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/compare/page.tsx — server page pattern (fetch data, pass to client view)",
+          "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx — client-side comparison view pattern",
+          "src/lib/export/comparison-pdf.ts — PDF export pattern with jsPDF"
+        ],
+        "patterns_to_follow": [
+          "Server page: createClient() → auth check → redirect → fetch perspectives + annotations → pass to client view",
+          "Client API: use fetchPerspectives(workspaceId) and fetchAnnotations(perspectiveId) from lib/api/client.ts",
+          "Sidebar: add entry to NAV_ITEMS array with {label, icon, href} — use Eye icon from lucide-react",
+          "Also update Workflows active check in sidebar.tsx line 37 to exclude /perspectives",
+          "workspace-shell.tsx line 47: add 'perspectives' to the exclusion array",
+          "DIVERGENCE_THRESHOLD = 2 as named constant (not magic number)",
+          "Navigation URLs: /w/{workspaceId}/{tabId} — need tab_id from elements",
+          "PDF: jsPDF with autoTable or manual text positioning — match existing comparison-pdf.ts pattern"
+        ],
+        "learnings_relevant": [
+          "workspace-shell route exclusion list: must add segment name when adding new route dirs (LEARNINGS.md)",
+          "apiFetch unwraps envelope — returns T directly, no nested access",
+          "React state immutability — [...arr].sort() not arr.sort()",
+          "Canvas null guards — (arr ?? []).filter(Boolean) before .map()"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/perspectives/compare"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "This is purely client-side. No migrations needed. All data comes from existing perspectives + perspective_annotations tables via existing API wrappers. The page should fetch all perspectives for the workspace, let user select 2, then fetch annotations for both, compute comparison table client-side. Divergence = abs(rating_a - rating_b) >= DIVERGENCE_THRESHOLD. 'Top 3 most divergent' = sorted by max absolute rating difference across all annotations for that element. Navigation requires tab_id for each element — server page should fetch steps/sections/stages/touchpoints with their tab_id to build a lookup map. PDF export should use jsPDF (already a dependency) — create a standalone download function, not a separate route."
+    },
+    {
+      "slot": 2,
+      "id": "#BUG-024",
+      "description": "Fix section-detail-panel.tsx Save as Template dialog DialogTitle — use DialogPrimitive.Title instead of custom DialogTitle to fix Radix a11y check",
+      "source": "prd/BUGS.md",
+      "type": "fix",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Import DialogPrimitive from @radix-ui/react-dialog in section-detail-panel.tsx",
+        "Replace <DialogTitle> with <DialogPrimitive.Title> in the Save as Template dialog",
+        "No console.error when opening Save as Template dialog",
+        "Dialog title still visually renders as before (same styling/classnames)"
+      ],
+      "files_owned": [
+        "src/components/panels/section-detail-panel.tsx"
+      ],
+      "files_read_only": [
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — BUG-023 fix applied here (same pattern)"
+        ],
+        "patterns_to_follow": [
+          "Import: import * as DialogPrimitive from '@radix-ui/react-dialog'",
+          "Replace: <DialogTitle> → <DialogPrimitive.Title className={same classes}>",
+          "Keep existing styling classes intact",
+          "Add brief comment documenting root cause (same as BUG-023 comment in canvas-view.tsx)"
+        ],
+        "learnings_relevant": [
+          "Custom Radix DialogTitle wrapper breaks a11y check — ui/dialog.tsx DialogTitle wraps <h2>, not DialogPrimitive.Title (LEARNINGS.md)"
+        ],
+        "affected_urls": []
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "Exact same fix pattern as BUG-023 (iteration 102, canvas-view.tsx). Read canvas-view.tsx to see how BUG-023 was fixed and replicate in section-detail-panel.tsx."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-039",
+      "description": "Change activity view 'Unknown' fallback text to '[Deleted User]' for better audit trail clarity",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Activity entries with null user join display '[Deleted User]' instead of 'Unknown'",
+        "Only the fallback text changes — no structural code changes"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "Find the 'Unknown' fallback string (reported at line 176) and replace with '[Deleted User]'"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/activity"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Single string replacement. Find the fallback text for when users join returns null and change 'Unknown' to '[Deleted User]'."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "owner": "#FEAT-033",
+    "note": "FEAT-033 owns sidebar.tsx and workspace-shell.tsx for nav link + exclusion list updates"
+  },
+  "merge_order": ["#IMP-039", "#BUG-024", "#FEAT-033"],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": false,
+    "regression_reason": "Regression ran at iter 103 (10/10 PASS). Risk score 2 from this iteration. Next regression at iter 112 (8-iteration cadence).",
+    "suites_to_run": ["feat-033-acceptance"],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [
+      "Accessibility cadence SEVERELY OVERDUE (83 iterations since last audit at iter 21). Schedule accessibility audit for next testing-only iteration after FEAT-033.",
+      "Migration 020 still not pushed — requires human action (npx supabase db push).",
+      "Production is 20+ commits behind ralph/init-stride."
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

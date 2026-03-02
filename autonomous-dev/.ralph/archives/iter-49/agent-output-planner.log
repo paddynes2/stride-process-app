@@ -1,0 +1,18 @@
+EXECUTION_PLAN.json written for iteration 103.
+
+**Summary:**
+
+- **Iteration:** 103
+- **Mode:** `testing_only`
+- **Task:** #FEAT-053 — Phase 4 testing gate
+- **Suites:** 10 test suites covering full regression baseline + individual acceptance for all 8 Phase 4 features (Comments, Tasks, Runbooks, Playbook, Activity, Clone, Coloring, Templates) + compilation verification
+
+**Validation:** Last commit `054d7bf` is valid, compilation passing, lint clean (1 pre-existing warning). No revert needed.
+
+**Key notes for testers:**
+- Playwright unavailable — use static code analysis + curl/API probing
+- Templates DB operations blocked (migration 020 not pushed) — test code paths and UI states only
+- BUG-021 (workspace-shell exclusion) fixed in codebase — verify fix present
+- BUG-024 (section-detail-panel DialogTitle) is known P2 — log but don't fail gate
+- Test the full chain: section → tasks → runbook → playbook → activity log captures all
+- Accessibility cadence is 82 iterations overdue — schedule audit immediately after this gate passes

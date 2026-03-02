@@ -1,0 +1,22 @@
+**PLANNER COMPLETE — Iteration 104**
+
+## Execution Plan Summary
+
+| Slot | Task | Type | Complexity | Files Owned |
+|------|------|------|------------|-------------|
+| 1 | **#FEAT-033** Perspective comparison view | build | M | `perspectives/**`, `sidebar.tsx`, `workspace-shell.tsx` |
+| 2 | **#BUG-024** section-detail-panel DialogTitle fix | fix | S | `section-detail-panel.tsx` |
+| 3 | **#IMP-039** Activity "[Deleted User]" fallback | improve | S | `activity-view.tsx` |
+
+**Mode:** `multi_task` (3 independent, non-overlapping builders)
+**Merge order:** IMP-039 → BUG-024 → FEAT-033 (smallest first to minimize conflict surface)
+
+**Key decisions:**
+- Phase 3a begins with FEAT-033 — the core consulting insight feature
+- No migration needed — purely client-side computation from existing perspectives + annotations APIs
+- BUG-024 uses established BUG-023 fix pattern (DialogPrimitive.Title)
+- Accessibility cadence noted as SEVERELY OVERDUE — scheduled for next testing iteration
+
+**Validation:** Last commit valid, tsc clean, no revert needed.
+
+Output: `knowledge/handoffs/EXECUTION_PLAN.json` + `knowledge/STATUS.md` updated.

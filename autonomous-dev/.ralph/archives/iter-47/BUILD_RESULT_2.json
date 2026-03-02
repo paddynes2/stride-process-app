@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "iteration": 101,
+  "slot": 2,
+  "task_id": "#IMP-032",
+  "status": "completed",
+  "duration_seconds": 90,
+
+  "files_changed": [
+    {
+      "path": "src/components/canvas/step-node.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 1
+    },
+    {
+      "path": "src/components/canvas/section-node.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 1
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0, no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused), 0 errors" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/components/canvas/step-node.tsx",
+    "src/components/canvas/section-node.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Renamed `export function StepNode` to `function StepNodeComponent` and `export function SectionNode` to `function SectionNodeComponent`. Added `export const StepNode = React.memo(StepNodeComponent)` and `export const SectionNode = React.memo(SectionNodeComponent)` at the end of each file. Named inner functions preserve React DevTools display names. No visual changes, no signature changes.",
+
+  "failure_details": null
+}

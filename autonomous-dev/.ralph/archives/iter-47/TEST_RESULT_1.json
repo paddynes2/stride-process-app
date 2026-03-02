@@ -1,0 +1,161 @@
+{
+  "schema_version": "1.0",
+  "iteration": 101,
+  "test_type": "acceptance",
+  "suite_name": "feat-052-ui-acceptance",
+  "status": "failed",
+  "duration_seconds": 180,
+
+  "criteria_results": [
+    {
+      "criterion": "Save as Template button in section-detail-panel footer (above Run as Checklist)",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: section-detail-panel.tsx line 373-375 — <Button variant='secondary' size='sm' onClick={handleOpenSaveDialog} className='w-full'><BookTemplate className='h-3.5 w-3.5' />Save as Template</Button>. BookTemplate icon imported from lucide-react at line 4. Button placed above Run as Checklist (line 373 precedes line 380).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Clicking Save as Template opens Radix Dialog with name (pre-filled section name), description, and category inputs",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: section-detail-panel.tsx lines 387-436 — Dialog with DialogHeader, DialogTitle ('Save as Template'), DialogDescription, and state variables tplName/tplDesc/tplCategory. handleOpenSaveDialog (line 128) sets tplName to section.name (pre-fill confirmed) and setShowSaveDialog(true).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Dialog submit calls createTemplate({ workspace_id, section_id, name, description, category }), shows toast on success, closes dialog",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: section-detail-panel.tsx lines 142-152 — await createTemplate({...}), setShowSaveDialog(false), toast('Template saved'). toastError on failure. createTemplate imported from @/lib/api/client at line 30.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Templates button in canvas-view.tsx toolbar area (top-right, next to coloring button)",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Browser verified: accessibility tree snapshot shows button 'Browse templates' (aria-label) with text 'Templates' in the same container as button 'Toggle coloring rules' with text 'Color'. DOM ref e153 contains both buttons side by side. canvas-view.tsx line 320-333 confirmed.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Clicking Templates opens Radix Dialog",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Browser verified: clicking 'Browse templates' button opened a dialog element (ref e211) with heading 'Templates' [level=2] and description 'Deploy a template to add a new section to the canvas'. Modal backdrop became active (intercepting pointer events).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Dialog shows both DB templates and STARTER_TEMPLATES as cards",
+      "task_id": "#FEAT-052",
+      "result": "fail",
+      "evidence": "Browser: dialog showed error message 'Could not find the table public.templates in the schema cache'. Network: /api/v1/templates?workspace_id=... returned HTTP 500. Root cause: migration 020_section_templates.sql has NOT been pushed to the remote Supabase DB (npx supabase db push not run). Code is correct (lines 381-413 of canvas-view.tsx) but unreachable due to DB error. Starter templates also hidden when templateError is set (ternary hides entire template list on error).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Each card shows: name, description, category badge, step count (from template_data.steps.length)",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx line 395 — {t.template_data.steps.length} step{...} renders step count. DB template and starter cards both render name/description/category badge fields per the map at lines 381-413. Cannot browser-verify due to DB error blocking card rendering.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "DB templates show delete button (trash icon); starters do not",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx line 388 — delete button with aria-label='Delete template' is inside dbTemplates.map() block only. STARTER_TEMPLATES.map() at line 403 has no delete button. Correct implementation.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Deploy button on each card with correct flow for DB vs starter templates",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx lines 196-215 — handleDeployTemplate handles both paths: DB templates call deployTemplate(templateId, {...}); starters call createSection + Promise.all(createStep). Position calculation: deployX=100, deployY=maxY+300 (or 100 if no sections).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "position_x and position_y for deploy: max existing section position_y + offset",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx line 198 — const maxY = sections.length > 0 ? Math.max(...sections.map((s) => s.position_y)) : -200; const deployX = 100; const deployY = maxY + 300; Matches spec: position_y = max + 300, fallback -200+300=100 when no sections.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "After deploy success: refresh sections/steps/connections state, close dialog, show toast",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx lines 210-214 — router.refresh() called after successful deploy for both DB templates and starters. Dialog close and toast verified in the success path. Cannot browser-verify due to DB error.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Template browser dialog handles loading, empty, and error states",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Browser: error state confirmed — dialog renders error paragraph. Static code: loadingTemplates shows spinner (line 366-371), empty state shows 'No templates yet' message (line 376-380), error state shows red error text (line 372-374). All three states implemented.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "StepNode component export wrapped in React.memo",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2: 'Renamed export function StepNode to function StepNodeComponent. Added export const StepNode = React.memo(StepNodeComponent) at end of file.' TypeScript: pass. BUILD_RESULT lines_added=2, lines_removed=1 — minimal diff consistent with memo wrap.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "SectionNode component export wrapped in React.memo",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2: 'Renamed export function SectionNode to function SectionNodeComponent. Added export const SectionNode = React.memo(SectionNodeComponent) at end of file.' TypeScript: pass.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Both components still render correctly (no visual changes)",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "Browser: canvas view rendered correctly with step node visible. Workspace summary shows '1 Steps, 0 Sections'. No visual regressions observed.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "TypeScript compiles without errors",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2 verification: typecheck status='pass', errors=0, 'npx tsc --noEmit exited 0, no output'.",
+      "screenshot_description": null
+    }
+  ],
+
+  "quality_gate": {
+    "pages_checked": ["/w/[workspaceId]/[tabId]"],
+    "console_errors": 2,
+    "network_errors": 1,
+    "accessibility_issues": 0,
+    "layout_shifts": 0
+  },
+
+  "bugs_found": [
+    {
+      "severity": "P1",
+      "page": "/w/[workspaceId]/[tabId]",
+      "description": "Migration 020_section_templates.sql not applied to remote Supabase DB. The templates table does not exist in production schema. GET /api/v1/templates returns HTTP 500 with Supabase error 'Could not find the table public.templates in the schema cache'. This blocks the entire Templates feature — dialog opens but cannot display any templates or allow deployment.",
+      "steps_to_reproduce": "1. Open any workspace canvas. 2. Click the 'Templates' button in the top-right toolbar. 3. Dialog opens but shows error: 'Could not find the table public.templates in the schema cache' instead of template cards.",
+      "related_task": "#FEAT-052"
+    },
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/[tabId]",
+      "description": "DialogContent accessibility warning fires when Templates dialog opens: 'DialogContent requires a DialogTitle for the component to be accessible for screen reader users'. Fires twice per open. Canvas-view.tsx line 363 does include <DialogTitle>Templates</DialogTitle> inside <DialogHeader> — likely caused by a timing/render issue or a different uncovered dialog in the same render tree (possibly workspace-summary-panel or coloring panel missing DialogTitle). Needs investigation to isolate which DialogContent is the offender.",
+      "steps_to_reproduce": "1. Open workspace canvas. 2. Open browser console. 3. Click Templates button. 4. Observe two console.error calls: 'DialogContent requires a DialogTitle'.",
+      "related_task": "#FEAT-052"
+    }
+  ],
+
+  "improvements_found": [
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/[tabId] — Templates dialog error state",
+      "observation": "When the templates API returns an error, the dialog shows only the error message and hides all STARTER_TEMPLATES cards. Starter templates are hardcoded in memory and do not require a DB connection — they could still be shown in the error state to allow users to deploy starters even when the DB is unavailable.",
+      "design_principle": "Nielsen H9: Help users recognize, diagnose, and recover from errors — show what IS available rather than a dead end",
+      "suggested_approach": "Render starters unconditionally below the error message. Only hide DB templates when templateError is set. Change the ternary to: render error notice + starters in error branch, render both DB templates + starters in success branch."
+    }
+  ],
+
+  "actions_used": 10,
+  "action_budget": 10
+}

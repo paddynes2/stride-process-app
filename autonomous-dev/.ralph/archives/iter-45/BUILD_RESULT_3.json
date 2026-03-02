@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "iteration": 99,
+  "slot": 3,
+  "task_id": "#IMP-029",
+  "status": "completed",
+  "duration_seconds": 60,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/settings/page.tsx",
+      "action": "modified",
+      "lines_added": 1,
+      "lines_removed": 1
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning (addEdge unused in flow-canvas.tsx), 0 errors" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Single-line text change at line 245: updated 'including all tabs, sections, steps, and connections' to 'including all tabs, sections, steps, connections, teams, roles, people, and tools' to match the clone dialog description from IMP-028.",
+
+  "failure_details": null
+}

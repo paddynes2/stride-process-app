@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "iteration": 104,
+  "slot": 2,
+  "task_id": "#BUG-024",
+  "status": "completed",
+  "duration_seconds": 120,
+
+  "files_changed": [
+    {
+      "path": "src/components/panels/section-detail-panel.tsx",
+      "action": "modified",
+      "lines_added": 5,
+      "lines_removed": 2
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0, no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused), 0 errors" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": ["src/components/panels/section-detail-panel.tsx"],
+  "ownership_violations": [],
+  "notes": "Replaced <DialogTitle> (custom ui/dialog.tsx wrapper that uses plain <h2>, not DialogPrimitive.Title) with <DialogPrimitive.Title className='text-[16px] font-semibold text-[var(--text-primary)] tracking-[-0.01em]'> in the Save as Template dialog. Removed DialogTitle from the ui/dialog import. Added import * as DialogPrimitive from '@radix-ui/react-dialog' (already a transitive dep). Added BUG-024 comment matching BUG-023 pattern in canvas-view.tsx. Styling classes are identical to the ui/dialog.tsx DialogTitle wrapper, so visual output is unchanged.",
+
+  "failure_details": null
+}

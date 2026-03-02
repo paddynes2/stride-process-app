@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-105, 2026-03-02 — Phase 3a, FEAT-034 data layer -->
+<!-- Updated: iter-106, 2026-03-02 — Phase 3a, FEAT-034 UI complete -->
 
 ## Project
 
@@ -50,7 +50,8 @@ npx supabase db push     # Push migrations
 | `/w/.../runbooks/[id]/playbook` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx` | Playbook mode (distraction-free step-by-step execution, fixed overlay z-50, Mark Complete & Next, Skip, dot navigation, progress bar, mobile-responsive) |
 | `/w/.../activity` | `src/app/(app)/w/[workspaceId]/activity/page.tsx` | Activity log (chronological feed, action type filter tabs, entity links, relative timestamps, Load More pagination) |
 | `/w/.../perspectives/compare` | `src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx` | Perspective comparison (dual dropdowns, divergence table, summary stats, element navigation, PDF export) |
-| `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
+| `/w/.../prioritization` | `src/app/(app)/w/[workspaceId]/prioritization/page.tsx` | Prioritization matrix (effort/impact quadrant chart, CSS positioning, Radix Tooltips, tab/section filters, click-to-navigate) |
+| `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings (clone dialog, delete dialog — both Radix) |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 
 ### API Routes (all under `src/app/api/v1/`)

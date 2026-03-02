@@ -1,0 +1,23 @@
+All tasks complete. Here's a summary of what was implemented:
+
+## #FEAT-052 — Section Templates Data Layer [1/2]
+
+**Status: completed** | TypeCheck: ✅ 0 errors | Lint: ✅ 0 errors
+
+### Files created/modified (7 owned files staged):
+
+1. **`supabase/migrations/020_section_templates.sql`** — `templates` table with JSONB `template_data`, RLS via `can_access_workspace()`, `update_updated_at` trigger, workspace index
+
+2. **`src/types/database.ts`** — Added `Template`, `TemplateData`, `TemplateSectionData`, `TemplateStepData`, `TemplateConnectionData`, `TemplateStepRoleData` interfaces
+
+3. **`src/app/api/v1/templates/route.ts`** — GET (list by workspace_id, ordered by created_at desc) + POST (snapshot section→JSONB with step positions relative to section origin, validates workspace ownership)
+
+4. **`src/app/api/v1/templates/[id]/route.ts`** — DELETE with 404 on PGRST116 + logActivity
+
+5. **`src/app/api/v1/templates/[id]/deploy/route.ts`** — POST deploy: creates section at position, steps with new UUIDs, connections with remapped IDs via `Map<oldId, newId>`, role assignments matched by name (silently skip unmatched)
+
+6. **`src/lib/templates.ts`** — `STARTER_TEMPLATES` constant: 4 templates (Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing) with 5 steps each
+
+7. **`src/lib/api/client.ts`** — Added `fetchTemplates`, `createTemplate`, `deployTemplate`, `deleteTemplate` wrappers
+
+**Key fix vs iter 98:** All files written to correct worktree `src/` paths. No `git add -f` used.

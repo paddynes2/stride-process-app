@@ -1,0 +1,25 @@
+All tasks complete. Here's the summary:
+
+---
+
+**#FEAT-052 — Section Templates [1/2] Data Layer: COMPLETED**
+
+**7 files staged** (all within `files_owned`):
+
+| File | Action | Notes |
+|------|--------|-------|
+| `supabase/migrations/020_section_templates.sql` | Created | `templates` table, RLS via `can_access_workspace()`, trigger, index |
+| `src/types/database.ts` | Modified | Added `Template`, `TemplateData`, `TemplateSectionData`, `TemplateStepData`, `TemplateConnectionData`, `TemplateStepRoleData` interfaces |
+| `src/app/api/v1/templates/route.ts` | Created | GET list by workspace_id; POST snapshot section→template_data JSONB |
+| `src/app/api/v1/templates/[id]/route.ts` | Created | DELETE with logActivity |
+| `src/app/api/v1/templates/[id]/deploy/route.ts` | Created | POST: creates section+steps+connections with UUID remapping, role matching by name |
+| `src/lib/api/client.ts` | Modified | Added `fetchTemplates`, `createTemplateFromSection`, `deployTemplate`, `deleteTemplate` |
+| `src/lib/templates.ts` | Created | `STARTER_TEMPLATES` — 4 templates × 5 steps each |
+
+**Verification:** `npx tsc --noEmit` → 0 errors | `npm run lint` → 0 errors, 3 pre-existing warnings only.
+
+**Key design decisions:**
+- Step positions in snapshots stored **relative to section origin** (offset from section's position_x/position_y) so templates are portable across canvas positions
+- Deploy route offsets step positions by adding the target section's deploy coordinates
+- `step_roles` snapshots store role names (not IDs); deploy remaps by name match in target workspace, silently skips unmatched
+- `git add -f` required to bypass `autonomous-dev/.ralph/worktrees/` gitignore

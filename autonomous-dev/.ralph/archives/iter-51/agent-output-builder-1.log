@@ -1,0 +1,13 @@
+Build complete. Summary:
+
+**Task #FEAT-034 [1/2] — completed**
+
+All 4 files changed, typecheck and lint pass cleanly:
+
+1. **`supabase/migrations/021_prioritization_scores.sql`** (created) — Two `ALTER TABLE` statements following migration 007 pattern exactly. Each adds `effort_score INT CHECK (effort_score BETWEEN 1 AND 5)` and `impact_score INT CHECK (impact_score BETWEEN 1 AND 5)`, nullable by default, to both `steps` and `touchpoints` tables.
+
+2. **`src/types/database.ts`** (modified) — Added `effort_score: number | null` and `impact_score: number | null` to the `Step` interface (after `target_maturity`) and to the `Touchpoint` interface (after `position_y`, before `created_at`).
+
+3. **`src/app/api/v1/steps/[id]/route.ts`** (modified) — Added `"effort_score"` and `"impact_score"` to `EDITABLE_FIELDS`.
+
+4. **`src/app/api/v1/touchpoints/[id]/route.ts`** (modified) — Added `"effort_score"` and `"impact_score"` to `EDITABLE_FIELDS`.

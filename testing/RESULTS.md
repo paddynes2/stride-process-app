@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 105
+- **Iteration:** 106
 - **Date:** 2026-03-02
-- **Suite:** feat-034-data-integrity + regression-baseline (acceptance + regression)
-- **Method:** Static code analysis (Playwright MCP unavailable)
-- **Result:** **ALL PASS** — Acceptance 14/14 (FEAT-034 6/6, IMP-042 4/4, IMP-046 4/4), Regression 12/12
-- **Bugs found:** 0
-- **Improvements found:** 2 (IMP-050, IMP-051)
+- **Suite:** feat-034-ui-acceptance + imp-050-acceptance + imp-051-acceptance (acceptance only)
+- **Method:** Static code analysis + production comparison (Playwright available, production behind)
+- **Result:** **19/20 PASS** — FEAT-034 [2/2] 11/11, IMP-050 4/4, IMP-051 4/5 (1 fail: pre-existing confirm() in PerspectivesSection)
+- **Bugs found:** 1 (BUG-025 — perspective confirm() inconsistency, pre-existing)
+- **Improvements found:** 3 (IMP-052 chart axis ticks, IMP-053 empty state CTA, IMP-054 perspective confirm consistency)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 105 (2026-03-02) — 14/14 PASS (FEAT-034 [1/2] 6/6, IMP-042 4/4, IMP-046 4/4 — static code analysis)
+- Last run: Iteration 106 (2026-03-02) — 19/20 PASS (FEAT-034 [2/2] 11/11, IMP-050 4/4, IMP-051 4/5 — static analysis + production comparison; 1 fail pre-existing)
+- Previous: Iteration 105 (2026-03-02) — 14/14 PASS (FEAT-034 [1/2] 6/6, IMP-042 4/4, IMP-046 4/4 — static code analysis)
 - Previous: Iteration 104 (2026-03-02) — 16/16 PASS (FEAT-033 10/10, BUG-024 4/4, IMP-039 2/2 — static code analysis)
 - Previous: Iteration 103 (2026-03-02) — 9/9 PASS (Phase 4 full gate — playbook, activity, clone, coloring, templates, compilation, BUG-021 fix, comments+tasks+runbooks baseline)
 - Previous: Iteration 102 (2026-03-02) — 5/5 PASS (BUG-023 + IMP-036 + IMP-030 + IMP-020 — static code analysis)

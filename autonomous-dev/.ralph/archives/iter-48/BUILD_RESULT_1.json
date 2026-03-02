@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "iteration": 102,
+  "slot": 1,
+  "task_id": "#BUG-023",
+  "status": "completed",
+  "duration_seconds": 180,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+      "action": "modified",
+      "lines_added": 12,
+      "lines_removed": 6
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge) — not in owned files, no new warnings introduced" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "BUG-023: Root cause — custom DialogTitle in ui/dialog.tsx wraps a plain <h2>, NOT DialogPrimitive.Title. Radix's DialogContent wraps DialogPrimitive.Content which checks at mount for a DialogPrimitive.Title registered via React context; a plain <h2> is invisible to this check. Fix in canvas-view.tsx: import * as DialogPrimitive from '@radix-ui/react-dialog' and use DialogPrimitive.Title directly with matching styles. Added explanatory comment. section-detail-panel.tsx has the same root cause (read-only file, not owned by this task) — the Save as Template dialog will still produce the warning until dialog.tsx DialogTitle is changed to wrap DialogPrimitive.Title. IMP-036: Restructured loading/error/content ternary — previously templateError hid starters entirely. Now: loading=skeletons; non-loading=grid with error message at top when error, DB templates hidden on error, starters always visible. IMP-030: All icon-only buttons in both canvas-view.tsx (Templates, Color, Delete template) and tab-bar.tsx (Close tab, Add tab) already had aria-label attributes — no changes needed.",
+
+  "failure_details": null
+}

@@ -1,18 +1,20 @@
-EXECUTION_PLAN.json written for iteration 103.
+**EXECUTION_PLAN.json written for iteration 106.**
 
-**Summary:**
+## Summary
 
-- **Iteration:** 103
-- **Mode:** `testing_only`
-- **Task:** #FEAT-053 — Phase 4 testing gate
-- **Suites:** 10 test suites covering full regression baseline + individual acceptance for all 8 Phase 4 features (Comments, Tasks, Runbooks, Playbook, Activity, Clone, Coloring, Templates) + compilation verification
+**Validation:** Last commit `221345e` valid. Compilation passing. No revert needed.
 
-**Validation:** Last commit `054d7bf` is valid, compilation passing, lint clean (1 pre-existing warning). No revert needed.
+**Mode:** `multi_task` (3 slots)
 
-**Key notes for testers:**
-- Playwright unavailable — use static code analysis + curl/API probing
-- Templates DB operations blocked (migration 020 not pushed) — test code paths and UI states only
-- BUG-021 (workspace-shell exclusion) fixed in codebase — verify fix present
-- BUG-024 (section-detail-panel DialogTitle) is known P2 — log but don't fail gate
-- Test the full chain: section → tasks → runbook → playbook → activity log captures all
-- Accessibility cadence is 82 iterations overdue — schedule audit immediately after this gate passes
+| Slot | Task | Type | Complexity | Files |
+|------|------|------|------------|-------|
+| 1 | **#FEAT-034 [2/2]** — Prioritization matrix UI | build | M | step-detail-panel, touchpoint-detail-panel, prioritization/*, sidebar, workspace-shell |
+| 2 | **#IMP-050** — Remove redundant runbook step count | improve | S | runbooks-list-view.tsx |
+| 3 | **#IMP-051** — Styled delete workspace dialog | improve | S | settings/page.tsx |
+
+**Key decisions:**
+- Primary task follows SIGNAL directive (FEAT-034 [2/2])
+- Data layer already done (iter 105) — this is UI-only
+- Two S-complexity improvements fill parallel slots with zero file overlap
+- No regression needed (ran last iteration 12/12 PASS, risk score 2 for UI-only changes)
+- Accessibility cadence still overdue (84 iterations) — next trigger: iteration 110

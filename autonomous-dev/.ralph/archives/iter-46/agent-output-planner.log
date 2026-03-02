@@ -1,0 +1,22 @@
+EXECUTION_PLAN.json written. Here's the summary:
+
+---
+
+## Iteration 100 — PLANNER OUTPUT
+
+**Mode:** `testing_only`
+
+**Why not building FEAT-052 [2/2]?**
+1. **Risk score 10** from iteration 99 (migration 020 + RLS + shared types/client = +3+3+2+2). Protocol mandates regression + data-integrity at ≥5.
+2. **Performance cadence** triggered at iteration 100 (every 20th: 20, 40, 60, 80, **100**).
+
+**Testing suites:**
+| Suite | Purpose |
+|-------|---------|
+| `regression-baseline-full` | 40+ checks across all phases (canvas, CRUD, journey, perspectives, comments, tasks, runbooks, playbook, activity, clone, coloring) |
+| `feat-052-data-integrity` | Verify migration 020 SQL, RLS, types, API routes, client wrappers, STARTER_TEMPLATES, deploy UUID remapping |
+| `performance-static-audit` | Component sizes >500 LOC, missing useCallback/useMemo, inline objects in JSX, over-fetching, circular imports, canvas node memoization |
+
+**Validation:** HEAD `afbe105` — type check PASS, no revert needed.
+
+**Next iteration (101):** #FEAT-052 [2/2] section templates UI. Research pre-done — patterns, file targets, and guidance captured in `next_iteration_guidance`.

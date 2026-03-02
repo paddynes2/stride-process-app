@@ -1,0 +1,14 @@
+Done. Here's a summary of what was implemented:
+
+**#IMP-020 — Activity view Load More skeleton placeholders**
+
+**Change:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx` (+10 / -1)
+
+When the Load More button is clicked (`loading=true`), 3 skeleton rows now appear below existing entries inside the same `space-y-2` list container. Each skeleton card:
+- Uses the same container styling as real entries (`rounded-[var(--radius-sm)] p-3 bg-[var(--bg-surface-active)] border border-[var(--border-subtle)]`)
+- Has two `animate-pulse` bars matching the 2-line entry layout: `h-3 w-3/4` (action sentence) + `h-2.5 w-2/5` (author/timestamp), using `bg-[var(--bg-surface-secondary)] rounded-[var(--radius-md)]` per the canvas-view.tsx pattern
+- Disappear automatically when `setLoading(false)` runs in the `finally` block
+
+The Load More button text was simplified to always show "Load More" (the skeletons are the visual indicator). Button remains `disabled` during loading to prevent double-clicks.
+
+**Verification:** typecheck ✅ (0 errors) · lint ✅ (0 errors, 1 pre-existing warning in unowned file)

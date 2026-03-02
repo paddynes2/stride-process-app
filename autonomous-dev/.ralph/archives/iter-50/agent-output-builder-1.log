@@ -1,0 +1,14 @@
+All tasks complete. Here's a summary of what was built:
+
+## #FEAT-033 — Perspective Comparison View
+
+**Files created (3 new):**
+- `src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx` — Server component that auth-checks, fetches all perspectives, and builds an element lookup map (steps/sections/stages/touchpoints → `{name, tab_id, type}`)
+- `src/app/(app)/w/[workspaceId]/perspectives/compare/export-pdf.ts` — Standalone PDF export using jsPDF (title page with per-perspective stats, comparison table with amber rows for divergent elements)
+- `src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx` — Client view with two perspective dropdowns, lazy annotation fetching, summary stats panel (counts/avg ratings/divergence count/top-3 most divergent elements as nav links), and comparison table
+
+**Files modified (2):**
+- `src/components/layout/sidebar.tsx` — Added `Eye` icon import, `Perspectives` nav item after Compare, updated Workflows active check to exclude `/perspectives` path
+- `src/app/(app)/w/[workspaceId]/workspace-shell.tsx` — Added `"perspectives"` to the route exclusion array at line 47
+
+**Verification:** TypeScript typecheck ✅ (0 errors) · ESLint ✅ (0 errors, 1 pre-existing warning)

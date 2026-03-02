@@ -1,0 +1,117 @@
+{
+  "schema_version": "1.0",
+  "iteration": 102,
+  "date": "2026-03-02T23:59:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "3fe2d858d68981f11e6c871f44ca65d6c18d1230",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#BUG-023",
+      "description": "Fix DialogTitle a11y warning, show starters on DB error, add aria-labels to icon buttons",
+      "source": "prd/BUGS.md, prd/IMPROVEMENTS.md",
+      "type": "fix",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "BUG-023: Audit every DialogContent in canvas-view.tsx render tree — ensure each has a DialogTitle (or VisuallyHidden wrapper). Zero DialogTitle console.error warnings.",
+        "BUG-023: If investigation reveals both dialogs (canvas-view.tsx Templates dialog and section-detail-panel.tsx Save as Template dialog) already have DialogTitle — check whether the issue is in Radix Dialog itself, a conditional render that unmounts DialogTitle, or a duplicated Dialog wrapper. If unfixable, add a comment documenting findings.",
+        "IMP-036: Template browser dialog shows STARTER_TEMPLATES cards unconditionally — even when templateError is set. When DB error occurs, render error message at top + starters below. Only hide DB template cards when error. Specifically: restructure the ternary at canvas-view.tsx line 372 so starters are outside the error branch.",
+        "IMP-030: All icon-only buttons on canvas toolbar and tab-bar have aria-label attributes. Audit existing buttons — Templates button (line 330) and Coloring button (line 344) already have aria-label. Find any remaining icon-only buttons that lack it."
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+        "src/components/layout/tab-bar.tsx"
+      ],
+      "files_read_only": [
+        "src/components/panels/section-detail-panel.tsx",
+        "src/components/ui/dialog.tsx"
+      ],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "Radix Dialog pattern: every <DialogContent> must have a <DialogTitle> child (or VisuallyHidden DialogTitle)",
+          "aria-label pattern for icon buttons: aria-label='Action description' on <button> or <Button>"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/[tabId]"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "BUG-023 RESEARCH CONTEXT: Planner found that canvas-view.tsx line 361-363 (Templates dialog) and section-detail-panel.tsx line 388-390 (Save as Template dialog) both have DialogTitle. workspace-summary-panel.tsx and coloring-panel.tsx do NOT use DialogContent. The two errors may come from: (1) a Dialog open/close race condition, (2) Radix DialogContent portaling before DialogTitle mounts, or (3) a DialogContent elsewhere in layout-client.tsx or workspace-shell.tsx. Check if VisuallyHidden is needed for any dialogs that intentionally hide their title. IMP-036: The fix is in the ternary at line 372 — templateError branch hides starters. Restructure to: show error message at top, then ALWAYS show starters section below."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-020",
+      "description": "Add skeleton placeholders when Load More fetches in activity view",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "When Load More button is clicked in activity view, 2-3 skeleton row placeholders appear below existing entries while loading",
+        "Skeleton rows match the layout of real activity entries (icon placeholder + 2 text lines + timestamp) using animate-pulse pattern",
+        "Skeleton rows disappear when new data arrives and real entries replace them",
+        "Follow existing Skeleton component usage from ui/skeleton.tsx if available, or use div + animate-pulse + bg-[var(--bg-surface-secondary)] matching existing skeleton patterns in the codebase",
+        "No layout shift when skeletons are replaced by real content"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+      ],
+      "files_read_only": [
+        "src/components/ui/skeleton.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — lines 367-371 show skeleton pattern (animate-pulse divs)"
+        ],
+        "patterns_to_follow": [
+          "Skeleton: div with bg-[var(--bg-surface-secondary)] rounded-[var(--radius-md)] animate-pulse",
+          "Activity entry layout: flex row with icon, text block (action + entity), and timestamp"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/activity"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": ""
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts"],
+    "owner": null,
+    "note": ""
+  },
+  "merge_order": ["#BUG-023", "#IMP-020"],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": false,
+    "regression_reason": null,
+    "suites_to_run": ["bug-023-imp-036-imp-030-acceptance", "imp-020-acceptance"],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [
+      "IMP-035 appears already resolved — sidebar.tsx has 12 nav items including Runbooks, Activity, Gap Analysis, Compare, Dashboard. Reviewer should verify and mark resolved.",
+      "BUG-022 (migration 020 not pushed) requires human action: `npx supabase db push`. Builders cannot/should not push migrations to production DB autonomously.",
+      "BUG-021 confirmed already fixed in codebase (workspace-shell.tsx exclusion list includes runbooks, activity, gap-analysis). Only affects production (20+ commits behind).",
+      "FEAT-053 (Phase 4 testing gate) should be the NEXT iteration (103) — this cleanup iteration ensures a cleaner codebase for the gate."
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

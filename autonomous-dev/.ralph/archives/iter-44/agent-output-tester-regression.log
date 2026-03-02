@@ -1,0 +1,28 @@
+`TEST_RESULT_2.json` written. Here's a summary of iteration 97 regression results:
+
+---
+
+## Iteration 97 — Regression Test Results
+
+**Overall status: PASSED** (static analysis, Playwright unavailable)
+
+### Suites Run
+
+| Suite | Checks | Result |
+|---|---|---|
+| `regression_baseline` | 35/35 | ✅ All pass |
+| `acceptance_FEAT-050` (workspace cloning) | 13/13 | ✅ All pass |
+| `verify_FEAT-051` (conditional coloring) | 10/10 | ✅ All pass |
+| `verify_BUG-019` (activity log user display) | 5/5 | ✅ All pass |
+
+### Bugs Found
+
+1. **P2 — `has_role` coloring rule silently no-ops** (`canvas-view.tsx:205-207`): Rules with `criteria_type='has_role'` can be created and appear to save, but produce no visual tint. A `// Requires additional data fetch — skip visual evaluation for now` comment explains why. Users have no feedback that this criteria type is non-functional.
+
+2. **P3 — EXECUTION_PLAN spec inaccuracy** (documentation only): Check #1 for FEAT-050 states `clone_workspace(p_workspace_id, p_user_id, p_org_id)` but migration 018 defines `clone_workspace(p_source_workspace_id)`. The code is correct; the spec was stale.
+
+### Improvements Found
+
+1. `confirm()` dialogs in settings page (Duplicate + Delete) should be Radix AlertDialogs for dark-theme consistency
+2. `has_role` criteria type needs either disabled-with-tooltip or full implementation
+3. Accessibility cadence 76 iterations overdue — coloring panel, playbook overlay, and activity tabs haven't been audited for WCAG compliance

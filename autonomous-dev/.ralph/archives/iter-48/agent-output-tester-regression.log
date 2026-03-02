@@ -1,0 +1,30 @@
+`TEST_RESULT_2.json` written. Here's the summary:
+
+---
+
+## Regression Test — Iteration 100 Result: **FAILED**
+
+### Suites run: `regression-baseline-full`, `feat-052-data-integrity`, `performance-static-audit`
+**Actions used:** 29 / 40
+
+---
+
+### Bugs Found
+
+**P1 — Routing regression on 3+ routes** (`/runbooks`, `/activity`, `/gap-analysis`)
+- Production `workspace-shell.tsx` exclusion list is missing `"runbooks"`, `"activity"`, and likely `"gap-analysis"`. The shell treats these as canvas tab IDs (`isCanvasView=true`), rendering an empty React Flow canvas instead of RunbooksListView, ActivityView, and GapAnalysisView. Confirmed via DOM inspection — TabBar is a sibling of `<main>`, meaning `isCanvasView` evaluated to `true` in the deployed build.
+- **Root cause:** The production deployment is behind the `ralph/init-stride` branch. The exclusion list in deployed `workspace-shell.tsx` likely only covers the original set (`["teams", "people", "tools", "settings", "list", "gap-analysis", "compare"]` or similar), missing routes added in later iterations.
+
+**P2 — 4 unlabeled icon-only buttons on canvas** — buttons with no `aria-label` (tab close/rename buttons, sidebar toggle-like buttons).
+
+---
+
+### FEAT-052 Data Integrity: **ALL PASS** (static analysis)
+Migration 020 SQL ✅ · RLS policies ✅ · TypeScript types ✅ · API envelope pattern ✅ · Client wrappers ✅ · STARTER_TEMPLATES ✅ · UUID remapping ✅ · Role name-matching ✅
+
+---
+
+### Performance Static Audit: **3 FAILS**
+- `canvas-view.tsx` handlers not in `useCallback` (causes FlowCanvas re-renders)
+- `StepNode`/`SectionNode` not wrapped in `React.memo`
+- 4 component files > 500 lines (teams-view 721, journey-canvas-view 662, compare-view 640, settings 581)

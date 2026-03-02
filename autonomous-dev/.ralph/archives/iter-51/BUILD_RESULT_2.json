@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "iteration": 105,
+  "slot": 2,
+  "task_id": "#IMP-042",
+  "status": "completed",
+  "duration_seconds": 120,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/settings/page.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 2
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0, no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused), 0 errors" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Injected workspace.name into two places: (1) DialogDescription in the clone confirmation dialog now reads 'A full copy of \"[workspace name]\" will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.' (2) Body paragraph in the Duplicate Workspace section now reads 'Create a full copy of \"[workspace name]\", including all tabs, sections, steps, connections, teams, roles, people, and tools.' Used JSX &quot; entities for the surrounding quotes. workspace.name was already available via useWorkspace() at line 36.",
+
+  "failure_details": null
+}

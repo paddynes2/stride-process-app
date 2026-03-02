@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.0",
+  "iteration": 105,
+  "date": "2026-03-02T23:59:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "1099b6e429d63ec9fb920b50131430ca0587612c",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-034 [1/2]",
+      "description": "Prioritization matrix data layer: migration adding effort_score and impact_score columns to steps and touchpoints tables, TypeScript type updates, API PATCH support for new columns",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "New migration file 021_prioritization_scores.sql adds effort_score INT CHECK (1-5) nullable and impact_score INT CHECK (1-5) nullable to both steps AND touchpoints tables",
+        "Step interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+        "Touchpoint interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+        "Steps PATCH route (src/app/api/v1/steps/[id]/route.ts) includes effort_score and impact_score in EDITABLE_FIELDS",
+        "Touchpoints PATCH route (src/app/api/v1/touchpoints/[id]/route.ts) includes effort_score and impact_score in EDITABLE_FIELDS",
+        "npx tsc --noEmit passes cleanly after changes"
+      ],
+      "files_owned": [
+        "supabase/migrations/021_prioritization_scores.sql",
+        "src/types/database.ts",
+        "src/app/api/v1/steps/[id]/route.ts",
+        "src/app/api/v1/touchpoints/[id]/route.ts"
+      ],
+      "files_read_only": [
+        "supabase/migrations/007_maturity_scoring.sql",
+        "src/lib/maturity.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "supabase/migrations/007_maturity_scoring.sql"
+        ],
+        "patterns_to_follow": [
+          "Migration 007 pattern: ALTER TABLE ... ADD COLUMN ... INT CHECK (col BETWEEN 1 AND 5) — nullable by default",
+          "Steps EDITABLE_FIELDS already includes maturity_score and target_maturity — add effort_score and impact_score to the same array",
+          "Touchpoints EDITABLE_FIELDS: add effort_score and impact_score to the existing array",
+          "database.ts Step interface: existing maturity_score: number | null pattern — add effort_score and impact_score with same type"
+        ],
+        "learnings_relevant": [
+          "NEXT_PUBLIC_ static replacement — not relevant for data layer",
+          "apiFetch unwraps envelope — existing pattern, follow it"
+        ],
+        "affected_urls": []
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "Follow migration 007 pattern exactly. Two ALTER TABLE statements (one for steps, one for touchpoints). Each adds two nullable INT columns with CHECK constraint BETWEEN 1 AND 5. The Touchpoint interface currently has no maturity fields — add effort_score and impact_score after the position_y field, before created_at."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-042",
+      "description": "Clone confirmation dialog should display workspace name in the description text",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "DialogDescription in the Duplicate Workspace dialog includes the workspace name dynamically",
+        "Text reads something like: 'A full copy of \"[workspace name]\" will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.'",
+        "The settings page body text paragraph also includes the workspace name for consistency",
+        "No TypeScript errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "IMP-028 already replaced confirm() with Radix Dialog — modify the existing DialogDescription content",
+          "IMP-029 already updated body text — modify it to include workspace name",
+          "Workspace object is available in the settings page context (useWorkspace hook or server-side fetch)"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/settings"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "The workspace object should already be available in the settings page. Find where the clone dialog is rendered (look for confirmCloneOpen state) and inject workspace.name into the DialogDescription string. Use template literal with quotes around the name."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-046",
+      "description": "Runbooks list progress bar should show step count text (e.g. '3 / 5') alongside the bar",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Each runbook card in the list view shows a text label like '3 / 5' next to or below the progress bar",
+        "Text uses existing text hierarchy (text-[var(--text-secondary)] or text-[var(--text-tertiary)])",
+        "Text shows resolved count (completed + skipped) out of total, matching playbook-view.tsx pattern",
+        "No TypeScript errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
+      ],
+      "files_read_only": [
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx"
+        ],
+        "patterns_to_follow": [
+          "IMP-014 already established resolvedCount = completedCount + skippedCount pattern in this file",
+          "playbook-view.tsx shows 'Step N of M' text — follow similar compact format for list cards",
+          "IMP-013 added the segmented progress bar — add text label adjacent to it"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/runbooks"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "The runbooks-list-view already has completedCount, skippedCount, and total step counts computed per runbook card (from IMP-014). Add a small text label showing the fraction, matching the existing text sizing pattern in the card."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/lib/utils.ts"],
+    "owner": null,
+    "note": "database.ts is owned by slot 1. No other slot should modify it."
+  },
+  "merge_order": ["#FEAT-034 [1/2]", "#IMP-042", "#IMP-046"],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": true,
+    "regression_reason": "risk_score=4 from iteration 104 (7 source files changed including shared components sidebar.tsx, workspace-shell.tsx)",
+    "suites_to_run": ["feat-034-data-integrity", "regression-baseline"],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [
+      "Migration 021 will need npx supabase db push (human action) — same as migration 020 blocker",
+      "Accessibility audit still overdue (84 iterations). Next cadence trigger: iteration 110."
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

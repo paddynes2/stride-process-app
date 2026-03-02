@@ -1,0 +1,23 @@
+EXECUTION_PLAN.json written. Here's the summary:
+
+## Iteration 101 Plan
+
+**Mode:** `multi_task` (2 parallel slots)
+
+### Slot 1: #FEAT-052 [2/2] — Section Templates UI (M)
+- **Save as Template** button on section-detail-panel footer → Radix Dialog with name/description/category
+- **Templates browser** button on canvas-view toolbar → Radix Dialog showing DB templates + 4 STARTER_TEMPLATES as cards
+- **Deploy flow** — for DB templates: direct deploy; for starters: create then deploy
+- **Files owned:** `section-detail-panel.tsx`, `canvas-view.tsx`
+
+### Slot 2: #IMP-032 — React.memo on Custom Nodes (S)
+- Wrap `StepNode` and `SectionNode` exports in `React.memo`
+- Performance improvement recommended by React Flow docs
+- **Files owned:** `step-node.tsx`, `section-node.tsx`
+
+### Planner Findings
+- **BUG-021**: Already resolved in current codebase — exclusion list has all 3 segments. Bug only exists on production (19+ commits behind).
+- **IMP-035**: Already resolved — sidebar.tsx has all 11 nav links.
+- **Validation**: Type check passes, no revert needed.
+- **Risk score**: 0 (testing-only iteration had no code changes).
+- **Merge order**: IMP-032 first (smaller, independent), then FEAT-052.

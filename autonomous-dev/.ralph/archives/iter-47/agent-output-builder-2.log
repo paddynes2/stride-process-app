@@ -1,0 +1,13 @@
+Done. Here's a summary:
+
+**Task #IMP-032 — Complete**
+
+- `step-node.tsx`: `export function StepNode` → `function StepNodeComponent` + `export const StepNode = React.memo(StepNodeComponent)`
+- `section-node.tsx`: `export function SectionNode` → `function SectionNodeComponent` + `export const SectionNode = React.memo(SectionNodeComponent)`
+
+**Verification:**
+- TypeScript: ✅ pass (0 errors)
+- Lint: ✅ pass (0 errors; 1 pre-existing warning in unrelated file)
+- Build/tests: not applicable
+
+Both files staged. BUILD_RESULT_2.json written.

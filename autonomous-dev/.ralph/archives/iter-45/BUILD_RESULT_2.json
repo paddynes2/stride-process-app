@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "iteration": 99,
+  "slot": 2,
+  "task_id": "#BUG-020",
+  "status": "completed",
+  "duration_seconds": 180,
+
+  "files_changed": [
+    {
+      "path": "src/components/canvas/coloring-panel.tsx",
+      "action": "modified",
+      "lines_added": 4,
+      "lines_removed": 3
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused) — documented in LEARNINGS.md as acceptable" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": ["src/components/canvas/coloring-panel.tsx"],
+  "ownership_violations": [],
+  "notes": "Changes: (1) CRITERIA_OPTIONS type updated to include disabled?: boolean. (2) has_role entry updated: label='Has Role (coming soon)', disabled=true. (3) Both <select> elements (add form + edit form) now pass disabled={opt.disabled} to each <option>. (4) Rule list display updated to show CRITERIA_OPTIONS label (with fallback to raw criteria_type) instead of raw criteria_type string — so existing has_role rules show 'Has Role (coming soon): <value>'. CRITERIA_VALUE_HINTS for has_role kept unchanged.",
+
+  "failure_details": null
+}

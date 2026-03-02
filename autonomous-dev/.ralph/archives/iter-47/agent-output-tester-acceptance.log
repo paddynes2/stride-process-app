@@ -1,0 +1,28 @@
+**Testing complete.** Here's the summary:
+
+---
+
+## Test Result: FAILED (iteration 101)
+
+### What Passed ✅ (14/16 criteria)
+- **Templates button** in top-right toolbar next to Color — browser confirmed
+- **Templates dialog opens** on click — browser confirmed
+- **Error state rendering** — browser confirmed (shows error gracefully)
+- **Save as Template button** in section panel footer with BookTemplate icon — static verified
+- **Save as Template dialog** structure (DialogTitle, DialogDescription, inputs, pre-fill) — static verified
+- **Dialog submit flow** (createTemplate → toast → close) — static verified
+- **Card content** (name, description, category badge, step count) — static verified
+- **Delete button only on DB templates** — static verified
+- **Deploy flow** (both DB and starter paths) — static verified
+- **Position calculation** (maxY + 300, fallback 100) — static verified
+- **Post-deploy router.refresh()** — static verified
+- **IMP-032**: Both StepNode and SectionNode wrapped in React.memo — static + build verified
+
+### P1 Bug: Migration Not Deployed 🔴
+`/api/v1/templates` returns HTTP 500 — `migration 020_section_templates.sql` was never pushed to the Supabase remote DB. **Fix: `npx supabase db push`** before any runtime verification of template cards or deploy flow is possible.
+
+### P2 Bug: DialogContent Accessibility Warning 🟡
+Two `DialogContent requires a DialogTitle` warnings fire when the Templates dialog opens. The dialog code has `<DialogTitle>` in place — likely caused by a *different* uncovered `DialogContent` in the same render tree (coloring panel or workspace summary panel).
+
+### Improvement 💡
+When the API errors, STARTER_TEMPLATES (in-memory, no DB needed) are hidden along with DB templates. Starters could still be shown in the error state for partial availability.

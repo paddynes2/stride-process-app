@@ -1,0 +1,23 @@
+Done. Here's a summary of what was done:
+
+**Task #IMP-046 — completed**
+
+**Change:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
+
+The segmented progress bar was wrapped in a `flex items-center gap-2` container. The bar div got `flex-1` to fill remaining space. A `<span>` showing `{resolved} / {total}` was added to the right of the bar:
+
+```tsx
+<div className="mt-1.5 flex items-center gap-2">
+  <div className="flex-1 h-1.5 ...">
+    {/* bar segments */}
+  </div>
+  <span className="text-[11px] text-[var(--text-tertiary)] shrink-0 tabular-nums">
+    {resolved} / {total}
+  </span>
+</div>
+```
+
+- Uses `text-[var(--text-tertiary)]` per acceptance criteria
+- `resolved = completed + skipped` — already computed from IMP-014, no new logic
+- `tabular-nums` prevents layout shift as numbers change
+- TypeScript: pass (0 errors) | Lint: pass (0 errors)

@@ -1,0 +1,26 @@
+`TEST_RESULT_1.json` written to `knowledge/handoffs/`.
+
+**Summary — Iteration 98 Acceptance Testing:**
+
+**Overall: `failed`** — 2 of 3 tasks have pipeline-level issues.
+
+---
+
+**#IMP-028 (Settings clone dialog): ALL PASS ✅**
+- Radix Dialog correctly wired with `confirmCloneOpen` state
+- Title, description, Cancel/Duplicate buttons match spec exactly
+- `window.confirm()` removed from clone path
+- TypeScript verified
+
+---
+
+**#BUG-020 (Disable has_role in coloring panel): ALL FAIL ❌ — P1 Bug**
+- `coloring-panel.tsx` is unchanged from pre-iteration state: `has_role` still shows "Has Role" (not "coming soon"), no `disabled` field, no warning text
+- Root cause: No `builder slot 2 iteration 44` or `merge builder slot 2 iteration 44` commit exists in git log — the BUG-020 build output was **never committed or merged**
+
+---
+
+**#FEAT-052 (Templates data layer): ALL PASS (static) but P2 Bug ⚠️**
+- All code verified via `git show` (files committed in HEAD but to worktree paths under `autonomous-dev/.ralph/worktrees/build-1/src/...`)
+- `src/app/api/v1/templates/` does **not exist** at runtime — the builder added worktree-relative paths, not `src/` paths; no merge commit present
+- Two spec deviations flagged as improvements: connection format (UUIDs vs indices) and step field naming mismatches
