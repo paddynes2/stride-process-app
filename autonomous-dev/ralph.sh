@@ -1302,6 +1302,9 @@ run_pipeline() {
         set +e
 
         export PROJECT_ROOT="$wt_path"
+        # Save pre-agent HEAD — the agent may commit during its run, moving HEAD
+        local pre_agent_head
+        pre_agent_head=$(cd "$wt_path" && git rev-parse HEAD 2>/dev/null || echo "")
         agent_exit=0
         run_agent "builder-${slot}" "$prompt_file_path" "$BUILDER_MODEL" || agent_exit=$?
 
@@ -1321,9 +1324,12 @@ run_pipeline() {
         # ── Reset tracked knowledge/autonomous-dev files BEFORE staging ──
         # Builders may modify knowledge/*.md, autonomous-dev/*.sh, or handoff
         # files. These are tracked in git and cause merge conflicts (see G015).
-        # Restore them to HEAD so only src/supabase/prd changes get committed.
+        # The agent may have committed during its run, so HEAD has moved.
+        # Restore from pre-agent HEAD to undo knowledge changes in working tree.
         rm -f "$wt_path"/knowledge/handoffs/*.json 2>/dev/null || true
-        (cd "$wt_path" && git checkout HEAD -- knowledge/ autonomous-dev/ 2>/dev/null || true)
+        if [ -n "$pre_agent_head" ]; then
+          (cd "$wt_path" && git checkout "$pre_agent_head" -- knowledge/ autonomous-dev/ 2>/dev/null || true)
+        fi
 
         # ── Stage and commit all changes ──
         # Builder may create files but miss git-adding some. Since this is a
