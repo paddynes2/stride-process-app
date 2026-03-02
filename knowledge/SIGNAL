@@ -1,1 +1,1 @@
-CONTINUE: Re-attempt #FEAT-048 Playbook mode + #IMP-012 Styled confirm dialog (attempt 2 — pipeline merge failure lost all builder work in iter 84)
+BLOCKED: Pipeline merge step in ralph.sh is broken — 2 consecutive iterations (84, 85) lost ALL builder work. Builders complete code in worktrees but merge never executes and worktrees are cleaned up. Fix pipeline before re-attempting #FEAT-048 + #IMP-012.
