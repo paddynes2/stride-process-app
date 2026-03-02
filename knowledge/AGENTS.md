@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-92, 2026-03-03 -->
+<!-- Updated: iter-93, 2026-03-03 -->
 
 ## Project
 
@@ -138,6 +138,7 @@ npx supabase db push     # Push migrations
 | 015 | Tasks table (step-scoped checklists) + RLS + indexes + update trigger |
 | 016 | Runbooks + runbook_steps tables + enums (runbook_status, runbook_step_status) + RLS + indexes + triggers |
 | 017 | Activity log (activity_action enum + activity_log table, append-only, SELECT+INSERT RLS, workspace+created_at index) |
+| 018 | clone_workspace() SECURITY DEFINER function (deep-copies workspace + 12 child table types with UUID remapping via temp tables) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->

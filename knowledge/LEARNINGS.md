@@ -13,6 +13,8 @@
 - **TipTap SSR crash:** TipTap editor must be lazy-loaded or wrapped in dynamic() to avoid SSR hydration mismatch.
 - **WCAG AA text-quaternary:** `text-white/15` is too low contrast for functional content. Only use for decorative elements. Functional text minimum: `text-white/55`.
 
+- **Server/API query mismatch:** When a page uses both a server component (page.tsx with direct Supabase query) and an API route (for client-side Load More), BOTH queries must use the same `.select()` shape. Updating only the API route to add a join (e.g., `select("*, users!fk(email)")`) while leaving page.tsx at `select("*")` causes initial load data to lack join fields. Always update both code paths together.
+
 ## Patterns That Work
 
 - **Phase decomposition:** Large features (4+ files) benefit from splitting into 3-4 sub-tasks (data model → API → UI → polish).
