@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -588,3 +588,62 @@ export async function updateTask(id: string, data: Partial<Pick<Task, "title" | 
 export async function deleteTask(id: string): Promise<void> {
   await apiFetch(`/api/v1/tasks/${id}`, { method: "DELETE" });
 }
+
+// ---------------------------------------------------------------------------
+// Runbooks
+// ---------------------------------------------------------------------------
+
+export async function fetchRunbooks(workspaceId: string): Promise<Runbook[]> {
+  return apiFetch<Runbook[]>(`/api/v1/runbooks?workspace_id=${workspaceId}`);
+}
+
+export async function createRunbook(data: {
+  workspace_id: string;
+  section_id: string;
+  name?: string;
+}): Promise<Runbook> {
+  return apiFetch<Runbook>("/api/v1/runbooks", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function fetchRunbook(id: string): Promise<Runbook> {
+  return apiFetch<Runbook>(`/api/v1/runbooks/${id}`);
+}
+
+export async function updateRunbook(
+  id: string,
+  data: Partial<Pick<Runbook, "name" | "status" | "completed_at">>
+): Promise<Runbook> {
+  return apiFetch<Runbook>(`/api/v1/runbooks/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteRunbook(id: string): Promise<void> {
+  await apiFetch(`/api/v1/runbooks/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Runbook Steps
+// ---------------------------------------------------------------------------
+
+export async function fetchRunbookSteps(runbookId: string): Promise<RunbookStep[]> {
+  return apiFetch<RunbookStep[]>(`/api/v1/runbook-steps?runbook_id=${runbookId}`);
+}
+
+export async function updateRunbookStep(
+  id: string,
+  data: Partial<Pick<RunbookStep, "status" | "assigned_to" | "completed_at" | "notes">>
+): Promise<RunbookStep> {
+  return apiFetch<RunbookStep>(`/api/v1/runbook-steps/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
