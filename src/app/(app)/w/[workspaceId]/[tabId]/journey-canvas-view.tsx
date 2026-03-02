@@ -615,25 +615,37 @@ export function JourneyCanvasView({
               </div>
             )}
           </div>
-          {activePerspective && selectedStage && (
-            <AnnotationPanel
-              perspectiveId={activePerspective.id}
-              perspectiveName={activePerspective.name}
-              perspectiveColor={activePerspective.color}
-              annotatableType="stage"
-              annotatableId={selectedStage.id}
-              onAnnotationChange={refreshAnnotatedIds}
-            />
+          {selectedStage && (
+            activePerspective ? (
+              <AnnotationPanel
+                perspectiveId={activePerspective.id}
+                perspectiveName={activePerspective.name}
+                perspectiveColor={activePerspective.color}
+                annotatableType="stage"
+                annotatableId={selectedStage.id}
+                onAnnotationChange={refreshAnnotatedIds}
+              />
+            ) : (
+              <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
+                Select a perspective to add annotations
+              </div>
+            )
           )}
-          {activePerspective && selectedTouchpoint && !selectedStage && (
-            <AnnotationPanel
-              perspectiveId={activePerspective.id}
-              perspectiveName={activePerspective.name}
-              perspectiveColor={activePerspective.color}
-              annotatableType="touchpoint"
-              annotatableId={selectedTouchpoint.id}
-              onAnnotationChange={refreshAnnotatedIds}
-            />
+          {selectedTouchpoint && !selectedStage && (
+            activePerspective ? (
+              <AnnotationPanel
+                perspectiveId={activePerspective.id}
+                perspectiveName={activePerspective.name}
+                perspectiveColor={activePerspective.color}
+                annotatableType="touchpoint"
+                annotatableId={selectedTouchpoint.id}
+                onAnnotationChange={refreshAnnotatedIds}
+              />
+            ) : (
+              <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
+                Select a perspective to add annotations
+              </div>
+            )
           )}
           {selectedStage && (
             <CommentPanel commentableType="stage" commentableId={selectedStage.id} />

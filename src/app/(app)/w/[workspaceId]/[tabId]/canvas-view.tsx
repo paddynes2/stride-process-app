@@ -219,25 +219,37 @@ export function CanvasView({
               />
             )}
           </div>
-          {activePerspective && selectedStep && (
-            <AnnotationPanel
-              perspectiveId={activePerspective.id}
-              perspectiveName={activePerspective.name}
-              perspectiveColor={activePerspective.color}
-              annotatableType="step"
-              annotatableId={selectedStep.id}
-              onAnnotationChange={refreshAnnotatedIds}
-            />
+          {selectedStep && (
+            activePerspective ? (
+              <AnnotationPanel
+                perspectiveId={activePerspective.id}
+                perspectiveName={activePerspective.name}
+                perspectiveColor={activePerspective.color}
+                annotatableType="step"
+                annotatableId={selectedStep.id}
+                onAnnotationChange={refreshAnnotatedIds}
+              />
+            ) : (
+              <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
+                Select a perspective to add annotations
+              </div>
+            )
           )}
-          {activePerspective && selectedSection && !selectedStep && (
-            <AnnotationPanel
-              perspectiveId={activePerspective.id}
-              perspectiveName={activePerspective.name}
-              perspectiveColor={activePerspective.color}
-              annotatableType="section"
-              annotatableId={selectedSection.id}
-              onAnnotationChange={refreshAnnotatedIds}
-            />
+          {selectedSection && !selectedStep && (
+            activePerspective ? (
+              <AnnotationPanel
+                perspectiveId={activePerspective.id}
+                perspectiveName={activePerspective.name}
+                perspectiveColor={activePerspective.color}
+                annotatableType="section"
+                annotatableId={selectedSection.id}
+                onAnnotationChange={refreshAnnotatedIds}
+              />
+            ) : (
+              <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
+                Select a perspective to add annotations
+              </div>
+            )
           )}
           {selectedStep && (
             <TaskPanel workspaceId={workspaceId} stepId={selectedStep.id} />
