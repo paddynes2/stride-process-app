@@ -510,10 +510,12 @@ export function JourneyCanvasView({
                 <Button variant="secondary" size="sm" onClick={handleAddTouchpoint}>
                   <Plus className="h-3.5 w-3.5" />
                   Touchpoint
+                  <kbd className="text-[10px] font-mono px-1 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-tertiary)] border border-[var(--border-subtle)]">N</kbd>
                 </Button>
                 <Button variant="secondary" size="sm" onClick={handleAddStage}>
                   <Layers className="h-3.5 w-3.5" />
                   Stage
+                  <kbd className="text-[10px] font-mono px-1 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-tertiary)] border border-[var(--border-subtle)]">S</kbd>
                 </Button>
                 <Button
                   variant={heatMapMode ? "default" : "secondary"}
