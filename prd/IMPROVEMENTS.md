@@ -109,13 +109,11 @@
   - **Why it matters:** Nielsen H1 — Visibility of system status. Progress should match user's mental model of "done."
   - **Suggested fix:** Count (completed + skipped) as "resolved" for progress, or add a secondary skipped segment (similar to IMP-013 in list view).
 
-- [ ] #IMP-015 Playbook mode needs Skip action button — Attempts: 0
+- [x] #IMP-015 Playbook mode Skip action button — Attempts: 1 — DONE iteration 88, 2026-03-03
   - **Found:** Iteration 87 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx`
-  - **What:** Only "Mark Complete & Next" exists. Users who want to skip a step must exit playbook mode, skip in checklist view, then re-enter playbook mode.
-  - **Why it matters:** Nielsen H7 — Flexibility and efficiency of use. Power users need skip without extra navigation.
-  - **Suggested fix:** Add secondary "Skip" button below "Mark Complete & Next" for pending steps.
+  - **Fix applied:** Added handleSkip function with identical optimistic+rollback pattern (status='skipped', prevIndex saved/restored). Skip button (variant=secondary) placed below Mark Complete & Next, hidden for completed/skipped steps and in read-only mode, disabled while isUpdating.
 
 - [ ] #IMP-016 Playbook button should be visible on read-only runbooks — Attempts: 0
   - **Found:** Iteration 87 (acceptance tester)

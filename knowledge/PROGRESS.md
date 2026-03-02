@@ -966,3 +966,35 @@
 - Efficiency: 5 — single tester covered all 3 suites in 38/40 actions
 - Observations: 4 (1 bug + 3 improvements)
 **Notes:** Testing inflection point — all Phase 4 P0 features acceptance-tested. FEAT-047 acceptance was overdue 5+ iterations due to tester dispatch failures (iters 72, 79, 83, 84, 85) — finally resolved. BUG-017 is a real but edge-case issue (only triggers on API failure during optimistic advance). Three usability improvements logged for future consideration. Next: FEAT-049 Activity log.
+
+## Iteration 88 — 2026-03-03 01:00
+**Tasks:**
+- #FEAT-049 [1/3] Activity log data layer — slot 1 — completed
+- #BUG-017 Playbook optimistic rollback fix — slot 2 — completed
+- #IMP-015 Playbook skip button — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/BUGS.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- supabase/migrations/017_activity_log.sql (created — activity_action enum + activity_log table, append-only RLS)
+- src/types/database.ts (modified — ActivityAction type + ActivityLog interface)
+- src/app/api/v1/activity/route.ts (created — GET with workspace_id, user_id, action, entity_type, from/to, limit/offset filters)
+- src/lib/api/client.ts (modified — fetchActivityLog() wrapper + ActivityLog/ActivityAction imports)
+- src/lib/api/activity.ts (created — logActivity() fire-and-forget server utility)
+- src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx (modified — BUG-017 prevIndex fix + handleSkip + Skip button UI)
+**Verification:**
+- Type check: pass (both builders + POST_MERGE_CHECK all pass)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx, 0 errors)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — slot 2 has UI changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Clean code, follows all existing patterns, correct append-only design, proper error handling
+- Test coverage: 2 — No acceptance testing this iteration (testing plan said run_acceptance: false)
+- Confidence: 5 — Both builders typecheck+lint clean, POST_MERGE_CHECK pass, review clean
+- Efficiency: 5 — Both slots succeeded on first attempt, no merge issues
+- Observations: 0
+**Notes:** First iteration to build FEAT-049 activity log (P1 feature). Data layer complete — [2/3] activity page UI and [3/3] logActivity() integration into existing API routes remain. BUG-017 fixed (prevIndex saved/restored on rollback). IMP-015 Skip button follows identical optimistic pattern. Both builders merged cleanly — no worktree merge failures this iteration.

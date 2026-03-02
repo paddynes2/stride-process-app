@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-86, 2026-03-02 -->
+<!-- Updated: iter-88, 2026-03-03 -->
 
 ## Project
 
@@ -47,7 +47,7 @@ npx supabase db push     # Push migrations
 | `/w/.../comments` | `src/app/(app)/w/[workspaceId]/comments/page.tsx` | Workspace comments (all comments, category filter, entity nav links) |
 | `/w/.../runbooks` | `src/app/(app)/w/[workspaceId]/runbooks/page.tsx` | Runbook list (name, status, progress, section, date, filter tabs) |
 | `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with 4-state status, progress bar+text, notes, Complete/Cancel via Radix Dialog, read-only mode, metadata footer, Playbook button) |
-| `/w/.../runbooks/[id]/playbook` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx` | Playbook mode (distraction-free step-by-step execution, fixed overlay z-50, Mark Complete & Next, dot navigation, progress bar, mobile-responsive) |
+| `/w/.../runbooks/[id]/playbook` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx` | Playbook mode (distraction-free step-by-step execution, fixed overlay z-50, Mark Complete & Next, Skip, dot navigation, progress bar, mobile-responsive) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 
@@ -74,6 +74,7 @@ npx supabase db push     # Push migrations
 - `tasks/route.ts` + `[id]/route.ts` — CRUD (GET by step_id, POST, PATCH, DELETE)
 - `runbooks/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST create with step snapshot, GET/PATCH/DELETE by id)
 - `runbook-steps/route.ts` + `[id]/route.ts` — GET by runbook_id, PATCH by id
+- `activity/route.ts` — GET (workspace_id required, optional filters: user_id, action, entity_type, from/to, limit/offset)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
 
 ### Components
@@ -90,6 +91,7 @@ npx supabase db push     # Push migrations
 | `src/lib/api/client.ts` | Client-side API wrappers (apiFetch<T>) |
 | `src/lib/api/response.ts` | Server-side response envelope helpers |
 | `src/lib/api/toast-helpers.ts` | Toast notification helpers |
+| `src/lib/api/activity.ts` | Server-side logActivity() utility (fire-and-forget, append-only) |
 | `src/lib/supabase/client.ts` | Browser Supabase client |
 | `src/lib/supabase/server.ts` | Server Supabase client |
 | `src/lib/supabase/middleware.ts` | Auth middleware |
@@ -105,7 +107,7 @@ npx supabase db push     # Push migrations
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus) |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 
@@ -133,6 +135,7 @@ npx supabase db push     # Push migrations
 | 014 | Comments table + comment_category enum + RLS (reuses annotatable_type) |
 | 015 | Tasks table (step-scoped checklists) + RLS + indexes + update trigger |
 | 016 | Runbooks + runbook_steps tables + enums (runbook_status, runbook_step_status) + RLS + indexes + triggers |
+| 017 | Activity log (activity_action enum + activity_log table, append-only, SELECT+INSERT RLS, workspace+created_at index) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->

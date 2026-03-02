@@ -103,7 +103,7 @@ Core consulting insight features:
 - [x] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder) — [1/3] DONE iter 76, [2/3] DONE iter 77, [3/3] DONE iter 78
 - [x] #FEAT-047 Runbook instances (turn sections into executable checklists) — [1/3] DONE iter 80, [2/3] DONE iter 81, [3/3] DONE iter 82
 - [x] #FEAT-048 Playbook mode (distraction-free runbook execution view) — DONE iteration 86
-- [ ] #FEAT-049 Activity log (audit trail for consulting engagements)
+- [ ] #FEAT-049 Activity log (audit trail for consulting engagements) — [1/3] data layer DONE iter 88
 - [ ] #FEAT-050 Workspace cloning (deep copy for reuse)
 - [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting)
 - [ ] #FEAT-052 Section templates (save & deploy)
@@ -146,3 +146,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 85: FEAT-048 + IMP-012 attempt 2 — IDENTICAL failure to iter 84. Both BUILD_RESULTs report success with passing typecheck/lint, but no builder branches exist, no source files on disk, no merge commits. Pipeline merge step is completely broken — not a conflict issue (those were recoverable in iters 73-78) but a total non-execution. 3 consecutive non-productive iterations (83 partial, 84 reverted, 85 reverted). **Pipeline infrastructure fix required before any more build iterations.**
 - [2026-03-02] Iteration 86: #FEAT-048 Playbook mode (attempt 3) + #IMP-012 styled confirm dialog + #IMP-013 segmented progress bar — ALL COMPLETED. Pipeline merge succeeded after 2 consecutive failures. PlaybookView uses fixed overlay (D-006). FEAT-048 acceptance testing needed next iteration. All Phase 4 P0 features now done (FEAT-045, 046, 047). Next: FEAT-049 Activity log or regression+acceptance testing.
 - [2026-03-02] Iteration 87: Testing-only — 33/33 PASS (regression 5 + FEAT-047 acceptance 16 + FEAT-048 acceptance 12). All Phase 4 P0 features acceptance-tested. FEAT-047 overdue acceptance resolved. 1 bug (BUG-017 optimistic rollback) + 3 improvements logged. Next: FEAT-049 Activity log.
+- [2026-03-03] Iteration 88: #FEAT-049 [1/3] data layer complete (migration 017, types, API, client, logActivity). #BUG-017 fixed (optimistic rollback prevIndex). #IMP-015 done (playbook skip button). Both builders merged cleanly. Next: FEAT-049 [2/3] activity page UI.
