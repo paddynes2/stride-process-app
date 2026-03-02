@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 108,
-  "date": "2026-03-03T01:00:00Z",
+  "iteration": 109,
+  "date": "2026-03-03T02:30:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "d9588dfcbbc01bc2e6e6f0ea709c881b5b5edae3",
+    "last_commit_hash": "2a8dcf5390c1d06a10483938d4f33247002676e0",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,8 +13,8 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-035",
-      "description": "FEAT-035 [2/2] Improvement ideas UI — 'Add Improvement' dialog on detail panels, improvements page, sidebar count badge",
+      "id": "#FEAT-036 [1/2]",
+      "description": "AI process analysis backend — API route (OpenRouter/DeepSeek), types, client wrapper, workspace settings caching, rate limiting",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 3a: Analysis Intelligence",
@@ -22,97 +22,104 @@
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "Add Improvement button on step-detail-panel, section-detail-panel, and touchpoint-detail-panel — opens Radix Dialog with title (required), description (textarea), priority dropdown (low/medium/high/critical, default medium). Pre-fills linked entity ID (linked_step_id, linked_section_id, or linked_touchpoint_id respectively). Calls createImprovementIdea() from client.ts. Toast on success/error.",
-        "New page at /w/[workspaceId]/improvements — server component page.tsx fetches improvement ideas, passes to client improvements-view.tsx",
-        "Improvements view: filterable list by status tabs (All, Proposed, Approved, In Progress, Completed, Rejected) and priority filter dropdown. Each card shows: title, status badge (colored by status), priority badge, linked element name (clickable link to canvas tab), description preview (truncated). Cards in a grid or list layout matching dark theme.",
-        "Inline status change via dropdown on each card — calls updateImprovementIdea()",
-        "Sidebar nav item 'Improvements' with Lightbulb icon from lucide-react, positioned between Prioritization and Comments. Badge showing open count (status NOT IN completed, rejected). Badge uses fetch in useEffect on mount.",
-        "Add 'improvements' to workspace-shell.tsx reserved paths array (line 47)",
-        "Add !p.includes('/improvements') to sidebar.tsx Workflows active check (line 39)"
+        "New POST route at src/app/api/v1/ai/analyze-process/route.ts — accepts { workspace_id } in request body, authenticates user, validates workspace access via Supabase RLS",
+        "Route fetches all steps for the workspace via supabase.from('steps').select('*').eq('workspace_id', workspaceId) — gets maturity_score, target_maturity, effort_score, impact_score, executor, time_minutes, frequency_per_month, status, step_type, section_id",
+        "Route fetches all sections for the workspace via supabase.from('sections').select('*').eq('workspace_id', workspaceId) — for grouping context",
+        "Constructs a system prompt setting persona as process optimization consultant, and user prompt enumerating each section's steps with their actual metrics (name, status, executor, maturity current/target, time, frequency, effort, impact, gaps)",
+        "Calls OpenRouter API at https://openrouter.ai/api/v1/chat/completions using native fetch() — model: deepseek/deepseek-chat-v3-0324, temperature: 0.3, max_tokens: 4096, Authorization: Bearer ${process.env.OPENROUTER_API_KEY}",
+        "Parses response.choices[0].message.content as JSON into AIAnalysisResult type (with try/catch for parse failures)",
+        "Types added to src/types/database.ts: AIAnalysisResult { bottlenecks: AIInsight[], redundancies: AIInsight[], automation_candidates: AIInsight[], maturity_recommendations: AIInsight[] }, AIInsight { title: string, description: string, severity: 'high' | 'medium' | 'low', affected_step_ids: string[] }",
+        "Caches result by updating workspace settings JSONB directly via Supabase: merge { last_analysis: result, last_analysis_at: new Date().toISOString() } into existing settings object — preserves other settings keys",
+        "Rate limit: reads workspace.settings.last_analysis_at — if less than 5 minutes ago, returns 429 with { error: { code: 'rate_limited', message: '...' }, retry_after_seconds: N }",
+        "Error handling: OPENROUTER_API_KEY not set → returns 503 { error: { code: 'ai_not_configured', message: 'AI analysis requires an OpenRouter API key. Add OPENROUTER_API_KEY to your environment variables.' } }",
+        "Error handling: OpenRouter API failure → returns 502 with error detail from upstream",
+        "Client wrapper in src/lib/api/client.ts: analyzeProcess(workspaceId: string): Promise<AIAnalysisResult> using apiFetch<AIAnalysisResult>",
+        "Uses native fetch() only — zero new dependencies",
+        "logActivity() called on successful analysis (action: 'created', entity_type: 'ai_analysis')"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/improvements/page.tsx",
-        "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
-        "src/components/panels/step-detail-panel.tsx",
-        "src/components/panels/section-detail-panel.tsx",
-        "src/components/panels/touchpoint-detail-panel.tsx",
-        "src/components/layout/sidebar.tsx",
-        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
+        "src/app/api/v1/ai/analyze-process/route.ts",
+        "src/types/database.ts",
+        "src/lib/api/client.ts"
       ],
       "files_read_only": [
-        "src/types/database.ts",
-        "src/lib/api/client.ts",
-        "src/lib/api/toast-helpers.ts",
-        "src/app/(app)/w/[workspaceId]/comments/page.tsx",
-        "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
-        "src/app/(app)/w/[workspaceId]/activity/page.tsx",
-        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+        "src/lib/api/response.ts",
+        "src/lib/api/activity.ts",
+        "src/lib/supabase/server.ts",
+        "src/app/api/v1/improvement-ideas/route.ts"
       ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/comments/page.tsx — server component pattern (fetch + pass to view)",
-          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx — filterable list view with category tabs pattern",
-          "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx — list view with filter tabs + Load More pattern"
+          "src/app/api/v1/improvement-ideas/route.ts — same auth + envelope + validation pattern",
+          "src/app/api/v1/workspaces/[id]/route.ts — workspace access pattern, settings column usage"
         ],
         "patterns_to_follow": [
-          "Server page.tsx: createServerSupabaseClient() → fetch improvement_ideas → pass to client view component",
-          "Client view: filter tabs for status, map cards, inline status dropdown, linked entity clickable links",
-          "Detail panel button: follow existing button patterns in step-detail-panel. Use Radix Dialog (Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter) from @radix-ui/react-dialog (import DialogPrimitive for Title to avoid BUG-023 pattern)",
-          "Sidebar badge: useState + useEffect to fetch open count. Badge styled like status badges (text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-blue)] text-white)",
-          "Status badges: proposed=gray, approved=blue, in_progress=yellow, completed=green, rejected=red — match existing step status badge colors",
-          "Priority badges: low=gray, medium=blue, high=yellow, critical=red"
+          "API envelope: successResponse(data) / errorResponse(code, message, status)",
+          "Auth guard: const { data: { user } } = await supabase.auth.getUser(); if (!user) return errorResponse('unauthorized', 'Not authenticated', 401);",
+          "apiFetch<T>() unwraps envelope, returns T directly — client wrapper returns apiFetch<AIAnalysisResult>(url, opts)",
+          "void logActivity() for fire-and-forget audit logging",
+          "Server-only env vars: process.env.OPENROUTER_API_KEY (no NEXT_PUBLIC_ prefix)"
         ],
         "learnings_relevant": [
-          "apiFetch unwraps envelope — fetchImprovementIdeas returns ImprovementIdea[] directly",
-          "workspace-shell reserved paths array — must add 'improvements' or page shows empty canvas",
-          "Sidebar Workflows active check — must exclude /improvements or nav item doesn't highlight correctly",
-          "React 19 useRef requires initial value: useRef(null)",
-          "Custom DialogTitle vs DialogPrimitive.Title — use DialogPrimitive.Title to avoid a11y warning (BUG-023 pattern)"
+          "apiFetch unwraps envelope — client functions return apiFetch<T>() directly, no nested access",
+          "NEXT_PUBLIC_ static replacement — OPENROUTER_API_KEY is server-only, must NOT use NEXT_PUBLIC_ prefix",
+          "Supabase RLS + workspace access — use workspace fetch as implicit RLS check"
         ],
+        "affected_urls": [
+          "/api/v1/ai/analyze-process"
+        ]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "OpenRouter uses OpenAI-compatible API format. Request body: { model: 'deepseek/deepseek-chat-v3-0324', messages: [{role:'system', content: systemPrompt}, {role:'user', content: userPrompt}], temperature: 0.3, max_tokens: 4096, response_format: { type: 'json_object' } }. Response shape: { choices: [{ message: { content: string } }] } — content is a JSON string to parse. The workspace settings JSONB column already exists (migration 003, DEFAULT '{}'). To cache: fetch current workspace, spread existing settings, add last_analysis and last_analysis_at, then update. Use direct Supabase update: supabase.from('workspaces').update({ settings: { ...currentSettings, last_analysis: result, last_analysis_at: isoDate } }).eq('id', workspaceId). Do NOT modify the workspace PATCH API route. Step data: steps table has workspace_id directly — query supabase.from('steps').select('*').eq('workspace_id', workspaceId). Sections table also has workspace_id. Prompt structure: system prompt sets AI as 'senior process optimization consultant analyzing a business process map', user prompt lists each section with its steps and their metrics. Request JSON output matching AIAnalysisResult schema. If workspace has no steps, return empty analysis (no API call needed). The route file goes in src/app/api/v1/ai/analyze-process/route.ts — create the ai/ and analyze-process/ directories."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-057",
+      "description": "Add delete action button on improvement idea cards with confirmation",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Each improvement card has a Trash2 icon button in the top-right area (next to priority badge)",
+        "Click triggers window.confirm('Delete this improvement idea?') — simple pattern matching other delete actions",
+        "On confirm, calls deleteImprovementIdea(idea.id) imported from @/lib/api/client",
+        "On success, removes idea from local state: setIdeas(prev => prev.filter(i => i.id !== idea.id))",
+        "On error, calls toastError('Failed to delete improvement', { error: err })",
+        "Delete button styled subtle: text-[var(--text-tertiary)] hover:text-[#EF4444] transition-colors, Trash2 h-3.5 w-3.5",
+        "TypeScript compiles without errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
+      ],
+      "files_read_only": [
+        "src/lib/api/client.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx — delete pattern with confirmation"
+        ],
+        "patterns_to_follow": [
+          "Import deleteImprovementIdea from @/lib/api/client (already exists line 791-792)",
+          "Import Trash2 from lucide-react (add to existing import line 5)",
+          "toastError pattern already used in handleStatusChange (line 63)"
+        ],
+        "learnings_relevant": [],
         "affected_urls": [
           "/w/[workspaceId]/improvements"
         ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Client wrappers already exist in client.ts: fetchImprovementIdeas, createImprovementIdea, updateImprovementIdea, deleteImprovementIdea. Types exist in database.ts: ImprovementIdea, ImprovementStatus, ImprovementPriority. API routes already exist at /api/v1/improvement-ideas. This is PURELY UI work — no API or type changes needed. For the page.tsx server component, fetch improvement_ideas from Supabase with select('*') ordered by created_at desc. For linked entity display, the improvement idea has linked_step_id/linked_section_id/linked_touchpoint_id — fetch the entity name from a join or secondary query for display. Simplest: store entity_name in a column, or fetch entities separately. Since the table doesn't have entity_name, the page.tsx should join or the view should resolve names client-side by fetching steps/sections/touchpoints for the workspace."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-055",
-      "description": "Delete Perspective button label should say 'Delete Perspective' for specificity",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3a: Analysis Intelligence",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Delete Perspective confirmation dialog footer button reads 'Delete Perspective' instead of 'Delete'",
-        "Matches specificity pattern of other dialogs (e.g., workspace delete says 'Delete' but context is clear from title)"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
-      ],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "Find the Delete Perspective Radix Dialog footer button (added in BUG-025 iter 107), change label from 'Delete' to 'Delete Perspective'"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/settings"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Trivial label change. The Delete Perspective dialog was added in iteration 107 (BUG-025). Find the destructive Button in the DialogFooter for perspective deletion and change its text from 'Delete' to 'Delete Perspective'."
+      "special_instructions": "deleteImprovementIdea already exists in client.ts — do NOT modify client.ts. Only modify improvements-view.tsx. Add the delete button inside each card's top-right badge area. Add a handleDelete async function similar to handleStatusChange. Use window.confirm() for simplicity (this is a lightweight improvement, not a major feature). The function should also be async with try/catch wrapping the API call."
     },
     {
       "slot": 3,
-      "id": "#IMP-053",
-      "description": "Prioritization empty state CTA — add link to navigate to first workflow canvas",
+      "id": "#IMP-062",
+      "description": "Prioritization 'Go to Canvas' link targets first process-type tab instead of tabs[0]",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 3a: Analysis Intelligence",
@@ -120,19 +127,22 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "When no items have effort/impact scores, the empty state shows a 'Go to Canvas' link below the existing message",
-        "Link navigates to /w/{workspaceId}/{firstTabId} — uses tabs from props or context. If no tabs exist, link is hidden.",
-        "Link styled as text-[var(--accent-blue)] hover:underline"
+        "Go to Canvas link targets first tab with canvas_type === 'process' instead of tabs[0]",
+        "Falls back to tabs[0] if no process-type tab exists",
+        "Link still hidden when tabs.length === 0",
+        "TypeScript compiles without errors"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx"
       ],
-      "files_read_only": [],
+      "files_read_only": [
+        "src/types/database.ts"
+      ],
       "context": {
         "similar_files": [],
         "patterns_to_follow": [
-          "PrioritizationView receives tabs data (check props/context). Use first workflow tab for link target.",
-          "Follow existing empty state patterns in the codebase — guidance text + action link"
+          "Replace tabs[0].id at line 169 with (tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id",
+          "Tab type has canvas_type: 'process' | 'journey' field"
         ],
         "learnings_relevant": [],
         "affected_urls": [
@@ -141,26 +151,24 @@
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The prioritization-view.tsx already has an empty state message. Add a Link component below it pointing to the first tab. The view likely receives tabs from the page.tsx server component or useWorkspace() context. Check how the component gets tab data before adding the link."
+      "special_instructions": "Minimal one-line change at line 169 of prioritization-view.tsx. Change `tabs[0].id` to `(tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id`. The Tab type from database.ts includes canvas_type. Verify the tabs prop passed to PrioritizationView includes canvas_type in its type signature — if using a subset type, ensure canvas_type is included."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/lib/api/response.ts", "src/lib/supabase/server.ts"],
     "owner": null,
-    "note": "No shared file modifications needed. Types and client wrappers were built in FEAT-035 [1/2]."
+    "note": "src/types/database.ts and src/lib/api/client.ts owned exclusively by slot 1. No other slot may modify these files."
   },
-  "merge_order": ["#FEAT-035", "#IMP-055", "#IMP-053"],
+  "merge_order": ["#FEAT-036 [1/2]", "#IMP-057", "#IMP-062"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": true,
-    "regression_reason": "Risk score 7 from iter 107 (schema change + >5 files + shared components). Iter 107 ran regression but scoring requires it here too.",
-    "suites_to_run": ["acceptance-feat-035-ui", "regression-baseline"],
+    "regression_reason": "Risk score 4 from iteration 108 (9 files changed including shared components: sidebar, workspace-shell, 3 detail panels). Last regression: iteration 107.",
+    "suites_to_run": ["acceptance", "regression-baseline"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "Accessibility cadence OVERDUE — last audit iteration 21, now iteration 108. Next trigger: iteration 110 (even multiple of 10)."
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

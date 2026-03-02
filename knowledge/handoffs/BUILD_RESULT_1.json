@@ -1,74 +1,46 @@
 {
   "schema_version": "1.0",
-  "iteration": 108,
+  "iteration": 109,
   "slot": 1,
-  "task_id": "#FEAT-035",
+  "task_id": "#FEAT-036 [1/2]",
   "status": "completed",
   "duration_seconds": 420,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/improvements/page.tsx",
-      "action": "created",
-      "lines_added": 55,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
+      "path": "src/app/api/v1/ai/analyze-process/route.ts",
       "action": "created",
       "lines_added": 168,
       "lines_removed": 0
     },
     {
-      "path": "src/components/panels/step-detail-panel.tsx",
+      "path": "src/types/database.ts",
       "action": "modified",
-      "lines_added": 88,
-      "lines_removed": 4
+      "lines_added": 16,
+      "lines_removed": 0
     },
     {
-      "path": "src/components/panels/section-detail-panel.tsx",
+      "path": "src/lib/api/client.ts",
       "action": "modified",
-      "lines_added": 83,
-      "lines_removed": 3
-    },
-    {
-      "path": "src/components/panels/touchpoint-detail-panel.tsx",
-      "action": "modified",
-      "lines_added": 91,
-      "lines_removed": 4
-    },
-    {
-      "path": "src/components/layout/sidebar.tsx",
-      "action": "modified",
-      "lines_added": 21,
-      "lines_removed": 2
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
-      "action": "modified",
-      "lines_added": 1,
+      "lines_added": 12,
       "lines_removed": 1
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not modified)" },
-    "build": { "status": "not_applicable", "output": "" },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known/acceptable per LEARNINGS.md). Zero errors in new files." },
+    "build": { "status": "not_applicable", "output": "Full build not run — typecheck + lint sufficient for API/type-only changes" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests exist for API routes in this codebase" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/improvements/page.tsx",
-    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
-    "src/components/panels/step-detail-panel.tsx",
-    "src/components/panels/section-detail-panel.tsx",
-    "src/components/panels/touchpoint-detail-panel.tsx",
-    "src/components/layout/sidebar.tsx",
-    "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
+    "src/app/api/v1/ai/analyze-process/route.ts",
+    "src/types/database.ts",
+    "src/lib/api/client.ts"
   ],
   "ownership_violations": [],
-  "notes": "All 7 acceptance criteria implemented: (1) Add Improvement dialog on step/section/touchpoint detail panels using Radix Dialog + DialogPrimitive.Title (BUG-023 pattern), pre-fills linked entity IDs, calls createImprovementIdea(), toast on success/error. (2) New page at /w/[workspaceId]/improvements — server component fetches improvement_ideas + entity lookup tables (steps/sections/touchpoints). (3) ImprovementsView with status tabs (All/Proposed/Approved/In Progress/Completed/Rejected) and priority filter dropdown, cards with title/status badge/priority badge/linked entity link/description preview. (4) Inline status change via DropdownMenu on each card calls updateImprovementIdea() with optimistic local state update. (5) Sidebar Lightbulb nav item between Prioritization and Comments with open count badge via useEffect fetch (excludes completed/rejected). (6) 'improvements' added to workspace-shell reserved paths array. (7) !p.includes('/improvements') added to Workflows active check in sidebar.",
+  "notes": "All acceptance criteria met. POST /api/v1/ai/analyze-process: auth guard, workspace fetch (implicit RLS), 5-min rate limit (reads settings.last_analysis_at, returns 429 with retry_after_seconds), OPENROUTER_API_KEY check (503 if missing), parallel fetch of steps + sections, empty analysis short-circuit when no steps, prompt construction grouped by section with all metrics (name/status/executor/maturity/target/gap/time/frequency/effort/impact/type), OpenRouter call using native fetch() with deepseek/deepseek-chat-v3-0324 at temp 0.3 + max_tokens 4096 + json_object response_format, JSON parse with try/catch (502 on failure), workspace settings cache via spread (...settings) preserving existing keys, logActivity fire-and-forget (action: created, entity_type: ai_analysis). Client wrapper: analyzeProcess(workspaceId) using apiFetch<AIAnalysisResult>. Types: AIInsight + AIAnalysisResult added to database.ts. Zero new dependencies.",
   "failure_details": null
 }

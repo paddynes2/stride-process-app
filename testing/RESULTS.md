@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 107
+- **Iteration:** 109
 - **Date:** 2026-03-03
-- **Suite:** acceptance (FEAT-035 + BUG-025 + IMP-052) + regression-baseline (Playwright browser)
-- **Method:** Static code analysis (acceptance) + Playwright browser (regression)
-- **Result:** **39/39 PASS** — Acceptance 19/19, Regression 20/20
+- **Suite:** acceptance (FEAT-036 [1/2] + IMP-057 + IMP-062) + regression-baseline (hybrid browser+static)
+- **Method:** Static code analysis (acceptance — Playwright unavailable) + Hybrid browser+static (regression)
+- **Result:** **43/43 PASS** — Acceptance 24/24, Regression 19/19 (2 skip)
 - **Bugs found:** 0
-- **Improvements found:** 2 (IMP-055 delete button specificity, IMP-056 y-axis label width)
+- **Improvements found:** 1 (aria-label on delete button — fixed by reviewer)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 107 (2026-03-03) — 19/19 PASS (FEAT-035 11/11, BUG-025 5/5, IMP-052 4/4 — static code analysis, Playwright unavailable)
+- Last run: Iteration 109 (2026-03-03) — 24/24 PASS (FEAT-036 [1/2] 14/14, IMP-057 7/7, IMP-062 3/3 — static code analysis, Playwright unavailable)
+- Previous: Iteration 107 (2026-03-03) — 19/19 PASS (FEAT-035 11/11, BUG-025 5/5, IMP-052 4/4 — static code analysis, Playwright unavailable)
 - Previous: Iteration 106 (2026-03-02) — 19/20 PASS (FEAT-034 [2/2] 11/11, IMP-050 4/4, IMP-051 4/5 — static analysis + production comparison; 1 fail pre-existing)
 - Previous: Iteration 105 (2026-03-02) — 14/14 PASS (FEAT-034 [1/2] 6/6, IMP-042 4/4, IMP-046 4/4 — static code analysis)
 - Previous: Iteration 104 (2026-03-02) — 16/16 PASS (FEAT-033 10/10, BUG-024 4/4, IMP-039 2/2 — static code analysis)
@@ -22,7 +23,8 @@
 - Previous: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 DI 10, BUG-020 4, IMP-029 2 — static)
 
 ### Regression
-- Last run: Iteration 107 (2026-03-03) — 20/20 PASS (baseline 15 + BUG-025 2 + FEAT-035 2 + IMP-052 1 — Playwright browser, 7 pages checked, 0 console errors)
+- Last run: Iteration 109 (2026-03-03) — 19/19 PASS, 2 skip (regression-baseline hybrid: browser on production + static analysis for iter-109 changes, 7 pages checked, 0 console errors, 8 regression checks PASS)
+- Previous: Iteration 107 (2026-03-03) — 20/20 PASS (baseline 15 + BUG-025 2 + FEAT-035 2 + IMP-052 1 — Playwright browser, 7 pages checked, 0 console errors)
 - Previous: Iteration 105 (2026-03-02) — 12/12 PASS (regression-baseline static, feat-034-data-integrity static — Playwright unavailable)
 - Previous run: Iteration 103 (2026-03-02) — 10/10 PASS (Phase 4 full gate — all phases regression + all Phase 4 feature verification, 30+ files analyzed)
 - Previous run: Iteration 100 (2026-03-02) — 29/32 (regression 11/14 browser, FEAT-052 DI 10/10 static, performance 3/6+3warn static)

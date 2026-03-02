@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-108, 2026-03-03 — Phase 3a, FEAT-035 fully complete -->
+<!-- Updated: iter-109, 2026-03-03 — Phase 3a, FEAT-036 [1/2] backend complete -->
 
 ## Project
 
@@ -85,6 +85,7 @@ npx supabase db push     # Push migrations
 - `templates/[id]/deploy/route.ts` — POST deploy (UUID remap for steps+connections, role-by-name matching for step_roles)
 - `activity/route.ts` — GET (workspace_id required, optional filters: user_id, action, entity_type, from/to, limit/offset). Joins users table via FK for email display.
 - `workspaces/[id]/clone/route.ts` — POST (deep clone workspace via clone_workspace RPC)
+- `ai/analyze-process/route.ts` — POST (OpenRouter/DeepSeek AI analysis: auth, workspace RLS, 5-min rate limit via settings.last_analysis_at, parallel steps+sections fetch, structured prompt, returns AIAnalysisResult, caches in workspace settings JSONB, 503 if no API key)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
 
 ### Components

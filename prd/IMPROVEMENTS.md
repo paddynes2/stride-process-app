@@ -400,13 +400,11 @@
   - **Design principle:** Nielsen H4: Consistency and standards — labels should remain readable
   - **Suggested fix:** Consider w-5 or add overflow-visible if wider scores are planned in future.
 
-- [ ] #IMP-057 ImprovementsView has no delete action on cards — Attempts: 0
+- [x] #IMP-057 ImprovementsView has no delete action on cards — Attempts: 1 — DONE iteration 109, 2026-03-03
   - **Found:** Iteration 108 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
-  - **What:** Users can change status to 'Rejected' as a soft-delete but cannot permanently remove erroneous entries. Other entity lists (comments, tasks) offer delete.
-  - **Design principle:** Nielsen H3: User control and freedom — provide undo/delete for irreversible states
-  - **Suggested fix:** Add a delete icon button on each card that calls deleteImprovementIdea() with confirmation, matching the pattern in comments-view.tsx.
+  - **Fix applied:** Added Trash2 icon button after priority badge with window.confirm + deleteImprovementIdea + state removal + toastError. Styled text-[var(--text-tertiary)] hover:text-[#EF4444]. Reviewer added aria-label='Delete improvement idea'.
 
 - [ ] #IMP-058 Improvements page empty state has no CTA to navigate to canvas — Attempts: 0
   - **Found:** Iteration 108 (acceptance tester)
@@ -440,13 +438,11 @@
   - **Design principle:** Nielsen H1: Visibility of system status — immediate feedback preferred
   - **Suggested fix:** Apply optimistic update before API call: setIdeas with newStatus first, then revert on error.
 
-- [ ] #IMP-062 Prioritization 'Go to Canvas' should target first process tab — Attempts: 0
+- [x] #IMP-062 Prioritization 'Go to Canvas' should target first process tab — Attempts: 1 — DONE iteration 109, 2026-03-03
   - **Found:** Iteration 108 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx` (line 169)
-  - **What:** Link always targets tabs[0] regardless of canvas_type. If first tab is journey canvas, user lands on journey instead of process canvas where effort/impact scoring is more natural.
-  - **Design principle:** Nielsen H4: Consistency and standards — match user expectation of 'canvas with scoreable items'
-  - **Suggested fix:** Filter tabs to first process-type tab (canvas_type === 'process') before falling back to tabs[0].
+  - **Fix applied:** Changed `tabs[0].id` to `(tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id`. Existing `tabs.length > 0` guard prevents render when empty.
 
 - [ ] #IMP-063 section-detail-panel BUG reference inconsistency (BUG-024 vs BUG-023) — Attempts: 0
   - **Found:** Iteration 108 (regression tester)

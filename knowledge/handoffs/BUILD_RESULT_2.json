@@ -1,17 +1,17 @@
 {
   "schema_version": "1.0",
-  "iteration": 54,
+  "iteration": 109,
   "slot": 2,
-  "task_id": "#IMP-055",
+  "task_id": "#IMP-057",
   "status": "completed",
-  "duration_seconds": 45,
+  "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/settings/page.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
       "action": "modified",
-      "lines_added": 1,
-      "lines_removed": 1
+      "lines_added": 20,
+      "lines_removed": 2
     }
   ],
 
@@ -24,10 +24,10 @@
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Changed destructive Button label in Delete Perspective DialogFooter from 'Delete' to 'Delete Perspective' (line 463). Single label change, no logic touched.",
+  "notes": "Added Trash2 to lucide-react import, deleteImprovementIdea to client import, handleDelete async function with window.confirm + try/catch, and delete button after priority badge with specified styling.",
 
   "failure_details": null
 }

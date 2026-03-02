@@ -55,3 +55,9 @@
 **Options:** (A) Modify API to allow templates without section_id (changes API contract, client.ts is read-only), (B) Deploy starters directly via createSection + createStep calls (functionally equivalent to what deploy route does internally), (C) Leave starters as non-deployable
 **Decision:** Option B — deploy starters by calling createSection then Promise.all(createStep) with position offsets. DB templates still use standard deployTemplate() path.
 **Trade-off:** Two deploy code paths (DB templates vs starters) in canvas-view.tsx. Starters don't get connection/role-assignment deployment (createSection+createStep only). Acceptable because starters define only sections and steps, no connections.
+
+## D-010 — OpenRouter + DeepSeek for AI analysis instead of direct Anthropic API (Phase 3a, Iteration 109)
+**Context:** FEAT-036 AI process analysis needs an LLM to analyze workspace step data and produce structured JSON insights. The original spec said "Anthropic API" but was updated to OpenRouter.
+**Options:** (A) Direct Anthropic API (Claude models, `@anthropic-ai/sdk`), (B) OpenRouter API (OpenAI-compatible, multiple model providers), (C) Direct DeepSeek API
+**Decision:** OpenRouter with DeepSeek model (`deepseek/deepseek-chat-v3-0324`) via native `fetch()`. OpenAI-compatible request format (`messages`, `response_format: { type: 'json_object' }`).
+**Trade-off:** Depends on third-party proxy (OpenRouter) adding a hop, but provides model flexibility (can switch models by changing one string). Zero new dependencies — native `fetch()` only. Server-only `OPENROUTER_API_KEY` (no NEXT_PUBLIC_ prefix).
