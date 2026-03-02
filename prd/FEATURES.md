@@ -56,7 +56,7 @@
 
 ---
 
-## Phase 3a: Analysis Intelligence — DEFERRED (Phase 4 prioritized)
+## Phase 3a: Analysis Intelligence — ACTIVE (begin after Phase 4 complete)
 
 ### #FEAT-033 Perspective comparison view
 **Phase:** 3a
@@ -69,8 +69,9 @@
 - [ ] Table layout: rows = annotated elements (steps/sections/touchpoints/stages), columns = each perspective's annotation text + rating
 - [ ] Divergence highlighting: rows where ratings differ by 2+ points get amber background
 - [ ] Summary stats at top: annotation count per perspective, average rating, divergence count, top 3 most divergent elements
-- [ ] Clicking element name navigates to that element on the correct canvas
-- [ ] Export comparison as PDF section (button)
+- [ ] Clicking element name navigates to that element on the correct canvas. Fetch elements with tab_id to build navigation URLs: `/w/{workspaceId}/{tabId}`
+- [ ] Export comparison as PDF section (button). PDF export is standalone download using jsPDF (existing dep). Layout: title + summary stats + comparison table.
+- [ ] "Top 3 most divergent" = sorted by maximum absolute rating difference across all annotations for that element
 **Notes:** This is THE consulting insight tool — reveals where leaders and frontline teams disagree. Uses existing perspectives + perspective_annotations tables from FEAT-023/024. Pure client-side computation from fetched annotations. Divergence threshold (2 points) should be a named constant.
 
 ### #FEAT-034 Prioritization matrix
@@ -85,9 +86,13 @@
 - [ ] New "Prioritization" page at `/w/[workspaceId]/prioritization`
 - [ ] Quadrant chart: X=effort (1-5), Y=impact (1-5), items plotted as dots
 - [ ] Quadrants labeled: "Quick Wins" (low effort, high impact), "Major Projects" (high effort, high impact), "Fill-Ins" (low effort, low impact), "Deprioritize" (high effort, low impact)
-- [ ] Dots show name on hover, colored by section/stage. Click navigates to canvas.
-- [ ] Filter by tab, section/stage
+- [ ] Dots show name on hover, colored by section/stage. Click navigates to canvas. Section/stage color derived from deterministic hash of entity name → HSL palette (8 colors). Tooltips use Radix Tooltip (already in deps).
+- [ ] Filters: two dropdowns above chart — Tab (select) and Section/Stage (select, filtered by tab). Default: All.
+- [ ] Render quadrant chart using positioned divs (CSS absolute positioning within relative container). No charting library.
 - [ ] TypeScript types updated, API routes updated for new columns
+**Sub-tasks:**
+- [ ] [1/2] Data layer: migration (effort_score + impact_score on steps and touchpoints), types, API PATCH support
+- [ ] [2/2] UI: Score selectors on detail panels + prioritization page with quadrant chart
 **Notes:** Standard consulting deliverable. Position computed from scores — no drag-to-reposition. Reuse scoring UI pattern from maturity scoring (FEAT-001). Migration adds nullable columns — zero risk to existing data.
 
 ### #FEAT-035 Improvement ideas tracker
@@ -96,13 +101,16 @@
 **Attempts:** 0
 **Status:** pending
 **Acceptance criteria:**
-- [ ] New `improvement_ideas` table: id, workspace_id, title, description, status (enum: proposed/approved/in_progress/completed/rejected), priority (enum: low/medium/high/critical), linked_step_id (nullable FK), linked_touchpoint_id (nullable FK), linked_section_id (nullable FK), created_by (FK users), created_at, updated_at
+- [ ] New `improvement_ideas` table: id, workspace_id, title, description, status (enum `improvement_status`: proposed/approved/in_progress/completed/rejected), priority (enum `improvement_priority`: low/medium/high/critical), linked_step_id (nullable FK), linked_touchpoint_id (nullable FK), linked_section_id (nullable FK), created_by (FK users), created_at, updated_at
 - [ ] RLS via `can_access_workspace()`, types, API routes (GET list filterable, POST, PATCH, DELETE), client wrappers
 - [ ] "Add Improvement" button on step/section/touchpoint detail panels — dialog with title, description, priority. Pre-fills linked entity.
 - [ ] "Improvements" page at `/w/[workspaceId]/improvements` — filterable list view by status/priority
 - [ ] Each card: title, status badge, priority badge, linked element (clickable), description preview
 - [ ] Inline status change via dropdown
-- [ ] Count badge on sidebar nav showing open ideas count
+- [ ] Count badge on sidebar nav showing open ideas count. Open count = status NOT IN ('completed', 'rejected').
+**Sub-tasks:**
+- [ ] [1/2] Data layer: migration (improvement_ideas table + `improvement_status` and `improvement_priority` enums), types, API routes, client wrappers
+- [ ] [2/2] UI: "Add Improvement" on detail panels, improvements page, sidebar count badge
 **Notes:** Replaces consultant sticky notes and spreadsheets. Status lifecycle: proposed → approved → in_progress → completed (or rejected). Link to source element provides traceability.
 
 ### #FEAT-036 AI process analysis
@@ -112,15 +120,19 @@
 **Status:** pending
 **Acceptance criteria:**
 - [ ] API route: POST `/api/v1/ai/analyze-process` — accepts workspace_id, returns structured JSON analysis
-- [ ] Server-side call to Anthropic API via fetch() to `https://api.anthropic.com/v1/messages`. Model: `claude-sonnet-4-5-20250514`. Requires `ANTHROPIC_API_KEY` in .env.local
+- [ ] Server-side call to OpenRouter API via fetch() to `https://openrouter.ai/api/v1/chat/completions`. Model: `deepseek/deepseek-chat-v3-0324`. Requires `OPENROUTER_API_KEY` in .env.local. Auth header: `Authorization: Bearer ${process.env.OPENROUTER_API_KEY}`
 - [ ] Prompt constructed from workspace's actual steps (maturity, time, frequency, cost, roles, gaps)
-- [ ] Response JSON: `bottlenecks`, `redundancies`, `automation_candidates`, `maturity_recommendations` — each with affected step IDs
+- [ ] Response JSON typed as:
+  ```typescript
+  interface AIAnalysisResult { bottlenecks: AIInsight[]; redundancies: AIInsight[]; automation_candidates: AIInsight[]; maturity_recommendations: AIInsight[]; }
+  interface AIInsight { title: string; description: string; severity: 'high' | 'medium' | 'low'; affected_step_ids: string[]; }
+  ```
 - [ ] "AI Analysis" page at `/w/[workspaceId]/ai-analysis` — categorized result cards with severity indicators
 - [ ] Each recommendation links back to source step(s)
-- [ ] "Regenerate" button, loading state (5-15 seconds), cache in workspace settings JSONB (key: last_analysis)
+- [ ] "Regenerate" button, loading state (5-15 seconds). Cache via PATCH to workspace settings JSONB: `{ settings: { last_analysis: AIAnalysisResult, last_analysis_at: string } }`. Merge into existing settings, don't overwrite. Workspace PATCH route must support partial `settings` JSONB merge if it doesn't already.
 - [ ] Error handling: missing API key → setup instructions, API failure → retry with error message
 - [ ] Rate limit: 1 analysis per workspace per 5 minutes (check cached timestamp)
-**Notes:** NOT generic advice. Prompt is grounded in real data. Temperature 0.3, max tokens 4096. Do NOT install new deps — use native fetch(). If ANTHROPIC_API_KEY not set, UI shows setup instructions gracefully.
+**Notes:** NOT generic advice. Prompt is grounded in real data. Temperature 0.3, max_tokens 4096. Do NOT install new deps — use native fetch(). Uses OpenRouter (OpenAI-compatible API format). Request body: `{ model: "deepseek/deepseek-chat-v3-0324", messages: [...], temperature: 0.3, max_tokens: 4096 }`. Response: `response.choices[0].message.content`. If OPENROUTER_API_KEY not set, UI shows setup instructions gracefully.
 
 ### #FEAT-037 AI gap narrative generator
 **Phase:** 3a
@@ -133,7 +145,7 @@
 - [ ] "Generate Summary" button on gap analysis page, above the table
 - [ ] Narrative displayed in styled card with copy-to-clipboard button
 - [ ] "Regenerate" button, loading state. Cache in localStorage.
-**Notes:** Consultants need gap analysis summaries for client reports. AI generates first draft. Must reference actual step/section names and maturity numbers. Same Anthropic API pattern as FEAT-036.
+**Notes:** Consultants need gap analysis summaries for client reports. AI generates first draft. Must reference actual step/section names and maturity numbers. Same OpenRouter API pattern as FEAT-036 (deepseek/deepseek-chat-v3-0324 via `https://openrouter.ai/api/v1/chat/completions`).
 
 ### #FEAT-038 AI improvement suggestions
 **Phase:** 3a
@@ -146,7 +158,7 @@
 - [ ] "AI Suggestions" button on Improvements page (FEAT-035) — generates and shows suggestions
 - [ ] Each suggestion has "Add as Improvement" button that pre-fills the improvement idea dialog
 - [ ] Loading state, error handling (same pattern as FEAT-036)
-**Notes:** Depends on FEAT-035 (improvement_ideas table). Bridges AI analysis and improvement tracker. Suggestions must be specific: "Automate 'Manual Data Entry' (45min × 20/month = $1,500/month)" not "improve your processes."
+**Notes:** Depends on FEAT-035 (improvement_ideas table). Bridges AI analysis and improvement tracker. Suggestions must be specific: "Automate 'Manual Data Entry' (45min × 20/month = $1,500/month)" not "improve your processes." Same OpenRouter API pattern as FEAT-036.
 
 ### #FEAT-039 Phase 3a testing gate
 **Phase:** 3a
@@ -158,7 +170,7 @@
 - [ ] Perspective comparison: create 2 perspectives → annotate → compare → see divergence
 - [ ] Prioritization matrix renders with effort/impact scores
 - [ ] Improvement ideas lifecycle: create → approve → complete
-- [ ] AI analysis returns structured results (if ANTHROPIC_API_KEY available; otherwise test UI states)
+- [ ] AI analysis returns structured results (if OPENROUTER_API_KEY available; otherwise test UI states)
 - [ ] Type check, lint, build pass. No console errors on new pages.
 **Notes:** Dedicated testing iteration. If AI can't be tested (no API key), test loading/error/empty UI states and mark integration testing as deferred.
 
@@ -333,31 +345,22 @@
 - [ ] Add logActivity() calls to POST/PATCH/DELETE handlers across existing API routes
 **Notes:** Audit trail for consulting engagements. Don't log reads. Keep details JSONB small (only changed fields for updates).
 
-### #FEAT-050 Workspace cloning
-**Phase:** 4
-**Priority:** P2 (nice to have)
-**Attempts:** 0
-**Status:** pending
-**Acceptance criteria:**
-- [ ] "Duplicate Workspace" button in workspace settings
-- [ ] Deep copy: workspace + tabs + sections + steps + connections + teams + roles + people + tools + tool_sections + step_roles + step_tools + stages + touchpoints + touchpoint_connections
-- [ ] New UUIDs throughout, internal FKs preserved (copied section_id on copied steps)
-- [ ] Perspectives, annotations, comments, tasks, runbooks, activity log NOT copied
-- [ ] SECURITY DEFINER function for atomic transaction. Loading state. Navigate to new workspace.
-**Notes:** How consultants reuse frameworks. Clone template workspace for each client engagement.
-
 ### #FEAT-051 Conditional step coloring
 **Phase:** 4
 **Priority:** P2 (nice to have)
 **Attempts:** 0
 **Status:** pending
 **Acceptance criteria:**
-- [ ] New `coloring_rules` table: id, workspace_id, name, color (hex), criteria_type (enum: status/executor/step_type/has_tool/has_role/maturity_below/maturity_above), criteria_value, is_active (boolean), position (integer), created_at, updated_at
+- [ ] New `coloring_rules` table: id, workspace_id, name, color (hex), criteria_type (enum: status/executor/step_type/has_role/maturity_below/maturity_above), criteria_value TEXT NOT NULL (interpreted per criteria_type), is_active (boolean), position (integer), created_at, updated_at
 - [ ] RLS, types, API (CRUD), client wrappers
 - [ ] Coloring panel in canvas toolbar (paintbrush icon): list rules with color swatch, criteria dropdowns, active toggle
 - [ ] Rules evaluated client-side in position order, last match wins
-- [ ] Step nodes show matching rule's color as subtle background tint
+- [ ] Step nodes show matching rule's color as subtle background tint (opacity: 15%). Steps matching no rule show default background (no tint).
+- [ ] Applies to process canvas step nodes only (not journey touchpoints/stages)
 - [ ] Real-time: rules apply as created/edited
+**Sub-tasks:**
+- [ ] [1/2] Data layer: migration (coloring_rules table + criteria_type enum), types, API (CRUD), client wrappers
+- [ ] [2/2] UI: Coloring panel in canvas toolbar (paintbrush icon) + step node background tint
 **Notes:** From Puzzle spec. "All draft steps = yellow", "steps with no role = red". Color is background tint (low opacity) preserving readability.
 
 ### #FEAT-052 Section templates (save & deploy)
@@ -366,14 +369,39 @@
 **Attempts:** 0
 **Status:** pending
 **Acceptance criteria:**
-- [ ] New `templates` table: id, workspace_id (nullable), organization_id, name, description, category, template_data (JSONB snapshot), created_by, created_at, updated_at
-- [ ] RLS, types, API (GET list, POST from section_id, DELETE), client wrappers
+- [ ] New `templates` table: id, workspace_id UUID NOT NULL, name, description, category, template_data (JSONB snapshot), created_by, created_at, updated_at
+- [ ] RLS via `can_access_workspace()`, types, API (GET list, POST from section_id, POST deploy, DELETE), client wrappers
 - [ ] "Save as Template" on section detail panel → dialog with name, description, category
-- [ ] Captures: section + steps + connections + role assignments + tool assignments as JSONB
+- [ ] Captures: section + steps + connections + role assignments as JSONB
 - [ ] Template browser in canvas toolbar: cards with name, description, category, step count
+- [ ] Deploy route: `POST /api/v1/templates/[id]/deploy` with body `{ tab_id, position_x, position_y }`. Deploy remaps connection source/target IDs using old→new UUID mapping. Role assignments matched by name; silently skip if name not found in target workspace.
 - [ ] "Deploy Template" creates new section + steps + connections on current tab (new UUIDs)
-- [ ] Pre-built starters: "Customer Onboarding", "Support Ticket", "Content Creation", "Lead Nurturing"
-**Notes:** Role/tool assignments matched by name on deploy (not by ID). JSONB snapshot, not live references.
+- [ ] Pre-built starters hardcoded in `src/lib/templates.ts` as `STARTER_TEMPLATES` constant. Shown alongside DB templates in browser. Not stored in DB until deployed. Starters:
+  - "Customer Onboarding" (steps: Receive Application, Verify Identity, Setup Account, Welcome Email, Assign CSM)
+  - "Support Ticket" (steps: Receive Ticket, Triage & Classify, Investigate Issue, Resolve & Respond, Close Ticket)
+  - "Content Creation" (steps: Brief & Research, Draft Content, Internal Review, Revisions, Publish & Distribute)
+  - "Lead Nurturing" (steps: Capture Lead, Qualify Lead, Initial Outreach, Follow-Up Sequence, Hand Off to Sales)
+**Sub-tasks:**
+- [ ] [1/2] Data layer: migration (templates table), types, API (GET list, POST from section_id, POST deploy, DELETE), client wrappers, STARTER_TEMPLATES constant
+- [ ] [2/2] UI: "Save as Template" dialog on section panel, template browser dialog in toolbar, deploy flow
+**Notes:** Workspace-scoped only (no organization_id — no org-level RLS helper exists). Role assignments matched by name on deploy (not by ID). JSONB snapshot, not live references.
+
+### #FEAT-050 Workspace cloning
+**Phase:** 4
+**Priority:** P2 (nice to have)
+**Attempts:** 0
+**Status:** pending
+**Acceptance criteria:**
+- [ ] API route: `POST /api/v1/workspaces/[id]/clone`
+- [ ] "Duplicate Workspace" button in workspace settings. Loading spinner on button, timeout handling (clone may take 2-5s).
+- [ ] Deep copy: workspace + tabs + sections + steps + connections + teams + roles + people + tools + step_roles + stages + touchpoints + touchpoint_connections
+- [ ] New UUIDs throughout, internal FKs preserved using temporary mapping arrays (old UUID → new UUID) for all tables
+- [ ] Perspectives, annotations, comments, tasks, runbooks, activity log NOT copied
+- [ ] `clone_workspace` SECURITY DEFINER function for atomic transaction. Navigate to new workspace on success.
+**Sub-tasks:**
+- [ ] [1/2] Migration (`clone_workspace` SECURITY DEFINER function) + API route + client wrapper
+- [ ] [2/2] UI: "Duplicate Workspace" button in settings, loading state, navigate to clone
+**Notes:** How consultants reuse frameworks. Clone template workspace for each client engagement.
 
 ### #FEAT-053 Phase 4 testing gate
 **Phase:** 4

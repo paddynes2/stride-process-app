@@ -137,6 +137,14 @@ log() {
   echo "[$timestamp] $*" | tee -a "$LOG_FILE"
 }
 
+vlog() {
+  if [ "${RALPH_VERBOSE:-0}" = "1" ]; then
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] [VERBOSE] $*" >> "$LOG_FILE"
+  fi
+}
+
 log_structured() {
   local timestamp iteration status task
   timestamp=$(date '+%Y-%m-%d %H:%M:%S')
@@ -918,10 +926,13 @@ run_agent() {
   # --no-session-persistence: prevents concurrent agents from conflicting on session files
   # NOTE: Do NOT use `if ! (cmd); then exit_code=$?` — the `!` negation
   # makes $? always 0 inside the then-block. Use `cmd || exit_code=$?` instead.
+  # stdout captured to per-agent log file via tee (overwritten each iteration).
+  # pipefail (set at script top) ensures claude's exit code propagates through tee.
+  local stdout_file="$SCRIPT_DIR/.ralph/agent-output-${agent_name}.log"
   # shellcheck disable=SC2086
   (cd "$PROJECT_ROOT" && cat "$prompt_file" | \
     claude --print --no-session-persistence --permission-mode bypassPermissions $model_flag \
-    2>"$stderr_file") || exit_code=$?
+    2>"$stderr_file" | tee "$stdout_file") || exit_code=$?
 
   end_time=$(date +%s)
   duration=$((end_time - start_time))
@@ -934,7 +945,8 @@ run_agent() {
   log "  │   └── $agent_name: ${duration}s, tokens in=${tokens_in:-?} out=${tokens_out:-?}, exit=$exit_code"
   log_structured "$ITER_NUM" "agent_done" "agent=$agent_name,duration=${duration}s,tokens_in=${tokens_in:-0},tokens_out=${tokens_out:-0},exit=$exit_code"
 
-  rm -f "$stderr_file"
+  # Move stderr to persistent location instead of deleting (overwritten each iteration)
+  mv "$stderr_file" "$SCRIPT_DIR/.ralph/agent-stderr-${agent_name}.log" 2>/dev/null || true
   unset RALPH_AGENT
 
   return $exit_code
@@ -1016,12 +1028,18 @@ merge_worktrees() {
     fi
 
     # Merge with --no-ff to preserve branch history
+    vlog "Pre-merge HEAD: $(cd "$PROJECT_ROOT" && git rev-parse --short HEAD 2>/dev/null)"
     log "  │   Merging slot $slot (branch: $branch_name)..."
     if (cd "$PROJECT_ROOT" && git merge --no-ff "$branch_name" -m "ralph: merge builder slot $slot for iteration $ITER_NUM" 2>/dev/null); then
       merged_count=$((merged_count + 1))
+      vlog "Post-merge HEAD: $(cd "$PROJECT_ROOT" && git rev-parse --short HEAD 2>/dev/null)"
       log "  │   └── Merged successfully"
     else
-      log "  │   └── MERGE CONFLICT in slot $slot — aborting merge"
+      # Capture conflict details before aborting
+      local conflict_info
+      conflict_info=$(cd "$PROJECT_ROOT" && git diff --name-only --diff-filter=U 2>/dev/null || true)
+      log "  │   └── MERGE CONFLICT in slot $slot — files: ${conflict_info//$'\n'/, }"
+      (cd "$PROJECT_ROOT" && git diff 2>/dev/null >> "$LOG_FILE" || true)
       (cd "$PROJECT_ROOT" && git merge --abort 2>/dev/null || true)
       merge_failed=true
     fi
@@ -1128,11 +1146,25 @@ prepare_tester_prompt() {
 run_pipeline() {
   local plan_file="$PROJECT_ROOT/knowledge/handoffs/EXECUTION_PLAN.json"
 
+  # ── Archive previous iteration's handoff files before cleaning ──
+  mkdir -p "$SCRIPT_DIR/.ralph"
+  local iter_num_prev=$((ITER_NUM - 1))
+  if [ "$iter_num_prev" -gt 0 ] && ls "$PROJECT_ROOT"/knowledge/handoffs/*.json 1>/dev/null 2>&1; then
+    local archive_dir="$SCRIPT_DIR/.ralph/archives/iter-${iter_num_prev}"
+    mkdir -p "$archive_dir"
+    cp "$PROJECT_ROOT"/knowledge/handoffs/*.json "$archive_dir/" 2>/dev/null || true
+    cp "$PROJECT_ROOT"/knowledge/handoffs/POST_MERGE_CHECK.txt "$archive_dir/" 2>/dev/null || true
+    cp "$SCRIPT_DIR"/.ralph/agent-output-*.log "$archive_dir/" 2>/dev/null || true
+    cp "$SCRIPT_DIR"/.ralph/agent-stderr-*.log "$archive_dir/" 2>/dev/null || true
+    # Keep last 30 iteration archives (prune older)
+    ls -dt "$SCRIPT_DIR/.ralph/archives"/iter-* 2>/dev/null | tail -n +31 | xargs rm -rf 2>/dev/null || true
+    vlog "Archived iteration $iter_num_prev handoffs to $archive_dir"
+  fi
+
   # ── Clean stale handoff files ──
   rm -f "$PROJECT_ROOT"/knowledge/handoffs/*.json
   mkdir -p "$PROJECT_ROOT/knowledge/handoffs"
   mkdir -p "$SCRIPT_DIR/$WORKTREE_DIR"
-  mkdir -p "$SCRIPT_DIR/.ralph"
 
   # ═══════════════════════════════════════════════════════════════
   # STAGE 1: PLANNER (serial, Opus)
@@ -1156,6 +1188,8 @@ run_pipeline() {
   # Check plan mode
   local plan_mode
   plan_mode=$(json_val "$plan_file" .mode "unknown")
+
+  vlog "Planner mode: $plan_mode"
 
   case "$plan_mode" in
     blocked)
@@ -1252,6 +1286,8 @@ run_pipeline() {
       # Prepare customized builder prompt
       local prompt_file_path
       prompt_file_path=$(prepare_builder_prompt "$slot")
+
+      vlog "Builder slot $slot: worktree=$wt_path, prompt=$prompt_file_path"
 
       # Launch builder in background, working in worktree
       # NOTE: Capture main PROJECT_ROOT before subshell overrides it
@@ -1364,6 +1400,8 @@ run_pipeline() {
       else
         echo "RESULT: FAIL" >> "$tsc_result_file"
         log "  │   └── WARNING: Type check FAILED after merge — skipping testers"
+        log "  │       Type errors:"
+        head -20 "$tsc_result_file" >> "$LOG_FILE"
         skip_testers=true
       fi
     fi
@@ -1406,6 +1444,7 @@ run_pipeline() {
 
     local tester_pids=()
     local tester_count=0
+    vlog "Tester decisions: playwright_ok=$playwright_ok, run_acceptance=$run_acceptance, run_regression=$run_regression, has_ui_changes=$has_ui_changes"
 
     # ── Acceptance tester (requires Playwright + UI changes) ──
     if [ "$playwright_ok" = true ] && [ "$run_acceptance" = "true" ] && [ "$has_ui_changes" = "true" ]; then
@@ -1443,7 +1482,7 @@ run_pipeline() {
       log "  ├── Stage 4: TESTERS ($tester_count launched)"
       # Wait for testers (non-fatal — reviewer always runs)
       for pid in "${tester_pids[@]}"; do
-        wait "$pid" || log "  │   WARNING: Tester exited with error"
+        wait "$pid" || log "  │   WARNING: Tester PID $pid exited with error (exit $?)"
       done
     else
       log "  ├── Stage 4: TESTERS (skipped — none triggered)"
