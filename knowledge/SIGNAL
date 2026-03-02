@@ -1,1 +1,1 @@
-CONTINUE: #FEAT-047 [3/3] Runbook polish — status transitions, "Complete Runbook" button, progress indicators
+CONTINUE: Acceptance testing for #FEAT-047 (all 3 sub-tasks) + regression (recommended, risk score 4 from iter 81). Next build: #FEAT-048 Playbook mode.
