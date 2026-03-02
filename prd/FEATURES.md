@@ -58,20 +58,20 @@
 
 ## Phase 3a: Analysis Intelligence — ACTIVE (Phase 4 complete, iteration 103)
 
-### #FEAT-033 Perspective comparison view
+### #FEAT-033 Perspective comparison view — DONE iteration 104, 2026-03-02
 **Phase:** 3a
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] New "Compare Perspectives" page at `/w/[workspaceId]/perspectives/compare` — only visible when 2+ perspectives exist with annotations
-- [ ] Two dropdown selectors at top to pick which perspectives to compare
-- [ ] Table layout: rows = annotated elements (steps/sections/touchpoints/stages), columns = each perspective's annotation text + rating
-- [ ] Divergence highlighting: rows where ratings differ by 2+ points get amber background
-- [ ] Summary stats at top: annotation count per perspective, average rating, divergence count, top 3 most divergent elements
-- [ ] Clicking element name navigates to that element on the correct canvas. Fetch elements with tab_id to build navigation URLs: `/w/{workspaceId}/{tabId}`
-- [ ] Export comparison as PDF section (button). PDF export is standalone download using jsPDF (existing dep). Layout: title + summary stats + comparison table.
-- [ ] "Top 3 most divergent" = sorted by maximum absolute rating difference across all annotations for that element
+- [x] New "Compare Perspectives" page at `/w/[workspaceId]/perspectives/compare` — only visible when 2+ perspectives exist with annotations
+- [x] Two dropdown selectors at top to pick which perspectives to compare
+- [x] Table layout: rows = annotated elements (steps/sections/touchpoints/stages), columns = each perspective's annotation text + rating
+- [x] Divergence highlighting: rows where ratings differ by 2+ points get amber background
+- [x] Summary stats at top: annotation count per perspective, average rating, divergence count, top 3 most divergent elements
+- [x] Clicking element name navigates to that element on the correct canvas. Fetch elements with tab_id to build navigation URLs: `/w/{workspaceId}/{tabId}`
+- [x] Export comparison as PDF section (button). PDF export is standalone download using jsPDF (existing dep). Layout: title + summary stats + comparison table.
+- [x] "Top 3 most divergent" = sorted by maximum absolute rating difference across all annotations for that element
 **Notes:** This is THE consulting insight tool — reveals where leaders and frontline teams disagree. Uses existing perspectives + perspective_annotations tables from FEAT-023/024. Pure client-side computation from fetched annotations. Divergence threshold (2 points) should be a named constant.
 
 ### #FEAT-034 Prioritization matrix

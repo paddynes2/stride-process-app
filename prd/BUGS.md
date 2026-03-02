@@ -85,9 +85,8 @@
   - **What:** Root cause: custom `ui/dialog.tsx` DialogTitle wraps a plain `<h2>`, not `DialogPrimitive.Title`. Radix's internal context check cannot detect it.
   - **Fix applied:** Imported `DialogPrimitive` from `@radix-ui/react-dialog` and replaced `<DialogTitle>` with `<DialogPrimitive.Title>` in canvas-view.tsx Templates dialog. Comment documents root cause. section-detail-panel.tsx has same issue (filed as BUG-024).
 
-- [ ] #BUG-024 section-detail-panel.tsx Save as Template dialog has same DialogTitle a11y warning (P2) — Attempts: 0
+- [x] #BUG-024 section-detail-panel.tsx Save as Template dialog has same DialogTitle a11y warning (P2) — Attempts: 1 — DONE iteration 104, 2026-03-02
   - **Found:** Iteration 102 (acceptance tester)
   - **Where:** `src/components/panels/section-detail-panel.tsx` — Save as Template dialog
   - **What:** Same root cause as BUG-023 — custom ui/dialog.tsx DialogTitle wraps `<h2>` not `DialogPrimitive.Title`. Radix a11y check fires console.error when dialog opens.
-  - **Steps to reproduce:** Navigate to canvas → click section → in section detail panel, click "Save as Template" → observe console.error.
-  - **Suggested fix:** Same as BUG-023 — import DialogPrimitive and use DialogPrimitive.Title. Alternatively, fix root cause in ui/dialog.tsx by changing DialogTitle to wrap DialogPrimitive.Title.
+  - **Fix applied:** Imported `DialogPrimitive` from `@radix-ui/react-dialog` and replaced `<DialogTitle>` with `<DialogPrimitive.Title>` preserving identical styling classes. BUG-024 comment added matching BUG-023 pattern.

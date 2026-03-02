@@ -265,13 +265,12 @@
   - **Design principle:** WCAG 2.1 SC 4.1.2: Name, Role, Value
   - **Suggested fix:** Run full aria-label audit across all icon-only buttons as part of FEAT-053 testing gate.
 
-- [ ] #IMP-039 Activity 'Unknown' fallback should be '[Deleted User]' for deleted accounts — Attempts: 0
+- [x] #IMP-039 Activity 'Unknown' fallback should be '[Deleted User]' for deleted accounts — Attempts: 1 — DONE iteration 104, 2026-03-02
   - **Found:** Iteration 103 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx` line 176
   - **What:** Activity entries show 'Unknown' when the users join is null (deleted user accounts). '[Deleted User]' would be more informative for audit trail purposes.
-  - **Design principle:** Nielsen H1: Visibility of system status
-  - **Suggested fix:** Change fallback from '"Unknown"' to '"[Deleted User]"' in activity-view.tsx:176.
+  - **Fix applied:** Changed fallback from `"Unknown"` to `"[Deleted User]"` at activity-view.tsx:176.
 
 - [ ] #IMP-040 Playbook step notes/description panel during execution — Attempts: 0
   - **Found:** Iteration 103 (acceptance tester)
@@ -336,6 +335,22 @@
   - **What:** 8 action type filter tabs likely overflow on viewports narrower than 1024px.
   - **Design principle:** Nielsen H4: Consistency and standards
   - **Suggested fix:** Wrap filter row or use compact dropdown on narrow viewports, matching workspace-shell tab-bar pattern.
+
+- [ ] #IMP-048 Perspective comparison empty annotations state after selection — Attempts: 0
+  - **Found:** Iteration 104 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx`
+  - **What:** Empty state guard checks `perspectives.length < 2` (total perspectives) rather than perspectives-with-annotations. A workspace could have 2+ perspectives with zero annotations — user sees selectors but empty table with no guidance. The existing "No annotations found" empty state appears after both are selected, but no guidance is provided for the pre-selection state.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Add secondary empty-state message when both perspectives are selected but annotations.length === 0: e.g. "No annotations found — add annotations to perspective elements in Settings."
+
+- [ ] #IMP-049 Perspective comparison element links should deep-link to specific canvas node — Attempts: 0
+  - **Found:** Iteration 104 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx`
+  - **What:** Top-3 divergent elements and table element names link to the tab (canvas), but not to the specific element within that tab. User lands on the full canvas and must find the element manually.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** If deep-linking to specific canvas nodes is supported in future (e.g. via URL hash or query param), pre-select the element on navigation. Current behaviour is functional but not optimal.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

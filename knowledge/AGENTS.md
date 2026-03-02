@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-103, 2026-03-02 — Phase 4 COMPLETE -->
+<!-- Updated: iter-104, 2026-03-02 — Phase 3a started -->
 
 ## Project
 
@@ -49,6 +49,7 @@ npx supabase db push     # Push migrations
 | `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with 4-state status, progress bar+text, notes, Complete/Cancel via Radix Dialog, read-only mode, metadata footer, Playbook button) |
 | `/w/.../runbooks/[id]/playbook` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx` | Playbook mode (distraction-free step-by-step execution, fixed overlay z-50, Mark Complete & Next, Skip, dot navigation, progress bar, mobile-responsive) |
 | `/w/.../activity` | `src/app/(app)/w/[workspaceId]/activity/page.tsx` | Activity log (chronological feed, action type filter tabs, entity links, relative timestamps, Load More pagination) |
+| `/w/.../perspectives/compare` | `src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx` | Perspective comparison (dual dropdowns, divergence table, summary stats, element navigation, PDF export) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 
@@ -182,7 +183,7 @@ Types: step, section, touchpoint, stage.
 `ColoringTintContext` (from `canvas.ts`) provides Map<stepId, hexColor> to step nodes. Canvas-view evaluates workspace coloring rules against each step in position order (last match wins). Step nodes apply matching rule's color as background tint at 15% opacity (hex alpha `26`). HeatMapMode takes precedence over coloring rules. Coloring panel (`coloring-panel.tsx`, 347 lines) accessible via paintbrush button at top-right of canvas (absolute overlay, z-10). Panel supports full CRUD for rules. API routes validate color with `HEX_COLOR_REGEX` and criteria_type against `VALID_CRITERIA_TYPES`. has_role criteria type is in the enum but not visually evaluated (requires step-role data fetch). Process canvas only — does not apply to journey canvas.
 
 ### Reserved Paths in Workspace Shell
-`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity"]`
+`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity", "perspectives"]`
 
 ### Component Conventions
 - Dark theme only. All colors via CSS custom properties in globals.css

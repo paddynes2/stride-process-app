@@ -72,7 +72,7 @@ Prioritized features:
 **Depends on:** Phase 4 complete ✓ (iteration 103)
 
 Core consulting insight features:
-- [ ] #FEAT-033 Perspective comparison view
+- [x] #FEAT-033 Perspective comparison view — DONE iteration 104
 - [ ] #FEAT-034 Prioritization matrix (effort/impact scoring + quadrant chart)
 - [ ] #FEAT-035 Improvement ideas tracker (proposals → approval → completion)
 - [ ] #FEAT-036 AI process analysis (Anthropic API, structured bottleneck/redundancy/automation analysis)
@@ -165,3 +165,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 101: COMPLETED — #FEAT-052 [2/2] UI done (Save as Template dialog on section panel, template browser dialog in canvas toolbar). #IMP-032 done (React.memo on StepNode/SectionNode). FEAT-052 fully complete. 2 new bugs (BUG-022 migration not pushed, BUG-023 DialogTitle a11y) + 1 improvement (IMP-036 starters in error state). Next: file bugs, then FEAT-053 testing gate or remaining improvements.
 - [2026-03-02] Iteration 102: COMPLETED — Cleanup iteration. #BUG-023 fixed (DialogPrimitive.Title in canvas-view.tsx). #IMP-036 done (starters always visible in template dialog). #IMP-030 verified resolved. #IMP-020 done (activity skeleton placeholders). #IMP-035 verified resolved. 1 new bug (BUG-024). Next: FEAT-053 Phase 4 testing gate.
 - [2026-03-02] Iteration 103: **PHASE 4 COMPLETE.** FEAT-053 Phase 4 testing gate passed — acceptance 9/9, regression 10/10. All 9 Phase 4 features (FEAT-045 through FEAT-053) done. 9 new improvements logged (IMP-039-047). BUG-024 only open bug (P2). Phase 3a: Analysis Intelligence now ACTIVE, starting with FEAT-033 Perspective comparison view.
+- [2026-03-02] Iteration 104: COMPLETED — #FEAT-033 perspective comparison view (first Phase 3a feature). #BUG-024 resolved (last open bug). #IMP-039 resolved. All 3 slots completed cleanly with zero merge failures. 2 new improvements (IMP-048, IMP-049). Next: FEAT-034 Prioritization matrix.
