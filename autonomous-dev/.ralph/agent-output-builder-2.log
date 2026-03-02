@@ -1,21 +1,8 @@
-Done. Here's a summary of what was done:
+Done. Here's a summary:
 
-**Task #BUG-025 — Complete**
+**Task #IMP-055 — completed**
 
-**Changes to `src/app/(app)/w/[workspaceId]/settings/page.tsx`:**
-
-1. Added 3 new states to `PerspectivesSection`:
-   - `confirmDeletePerspectiveOpen` — controls dialog visibility
-   - `perspectiveToDelete` — tracks which perspective is being deleted (for name display)
-   - `deletingPerspective` — loading state for the Delete button
-
-2. Replaced `handleDelete` (which called native `confirm()`) with a version that looks up the perspective and opens the dialog
-
-3. Added `handleConfirmDeletePerspective` for the actual async deletion
-
-4. Changed `PerspectivesSection` return to a fragment with the Delete Perspective Radix Dialog appended — dialog shows the perspective name and consequence message: *"All annotations for this perspective will be permanently removed."*
-
-**Verification:**
-- TypeScript: 0 errors
-- Lint: 0 errors (1 pre-existing warning in unrelated file)
-- Zero `confirm()` calls remain in `settings/page.tsx`
+- **Change:** Line 463 in `settings/page.tsx` — destructive button in the Delete Perspective `DialogFooter` changed from `Delete` to `Delete Perspective`
+- **Typecheck:** pass (0 errors)
+- **Lint:** pass (0 errors; 1 pre-existing warning in unrelated file)
+- **Staged:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`

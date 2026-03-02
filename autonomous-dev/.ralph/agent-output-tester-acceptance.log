@@ -1,38 +1,29 @@
-`TEST_RESULT_1.json` written. Here's the summary:
+TEST_RESULT_1.json written. Here's the summary:
 
 ---
 
-## Iteration 107 — Acceptance Test Summary
+## Test Result — Iteration 108 (Acceptance)
 
-**Status: `playwright_unavailable`** (Chrome session conflict prevented browser launch)
+**Status: PASSED** (static analysis) | 7/10 actions used
 
-All 20 acceptance criteria evaluated via static code analysis (file reads + grep).
+### All 9 Criteria: PASS
 
-### #FEAT-035 — Improvement Ideas Data Layer
-**11/11 criteria: PASS**
-- Migration 022 creates correct enums and table schema
-- All FKs correct: `ON DELETE CASCADE` for workspace/created_by, `ON DELETE SET NULL` for linked_*_id
-- RLS: 4 policies all using `can_access_workspace()`
-- `update_updated_at()` trigger reused (not recreated)
-- TypeScript types match spec exactly
-- GET filtering + ordering confirmed in route code
-- POST/PATCH/DELETE validation patterns all correct
-- All mutations use `void logActivity()`
-- Client wrappers: all 4 present with correct signatures
+| Task | Criteria | Result |
+|------|----------|--------|
+| #FEAT-035 | Add Improvement dialog on step/section/touchpoint panels | ✅ pass |
+| #FEAT-035 | /improvements page — server component + entity joins | ✅ pass |
+| #FEAT-035 | Filterable status tabs + priority dropdown + cards | ✅ pass |
+| #FEAT-035 | Inline status change via dropdown → updateImprovementIdea() | ✅ pass |
+| #FEAT-035 | Sidebar Lightbulb nav item + open count badge | ✅ pass |
+| #FEAT-035 | 'improvements' in workspace-shell reserved paths | ✅ pass |
+| #FEAT-035 | !p.includes('/improvements') in Workflows active check | ✅ pass |
+| #IMP-055 | Delete Perspective button reads "Delete Perspective" | ✅ pass |
+| #IMP-053 | Prioritization empty state "Go to Canvas" link | ✅ pass |
 
-### #BUG-025 — Perspective Delete Dialog
-**5/5 criteria: PASS**
-- `confirm()` eliminated — 0 occurrences remaining in settings/page.tsx
-- Dialog shows `perspectiveToDelete?.name` inline
-- Cancel (secondary) + Delete (destructive) buttons in footer
-- Consequences text matches spec exactly: "All annotations for this perspective will be permanently removed."
+### Bugs Found (2)
 
-### #IMP-052 — Prioritization Chart Grid Lines
-**4/4 criteria: PASS (static)**
-- Dashed grid lines at 25%/75% (V+H) using `var(--border-subtle)` at opacity 0.35
-- Existing 50% dividers preserved
-- Y-axis labels 5→1, X-axis labels 1→5, positioned outside chart area
-- Existing quadrant labels/dots/tooltips/filters code untouched
+- **P2** — Production deployment is NOT on iteration 108 code. The `/improvements` URL renders an empty canvas; sidebar shows only 6 nav items. The `ralph/init-stride` branch hasn't been merged to `main` / deployed to Vercel.
+- **P2** — `BUILD_RESULT_2.json` has `iteration: 54` instead of `108` — metadata mismatch in the pipeline's tracking file.
 
-### Bugs Found: 0
-### Improvements Found: 2 (minor — button label specificity, axis label width)
+### Quality Gate
+No console errors or network errors on the production pages tested. Implementation quality is solid — correct patterns (BUG-023 DialogPrimitive.Title, optimistic state updates, proper empty states, RLS-safe server queries).

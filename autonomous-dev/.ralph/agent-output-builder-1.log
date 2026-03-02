@@ -1,13 +1,16 @@
-**#FEAT-035 complete.** All 5 owned files staged, typecheck passes (0 errors), lint passes (0 errors, 1 pre-existing warning).
+All tasks complete. Here's a summary of what was implemented for **#FEAT-035**:
 
-**Summary of what was built:**
+## Implementation Summary
 
-- **`supabase/migrations/022_improvement_ideas.sql`** — `improvement_status` enum (proposed/approved/in_progress/completed/rejected), `improvement_priority` enum (low/medium/high/critical), `improvement_ideas` table with all required columns, reuses `update_updated_at()` trigger from migration 015, workspace_id index, RLS policies using `can_access_workspace()`
+**7 files changed, 0 typecheck errors, 0 lint errors**
 
-- **`src/types/database.ts`** — `ImprovementStatus`, `ImprovementPriority` types + `ImprovementIdea` interface
+### New files:
+- **`improvements/page.tsx`** — Server component: fetches `improvement_ideas` + entity name/tab lookups (steps, sections, touchpoints), passes to view
+- **`improvements/improvements-view.tsx`** — Client view: status filter tabs (All/Proposed/Approved/In Progress/Completed/Rejected), priority dropdown filter, cards with title + colored status/priority badges + linked entity link + description preview, inline status change via DropdownMenu → `updateImprovementIdea()`
 
-- **`src/app/api/v1/improvement-ideas/route.ts`** — GET (filterable by status/priority, ordered `created_at desc`) + POST (validates workspace_id, non-empty title, enum values; calls `void logActivity()`)
-
-- **`src/app/api/v1/improvement-ideas/[id]/route.ts`** — PATCH (EDITABLE_FIELDS pattern, enum validation for status/priority, title trim) + DELETE (`.select().single()` for 0-row detection; both call `void logActivity()`)
-
-- **`src/lib/api/client.ts`** — `fetchImprovementIdeas`, `createImprovementIdea`, `updateImprovementIdea`, `deleteImprovementIdea` wrappers following existing patterns
+### Modified files:
+- **`step-detail-panel.tsx`** — Added "Add Improvement" button + Radix Dialog (using `DialogPrimitive.Title` per BUG-023 pattern) with title/description/priority form, pre-fills `linked_step_id`
+- **`section-detail-panel.tsx`** — Same dialog pattern, pre-fills `linked_section_id`, uses `section.workspace_id`
+- **`touchpoint-detail-panel.tsx`** — Same dialog pattern, pre-fills `linked_touchpoint_id`, uses `touchpoint.workspace_id`
+- **`sidebar.tsx`** — Added `Lightbulb` import, Improvements nav item between Prioritization and Comments, open-count badge via `useEffect` fetch, `!p.includes('/improvements')` added to Workflows active check
+- **`workspace-shell.tsx`** — `'improvements'` added to reserved paths array

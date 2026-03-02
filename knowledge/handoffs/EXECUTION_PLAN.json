@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 107,
-  "date": "2026-03-02T23:55:00Z",
+  "iteration": 108,
+  "date": "2026-03-03T01:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "d3fed5495b2f5bf445b2298df758beff6f850944",
+    "last_commit_hash": "d9588dfcbbc01bc2e6e6f0ea709c881b5b5edae3",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -14,7 +14,7 @@
     {
       "slot": 1,
       "id": "#FEAT-035",
-      "description": "Improvement ideas tracker — data layer: migration 022 (improvement_ideas table with improvement_status + improvement_priority enums), TypeScript types, API routes (GET filterable + POST + PATCH + DELETE), client wrappers",
+      "description": "FEAT-035 [2/2] Improvement ideas UI — 'Add Improvement' dialog on detail panels, improvements page, sidebar count badge",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 3a: Analysis Intelligence",
@@ -22,78 +22,74 @@
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "New migration 022_improvement_ideas.sql creates improvement_status enum (proposed/approved/in_progress/completed/rejected) and improvement_priority enum (low/medium/high/critical)",
-        "improvement_ideas table: id UUID PK, workspace_id UUID NOT NULL FK workspaces ON DELETE CASCADE, title TEXT NOT NULL, description TEXT, status improvement_status NOT NULL DEFAULT 'proposed', priority improvement_priority NOT NULL DEFAULT 'medium', linked_step_id UUID FK steps ON DELETE SET NULL, linked_touchpoint_id UUID FK touchpoints ON DELETE SET NULL, linked_section_id UUID FK sections ON DELETE SET NULL, created_by UUID FK users NOT NULL, created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now()",
-        "RLS enabled: SELECT/INSERT/UPDATE/DELETE policies using can_access_workspace(workspace_id)",
-        "Index on workspace_id, update_updated_at trigger reused from migration 015",
-        "TypeScript types added to database.ts: ImprovementIdea interface, ImprovementStatus type, ImprovementPriority type",
-        "GET /api/v1/improvement-ideas?workspace_id=X returns all ideas for workspace, supports optional status and priority query params for filtering, ordered by created_at desc",
-        "POST /api/v1/improvement-ideas creates new idea with validation (workspace_id required, title required non-empty, status must be valid enum, priority must be valid enum, linked_*_id optional)",
-        "PATCH /api/v1/improvement-ideas/[id] updates idea (title, description, status, priority, linked_*_id). EDITABLE_FIELDS pattern.",
-        "DELETE /api/v1/improvement-ideas/[id] deletes idea with .select().single() pattern for 0-row detection",
-        "All mutation routes call void logActivity() with appropriate action (created/updated/deleted)",
-        "Client wrappers in client.ts: fetchImprovementIdeas(workspaceId, filters?), createImprovementIdea(data), updateImprovementIdea(id, data), deleteImprovementIdea(id)"
+        "Add Improvement button on step-detail-panel, section-detail-panel, and touchpoint-detail-panel — opens Radix Dialog with title (required), description (textarea), priority dropdown (low/medium/high/critical, default medium). Pre-fills linked entity ID (linked_step_id, linked_section_id, or linked_touchpoint_id respectively). Calls createImprovementIdea() from client.ts. Toast on success/error.",
+        "New page at /w/[workspaceId]/improvements — server component page.tsx fetches improvement ideas, passes to client improvements-view.tsx",
+        "Improvements view: filterable list by status tabs (All, Proposed, Approved, In Progress, Completed, Rejected) and priority filter dropdown. Each card shows: title, status badge (colored by status), priority badge, linked element name (clickable link to canvas tab), description preview (truncated). Cards in a grid or list layout matching dark theme.",
+        "Inline status change via dropdown on each card — calls updateImprovementIdea()",
+        "Sidebar nav item 'Improvements' with Lightbulb icon from lucide-react, positioned between Prioritization and Comments. Badge showing open count (status NOT IN completed, rejected). Badge uses fetch in useEffect on mount.",
+        "Add 'improvements' to workspace-shell.tsx reserved paths array (line 47)",
+        "Add !p.includes('/improvements') to sidebar.tsx Workflows active check (line 39)"
       ],
       "files_owned": [
-        "supabase/migrations/022_improvement_ideas.sql",
-        "src/types/database.ts",
-        "src/app/api/v1/improvement-ideas/route.ts",
-        "src/app/api/v1/improvement-ideas/[id]/route.ts",
-        "src/lib/api/client.ts"
+        "src/app/(app)/w/[workspaceId]/improvements/page.tsx",
+        "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
+        "src/components/panels/step-detail-panel.tsx",
+        "src/components/panels/section-detail-panel.tsx",
+        "src/components/panels/touchpoint-detail-panel.tsx",
+        "src/components/layout/sidebar.tsx",
+        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
       ],
       "files_read_only": [
-        "src/lib/api/response.ts",
-        "src/lib/api/activity.ts",
-        "src/lib/supabase/server.ts",
-        "supabase/migrations/019_coloring_rules.sql",
-        "src/app/api/v1/coloring-rules/route.ts",
-        "src/app/api/v1/coloring-rules/[id]/route.ts"
+        "src/types/database.ts",
+        "src/lib/api/client.ts",
+        "src/lib/api/toast-helpers.ts",
+        "src/app/(app)/w/[workspaceId]/comments/page.tsx",
+        "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
+        "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
       ],
       "context": {
         "similar_files": [
-          "supabase/migrations/019_coloring_rules.sql",
-          "src/app/api/v1/coloring-rules/route.ts",
-          "src/app/api/v1/coloring-rules/[id]/route.ts",
-          "supabase/migrations/014_comments.sql",
-          "src/app/api/v1/comments/route.ts"
+          "src/app/(app)/w/[workspaceId]/comments/page.tsx — server component pattern (fetch + pass to view)",
+          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx — filterable list view with category tabs pattern",
+          "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx — list view with filter tabs + Load More pattern"
         ],
         "patterns_to_follow": [
-          "Migration pattern: CREATE TYPE enums, CREATE TABLE, update_updated_at trigger, workspace_id INDEX, RLS with can_access_workspace() — see 019_coloring_rules.sql",
-          "API route pattern: auth check, validation guards, EDITABLE_FIELDS for PATCH, .select().single() for DELETE, void logActivity() — see coloring-rules routes",
-          "Client wrapper pattern: apiFetch<Type[]> for list, apiFetch<Type> for create/update/delete — see existing wrappers in client.ts",
-          "Type pattern: interface + string literal union type for enums — see ColoringRule, CriteriaType in database.ts",
-          "FK with ON DELETE SET NULL for linked entity IDs (step, touchpoint, section) — allows deleting source entities without cascade-deleting improvement ideas"
+          "Server page.tsx: createServerSupabaseClient() → fetch improvement_ideas → pass to client view component",
+          "Client view: filter tabs for status, map cards, inline status dropdown, linked entity clickable links",
+          "Detail panel button: follow existing button patterns in step-detail-panel. Use Radix Dialog (Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter) from @radix-ui/react-dialog (import DialogPrimitive for Title to avoid BUG-023 pattern)",
+          "Sidebar badge: useState + useEffect to fetch open count. Badge styled like status badges (text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-blue)] text-white)",
+          "Status badges: proposed=gray, approved=blue, in_progress=yellow, completed=green, rejected=red — match existing step status badge colors",
+          "Priority badges: low=gray, medium=blue, high=yellow, critical=red"
         ],
         "learnings_relevant": [
-          "Supabase RLS silent mutations — API routes must check if data is null after mutations and return 403/404",
-          "apiFetch unwraps envelope — client functions return apiFetch<T>() directly",
-          "void logActivity() — fire-and-forget with void prefix to avoid floating promises"
+          "apiFetch unwraps envelope — fetchImprovementIdeas returns ImprovementIdea[] directly",
+          "workspace-shell reserved paths array — must add 'improvements' or page shows empty canvas",
+          "Sidebar Workflows active check — must exclude /improvements or nav item doesn't highlight correctly",
+          "React 19 useRef requires initial value: useRef(null)",
+          "Custom DialogTitle vs DialogPrimitive.Title — use DialogPrimitive.Title to avoid a11y warning (BUG-023 pattern)"
         ],
         "affected_urls": [
-          "/api/v1/improvement-ideas",
-          "/api/v1/improvement-ideas/[id]"
+          "/w/[workspaceId]/improvements"
         ]
       },
-      "has_ui_changes": false,
-      "has_data_model_changes": true,
-      "special_instructions": "Next migration number is 022. Reuse update_updated_at() trigger function from migration 015 (DO NOT recreate). Follow coloring_rules migration as closest pattern. linked_step_id, linked_touchpoint_id, linked_section_id should all be nullable FK with ON DELETE SET NULL so deleting a source entity orphans the idea rather than deleting it."
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Client wrappers already exist in client.ts: fetchImprovementIdeas, createImprovementIdea, updateImprovementIdea, deleteImprovementIdea. Types exist in database.ts: ImprovementIdea, ImprovementStatus, ImprovementPriority. API routes already exist at /api/v1/improvement-ideas. This is PURELY UI work — no API or type changes needed. For the page.tsx server component, fetch improvement_ideas from Supabase with select('*') ordered by created_at desc. For linked entity display, the improvement idea has linked_step_id/linked_section_id/linked_touchpoint_id — fetch the entity name from a join or secondary query for display. Simplest: store entity_name in a column, or fetch entities separately. Since the table doesn't have entity_name, the page.tsx should join or the view should resolve names client-side by fetching steps/sections/touchpoints for the workspace."
     },
     {
       "slot": 2,
-      "id": "#BUG-025",
-      "description": "Replace native confirm() for perspective deletion in settings page with Radix Dialog, following IMP-051 delete workspace dialog pattern",
-      "source": "prd/BUGS.md",
-      "type": "fix",
+      "id": "#IMP-055",
+      "description": "Delete Perspective button label should say 'Delete Perspective' for specificity",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
       "phase": "Phase 3a: Analysis Intelligence",
       "complexity": "S",
       "attempts": 1,
-      "risk_score": 1,
+      "risk_score": 0,
       "acceptance_criteria": [
-        "PerspectivesSection.handleDelete no longer calls native confirm()",
-        "Radix Dialog shows perspective name in description text",
-        "Cancel (secondary variant) and Delete (destructive/red variant) buttons in dialog footer",
-        "Dialog explains consequences: 'All annotations for this perspective will be permanently removed.'",
-        "Zero native confirm() calls remain in settings/page.tsx after fix"
+        "Delete Perspective confirmation dialog footer button reads 'Delete Perspective' instead of 'Delete'",
+        "Matches specificity pattern of other dialogs (e.g., workspace delete says 'Delete' but context is clear from title)"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/settings/page.tsx"
@@ -102,8 +98,7 @@
       "context": {
         "similar_files": [],
         "patterns_to_follow": [
-          "IMP-051 pattern already in same file — confirmDeleteOpen state, handleConfirmDelete, Radix Dialog with DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter",
-          "IMP-028 clone dialog pattern also in same file — confirmCloneOpen"
+          "Find the Delete Perspective Radix Dialog footer button (added in BUG-025 iter 107), change label from 'Delete' to 'Delete Perspective'"
         ],
         "learnings_relevant": [],
         "affected_urls": [
@@ -112,12 +107,12 @@
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The file already has two Radix Dialog patterns (clone and delete workspace). Follow the identical pattern for perspective deletion. Need confirmDeletePerspectiveOpen state + perspectiveToDelete state to track which perspective is being deleted. Also resolves IMP-054 (same issue)."
+      "special_instructions": "Trivial label change. The Delete Perspective dialog was added in iteration 107 (BUG-025). Find the destructive Button in the DialogFooter for perspective deletion and change its text from 'Delete' to 'Delete Perspective'."
     },
     {
       "slot": 3,
-      "id": "#IMP-052",
-      "description": "Add axis tick marks or grid lines to prioritization quadrant chart for better score readability",
+      "id": "#IMP-053",
+      "description": "Prioritization empty state CTA — add link to navigate to first workflow canvas",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 3a: Analysis Intelligence",
@@ -125,10 +120,9 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Subtle grid lines at 25%, 50%, 75% positions (horizontal and vertical) within the chart area",
-        "Numeric labels 1-5 along left edge (impact) and bottom edge (effort) of chart",
-        "Grid lines use border-subtle or similar low-opacity color that doesn't compete with dots",
-        "Existing quadrant labels, dots, tooltips, and filters still work correctly"
+        "When no items have effort/impact scores, the empty state shows a 'Go to Canvas' link below the existing message",
+        "Link navigates to /w/{workspaceId}/{firstTabId} — uses tabs from props or context. If no tabs exist, link is hidden.",
+        "Link styled as text-[var(--accent-blue)] hover:underline"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx"
@@ -137,9 +131,8 @@
       "context": {
         "similar_files": [],
         "patterns_to_follow": [
-          "Chart uses CSS absolute positioning within relative container — grid lines should be positioned the same way",
-          "Design tokens: --border-subtle for grid lines, --text-tertiary for axis labels",
-          "Keep axis labels outside chart area to avoid overlapping dots"
+          "PrioritizationView receives tabs data (check props/context). Use first workflow tab for link target.",
+          "Follow existing empty state patterns in the codebase — guidance text + action link"
         ],
         "learnings_relevant": [],
         "affected_urls": [
@@ -148,24 +141,26 @@
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "CSS-only enhancement. No new dependencies. Grid lines positioned at 25%, 50%, 75% of chart width/height (mapping to scores 2, 3, 4 on the 1-5 scale). Use very subtle styling — dashed or dotted lines at low opacity."
+      "special_instructions": "The prioritization-view.tsx already has an empty state message. Add a Link component below it pointing to the first tab. The view likely receives tabs from the page.tsx server component or useWorkspace() context. Check how the component gets tab data before adding the link."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/lib/api/response.ts", "src/lib/api/activity.ts", "src/lib/supabase/server.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
     "owner": null,
-    "note": "database.ts and client.ts are owned exclusively by slot 1. No other slot needs to modify them."
+    "note": "No shared file modifications needed. Types and client wrappers were built in FEAT-035 [1/2]."
   },
-  "merge_order": ["#FEAT-035", "#BUG-025", "#IMP-052"],
+  "merge_order": ["#FEAT-035", "#IMP-055", "#IMP-053"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": true,
-    "regression_reason": "Risk score 4 from iteration 106 (8 files changed, shared components modified: step-detail-panel, touchpoint-detail-panel, sidebar, workspace-shell)",
-    "suites_to_run": ["feat-035-data-layer-acceptance", "bug-025-acceptance", "imp-052-acceptance", "regression-baseline"],
+    "regression_reason": "Risk score 7 from iter 107 (schema change + >5 files + shared components). Iter 107 ran regression but scoring requires it here too.",
+    "suites_to_run": ["acceptance-feat-035-ui", "regression-baseline"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": [
+      "Accessibility cadence OVERDUE — last audit iteration 21, now iteration 108. Next trigger: iteration 110 (even multiple of 10)."
+    ],
     "diagnoses_written": false,
     "signal_override": null
   }

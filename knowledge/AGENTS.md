@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-107, 2026-03-03 — Phase 3a, FEAT-035 [1/2] data layer complete -->
+<!-- Updated: iter-108, 2026-03-03 — Phase 3a, FEAT-035 fully complete -->
 
 ## Project
 
@@ -51,7 +51,8 @@ npx supabase db push     # Push migrations
 | `/w/.../activity` | `src/app/(app)/w/[workspaceId]/activity/page.tsx` | Activity log (chronological feed, action type filter tabs, entity links, relative timestamps, Load More pagination) |
 | `/w/.../perspectives/compare` | `src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx` | Perspective comparison (dual dropdowns, divergence table, summary stats, element navigation, PDF export) |
 | `/w/.../prioritization` | `src/app/(app)/w/[workspaceId]/prioritization/page.tsx` | Prioritization matrix (effort/impact quadrant chart, CSS positioning, Radix Tooltips, tab/section filters, click-to-navigate) |
-| `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings (clone dialog, delete dialog — both Radix) |
+| `/w/.../improvements` | `src/app/(app)/w/[workspaceId]/improvements/page.tsx` | Improvement ideas (status tabs, priority filter, inline status change dropdown, linked entity links, sidebar badge) |
+| `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings (clone dialog, delete dialog, perspective delete dialog — all Radix) |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 
 ### API Routes (all under `src/app/api/v1/`)

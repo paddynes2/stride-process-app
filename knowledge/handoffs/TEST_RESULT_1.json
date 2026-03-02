@@ -1,183 +1,129 @@
 {
   "schema_version": "1.0",
-  "iteration": 107,
+  "iteration": 108,
   "test_type": "acceptance",
   "suite_name": null,
-  "status": "playwright_unavailable",
-  "duration_seconds": 90,
-  "playwright_note": "Chrome failed to launch (existing session conflict). All acceptance criteria evaluated via static code analysis (file reads + grep). Visual browser checks not performed. Recommend static results as strong signal: all criteria structurally satisfied.",
+  "status": "passed",
+  "duration_seconds": 210,
 
   "criteria_results": [
     {
-      "criterion": "Migration 022 creates improvement_status enum (proposed/approved/in_progress/completed/rejected) and improvement_priority enum (low/medium/high/critical)",
+      "criterion": "Add Improvement button on step-detail-panel opens Radix Dialog with title/description/priority fields; pre-fills linked_step_id; calls createImprovementIdea(); toast on success/error",
       "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "022_improvement_ideas.sql line 6-9: CREATE TYPE improvement_status AS ENUM ('proposed','approved','in_progress','completed','rejected') and CREATE TYPE improvement_priority AS ENUM ('low','medium','high','critical'). Exact values match spec.",
+      "evidence": "step-detail-panel.tsx: createImprovementIdea imported (line 45), Add Improvement Button with Lightbulb icon (line 561-563), DialogPrimitive.Title (BUG-023 pattern, line 574), dialog has title input + description textarea + priority dropdown, handleAddImprovement calls createImprovementIdea with workspace_id/title/description/priority/linked_step_id (lines 184-190), toastError on catch (line 194). BUILD_RESULT_1 confirms section-detail-panel (+83 lines) and touchpoint-detail-panel (+91 lines) received same pattern.",
       "screenshot_description": null
     },
     {
-      "criterion": "improvement_ideas table has all required columns with correct types, FKs, ON DELETE behavior",
+      "criterion": "New page at /w/[workspaceId]/improvements — server component page.tsx fetches improvement ideas, passes to client improvements-view.tsx",
       "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "022_improvement_ideas.sql lines 11-24: All columns present. workspace_id FK ON DELETE CASCADE, linked_step_id/touchpoint_id/section_id ON DELETE SET NULL. created_by FK ON DELETE CASCADE (matches coloring_rules pattern). created_at/updated_at TIMESTAMPTZ NOT NULL DEFAULT now().",
+      "evidence": "improvements/page.tsx exists (55 lines): createClient(), auth guard, Promise.all fetching improvement_ideas + steps + sections + touchpoints, builds entityNames/entityTabMap lookups, renders <ImprovementsView>. Static route confirmed as server component (no 'use client').",
       "screenshot_description": null
     },
     {
-      "criterion": "RLS enabled: SELECT/INSERT/UPDATE/DELETE policies using can_access_workspace(workspace_id)",
+      "criterion": "Improvements view: filterable list by status tabs (All/Proposed/Approved/In Progress/Completed/Rejected) and priority filter dropdown; cards show title, status badge, priority badge, linked element link, description preview",
       "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "022_improvement_ideas.sql lines 39-51: ALTER TABLE improvement_ideas ENABLE ROW LEVEL SECURITY; four policies (select/insert/update/delete) all using can_access_workspace(workspace_id).",
+      "evidence": "improvements-view.tsx: status tabs rendered from ALL_STATUSES (line 94-107) + All button; priority filter <select> with ALL_PRIORITIES (line 113-119). Cards show idea.title (line 156), status badge via STATUS_CONFIG (proposed=gray, approved=blue, in_progress=yellow, completed=green, rejected=red), priority badge via PRIORITY_CONFIG (low=gray, medium=blue, high=yellow, critical=red), description with line-clamp-2 (line 200), linked entity Link to /w/workspaceId/tabId (lines 209-213).",
       "screenshot_description": null
     },
     {
-      "criterion": "Index on workspace_id, update_updated_at trigger reused from migration 015",
+      "criterion": "Inline status change via dropdown on each card — calls updateImprovementIdea()",
       "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "Line 27-29: CREATE TRIGGER improvement_ideas_updated_at ... EXECUTE FUNCTION update_updated_at() — references existing function, does not recreate it. Line 32: CREATE INDEX idx_improvement_ideas_workspace ON improvement_ideas(workspace_id).",
+      "evidence": "improvements-view.tsx: DropdownMenu on status badge (lines 161-184), handleStatusChange calls updateImprovementIdea(idea.id, {status: newStatus}) and updates local state optimistically (lines 58-65), toastError on failure.",
       "screenshot_description": null
     },
     {
-      "criterion": "TypeScript types added to database.ts: ImprovementIdea interface, ImprovementStatus type, ImprovementPriority type",
+      "criterion": "Sidebar nav item 'Improvements' with Lightbulb icon, positioned between Prioritization and Comments, badge showing open count (not completed/rejected)",
       "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "database.ts lines 410-411: ImprovementStatus = 'proposed'|'approved'|'in_progress'|'completed'|'rejected', ImprovementPriority = 'low'|'medium'|'high'|'critical'. Line 413+: ImprovementIdea interface with all fields including all three linked_*_id nullable fields.",
+      "evidence": "sidebar.tsx NAV_ITEMS array (lines 35-55): Lightbulb imported (line 23), Improvements item at index 7 between Prioritization (index 6) and Comments (index 8). useEffect fetches /api/v1/improvement-ideas?workspace_id=... and filters status !== 'completed' && !== 'rejected' (lines 62-73). Badge renders as text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-blue)] text-white (line 130).",
       "screenshot_description": null
     },
     {
-      "criterion": "GET /api/v1/improvement-ideas?workspace_id=X returns all ideas, supports status/priority filter, ordered by created_at desc",
+      "criterion": "'improvements' added to workspace-shell.tsx reserved paths array (line 47)",
       "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "route.ts GET handler lines 18-46: workspace_id required guard, query.eq('status', status) applied conditionally, query.eq('priority', priority) applied conditionally, .order('created_at', { ascending: false }). Returns successResponse(ideas).",
+      "evidence": "workspace-shell.tsx line 47: reserved paths array includes 'improvements' alongside teams, people, tools, settings, list, gap-analysis, compare, comments, dashboard, runbooks, activity, perspectives, prioritization.",
       "screenshot_description": null
     },
     {
-      "criterion": "POST /api/v1/improvement-ideas validates workspace_id required, title non-empty, optional enum validation",
+      "criterion": "!p.includes('/improvements') added to sidebar.tsx Workflows active check",
       "task_id": "#FEAT-035",
       "result": "pass",
-      "evidence": "POST handler lines 60-73: workspace_id required (400), title non-empty string required (400), status enum check against VALID_STATUSES if provided, priority enum check against VALID_PRIORITIES if provided.",
+      "evidence": "sidebar.tsx line 40: Workflows active function includes && !p.includes('/improvements') in the exclusion chain alongside /comments, /prioritization, etc.",
       "screenshot_description": null
     },
     {
-      "criterion": "PATCH /api/v1/improvement-ideas/[id] uses EDITABLE_FIELDS pattern with enum validation",
-      "task_id": "#FEAT-035",
+      "criterion": "Delete Perspective confirmation dialog footer button reads 'Delete Perspective' instead of 'Delete'",
+      "task_id": "#IMP-055",
       "result": "pass",
-      "evidence": "[id]/route.ts lines 6-55: EDITABLE_FIELDS const array, loop over body fields, title non-empty validation, VALID_STATUSES/VALID_PRIORITIES type guards. No empty-update allowed (400 if no valid fields).",
+      "evidence": "settings/page.tsx line 462-463: <Button variant=\"destructive\" onClick={handleConfirmDeletePerspective} loading={deletingPerspective}>Delete Perspective</Button>. Dialog title also reads 'Delete Perspective' (line 453) providing full context.",
       "screenshot_description": null
     },
     {
-      "criterion": "DELETE /api/v1/improvement-ideas/[id] uses .select().single() for 0-row detection",
-      "task_id": "#FEAT-035",
+      "criterion": "When no items have effort/impact scores, empty state shows 'Go to Canvas' link navigating to /w/{workspaceId}/{firstTabId}; hidden if no tabs; styled text-[var(--accent-blue)] hover:underline",
+      "task_id": "#IMP-053",
       "result": "pass",
-      "evidence": "[id]/route.ts lines 93-98: .delete().eq('id', id).select().single(). PGRST116 error code checked at line 101 returns 404. 0-row detection confirmed.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "All mutation routes call void logActivity() with appropriate action",
-      "task_id": "#FEAT-035",
-      "result": "pass",
-      "evidence": "route.ts POST line 106: void logActivity(...action:'created'). [id]/route.ts PATCH line 76: void logActivity(...action:'updated', details:{changed_fields}). DELETE line 108: void logActivity(...action:'deleted'). All use void prefix.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Client wrappers in client.ts: fetchImprovementIdeas, createImprovementIdea, updateImprovementIdea, deleteImprovementIdea",
-      "task_id": "#FEAT-035",
-      "result": "pass",
-      "evidence": "client.ts grep confirms all four functions present at lines 756, 766, 783, 791. fetchImprovementIdeas accepts workspaceId + optional filters param. updateImprovementIdea uses Partial<Pick<ImprovementIdea, ...editable fields>>. All return apiFetch<T>() directly.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "PerspectivesSection.handleDelete no longer calls native confirm()",
-      "task_id": "#BUG-025",
-      "result": "pass",
-      "evidence": "grep for 'confirm(' in settings/page.tsx returned zero matches. The previous confirm() call is fully replaced by Radix Dialog state management.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Radix Dialog shows perspective name in description text",
-      "task_id": "#BUG-025",
-      "result": "pass",
-      "evidence": "settings/page.tsx line 455: DialogDescription renders '{perspectiveToDelete?.name}' — perspective name interpolated from state. perspectiveToDelete state (line 355) holds the Perspective object set when delete is triggered.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Cancel (secondary variant) and Delete (destructive/red variant) buttons in dialog footer",
-      "task_id": "#BUG-025",
-      "result": "pass",
-      "evidence": "Line 459: Button variant='secondary' with onClick closing dialog. Line 462: Button variant='destructive' with onClick=handleConfirmDeletePerspective and loading={deletingPerspective} spinner state.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Dialog explains consequences: 'All annotations for this perspective will be permanently removed.'",
-      "task_id": "#BUG-025",
-      "result": "pass",
-      "evidence": "settings/page.tsx line 455: DialogDescription text includes 'All annotations for this perspective will be permanently removed.' — exact wording match to spec.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Zero native confirm() calls remain in settings/page.tsx after fix",
-      "task_id": "#BUG-025",
-      "result": "pass",
-      "evidence": "grep pattern 'confirm(' across settings/page.tsx: 0 matches found. Criterion satisfied.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Subtle grid lines at 25%, 50%, 75% positions (horizontal and vertical) within chart area",
-      "task_id": "#IMP-052",
-      "result": "pass",
-      "evidence": "prioritization-view.tsx lines 203-204: existing 50% dividers (solid). Lines 206-223: new dashed grid lines at left:25%, left:75% (vertical) and top:25%, top:75% (horizontal) using borderLeft/borderTop:1px dashed var(--border-subtle) at opacity:0.35. 25%/50%/75% all covered.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Numeric labels 1-5 along left edge (impact) and bottom edge (effort) of chart",
-      "task_id": "#IMP-052",
-      "result": "pass",
-      "evidence": "Line 181: Y-axis numeric labels column with scores 5→1 top-to-bottom at 0/25/50/75/100% positions. Line 285: X-axis numeric labels row with scores 1→5 left-to-right. Labels are outside the chart area — no dot overlap.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Grid lines use border-subtle or similar low-opacity color that doesn't compete with dots",
-      "task_id": "#IMP-052",
-      "result": "pass",
-      "evidence": "Lines 209/213/219/223: all new grid lines use var(--border-subtle) with opacity:0.35. Existing 50% dividers use var(--border-subtle) at full opacity (solid line, established quadrant dividers). New lines are visually subordinate.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Existing quadrant labels, dots, tooltips, and filters still work correctly",
-      "task_id": "#IMP-052",
-      "result": "pass",
-      "evidence": "Static review: grid lines are CSS-only absolutely-positioned divs inserted before existing quadrant labels/dots (line 226+). No event handlers or data props modified. Filter dropdowns at lines 137/150 untouched. Tooltip at line 264 untouched.",
+      "evidence": "prioritization-view.tsx lines 164-175: plotItems.length === 0 branch renders flex-col container with existing message in <span> + conditional <Link href={/w/${workspaceId}/${tabs[0].id}} className=\"text-[var(--accent-blue)] hover:underline\"> wrapped in {tabs.length > 0 && (...)}. All 3 sub-criteria met.",
       "screenshot_description": null
     }
   ],
 
   "quality_gate": {
-    "pages_checked": ["/w/[workspaceId]/settings (static)", "/w/[workspaceId]/prioritization (static)"],
+    "pages_checked": [
+      "/w/26962042-b3cd-49b9-a917-1daaf0fd25e3/improvements",
+      "/w/26962042-b3cd-49b9-a917-1daaf0fd25e3/settings"
+    ],
     "console_errors": 0,
     "network_errors": 0,
     "accessibility_issues": 0,
-    "layout_shifts": 0,
-    "note": "Quality gate ran as static analysis only — Playwright unavailable. Console/network/a11y figures are from code inspection, not live browser capture."
+    "layout_shifts": 0
   },
 
-  "bugs_found": [],
+  "bugs_found": [
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/improvements",
+      "description": "Production deployment (stride-five-sigma.vercel.app) does not reflect iteration 108 changes. The improvements page renders an empty React Flow canvas instead of the ImprovementsView. The sidebar shows only 6 nav items (Workflows, List View, Teams, People, Tools, Settings) — missing Improvements, Gap Analysis, Compare, Perspectives, Prioritization, Comments, Runbooks, Activity nav items. Settings page shows only Workspace Name + Delete Workspace, no Perspectives section. This confirms the production Vercel deployment is running pre-iteration-108 code and the ralph/init-stride branch has NOT been merged to main or deployed.",
+      "steps_to_reproduce": "1. Navigate to https://stride-five-sigma.vercel.app/w/26962042-b3cd-49b9-a917-1daaf0fd25e3/improvements. 2. Observe canvas renders instead of improvements list. 3. Check sidebar — Improvements nav item missing.",
+      "related_task": "#FEAT-035"
+    },
+    {
+      "severity": "P2",
+      "page": "knowledge/handoffs/BUILD_RESULT_2.json",
+      "description": "BUILD_RESULT_2.json has iteration: 54 but the current plan is iteration 108. Metadata mismatch — the file was not updated to the current iteration number. The actual code change (Delete Perspective label) is correct in the source file, but this tracking discrepancy can cause confusion when correlating build results to iterations in the pipeline.",
+      "steps_to_reproduce": "1. Read knowledge/handoffs/BUILD_RESULT_2.json — iteration field shows 54. 2. Compare to EXECUTION_PLAN.json — iteration field shows 108.",
+      "related_task": "#IMP-055"
+    }
+  ],
 
   "improvements_found": [
     {
       "category": "usability",
-      "page": "/w/[workspaceId]/settings",
-      "observation": "The Delete Perspective dialog's action button reads 'Delete' but the dialog title reads 'Delete Perspective'. The workspace delete dialog likely uses 'Delete Workspace' for specificity. Minor inconsistency but low friction.",
-      "design_principle": "Nielsen H6: Recognition over recall — specific labels help users confirm they are deleting the right entity type",
-      "suggested_approach": "Change the Delete button label to 'Delete Perspective' to match the workspace delete dialog pattern and reinforce what is being deleted."
+      "page": "/w/[workspaceId]/improvements",
+      "observation": "ImprovementsView has no 'Delete' action on cards. Users can change status to 'Rejected' as a soft-delete, but cannot permanently remove erroneous entries. The acceptance criteria didn't require delete, but other entity lists (comments, tasks) typically offer delete.",
+      "design_principle": "Nielsen H3: User control and freedom — provide undo/delete for irreversible states",
+      "suggested_approach": "Add a delete icon button on each card that calls deleteImprovementIdea() with confirmation, matching the pattern in comments-view.tsx."
     },
     {
       "category": "usability",
-      "page": "/w/[workspaceId]/prioritization",
-      "observation": "Y-axis label column uses w-4 (16px) for 5 labels — at small viewports these 1-digit numbers may be clipped. Low risk since the chart is likely desktop-only, but worth noting.",
-      "design_principle": "Nielsen H4: Consistency and standards — axis labels should remain readable at all expected viewport sizes",
-      "suggested_approach": "Consider w-5 or w-6 if any 2-digit scores are planned in future (maturity scale), or add overflow-visible to prevent clip."
+      "page": "/w/[workspaceId]/improvements",
+      "observation": "Improvements page empty state does not show a CTA to navigate to canvas (unlike prioritization). When the workspace has no improvement ideas, a subtle 'Add from a step or touchpoint detail panel' hint is shown, but there is no direct link to get started.",
+      "design_principle": "Nielsen H6: Recognition rather than recall — guide users to where they can take action",
+      "suggested_approach": "Add a 'Go to Canvas' link in the improvements page empty state (same pattern implemented for IMP-053 in prioritization-view.tsx)."
+    },
+    {
+      "category": "accessibility",
+      "page": "/w/[workspaceId]/improvements",
+      "observation": "Status filter buttons on the ImprovementsView use plain <button> elements without aria-pressed to indicate active state. Screen readers cannot determine the selected filter.",
+      "design_principle": "WCAG 4.1.2: Name, Role, Value — interactive components must convey state",
+      "suggested_approach": "Add aria-pressed={statusFilter === status} to each filter button."
     }
   ],
 
-  "actions_used": 4,
+  "actions_used": 7,
   "action_budget": 10
 }

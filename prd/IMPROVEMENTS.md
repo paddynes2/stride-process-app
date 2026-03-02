@@ -370,7 +370,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`
   - **Fix applied:** Added Y-axis numeric labels (5→1 top-to-bottom) in w-4 column, X-axis numeric labels (1→5 left-to-right) in 14px row, and subtle dashed grid lines at 25%/75% (horizontal + vertical) using var(--border-subtle) at 35% opacity. Existing 50% quadrant dividers preserved.
 
-- [ ] #IMP-053 Prioritization empty state has no CTA to navigate to canvas — Attempts: 0
+- [x] #IMP-053 Prioritization empty state has no CTA to navigate to canvas — Attempts: 1 — DONE iteration 108, 2026-03-03
   - **Found:** Iteration 106 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`
@@ -384,7 +384,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` (PerspectivesSection.handleDelete, line ~379)
   - **Resolution:** Fixed by BUG-025 in iteration 107. Perspective deletion now uses Radix Dialog matching workspace delete and clone patterns.
 
-- [ ] #IMP-055 Delete Perspective button label should say "Delete Perspective" for specificity — Attempts: 0
+- [x] #IMP-055 Delete Perspective button label should say "Delete Perspective" for specificity — Attempts: 1 — DONE iteration 108, 2026-03-03
   - **Found:** Iteration 107 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — Delete Perspective dialog footer button
@@ -399,6 +399,62 @@
   - **What:** Y-axis label column uses w-4 (16px) for single-digit numbers. At very small viewports these 1-digit numbers may be clipped. Low risk since chart is desktop-only.
   - **Design principle:** Nielsen H4: Consistency and standards — labels should remain readable
   - **Suggested fix:** Consider w-5 or add overflow-visible if wider scores are planned in future.
+
+- [ ] #IMP-057 ImprovementsView has no delete action on cards — Attempts: 0
+  - **Found:** Iteration 108 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
+  - **What:** Users can change status to 'Rejected' as a soft-delete but cannot permanently remove erroneous entries. Other entity lists (comments, tasks) offer delete.
+  - **Design principle:** Nielsen H3: User control and freedom — provide undo/delete for irreversible states
+  - **Suggested fix:** Add a delete icon button on each card that calls deleteImprovementIdea() with confirmation, matching the pattern in comments-view.tsx.
+
+- [ ] #IMP-058 Improvements page empty state has no CTA to navigate to canvas — Attempts: 0
+  - **Found:** Iteration 108 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
+  - **What:** When workspace has no improvement ideas, only shows text hint. No direct link to get started.
+  - **Design principle:** Nielsen H6: Recognition rather than recall — guide users to where they can take action
+  - **Suggested fix:** Add a 'Go to Canvas' link in the improvements page empty state (same pattern as IMP-053 in prioritization-view.tsx).
+
+- [ ] #IMP-059 Status filter buttons missing aria-pressed on ImprovementsView — Attempts: 0
+  - **Found:** Iteration 108 (acceptance tester)
+  - **Category:** Accessibility
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
+  - **What:** Status filter buttons use plain `<button>` without `aria-pressed` to indicate active state. Screen readers cannot determine the selected filter.
+  - **Design principle:** WCAG 4.1.2: Name, Role, Value — interactive components must convey state
+  - **Suggested fix:** Add `aria-pressed={statusFilter === status}` to each filter button.
+
+- [ ] #IMP-060 Sidebar improvements badge count stale after adding from detail panel — Attempts: 0
+  - **Found:** Iteration 108 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/components/layout/sidebar.tsx` (lines 62-74)
+  - **What:** Badge count loads once on mount but does not refresh after user adds a new improvement from a detail panel. Count is stale until page reload or navigation.
+  - **Design principle:** Nielsen H1: Visibility of system status — badge should reflect current state
+  - **Suggested fix:** Emit a custom event or use a lightweight context signal from createImprovementIdea success path to trigger badge refetch. Alternatively, refetch on tab focus.
+
+- [ ] #IMP-061 Improvement status change waits for API before visual update — Attempts: 0
+  - **Found:** Iteration 108 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` (lines 58-65)
+  - **What:** handleStatusChange waits for API roundtrip before updating local state. Brief visual lag on slow connections.
+  - **Design principle:** Nielsen H1: Visibility of system status — immediate feedback preferred
+  - **Suggested fix:** Apply optimistic update before API call: setIdeas with newStatus first, then revert on error.
+
+- [ ] #IMP-062 Prioritization 'Go to Canvas' should target first process tab — Attempts: 0
+  - **Found:** Iteration 108 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx` (line 169)
+  - **What:** Link always targets tabs[0] regardless of canvas_type. If first tab is journey canvas, user lands on journey instead of process canvas where effort/impact scoring is more natural.
+  - **Design principle:** Nielsen H4: Consistency and standards — match user expectation of 'canvas with scoreable items'
+  - **Suggested fix:** Filter tabs to first process-type tab (canvas_type === 'process') before falling back to tabs[0].
+
+- [ ] #IMP-063 section-detail-panel BUG reference inconsistency (BUG-024 vs BUG-023) — Attempts: 0
+  - **Found:** Iteration 108 (regression tester)
+  - **Category:** Content
+  - **Where:** `src/components/panels/section-detail-panel.tsx`
+  - **What:** Comment at line 11 references 'BUG-024' but other panels reference this as the 'BUG-023 pattern'. Implementation is correct (using DialogPrimitive.Title) but the bug number is inconsistent.
+  - **Design principle:** Code maintainability — consistent documentation references across files
+  - **Suggested fix:** Align comment to reference 'BUG-023' consistently across all panels.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

@@ -96,3 +96,9 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — PerspectivesSection.handleDelete (line ~379)
   - **What:** Native `confirm("Delete this perspective? All annotations will be permanently removed.")` call. Pre-existing, not introduced by IMP-051. Now inconsistent with workspace delete (Radix Dialog) and clone (Radix Dialog) on same page.
   - **Fix applied:** Replaced with Radix Dialog following IMP-051 pattern. Added confirmDeletePerspectiveOpen + perspectiveToDelete + deletingPerspective state. Dialog shows perspective name, explains consequences ("All annotations for this perspective will be permanently removed."), Cancel (secondary) + Delete (destructive) buttons. Zero confirm() calls remain in settings/page.tsx. Also resolves IMP-054.
+
+- [ ] #BUG-026 Pipeline BUILD_RESULT_2.json iteration metadata mismatch (P3) — Attempts: 0
+  - **Found:** Iteration 108 (acceptance tester)
+  - **Where:** `knowledge/handoffs/BUILD_RESULT_2.json`
+  - **What:** BUILD_RESULT_2.json has `iteration: 54` but current plan is iteration 108. Pipeline slot 2 builder wrote stale iteration number. Code change (Delete Perspective label) is correct but tracking metadata is wrong. Can cause confusion when correlating build results to iterations.
+  - **Impact:** Pipeline metadata only — no user-facing impact.

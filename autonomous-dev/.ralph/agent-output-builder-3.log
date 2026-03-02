@@ -1,15 +1,15 @@
-Done. Here's a summary of what was implemented:
+Task complete. Here's a summary of what was done:
 
-**#IMP-052 — Prioritization chart grid lines & axis labels**
+**#IMP-053 — Prioritization empty state CTA**
 
-Changes to `prioritization-view.tsx`:
+**Changes made** to `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`:
 
-1. **Y-axis numeric labels** — Added a `w-4` column between the "Impact" title and the chart area. Shows scores `5→1` top-to-bottom, each positioned at `0/25/50/75/100%` with `translateY(-50%)` centering. Labels are outside the chart area.
+1. Added `import Link from "next/link"` 
+2. Modified the empty state `<div>` from `flex items-center justify-center` to `flex flex-col items-center justify-center gap-2` to support stacked content
+3. Wrapped the existing message text in a `<span>`
+4. Added a conditional `<Link>` component below the message:
+   - Only renders when `tabs.length > 0` (hidden if no tabs)
+   - Navigates to `/w/${workspaceId}/${tabs[0].id}` (first tab)
+   - Styled `text-[var(--accent-blue)] hover:underline`
 
-2. **X-axis numeric labels** — Added a `14px` row below the chart. Shows scores `1→5` left-to-right at `0/25/50/75/100%` positions with `translateX(-50%)` centering. Spacers (`w-6` + `w-4`) align with the left columns.
-
-3. **Grid lines at 25% and 75%** — 4 new absolutely-positioned `div`s inside the chart area using `borderLeft`/`borderTop: "1px dashed var(--border-subtle)"` at `opacity: 0.35`. These are distinctly more subtle than the existing solid 50% quadrant dividers.
-
-4. **Layout alignment** — Both the X-axis numeric row and the "Effort →" title row have matching `w-6 + w-4` left spacers so everything aligns with the chart area.
-
-All existing quadrant tints, divider lines, quadrant labels, dots, tooltips, and filters are unchanged.
+**Verification:** typecheck ✅ (0 errors), lint ✅ (0 errors, 1 pre-existing warning)

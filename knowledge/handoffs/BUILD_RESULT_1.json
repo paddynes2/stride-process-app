@@ -1,60 +1,74 @@
 {
   "schema_version": "1.0",
-  "iteration": 107,
+  "iteration": 108,
   "slot": 1,
   "task_id": "#FEAT-035",
   "status": "completed",
-  "duration_seconds": 240,
+  "duration_seconds": 420,
 
   "files_changed": [
     {
-      "path": "supabase/migrations/022_improvement_ideas.sql",
+      "path": "src/app/(app)/w/[workspaceId]/improvements/page.tsx",
       "action": "created",
-      "lines_added": 51,
+      "lines_added": 55,
       "lines_removed": 0
     },
     {
-      "path": "src/types/database.ts",
+      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
+      "action": "created",
+      "lines_added": 168,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/components/panels/step-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 22,
-      "lines_removed": 0
+      "lines_added": 88,
+      "lines_removed": 4
     },
     {
-      "path": "src/app/api/v1/improvement-ideas/route.ts",
-      "action": "created",
-      "lines_added": 109,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/api/v1/improvement-ideas/[id]/route.ts",
-      "action": "created",
-      "lines_added": 112,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/lib/api/client.ts",
+      "path": "src/components/panels/section-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 45,
+      "lines_added": 83,
+      "lines_removed": 3
+    },
+    {
+      "path": "src/components/panels/touchpoint-detail-panel.tsx",
+      "action": "modified",
+      "lines_added": 91,
+      "lines_removed": 4
+    },
+    {
+      "path": "src/components/layout/sidebar.tsx",
+      "action": "modified",
+      "lines_added": 21,
+      "lines_removed": 2
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
+      "action": "modified",
+      "lines_added": 1,
       "lines_removed": 1
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused import) — known acceptable per LEARNINGS.md. No new warnings." },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not modified)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "supabase/migrations/022_improvement_ideas.sql",
-    "src/types/database.ts",
-    "src/app/api/v1/improvement-ideas/route.ts",
-    "src/app/api/v1/improvement-ideas/[id]/route.ts",
-    "src/lib/api/client.ts"
+    "src/app/(app)/w/[workspaceId]/improvements/page.tsx",
+    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
+    "src/components/panels/step-detail-panel.tsx",
+    "src/components/panels/section-detail-panel.tsx",
+    "src/components/panels/touchpoint-detail-panel.tsx",
+    "src/components/layout/sidebar.tsx",
+    "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Migration 022 creates improvement_status enum (proposed/approved/in_progress/completed/rejected) and improvement_priority enum (low/medium/high/critical) + improvement_ideas table with all required columns. Reuses update_updated_at() trigger from migration 015. All linked_*_id FKs use ON DELETE SET NULL. RLS: SELECT/INSERT/UPDATE/DELETE using can_access_workspace(workspace_id). GET route supports optional status/priority query filter params, ordered created_at desc. POST validates workspace_id required, title non-empty, optional enum validation for status/priority. PATCH uses EDITABLE_FIELDS pattern with enum validation. DELETE uses .select().single() for 0-row detection. All mutations call void logActivity(). Client wrappers: fetchImprovementIdeas (with filters), createImprovementIdea, updateImprovementIdea, deleteImprovementIdea — all following coloring-rules pattern.",
+  "notes": "All 7 acceptance criteria implemented: (1) Add Improvement dialog on step/section/touchpoint detail panels using Radix Dialog + DialogPrimitive.Title (BUG-023 pattern), pre-fills linked entity IDs, calls createImprovementIdea(), toast on success/error. (2) New page at /w/[workspaceId]/improvements — server component fetches improvement_ideas + entity lookup tables (steps/sections/touchpoints). (3) ImprovementsView with status tabs (All/Proposed/Approved/In Progress/Completed/Rejected) and priority filter dropdown, cards with title/status badge/priority badge/linked entity link/description preview. (4) Inline status change via DropdownMenu on each card calls updateImprovementIdea() with optimistic local state update. (5) Sidebar Lightbulb nav item between Prioritization and Comments with open count badge via useEffect fetch (excludes completed/rejected). (6) 'improvements' added to workspace-shell reserved paths array. (7) !p.includes('/improvements') added to Workflows active check in sidebar.",
   "failure_details": null
 }

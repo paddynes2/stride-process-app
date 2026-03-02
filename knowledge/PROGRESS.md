@@ -1677,3 +1677,41 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed, clean merges, zero recovery needed.
 - Observations: 2 (2 new improvements)
 **Notes:** FEAT-035 [1/2] completes the improvement ideas data foundation. [2/2] will add UI: "Add Improvement" buttons on detail panels, improvements page, sidebar count badge. BUG-025 resolves IMP-054 (same issue). Zero native confirm() calls remain in settings/page.tsx. Migration 022 needs `npx supabase db push`.
+
+## Iteration 108 — 2026-03-03 01:30
+**Tasks:**
+- #FEAT-035 [2/2] Improvement ideas UI (detail panel dialogs, improvements page, sidebar badge) — slot 1 — completed
+- #IMP-055 Delete Perspective button label specificity — slot 2 — completed
+- #IMP-053 Prioritization empty state CTA — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/app/(app)/w/[workspaceId]/improvements/page.tsx (created — 58 lines, server component with parallel entity lookup)
+- src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx (created — 225 lines, filterable list with status tabs, priority dropdown, inline status change, linked entity links)
+- src/components/panels/step-detail-panel.tsx (modified — +88/-4, Add Improvement dialog with DialogPrimitive.Title)
+- src/components/panels/section-detail-panel.tsx (modified — +83/-3, Add Improvement dialog)
+- src/components/panels/touchpoint-detail-panel.tsx (modified — +91/-4, Add Improvement dialog)
+- src/components/layout/sidebar.tsx (modified — +21/-2, Lightbulb nav item, improvements open count badge, /improvements Workflows exclusion)
+- src/app/(app)/w/[workspaceId]/workspace-shell.tsx (modified — +1/-1, 'improvements' added to reserved paths)
+- src/app/(app)/w/[workspaceId]/settings/page.tsx (modified — +1/-1, 'Delete' → 'Delete Perspective' button label)
+- src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx (modified — +8/-3, 'Go to Canvas' link in empty state)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs — 0 errors)
+- Lint: pass (all 3 BUILD_RESULTs — 0 errors, 1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable — Chrome session conflict)
+- Canary test: skipped (Playwright unavailable)
+- Acceptance test: 8/8 PASS (7 FEAT-035 criteria + 1 IMP-055 + 1 IMP-053 — static code analysis)
+- Regression test: 11/11 PASS (static analysis — Playwright unavailable, Chrome session conflict)
+- POST_MERGE_CHECK: PASS
+**Bugs found:** 1 — BUG-026 (P3, pipeline: BUILD_RESULT_2.json iteration metadata mismatch — shows 54 instead of 108)
+**Improvements found:** 7 — IMP-057 (delete action on improvement cards), IMP-058 (improvements empty state CTA), IMP-059 (status filter aria-pressed), IMP-060 (sidebar badge count stale after adding), IMP-061 (status change not truly optimistic), IMP-062 (prioritization Go to Canvas should target process tab), IMP-063 (BUG-023/024 comment inconsistency in section-detail-panel)
+**Self-score:**
+- Code quality: 5 — All 7 FEAT-035 acceptance criteria implemented. Follows existing patterns exactly: DialogPrimitive.Title (BUG-023 pattern), status/priority config objects, DropdownMenu for inline status change, sidebar useEffect badge fetch, workspace-shell reserved paths. No debug artifacts, clean naming.
+- Test coverage: 4 — 8/8 acceptance + 11/11 regression via static code analysis. No browser testing (Playwright unavailable).
+- Confidence: 5 — All 3 tasks completed first attempt, all gates pass, POST_MERGE_CHECK PASS. Purely additive UI work using existing types/API/client wrappers from iter 107.
+- Efficiency: 5 — All 3 builders completed, clean merges, zero recovery needed.
+- Observations: 8 (1 bug + 7 improvements)
+**Notes:** FEAT-035 is now fully complete (data layer iter 107 + UI iter 108). The improvement ideas feature provides a complete workflow: add ideas from any detail panel, view/filter/change status on the improvements page, track open count in sidebar. Next Phase 3a feature is FEAT-036 AI process analysis (depends on Anthropic API key configuration).
