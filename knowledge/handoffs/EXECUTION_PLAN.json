@@ -1,67 +1,134 @@
 {
   "schema_version": "1.0",
-  "iteration": 100,
-  "date": "2026-03-02T22:00:00Z",
-  "mode": "testing_only",
+  "iteration": 101,
+  "date": "2026-03-02T23:30:00Z",
+  "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "afbe1051a94f2de9d6b2412fe57362413d7cf6b8",
+    "last_commit_hash": "036599104d4933c66da1f5089e3d70927fe3f6b3",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
     "revert_reason": null
   },
-  "tasks": [],
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-052",
+      "description": "Section templates UI — Save as Template dialog on section panel, template browser dialog in canvas toolbar, deploy flow",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
+      "attempts": 3,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "Save as Template button in section-detail-panel footer (next to Run as Checklist)",
+        "Clicking Save as Template opens Radix Dialog with name (pre-filled section name), description, and category inputs",
+        "Dialog submit calls createTemplate({ workspace_id, section_id, name, description, category }), shows toast on success, closes dialog",
+        "Templates button in canvas-view.tsx toolbar area (top-right, next to coloring button)",
+        "Clicking Templates opens Radix Dialog showing both DB templates and STARTER_TEMPLATES as cards",
+        "Each card shows: name, description, category badge, step count (from template_data.steps.length)",
+        "DB templates show delete button (trash icon); starters do not",
+        "Deploy button on each card — for DB templates: calls deployTemplate(id, { tab_id, position_x, position_y }); for starters: calls createTemplate first (saves to DB), then deployTemplate",
+        "position_x and position_y for deploy: use next available position (e.g., max existing section position_y + offset, or fixed fallback like 0,0)",
+        "After deploy success: refresh sections/steps/connections state, close dialog, show toast",
+        "Template browser dialog handles loading, empty, and error states"
+      ],
+      "files_owned": [
+        "src/components/panels/section-detail-panel.tsx",
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+      ],
+      "files_read_only": [
+        "src/lib/api/client.ts",
+        "src/lib/templates.ts",
+        "src/types/database.ts",
+        "src/components/canvas/coloring-panel.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/components/canvas/coloring-panel.tsx — overlay panel pattern with CRUD",
+          "src/components/panels/section-detail-panel.tsx:329-338 — Run as Checklist button pattern in footer"
+        ],
+        "patterns_to_follow": [
+          "Radix Dialog for all modals (Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter from @/components/ui/dialog)",
+          "toastError() from @/lib/api/toast-helpers for error handling, toast() from sonner for success",
+          "Button variants: default (blue), secondary (gray), destructive (red) from @/components/ui/button",
+          "CVA styling: text-[12px], text-[var(--text-secondary)], bg-[var(--bg-surface)], border-[var(--border-subtle)]",
+          "Badge component for category display",
+          "Icon-only buttons with aria-label",
+          "Client API wrappers: fetchTemplates, createTemplate, deployTemplate, deleteTemplate already exist in client.ts",
+          "STARTER_TEMPLATES constant from src/lib/templates.ts — StarterTemplate interface (name, description, category, template_data)",
+          "Template type from database.ts — has id, workspace_id, name, description, category, template_data, created_by, created_at, updated_at"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — returns T directly, no nested access",
+          "React 19 useRef requires initial value: useRef(null)"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/[tabId] — canvas view with new Templates button + browser dialog"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "CRITICAL: canvas-view.tsx is 353 lines — keep additions compact. The template browser dialog can be inline in canvas-view.tsx (not a separate component file) — similar to how ColoringPanel is a separate component but the coloring button/toggle is inline. However, if the dialog exceeds ~80 lines, extract to a separate file like src/components/canvas/template-browser.tsx. For the Save as Template dialog on section-detail-panel.tsx: add a BookTemplate or Copy icon import from lucide-react, place Save as Template button ABOVE the Run as Checklist button in the footer. The deploy position calculation: use Math.max of existing section position_y values + 300 (or 100 if no sections exist) for position_y, and 100 for position_x. For deploying starters: call createTemplate with the starter's data (workspace_id from context, no section_id since it's a starter), get the returned template, then call deployTemplate with the new ID. After deploy, re-fetch sections/steps/connections by refreshing the page or adding items to local state from the deploy response. Simplest: router.refresh() after deploy to reload server data. The deploy response is { section_id: string } — after deploy, router.refresh() will pick up the new data."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-032",
+      "description": "Wrap StepNode and SectionNode custom React Flow node components in React.memo for performance",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "StepNode component export wrapped in React.memo",
+        "SectionNode component export wrapped in React.memo",
+        "Both components still render correctly (no visual changes)",
+        "TypeScript compiles without errors"
+      ],
+      "files_owned": [
+        "src/components/canvas/step-node.tsx",
+        "src/components/canvas/section-node.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "React.memo wrapping pattern: export const StepNode = React.memo(function StepNode(...) { ... })",
+          "Or: const StepNodeInner = function StepNode(...) { ... }; export const StepNode = React.memo(StepNodeInner);",
+          "React Flow docs explicitly recommend React.memo on custom node components"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/[tabId] — canvas view (performance improvement, no visual changes)"
+        ]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "Simple wrap — rename existing export function to inner function, wrap with React.memo, export the memo'd version. Preserve existing function signature and component display name. step-node.tsx is 143 lines, section-node.tsx is 94 lines."
+    }
+  ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts", "src/lib/templates.ts"],
     "owner": null,
-    "note": "Testing-only iteration — no builder tasks"
+    "note": "No shared file modifications needed this iteration. All client API wrappers and types already exist from FEAT-052 [1/2]."
   },
-  "merge_order": [],
+  "merge_order": ["#IMP-032", "#FEAT-052"],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": true,
-    "regression_reason": "Risk score 10 from iteration 99 (migration 020 with RLS + new templates table + shared types/client modified). Performance cadence trigger at iteration 100 (every 20th starting at 20).",
-    "suites_to_run": [
-      "regression-baseline-full",
-      "feat-052-data-integrity",
-      "performance-static-audit"
-    ],
-    "cadence_trigger": "performance",
-    "suite_details": {
-      "regression-baseline-full": "Full regression across all phases (0-4). Verify: canvas render, step/section CRUD, journey canvas, perspectives, annotations, comments, tasks, runbooks, playbook, activity log, workspace clone, coloring rules. Minimum 40 checks. Include API auth guard probing.",
-      "feat-052-data-integrity": "Verify FEAT-052 [1/2] data layer integrity: migration 020 SQL correctness, RLS policy references can_access_workspace(), Template types match migration columns, API route envelope pattern (GET/POST/DELETE/deploy), client wrapper signatures match routes, STARTER_TEMPLATES constant structure, deploy route UUID remapping logic, step_role name-matching on deploy.",
-      "performance-static-audit": "Static performance analysis (cadence trigger). Check: (1) Component file sizes — flag any >500 lines, (2) Missing useCallback/useMemo on handlers passed as props, (3) Unnecessary re-renders from inline object/array literals in JSX props, (4) Client-side data fetching patterns — any over-fetching or N+1 patterns, (5) Import graph — any circular dependencies or heavy deps loaded eagerly, (6) Canvas node rendering efficiency — memoization on custom nodes."
-    }
+    "run_regression": false,
+    "regression_reason": null,
+    "suites_to_run": ["feat-052-ui-acceptance"],
+    "cadence_trigger": null
   },
   "status_updates": {
     "warnings_added": [
-      "Risk score 10 from iter 99 — testing mandatory before FEAT-052 [2/2]",
-      "Performance cadence triggered at iteration 100",
-      "Accessibility cadence still severely overdue (79 iterations since last audit at iter 21)"
+      "BUG-021 already fixed in current codebase (workspace-shell.tsx exclusion list has runbooks/activity/gap-analysis). Bug exists only on production which is behind by 19+ commits. Mark as resolved once deployed.",
+      "IMP-035 already resolved — sidebar.tsx has all 11 navigation links including Gap Analysis, Compare, Runbooks, Activity, and Dashboard."
     ],
     "diagnoses_written": false,
     "signal_override": null
-  },
-  "next_iteration_guidance": {
-    "primary_task": "#FEAT-052 [2/2] Section templates UI",
-    "description": "Save as Template dialog on section panel, template browser dialog in toolbar, deploy flow",
-    "complexity": "M",
-    "files_to_create_or_modify": [
-      "src/components/panels/section-detail-panel.tsx (add Save as Template button + dialog)",
-      "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (add Templates browser button in toolbar + deploy handler)",
-      "Possibly new: src/components/canvas/template-browser.tsx (template browser panel/dialog)"
-    ],
-    "patterns_to_follow": [
-      "Radix Dialog for Save as Template (same as IMP-012/IMP-028 pattern)",
-      "Toolbar button pattern from coloring panel (canvas-view.tsx lines 250-263)",
-      "STARTER_TEMPLATES merged with fetchTemplates() results in browser",
-      "deployTemplate() returns { section_id } — use to refresh canvas after deploy",
-      "Section panel footer buttons at lines 329-338 for button placement"
-    ],
-    "learnings_relevant": [
-      "apiFetch unwraps envelope — client functions return T directly",
-      "Canvas null guards — (arr ?? []).filter(Boolean) before .map()",
-      "React 19 useRef requires initial value"
-    ]
   }
 }

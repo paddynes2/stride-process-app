@@ -70,3 +70,18 @@
   - **What:** workspace-shell.tsx has an exclusion list for non-tab route segments (list, settings, teams, people, tools, dashboard, comments, compare). The segments 'runbooks', 'activity', and 'gap-analysis' are missing. When users navigate to /runbooks, /activity, or /gap-analysis, the shell treats the segment as a tabId, sets isCanvasView=true, and renders an empty React Flow canvas with TabBar instead of the intended view component.
   - **Steps to reproduce:** Navigate to /w/[workspaceId]/runbooks — see empty canvas instead of RunbooksListView. Same for /activity and /gap-analysis.
   - **Suggested fix:** Add 'runbooks', 'activity', 'gap-analysis' to the exclusion list in workspace-shell.tsx. Verify all route segment directories under `w/[workspaceId]/` are covered.
+  - **Note:** Already fixed in current codebase (ralph/init-stride) per planner analysis (iter 101). Exists only on production which is 20+ commits behind. Mark resolved once deployed.
+
+- [ ] #BUG-022 Migration 020 (section_templates) not pushed to remote Supabase DB (P1) — Attempts: 0
+  - **Found:** Iteration 101 (acceptance tester — browser)
+  - **Where:** Remote Supabase DB (project ref: tkcyxtxkmveipnwgrddd)
+  - **What:** The `templates` table does not exist in production schema. GET /api/v1/templates returns HTTP 500 with error "Could not find the table public.templates in the schema cache". This blocks the entire Templates feature — dialog opens but cannot display any templates or allow deployment of DB templates. Migration file exists at `supabase/migrations/020_section_templates.sql` but has not been pushed.
+  - **Steps to reproduce:** Open any workspace canvas → click Templates button → dialog shows error message instead of template cards.
+  - **Suggested fix:** Run `npx supabase db push` to apply migration 020 (and migrations 014-019 if also pending). Verify the templates table exists after push.
+
+- [ ] #BUG-023 DialogTitle accessibility warning fires when Templates dialog opens (P2) — Attempts: 0
+  - **Found:** Iteration 101 (acceptance tester — browser console)
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` — Templates dialog
+  - **What:** Opening the Templates dialog fires two console.error calls: "DialogContent requires a DialogTitle for the component to be accessible for screen reader users". canvas-view.tsx line 363 does include DialogTitle inside DialogHeader — may be caused by a different DialogContent in the render tree (workspace-summary-panel, coloring panel, or section-detail-panel) that lacks a DialogTitle.
+  - **Steps to reproduce:** Open workspace canvas → open browser console → click Templates button → observe two console.error messages.
+  - **Suggested fix:** Audit all DialogContent usages in the render tree for the canvas view. Ensure every DialogContent has a child DialogTitle (or VisuallyHidden DialogTitle if title is not desired).

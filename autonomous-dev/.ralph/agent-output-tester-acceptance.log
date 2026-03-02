@@ -1,26 +1,28 @@
-`TEST_RESULT_1.json` written to `knowledge/handoffs/`.
-
-**Summary — Iteration 98 Acceptance Testing:**
-
-**Overall: `failed`** — 2 of 3 tasks have pipeline-level issues.
+**Testing complete.** Here's the summary:
 
 ---
 
-**#IMP-028 (Settings clone dialog): ALL PASS ✅**
-- Radix Dialog correctly wired with `confirmCloneOpen` state
-- Title, description, Cancel/Duplicate buttons match spec exactly
-- `window.confirm()` removed from clone path
-- TypeScript verified
+## Test Result: FAILED (iteration 101)
 
----
+### What Passed ✅ (14/16 criteria)
+- **Templates button** in top-right toolbar next to Color — browser confirmed
+- **Templates dialog opens** on click — browser confirmed
+- **Error state rendering** — browser confirmed (shows error gracefully)
+- **Save as Template button** in section panel footer with BookTemplate icon — static verified
+- **Save as Template dialog** structure (DialogTitle, DialogDescription, inputs, pre-fill) — static verified
+- **Dialog submit flow** (createTemplate → toast → close) — static verified
+- **Card content** (name, description, category badge, step count) — static verified
+- **Delete button only on DB templates** — static verified
+- **Deploy flow** (both DB and starter paths) — static verified
+- **Position calculation** (maxY + 300, fallback 100) — static verified
+- **Post-deploy router.refresh()** — static verified
+- **IMP-032**: Both StepNode and SectionNode wrapped in React.memo — static + build verified
 
-**#BUG-020 (Disable has_role in coloring panel): ALL FAIL ❌ — P1 Bug**
-- `coloring-panel.tsx` is unchanged from pre-iteration state: `has_role` still shows "Has Role" (not "coming soon"), no `disabled` field, no warning text
-- Root cause: No `builder slot 2 iteration 44` or `merge builder slot 2 iteration 44` commit exists in git log — the BUG-020 build output was **never committed or merged**
+### P1 Bug: Migration Not Deployed 🔴
+`/api/v1/templates` returns HTTP 500 — `migration 020_section_templates.sql` was never pushed to the Supabase remote DB. **Fix: `npx supabase db push`** before any runtime verification of template cards or deploy flow is possible.
 
----
+### P2 Bug: DialogContent Accessibility Warning 🟡
+Two `DialogContent requires a DialogTitle` warnings fire when the Templates dialog opens. The dialog code has `<DialogTitle>` in place — likely caused by a *different* uncovered `DialogContent` in the same render tree (coloring panel or workspace summary panel).
 
-**#FEAT-052 (Templates data layer): ALL PASS (static) but P2 Bug ⚠️**
-- All code verified via `git show` (files committed in HEAD but to worktree paths under `autonomous-dev/.ralph/worktrees/build-1/src/...`)
-- `src/app/api/v1/templates/` does **not exist** at runtime — the builder added worktree-relative paths, not `src/` paths; no merge commit present
-- Two spec deviations flagged as improvements: connection format (UUIDs vs indices) and step field naming mismatches
+### Improvement 💡
+When the API errors, STARTER_TEMPLATES (in-memory, no DB needed) are hidden along with DB templates. Starters could still be shown in the error state for partial availability.

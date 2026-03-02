@@ -1,28 +1,30 @@
-`TEST_RESULT_2.json` written. Here's a summary of iteration 97 regression results:
+`TEST_RESULT_2.json` written. Here's the summary:
 
 ---
 
-## Iteration 97 — Regression Test Results
+## Regression Test — Iteration 100 Result: **FAILED**
 
-**Overall status: PASSED** (static analysis, Playwright unavailable)
+### Suites run: `regression-baseline-full`, `feat-052-data-integrity`, `performance-static-audit`
+**Actions used:** 29 / 40
 
-### Suites Run
-
-| Suite | Checks | Result |
-|---|---|---|
-| `regression_baseline` | 35/35 | ✅ All pass |
-| `acceptance_FEAT-050` (workspace cloning) | 13/13 | ✅ All pass |
-| `verify_FEAT-051` (conditional coloring) | 10/10 | ✅ All pass |
-| `verify_BUG-019` (activity log user display) | 5/5 | ✅ All pass |
+---
 
 ### Bugs Found
 
-1. **P2 — `has_role` coloring rule silently no-ops** (`canvas-view.tsx:205-207`): Rules with `criteria_type='has_role'` can be created and appear to save, but produce no visual tint. A `// Requires additional data fetch — skip visual evaluation for now` comment explains why. Users have no feedback that this criteria type is non-functional.
+**P1 — Routing regression on 3+ routes** (`/runbooks`, `/activity`, `/gap-analysis`)
+- Production `workspace-shell.tsx` exclusion list is missing `"runbooks"`, `"activity"`, and likely `"gap-analysis"`. The shell treats these as canvas tab IDs (`isCanvasView=true`), rendering an empty React Flow canvas instead of RunbooksListView, ActivityView, and GapAnalysisView. Confirmed via DOM inspection — TabBar is a sibling of `<main>`, meaning `isCanvasView` evaluated to `true` in the deployed build.
+- **Root cause:** The production deployment is behind the `ralph/init-stride` branch. The exclusion list in deployed `workspace-shell.tsx` likely only covers the original set (`["teams", "people", "tools", "settings", "list", "gap-analysis", "compare"]` or similar), missing routes added in later iterations.
 
-2. **P3 — EXECUTION_PLAN spec inaccuracy** (documentation only): Check #1 for FEAT-050 states `clone_workspace(p_workspace_id, p_user_id, p_org_id)` but migration 018 defines `clone_workspace(p_source_workspace_id)`. The code is correct; the spec was stale.
+**P2 — 4 unlabeled icon-only buttons on canvas** — buttons with no `aria-label` (tab close/rename buttons, sidebar toggle-like buttons).
 
-### Improvements Found
+---
 
-1. `confirm()` dialogs in settings page (Duplicate + Delete) should be Radix AlertDialogs for dark-theme consistency
-2. `has_role` criteria type needs either disabled-with-tooltip or full implementation
-3. Accessibility cadence 76 iterations overdue — coloring panel, playbook overlay, and activity tabs haven't been audited for WCAG compliance
+### FEAT-052 Data Integrity: **ALL PASS** (static analysis)
+Migration 020 SQL ✅ · RLS policies ✅ · TypeScript types ✅ · API envelope pattern ✅ · Client wrappers ✅ · STARTER_TEMPLATES ✅ · UUID remapping ✅ · Role name-matching ✅
+
+---
+
+### Performance Static Audit: **3 FAILS**
+- `canvas-view.tsx` handlers not in `useCallback` (causes FlowCanvas re-renders)
+- `StepNode`/`SectionNode` not wrapped in `React.memo`
+- 4 component files > 500 lines (teams-view 721, journey-canvas-view 662, compare-view 640, settings 581)

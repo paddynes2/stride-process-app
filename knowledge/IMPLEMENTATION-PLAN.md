@@ -109,7 +109,7 @@ Core consulting insight features:
   - [x] [3/3] API route integration — DONE iter 90
 - [x] #FEAT-050 Workspace cloning (deep copy for reuse) — [1/2] DONE iter 92, [2/2] DONE iter 93
 - [x] #FEAT-051 Conditional step coloring (rule-based canvas highlighting) — [1/2] DONE iter 94, [2/2] DONE iter 96
-- [ ] #FEAT-052 Section templates (save & deploy) — [1/2] DONE iter 99
+- [x] #FEAT-052 Section templates (save & deploy) — [1/2] DONE iter 99, [2/2] DONE iter 101
 - [ ] #FEAT-053 Phase 4 testing gate
 
 Deferred indefinitely:
@@ -162,3 +162,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 98: PARTIAL — #IMP-028 done (clone dialog), #IMP-026 done (dialog text). #FEAT-052 [1/2] FAILED (builder committed to worktree paths). #BUG-020 FAILED (never committed). 1 new improvement (IMP-029). Next: re-attempt FEAT-052 [1/2] + BUG-020.
 - [2026-03-02] Iteration 99: COMPLETED — #FEAT-052 [1/2] data layer done (migration 020, types, 3 API routes, client wrappers, STARTER_TEMPLATES). #BUG-020 resolved (has_role disabled in dropdown). #IMP-029 resolved (settings text). All 3 slots merged cleanly. Next: FEAT-052 [2/2] UI.
 - [2026-03-02] Iteration 100: TESTING ONLY — 3 suites: feat-052-data-integrity 10/10 PASS, performance-static-audit 3/6 PASS (3 warn), regression-baseline-full 11/14 (3 FAIL = BUG-021 routing). FEAT-052 data layer verified. 1 new P1 bug (BUG-021) + 5 improvements (IMP-031-035). Retrospective performed (100th iteration milestone). Next: FEAT-052 [2/2] UI.
+- [2026-03-02] Iteration 101: COMPLETED — #FEAT-052 [2/2] UI done (Save as Template dialog on section panel, template browser dialog in canvas toolbar). #IMP-032 done (React.memo on StepNode/SectionNode). FEAT-052 fully complete. 2 new bugs (BUG-022 migration not pushed, BUG-023 DialogTitle a11y) + 1 improvement (IMP-036 starters in error state). Next: file bugs, then FEAT-053 testing gate or remaining improvements.

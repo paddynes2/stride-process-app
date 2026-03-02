@@ -1,31 +1,40 @@
 {
   "schema_version": "1.0",
-  "iteration": 98,
+  "iteration": 101,
   "slot": 2,
-  "task_id": "#BUG-020",
+  "task_id": "#IMP-032",
   "status": "completed",
-  "duration_seconds": 180,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/components/canvas/coloring-panel.tsx",
+      "path": "src/components/canvas/step-node.tsx",
       "action": "modified",
-      "lines_added": 6,
-      "lines_removed": 3
+      "lines_added": 2,
+      "lines_removed": 1
+    },
+    {
+      "path": "src/components/canvas/section-node.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 1
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0 with no output" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (documented in LEARNINGS.md). 0 new errors or warnings." },
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0, no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused), 0 errors" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/canvas/coloring-panel.tsx"],
+  "staged_files": [
+    "src/components/canvas/step-node.tsx",
+    "src/components/canvas/section-node.tsx"
+  ],
   "ownership_violations": [],
-  "notes": "Three targeted changes: (1) CRITERIA_OPTIONS type extended with optional disabled field; has_role entry marked disabled:true with label 'Has Role (coming soon)'. (2) Both <select> elements (Add form + Edit form) now pass disabled={opt.disabled} to <option>. (3) Display mode for existing rules shows amber warning 'Not yet supported' below criteria line when criteria_type === 'has_role'. canvas-view.tsx not touched.",
+  "notes": "Renamed `export function StepNode` to `function StepNodeComponent` and `export function SectionNode` to `function SectionNodeComponent`. Added `export const StepNode = React.memo(StepNodeComponent)` and `export const SectionNode = React.memo(SectionNodeComponent)` at the end of each file. Named inner functions preserve React DevTools display names. No visual changes, no signature changes.",
 
   "failure_details": null
 }

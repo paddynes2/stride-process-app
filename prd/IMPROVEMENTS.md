@@ -218,7 +218,7 @@
   - **What:** Deploy route inserts steps in a sequential for-of loop — N supabase INSERT calls for N steps. For templates with many steps this creates N database roundtrips on the server. Acceptable for current template sizes (5 steps), but would degrade for larger templates.
   - **Suggested fix:** Batch insert all steps in one call, then build the ID map from the returned rows using stored template step IDs as correlation key.
 
-- [ ] #IMP-032 StepNode/SectionNode not wrapped in React.memo — Attempts: 0
+- [x] #IMP-032 StepNode/SectionNode not wrapped in React.memo — Attempts: 1 — DONE iteration 101, 2026-03-02
   - **Found:** Iteration 100 (acceptance + regression tester)
   - **Category:** Performance
   - **Where:** `src/components/canvas/step-node.tsx`, `src/components/canvas/section-node.tsx`
@@ -245,6 +245,14 @@
   - **Where:** `src/components/layout/sidebar.tsx`
   - **What:** Sidebar only shows 6 items (Workflows, List View, Teams/People/Tools (Soon), Settings). Important views like Gap Analysis, Compare, Runbooks, Activity, and Dashboard are not linked. Users can only reach them by typing URLs directly, violating Nielsen H6 (Recognition rather than recall).
   - **Suggested fix:** Add sidebar links for Gap Analysis, Compare, Runbooks, and Activity with appropriate grouping.
+
+- [ ] #IMP-036 Template browser should show starter templates even when DB fetch fails — Attempts: 0
+  - **Found:** Iteration 101 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` — template browser dialog
+  - **What:** When the templates API returns an error (e.g., missing migration), the dialog shows only the error message and hides all STARTER_TEMPLATES cards. Starter templates are hardcoded in memory and don't require a DB connection — they should still be available for deployment even when the DB is unavailable.
+  - **Design principle:** Nielsen H9: Help users recognize, diagnose, and recover from errors — show what IS available rather than a dead end.
+  - **Suggested fix:** Render starters unconditionally below the error message. Only hide DB templates when templateError is set.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

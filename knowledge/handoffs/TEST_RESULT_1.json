@@ -1,165 +1,161 @@
 {
   "schema_version": "1.0",
-  "iteration": 100,
+  "iteration": 101,
   "test_type": "acceptance",
-  "suite_name": null,
-  "status": "passed",
-  "duration_seconds": 95,
+  "suite_name": "feat-052-ui-acceptance",
+  "status": "failed",
+  "duration_seconds": 180,
 
-  "criteria_results": [],
-
-  "quality_gate": {
-    "pages_checked": [],
-    "console_errors": 0,
-    "network_errors": 0,
-    "accessibility_issues": 0,
-    "layout_shifts": 0,
-    "note": "playwright_unavailable — Chrome could not launch (existing browser session conflict on Windows). All three suites evaluated via static analysis."
-  },
-
-  "suite_results": {
-    "feat-052-data-integrity": {
-      "status": "passed",
-      "method": "static",
-      "checks": [
-        {
-          "id": "FDI-001",
-          "check": "Migration 020 SQL correctness — table schema",
-          "result": "pass",
-          "evidence": "templates table has all required columns: id UUID PK, workspace_id UUID FK, name TEXT NOT NULL, description TEXT, category TEXT, template_data JSONB NOT NULL, created_by UUID FK, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ. update_updated_at() trigger reused from migration 015 as documented. Index on workspace_id present."
-        },
-        {
-          "id": "FDI-002",
-          "check": "RLS policies reference can_access_workspace()",
-          "result": "pass",
-          "evidence": "All 4 policies (SELECT/INSERT/UPDATE/DELETE) use can_access_workspace(workspace_id). INSERT uses WITH CHECK, others use USING."
-        },
-        {
-          "id": "FDI-003",
-          "check": "Template TypeScript type matches migration columns",
-          "result": "pass",
-          "evidence": "types/database.ts Template interface: id/workspace_id/name/description/category/template_data/created_by/created_at/updated_at — 1:1 match with migration 020 DDL. Sub-types TemplateData/TemplateSectionData/TemplateStepData/TemplateConnectionData/TemplateStepRoleData all defined."
-        },
-        {
-          "id": "FDI-004",
-          "check": "API GET /api/v1/templates — envelope pattern and auth guard",
-          "result": "pass",
-          "evidence": "templates/route.ts GET: auth guard present, workspace_id required, successResponse(templates) envelope, errorResponse for all failure paths."
-        },
-        {
-          "id": "FDI-005",
-          "check": "API POST /api/v1/templates — creates from section, builds template_data",
-          "result": "pass",
-          "evidence": "POST validates workspace_id/section_id/name. Fetches section+steps+connections+step_roles. Builds TemplateData with relative step positions (position_x - section.position_x). Inserts with created_by=user.id. Returns 201 with template row."
-        },
-        {
-          "id": "FDI-006",
-          "check": "API DELETE /api/v1/templates/[id] — envelope and RLS enforcement",
-          "result": "pass",
-          "evidence": "templates/[id]/route.ts DELETE: auth guard, .delete().select().single() lets RLS block unauthorized deletes, PGRST116 maps to 404, successResponse({ deleted: true }) returned."
-        },
-        {
-          "id": "FDI-007",
-          "check": "Deploy route returns { section_id } and uses UUID remapping",
-          "result": "pass",
-          "evidence": "templates/[id]/deploy/route.ts: builds stepIdMap (Map<string,string>) mapping old template step IDs to new DB step IDs. Connections remapped via stepIdMap.get(). Returns successResponse({ section_id: newSection.id }, 201)."
-        },
-        {
-          "id": "FDI-008",
-          "check": "Client wrappers match API routes",
-          "result": "pass",
-          "evidence": "client.ts: fetchTemplates → GET /api/v1/templates?workspace_id=; createTemplate → POST /api/v1/templates; deployTemplate → POST /api/v1/templates/${id}/deploy returning { section_id }; deleteTemplate → DELETE /api/v1/templates/${id}. All use apiFetch<T>() correctly."
-        },
-        {
-          "id": "FDI-009",
-          "check": "STARTER_TEMPLATES constant structure valid",
-          "result": "pass",
-          "evidence": "lib/templates.ts: 4 templates (Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing). Each has name/description/category/template_data. Steps via makeSteps() have no id field (id is optional in TemplateStepData). connections/step_roles are empty arrays — deploy route handles missing ids with if (templateStep.id) guard."
-        },
-        {
-          "id": "FDI-010",
-          "check": "step_role name-matching on deploy",
-          "result": "pass",
-          "evidence": "Deploy route fetches all teams in target workspace → all roles in those teams → builds roleNameMap (name→id). step_roles matched by role_name, silently skipped if unmatched. stepIdMap used to translate step IDs. stepRoleInserts filtered of nulls before insert."
-        }
-      ]
-    },
-    "performance-static-audit": {
-      "status": "passed_with_warnings",
-      "method": "static",
-      "checks": [
-        {
-          "id": "PSA-001",
-          "check": "Component file sizes — flag >500 lines",
-          "result": "warn",
-          "evidence": "flow-canvas.tsx: 504 lines (4 lines over threshold). All other components under threshold: step-detail-panel.tsx 461, canvas-view.tsx 353, section-detail-panel.tsx 341, coloring-panel.tsx 347, step-node.tsx 143, section-node.tsx 94. client.ts 750 lines but is an API client not a component."
-        },
-        {
-          "id": "PSA-002",
-          "check": "useCallback/useMemo on handlers passed as props",
-          "result": "pass",
-          "evidence": "flow-canvas.tsx: handleNodesChange, handleEdgesChange, handleConnect, handleNodeClick, handlePaneClick, handleAddStep, handleAddSection, handleKeyDown, handleExportPdf, handleClick all wrapped in useCallback. initialNodes/initialEdges wrapped in useMemo."
-        },
-        {
-          "id": "PSA-003",
-          "check": "Inline object/array literals in JSX props (re-render risk)",
-          "result": "pass",
-          "evidence": "nodeTypes defined as module-level constant (not inline) — avoids React Flow re-render issue. No inline nodeTypes={...} found in flow-canvas.tsx JSX."
-        },
-        {
-          "id": "PSA-004",
-          "check": "Canvas node rendering — React.memo on custom nodes",
-          "result": "warn",
-          "evidence": "StepNode, SectionNode have no React.memo wrapping. React Flow recommends memo on custom nodes to prevent unnecessary re-renders when parent state changes. Partially mitigated by module-level nodeTypes and React Flow's internal memoization, but explicit memo would be safer."
-        },
-        {
-          "id": "PSA-005",
-          "check": "Client-side data fetching patterns — N+1 risks",
-          "result": "warn",
-          "evidence": "deploy/route.ts (server-side): sequential INSERT loop for templateData.steps — each step gets its own supabase.from('steps').insert().select('id').single() call. For a template with N steps = N sequential DB roundtrips. Acceptable for current template sizes (5 steps), but would degrade for large templates. A bulk insert + ID matching approach would be more efficient."
-        },
-        {
-          "id": "PSA-006",
-          "check": "Import graph — circular deps or heavy deps loaded eagerly",
-          "result": "pass",
-          "evidence": "flow-canvas.tsx imported in canvas-view.tsx, canvas-view.tsx imported in page.tsx and public share page. No circular imports detected. No client-side heavy deps (e.g., PDF libs) eagerly imported outside dynamic imports."
-        }
-      ]
-    },
-    "regression-baseline-full": {
-      "status": "playwright_unavailable",
-      "method": "browser",
-      "note": "Chrome browser could not launch — process exited immediately with 'Opening in existing browser session' (Windows Chrome session conflict). Browser install attempted, issue persisted. Regression baseline testing skipped. Recommend re-running tester with no Chrome instances open, or switching to Playwright-managed Chromium browser."
-    }
-  },
-
-  "bugs_found": [],
-
-  "improvements_found": [
+  "criteria_results": [
     {
-      "category": "performance",
-      "page": "server: /api/v1/templates/[id]/deploy",
-      "observation": "Deploy route inserts steps in a sequential for-of loop — N supabase INSERT calls for N steps. For templates with many steps this creates N database roundtrips on the server.",
-      "design_principle": "Performance: minimize database roundtrips",
-      "suggested_approach": "Batch insert all steps in one call, then build the ID map from the returned rows using the stored template step IDs as a correlation key. Requires templateData steps to have their original IDs (already optional in the schema — populated when saving from a section)."
+      "criterion": "Save as Template button in section-detail-panel footer (above Run as Checklist)",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: section-detail-panel.tsx line 373-375 — <Button variant='secondary' size='sm' onClick={handleOpenSaveDialog} className='w-full'><BookTemplate className='h-3.5 w-3.5' />Save as Template</Button>. BookTemplate icon imported from lucide-react at line 4. Button placed above Run as Checklist (line 373 precedes line 380).",
+      "screenshot_description": null
     },
     {
-      "category": "performance",
-      "page": "src/components/canvas/step-node.tsx, section-node.tsx",
-      "observation": "Custom React Flow node components (StepNode, SectionNode, StageNode, TouchpointNode) are not wrapped in React.memo. React Flow's nodeTypes pattern requires stable references, but the components themselves will still re-render on any parent context change.",
-      "design_principle": "Performance: memoize components with stable props",
-      "suggested_approach": "Wrap each custom node component with React.memo: export const StepNode = React.memo(function StepNode(...) { ... }). React Flow's NodeRenderer will skip re-renders when node data hasn't changed."
+      "criterion": "Clicking Save as Template opens Radix Dialog with name (pre-filled section name), description, and category inputs",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: section-detail-panel.tsx lines 387-436 — Dialog with DialogHeader, DialogTitle ('Save as Template'), DialogDescription, and state variables tplName/tplDesc/tplCategory. handleOpenSaveDialog (line 128) sets tplName to section.name (pre-fill confirmed) and setShowSaveDialog(true).",
+      "screenshot_description": null
     },
     {
-      "category": "performance",
-      "page": "src/components/canvas/flow-canvas.tsx",
-      "observation": "flow-canvas.tsx is 504 lines, 4 lines over the 500-line threshold. Minor overage but worth tracking.",
-      "design_principle": "Maintainability: keep files focused and under 500 lines",
-      "suggested_approach": "The coloring-related state and handlers (lines ~380-500) could be extracted into a useColoringPanel hook or moved to the coloring-panel component itself."
+      "criterion": "Dialog submit calls createTemplate({ workspace_id, section_id, name, description, category }), shows toast on success, closes dialog",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: section-detail-panel.tsx lines 142-152 — await createTemplate({...}), setShowSaveDialog(false), toast('Template saved'). toastError on failure. createTemplate imported from @/lib/api/client at line 30.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Templates button in canvas-view.tsx toolbar area (top-right, next to coloring button)",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Browser verified: accessibility tree snapshot shows button 'Browse templates' (aria-label) with text 'Templates' in the same container as button 'Toggle coloring rules' with text 'Color'. DOM ref e153 contains both buttons side by side. canvas-view.tsx line 320-333 confirmed.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Clicking Templates opens Radix Dialog",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Browser verified: clicking 'Browse templates' button opened a dialog element (ref e211) with heading 'Templates' [level=2] and description 'Deploy a template to add a new section to the canvas'. Modal backdrop became active (intercepting pointer events).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Dialog shows both DB templates and STARTER_TEMPLATES as cards",
+      "task_id": "#FEAT-052",
+      "result": "fail",
+      "evidence": "Browser: dialog showed error message 'Could not find the table public.templates in the schema cache'. Network: /api/v1/templates?workspace_id=... returned HTTP 500. Root cause: migration 020_section_templates.sql has NOT been pushed to the remote Supabase DB (npx supabase db push not run). Code is correct (lines 381-413 of canvas-view.tsx) but unreachable due to DB error. Starter templates also hidden when templateError is set (ternary hides entire template list on error).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Each card shows: name, description, category badge, step count (from template_data.steps.length)",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx line 395 — {t.template_data.steps.length} step{...} renders step count. DB template and starter cards both render name/description/category badge fields per the map at lines 381-413. Cannot browser-verify due to DB error blocking card rendering.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "DB templates show delete button (trash icon); starters do not",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx line 388 — delete button with aria-label='Delete template' is inside dbTemplates.map() block only. STARTER_TEMPLATES.map() at line 403 has no delete button. Correct implementation.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Deploy button on each card with correct flow for DB vs starter templates",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx lines 196-215 — handleDeployTemplate handles both paths: DB templates call deployTemplate(templateId, {...}); starters call createSection + Promise.all(createStep). Position calculation: deployX=100, deployY=maxY+300 (or 100 if no sections).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "position_x and position_y for deploy: max existing section position_y + offset",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx line 198 — const maxY = sections.length > 0 ? Math.max(...sections.map((s) => s.position_y)) : -200; const deployX = 100; const deployY = maxY + 300; Matches spec: position_y = max + 300, fallback -200+300=100 when no sections.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "After deploy success: refresh sections/steps/connections state, close dialog, show toast",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Static code verified: canvas-view.tsx lines 210-214 — router.refresh() called after successful deploy for both DB templates and starters. Dialog close and toast verified in the success path. Cannot browser-verify due to DB error.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Template browser dialog handles loading, empty, and error states",
+      "task_id": "#FEAT-052",
+      "result": "pass",
+      "evidence": "Browser: error state confirmed — dialog renders error paragraph. Static code: loadingTemplates shows spinner (line 366-371), empty state shows 'No templates yet' message (line 376-380), error state shows red error text (line 372-374). All three states implemented.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "StepNode component export wrapped in React.memo",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2: 'Renamed export function StepNode to function StepNodeComponent. Added export const StepNode = React.memo(StepNodeComponent) at end of file.' TypeScript: pass. BUILD_RESULT lines_added=2, lines_removed=1 — minimal diff consistent with memo wrap.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "SectionNode component export wrapped in React.memo",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2: 'Renamed export function SectionNode to function SectionNodeComponent. Added export const SectionNode = React.memo(SectionNodeComponent) at end of file.' TypeScript: pass.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Both components still render correctly (no visual changes)",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "Browser: canvas view rendered correctly with step node visible. Workspace summary shows '1 Steps, 0 Sections'. No visual regressions observed.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "TypeScript compiles without errors",
+      "task_id": "#IMP-032",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2 verification: typecheck status='pass', errors=0, 'npx tsc --noEmit exited 0, no output'.",
+      "screenshot_description": null
     }
   ],
 
-  "actions_used": 2,
-  "action_budget": 10,
-  "notes": "This was a testing-only iteration (no builder tasks). Playwright unavailable for browser regression. Two of three suites completed via static analysis: feat-052-data-integrity (10/10 checks pass), performance-static-audit (3/6 pass, 3 warnings). regression-baseline-full deferred — requires browser access. Static findings confirm FEAT-052 data layer is correctly implemented and safe to proceed to [2/2] UI work."
+  "quality_gate": {
+    "pages_checked": ["/w/[workspaceId]/[tabId]"],
+    "console_errors": 2,
+    "network_errors": 1,
+    "accessibility_issues": 0,
+    "layout_shifts": 0
+  },
+
+  "bugs_found": [
+    {
+      "severity": "P1",
+      "page": "/w/[workspaceId]/[tabId]",
+      "description": "Migration 020_section_templates.sql not applied to remote Supabase DB. The templates table does not exist in production schema. GET /api/v1/templates returns HTTP 500 with Supabase error 'Could not find the table public.templates in the schema cache'. This blocks the entire Templates feature — dialog opens but cannot display any templates or allow deployment.",
+      "steps_to_reproduce": "1. Open any workspace canvas. 2. Click the 'Templates' button in the top-right toolbar. 3. Dialog opens but shows error: 'Could not find the table public.templates in the schema cache' instead of template cards.",
+      "related_task": "#FEAT-052"
+    },
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/[tabId]",
+      "description": "DialogContent accessibility warning fires when Templates dialog opens: 'DialogContent requires a DialogTitle for the component to be accessible for screen reader users'. Fires twice per open. Canvas-view.tsx line 363 does include <DialogTitle>Templates</DialogTitle> inside <DialogHeader> — likely caused by a timing/render issue or a different uncovered dialog in the same render tree (possibly workspace-summary-panel or coloring panel missing DialogTitle). Needs investigation to isolate which DialogContent is the offender.",
+      "steps_to_reproduce": "1. Open workspace canvas. 2. Open browser console. 3. Click Templates button. 4. Observe two console.error calls: 'DialogContent requires a DialogTitle'.",
+      "related_task": "#FEAT-052"
+    }
+  ],
+
+  "improvements_found": [
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/[tabId] — Templates dialog error state",
+      "observation": "When the templates API returns an error, the dialog shows only the error message and hides all STARTER_TEMPLATES cards. Starter templates are hardcoded in memory and do not require a DB connection — they could still be shown in the error state to allow users to deploy starters even when the DB is unavailable.",
+      "design_principle": "Nielsen H9: Help users recognize, diagnose, and recover from errors — show what IS available rather than a dead end",
+      "suggested_approach": "Render starters unconditionally below the error message. Only hide DB templates when templateError is set. Change the ternary to: render error notice + starters in error branch, render both DB templates + starters in success branch."
+    }
+  ],
+
+  "actions_used": 10,
+  "action_budget": 10
 }

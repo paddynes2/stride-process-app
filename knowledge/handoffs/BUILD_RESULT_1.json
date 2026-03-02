@@ -1,78 +1,40 @@
 {
   "schema_version": "1.0",
-  "iteration": 98,
+  "iteration": 101,
   "slot": 1,
   "task_id": "#FEAT-052",
   "status": "completed",
-  "duration_seconds": 1200,
+  "duration_seconds": 420,
 
   "files_changed": [
     {
-      "path": "supabase/migrations/020_section_templates.sql",
-      "action": "created",
-      "lines_added": 44,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/types/database.ts",
+      "path": "src/components/panels/section-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 58,
-      "lines_removed": 0
+      "lines_added": 95,
+      "lines_removed": 7
     },
     {
-      "path": "src/app/api/v1/templates/route.ts",
-      "action": "created",
-      "lines_added": 162,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/api/v1/templates/[id]/route.ts",
-      "action": "created",
-      "lines_added": 40,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/api/v1/templates/[id]/deploy/route.ts",
-      "action": "created",
-      "lines_added": 128,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/lib/api/client.ts",
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
       "action": "modified",
-      "lines_added": 42,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/lib/templates.ts",
-      "action": "created",
-      "lines_added": 82,
-      "lines_removed": 0
+      "lines_added": 168,
+      "lines_removed": 20
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0, no output" },
-    "lint": { "status": "pass", "errors": 0, "output": "3 pre-existing warnings in flow-canvas.tsx (known); 0 errors or new warnings from new files" },
-    "build": { "status": "not_applicable", "output": "build not run; typecheck sufficient for data-layer task" },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "no unit tests for API routes in this codebase" }
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused) — documented in LEARNINGS.md. No new warnings." },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-
   "staged_files": [
-    "autonomous-dev/.ralph/worktrees/build-1/supabase/migrations/020_section_templates.sql",
-    "autonomous-dev/.ralph/worktrees/build-1/src/types/database.ts",
-    "autonomous-dev/.ralph/worktrees/build-1/src/app/api/v1/templates/route.ts",
-    "autonomous-dev/.ralph/worktrees/build-1/src/app/api/v1/templates/[id]/route.ts",
-    "autonomous-dev/.ralph/worktrees/build-1/src/app/api/v1/templates/[id]/deploy/route.ts",
-    "autonomous-dev/.ralph/worktrees/build-1/src/lib/api/client.ts",
-    "autonomous-dev/.ralph/worktrees/build-1/src/lib/templates.ts"
+    "src/components/panels/section-detail-panel.tsx",
+    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
   ],
-
   "ownership_violations": [],
-
-  "notes": "All acceptance criteria met. Migration 020 creates templates table with RLS policies using can_access_workspace(), update_updated_at trigger, and workspace_id index. Template interface + data shape types added to database.ts. GET/POST collection route snapshots section+steps+connections+step_roles into template_data JSONB (step positions stored relative to section origin for portability). DELETE route with activity log. Deploy route remaps connection source/target via oldStepId→newStepId Map, matches roles by name in target workspace (silently skips unmatched). 4 STARTER_TEMPLATES defined with 5 steps each. Client wrappers: fetchTemplates, createTemplateFromSection, deployTemplate, deleteTemplate. TypeScript error in step_roles join fixed by using any cast pattern consistent with step-roles/route.ts. git add -f required because autonomous-dev/.ralph/worktrees/ is in .gitignore.",
+  "notes": "All acceptance criteria met with one deviation: For deploying starter templates, the task spec said 'call createTemplate first (saves to DB), then deployTemplate'. However, POST /api/v1/templates requires section_id (server-side validation returns 400 without it) — there is no path to save a pre-built TemplateData JSONB blob without a real DB section. client.ts is read-only. Rather than leaving starters non-deployable, starters are deployed directly via createSection + createStep calls (functionally equivalent to what the deploy route does internally). DB templates still use the standard deployTemplate() path. Template browser dialog is inline in canvas-view.tsx (not extracted to separate file) — total file size stays manageable.",
 
   "failure_details": null
 }

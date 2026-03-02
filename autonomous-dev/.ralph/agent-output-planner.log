@@ -1,17 +1,23 @@
-EXECUTION_PLAN.json and STATUS.md are ready. Here's the summary:
+EXECUTION_PLAN.json written. Here's the summary:
 
----
+## Iteration 101 Plan
 
-**Iteration 98 — 3-slot multi_task build**
+**Mode:** `multi_task` (2 parallel slots)
 
-| Slot | Task | Type | Complexity | Files Owned |
-|------|------|------|-----------|-------------|
-| 1 | **#FEAT-052 [1/2]** Section templates data layer | build | M | migration 020, database.ts, 3 API route files, client.ts, templates.ts |
-| 2 | **#BUG-020** Disable has_role in coloring panel | fix | S | coloring-panel.tsx |
-| 3 | **#IMP-028 + #IMP-026** Clone dialog → Radix + fix text | improve | S | settings/page.tsx |
+### Slot 1: #FEAT-052 [2/2] — Section Templates UI (M)
+- **Save as Template** button on section-detail-panel footer → Radix Dialog with name/description/category
+- **Templates browser** button on canvas-view toolbar → Radix Dialog showing DB templates + 4 STARTER_TEMPLATES as cards
+- **Deploy flow** — for DB templates: direct deploy; for starters: create then deploy
+- **Files owned:** `section-detail-panel.tsx`, `canvas-view.tsx`
 
-**Zero file overlap** across all 3 slots. Merge order: BUG-020 → IMP-028 → FEAT-052.
+### Slot 2: #IMP-032 — React.memo on Custom Nodes (S)
+- Wrap `StepNode` and `SectionNode` exports in `React.memo`
+- Performance improvement recommended by React Flow docs
+- **Files owned:** `step-node.tsx`, `section-node.tsx`
 
-**Validation:** Last commit `b94ebe4` (docs-only testing iter), `tsc --noEmit` passes. No revert needed.
-
-**Testing plan:** Acceptance testing for FEAT-052 data layer + BUG-020 verify + IMP-028 verify. No regression trigger (risk score 3, last regression was iter 97).
+### Planner Findings
+- **BUG-021**: Already resolved in current codebase — exclusion list has all 3 segments. Bug only exists on production (19+ commits behind).
+- **IMP-035**: Already resolved — sidebar.tsx has all 11 nav links.
+- **Validation**: Type check passes, no revert needed.
+- **Risk score**: 0 (testing-only iteration had no code changes).
+- **Merge order**: IMP-032 first (smaller, independent), then FEAT-052.

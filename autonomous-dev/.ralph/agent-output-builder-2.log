@@ -1,13 +1,13 @@
-Task complete. Here's a summary of what was done:
+Done. Here's a summary:
 
-**#BUG-020 — Disable `has_role` criteria type in coloring panel**
+**Task #IMP-032 — Complete**
 
-Three minimal changes to `src/components/canvas/coloring-panel.tsx`:
+- `step-node.tsx`: `export function StepNode` → `function StepNodeComponent` + `export const StepNode = React.memo(StepNodeComponent)`
+- `section-node.tsx`: `export function SectionNode` → `function SectionNodeComponent` + `export const SectionNode = React.memo(SectionNodeComponent)`
 
-1. **`CRITERIA_OPTIONS` array** — added `disabled?: boolean` to the type, set `has_role` entry to `disabled: true` with label `"Has Role (coming soon)"`
+**Verification:**
+- TypeScript: ✅ pass (0 errors)
+- Lint: ✅ pass (0 errors; 1 pre-existing warning in unrelated file)
+- Build/tests: not applicable
 
-2. **Both `<select>` dropdowns** (Add form + Edit form) — each `<option>` now renders `disabled={opt.disabled}`, which grays out and prevents selection of `has_role`
-
-3. **Display mode** — existing `has_role` rules now show a small amber warning line `"Not yet supported"` below the criteria row
-
-Verification: `npx tsc --noEmit` passes (exit 0), lint passes with only the pre-existing warning in `flow-canvas.tsx`. `canvas-view.tsx` untouched.
+Both files staged. BUILD_RESULT_2.json written.

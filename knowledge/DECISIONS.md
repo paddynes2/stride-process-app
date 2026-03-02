@@ -49,3 +49,9 @@
 **Options:** (A) Modify FlowCanvas to pass coloringTints through (ownership violation, prop-drilling), (B) React Context consumed directly by StepNode
 **Decision:** React Context — `ColoringTintContext` exported from `canvas.ts`, provided by CanvasView, consumed by StepNode. Same pattern as CommentCountsContext (D-004) and TaskCountsContext.
 **Trade-off:** Third Context bypassing FlowCanvas makes data flow less explicit, but avoids ownership violation and follows the established pattern for canvas node data injection.
+
+## D-009 — Starter template deploy via createSection+createStep instead of createTemplate→deployTemplate (Phase 4, Iteration 101)
+**Context:** Starter templates (hardcoded in `src/lib/templates.ts`) need to be deployable from the template browser dialog. The spec said "call createTemplate first (saves to DB), then deployTemplate". However, POST /api/v1/templates requires `section_id` (server-side validation) — there's no path to save a pre-built JSONB template blob without an existing DB section.
+**Options:** (A) Modify API to allow templates without section_id (changes API contract, client.ts is read-only), (B) Deploy starters directly via createSection + createStep calls (functionally equivalent to what deploy route does internally), (C) Leave starters as non-deployable
+**Decision:** Option B — deploy starters by calling createSection then Promise.all(createStep) with position offsets. DB templates still use standard deployTemplate() path.
+**Trade-off:** Two deploy code paths (DB templates vs starters) in canvas-view.tsx. Starters don't get connection/role-assignment deployment (createSection+createStep only). Acceptable because starters define only sections and steps, no connections.

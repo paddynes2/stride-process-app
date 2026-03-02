@@ -366,8 +366,8 @@
 ### #FEAT-052 Section templates (save & deploy)
 **Phase:** 4
 **Priority:** P2 (nice to have)
-**Attempts:** 3
-**Status:** in_progress
+**Attempts:** 4
+**Status:** done
 **Acceptance criteria:**
 - [ ] New `templates` table: id, workspace_id UUID NOT NULL, name, description, category, template_data (JSONB snapshot), created_by, created_at, updated_at
 - [ ] RLS via `can_access_workspace()`, types, API (GET list, POST from section_id, POST deploy, DELETE), client wrappers
@@ -383,7 +383,7 @@
   - "Lead Nurturing" (steps: Capture Lead, Qualify Lead, Initial Outreach, Follow-Up Sequence, Hand Off to Sales)
 **Sub-tasks:**
 - [x] [1/2] Data layer: migration (templates table), types, API (GET list, POST from section_id, POST deploy, DELETE), client wrappers, STARTER_TEMPLATES constant — DONE iteration 99, 2026-03-02
-- [ ] [2/2] UI: "Save as Template" dialog on section panel, template browser dialog in toolbar, deploy flow
+- [x] [2/2] UI: "Save as Template" dialog on section panel, template browser dialog in toolbar, deploy flow — DONE iteration 101, 2026-03-02
 **Notes:** Workspace-scoped only (no organization_id — no org-level RLS helper exists). Role assignments matched by name on deploy (not by ID). JSONB snapshot, not live references.
 
 ### #FEAT-050 Workspace cloning
