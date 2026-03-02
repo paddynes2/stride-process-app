@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -647,3 +647,26 @@ export async function updateRunbookStep(
   });
 }
 
+// ---------------------------------------------------------------------------
+// Activity Log
+// ---------------------------------------------------------------------------
+
+export async function fetchActivityLog(workspaceId: string, filters?: {
+  user_id?: string;
+  action?: ActivityAction;
+  entity_type?: string;
+  from?: string;
+  to?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<ActivityLog[]> {
+  const params = new URLSearchParams({ workspace_id: workspaceId });
+  if (filters?.user_id) params.set("user_id", filters.user_id);
+  if (filters?.action) params.set("action", filters.action);
+  if (filters?.entity_type) params.set("entity_type", filters.entity_type);
+  if (filters?.from) params.set("from", filters.from);
+  if (filters?.to) params.set("to", filters.to);
+  if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+  if (filters?.offset !== undefined) params.set("offset", String(filters.offset));
+  return apiFetch<ActivityLog[]>(`/api/v1/activity?${params}`);
+}
