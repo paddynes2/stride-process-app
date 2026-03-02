@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-82, 2026-03-02 -->
+<!-- Updated: iter-83, 2026-03-02 -->
 
 ## Project
 
@@ -165,7 +165,7 @@ Types: step, section, touchpoint, stage.
 `CommentCountsContext` (from `canvas.ts`) provides Map<entityId, count> to node components. `TaskCountsContext` provides Map<stepId, { completed, total }>. Canvas views fetch all workspace comments/tasks once, build count maps, and wrap React Flow in both providers. Node components consume via `useContext()`. Comment badge: bottom-right. Task badge: bottom-left (step nodes only). Section detail panel shows task rollup (per-step progress + summary). This avoids prop-drilling through FlowCanvas (D-004).
 
 ### Reserved Paths in Workspace Shell
-`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard"]`
+`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks"]`
 
 ### Component Conventions
 - Dark theme only. All colors via CSS custom properties in globals.css

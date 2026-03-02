@@ -821,3 +821,31 @@
 - Efficiency: 5 — third consecutive clean multi-task merge (iter 80, 81, 82). No manual recovery needed.
 - Observations: 0
 **Notes:** Third consecutive clean merge. FEAT-047 is now fully complete (3/3): data layer (iter 80), UI (iter 81), polish (iter 82). IMP-006 resolves annotation panel visibility asymmetry found by regression tester in iter 73. Builder merge commits labeled "iteration 28" (counter bug persists). Acceptance testing for FEAT-047 recommended as next priority.
+
+## Iteration 83 — 2026-03-02 16:00
+**Tasks:**
+- Regression testing (23 checks) — completed (23/23 PASS)
+- Acceptance testing (#FEAT-047, 18 checks) — not executed (tester dispatch failure)
+**Source:** testing/RESULTS.md (FEAT-047 acceptance overdue, regression recommended risk score 4)
+**Mode:** testing_only
+**Result:** partial
+**Changes:** [documentation only — no app code changes]
+- knowledge/handoffs/TEST_RESULT_2.json (regression output — 23/23 PASS)
+**Verification:**
+- Type check: pass (POST_MERGE_CHECK: PASS, 0 errors)
+- Lint: pass (0 errors, 1 pre-existing warning)
+- Build: N/A (no app code changes)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (no UI changes)
+- Acceptance test: NOT EXECUTED — TEST_RESULT_1 not produced (tester dispatch failure)
+- Regression test: 23/23 PASS (static analysis + API auth probing + curl)
+**Bugs found:** 1 — Production 404s for perspectives/annotations/teams/stages routes (deployment lag — origin/main behind ralph/init-stride, not a code bug)
+**Improvements found:** 2 — IMP-012 (styled confirmation dialog for runbook Complete/Cancel), IMP-013 (segmented progress bar for runbook list)
+**Self-score:**
+- Code quality: N/A — no app code produced
+- Test coverage: 3 — regression thorough (23/23), but acceptance test didn't execute
+- Confidence: 4 — regression clean, but FEAT-047 acceptance still unverified by formal checklist
+- Efficiency: 2 — acceptance tester failed to dispatch (recurring issue — also occurred iter 72, 79 initially)
+- Observations: 3 (2 improvements + 1 deployment lag observation)
+**Notes:** Acceptance tester failed to produce output — 3rd testing_only iteration with partial tester dispatch (iter 72 blocked, iter 79 initial failure, iter 83 acceptance missing). Regression tester did verify runbook components exist via static analysis (included in its 23 checks). FEAT-047 acceptance testing must be reattempted next iteration. Two new improvements logged from regression tester observations.

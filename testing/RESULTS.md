@@ -1,19 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 79
+- **Iteration:** 83
 - **Date:** 2026-03-02
-- **Suite:** acceptance (#FEAT-046) + regression (40 checks)
-- **Method:** Static analysis + TypeScript + ESLint (Stride dev server not running)
-- **Result:** **40/40 PASS** — all acceptance and regression checks verified
-- **Bugs found:** 0
-- **Improvements found:** 1 (IMP-011 — journey-canvas useCallback)
-- **Note:** FEAT-046 tasks system fully acceptance-tested. All baseline features through Phase 4 verified. Risk score reset to 0.
+- **Suite:** regression (23 checks) — acceptance (#FEAT-047, 18 checks) planned but not executed
+- **Method:** Static analysis + TypeScript + ESLint + curl (Playwright unavailable)
+- **Result:** **23/23 regression PASS** — acceptance tester did not produce output
+- **Bugs found:** 1 (P2 — production deployment lag, not a code bug)
+- **Improvements found:** 2 (IMP-012 styled confirm dialog, IMP-013 segmented progress bar)
+- **Note:** Regression clean. FEAT-047 acceptance testing still needed (tester dispatch failure). Risk score remains elevated until acceptance passes.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 79 (2026-03-02) — 40/40 PASS (27 baseline + 13 acceptance, static analysis)
+- Last run: Iteration 83 (2026-03-02) — 23/23 PASS (static analysis + curl + API probing)
+- Previous run: Iteration 79 (2026-03-02) — 40/40 PASS (27 baseline + 13 acceptance, static analysis)
 - Previous run: Iteration 77 (2026-03-01) — 19/19 baseline PASS, 0/6 acceptance FAIL (code absent — merge failures)
 - Previous run: Iteration 75 (2026-03-01) — 32/32 PASS (19 baseline + 13 extended)
 - Previous run: Iteration 73 (2026-03-01) — baseline 19/19 PASS, iter-73 acceptance 0/5 FAIL (code absent at test time)

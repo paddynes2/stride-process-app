@@ -89,5 +89,21 @@
   - **Why it matters:** React performance: stable references in useCallback deps prevent unnecessary re-subscriptions and re-renders.
   - **Suggested fix:** Wrap handleAddTouchpoint and handleAddStage in useCallback (same fix pattern as IMP-008 for flow-canvas.tsx handleAddStep/handleAddSection).
 
+- [ ] #IMP-012 Styled confirmation dialog for runbook Complete/Cancel — Attempts: 0
+  - **Found:** Iteration 83 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
+  - **What:** Complete and Cancel runbook buttons use native `window.confirm()` which breaks the dark theme and doesn't explain consequences (e.g., "Completing will lock all steps and mark the runbook as done").
+  - **Why it matters:** Nielsen H4: Consistency and standards — confirmation dialog should match app design system.
+  - **Suggested fix:** Replace `window.confirm()` with a Radix Dialog component using design system colors and a consequence sentence.
+
+- [ ] #IMP-013 Segmented progress bar for runbook list — Attempts: 0
+  - **Found:** Iteration 83 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
+  - **What:** Progress bar percentage counts completed/total but doesn't visually distinguish in_progress vs skipped steps (both are non-completed). A striped or secondary color fill for in-progress steps would give better at-a-glance status.
+  - **Why it matters:** Nielsen H1: Visibility of system status.
+  - **Suggested fix:** Use a segmented progress bar with lighter teal fill for in_progress steps alongside full-teal fill for completed.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->
