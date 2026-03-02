@@ -136,12 +136,11 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
   - **Fix applied:** Added ENTITY_TYPE_SINGULAR map (19 entity types: steps → step, runbook_steps → runbook step, etc.). Activity entries now show "Created step" instead of "created steps". Also uses ACTION_LABELS for capitalized action names.
 
-- [ ] #IMP-020 Load More skeleton placeholders for activity pagination — Attempts: 0
+- [x] #IMP-020 Load More skeleton placeholders for activity pagination — Attempts: 1 — DONE iteration 102, 2026-03-02
   - **Found:** Iteration 91 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
-  - **What:** Load More shows 'Loading...' but no skeleton placeholders for expected new items.
-  - **Suggested fix:** Add 2-3 skeleton activity row placeholders below Load More button when loading.
+  - **Fix applied:** Added 3 skeleton rows inside space-y-2 list div that appear when loading=true. Each row matches real entry container (same border/bg/padding) with two animate-pulse bars (h-3 w-3/4 for action line, h-2.5 w-2/5 for timestamp). Button text simplified to static "Load More" since skeletons serve as loading indicator.
 
 - [ ] #IMP-021 Activity filter tab scroll affordance gradient — Attempts: 0
   - **Found:** Iteration 91 (regression tester)
@@ -204,12 +203,11 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — line 245
   - **Fix applied:** Updated paragraph to "including all tabs, sections, steps, connections, teams, roles, people, and tools" matching the Radix Dialog description.
 
-- [ ] #IMP-030 Canvas toolbar icon-only buttons lack aria-label — Attempts: 0
+- [x] #IMP-030 Canvas toolbar icon-only buttons lack aria-label — Attempts: 1 — DONE iteration 102, 2026-03-02
   - **Found:** Iteration 99 (acceptance tester)
   - **Category:** Accessibility
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`, `src/components/layout/tab-bar.tsx`
-  - **What:** 4 icon-only buttons on canvas toolbar/tab-bar lack aria-label attributes. Pre-existing issue, not introduced by iter 99.
-  - **Suggested fix:** Add aria-label to: add-tab button, canvas toolbar expand/collapse buttons.
+  - **Fix applied:** Builder audit confirmed all icon-only buttons in canvas-view.tsx (Templates, Color, Delete template) and tab-bar.tsx (Close tab, Add tab) already have aria-label attributes. No changes needed — marking resolved.
 
 - [ ] #IMP-031 Deploy route sequential INSERT — batch insert for templates — Attempts: 0
   - **Found:** Iteration 100 (acceptance tester — static analysis)
@@ -239,20 +237,33 @@
   - **What:** 10 handler functions (handleStepSelect, handleSectionSelect, handleStepUpdate, handleStepCreate, handleStepDelete, handleSectionCreate, handleSectionUpdate, handleSectionDelete, handleConnectionCreate, handleConnectionDelete) are plain inline functions not wrapped in useCallback. These are passed as props to FlowCanvas and cause re-renders on every CanvasView state change.
   - **Suggested fix:** Wrap all 10 handlers in React.useCallback with appropriate dependency arrays. Most only depend on setState functions (stable) and state values.
 
-- [ ] #IMP-035 Sidebar missing navigation links for multiple views — Attempts: 0
+- [x] #IMP-035 Sidebar missing navigation links for multiple views — Attempts: 0 — RESOLVED iteration 102, 2026-03-02
   - **Found:** Iteration 100 (regression tester)
   - **Category:** Usability
   - **Where:** `src/components/layout/sidebar.tsx`
-  - **What:** Sidebar only shows 6 items (Workflows, List View, Teams/People/Tools (Soon), Settings). Important views like Gap Analysis, Compare, Runbooks, Activity, and Dashboard are not linked. Users can only reach them by typing URLs directly, violating Nielsen H6 (Recognition rather than recall).
-  - **Suggested fix:** Add sidebar links for Gap Analysis, Compare, Runbooks, and Activity with appropriate grouping.
+  - **Resolution:** Already resolved in current codebase. Sidebar has 12 nav items including Dashboard, Gap Analysis, Compare, Runbooks, and Activity. The regression tester tested against production (which is 20+ commits behind). Confirmed by planner and reviewer in iteration 102.
 
-- [ ] #IMP-036 Template browser should show starter templates even when DB fetch fails — Attempts: 0
+- [x] #IMP-036 Template browser should show starter templates even when DB fetch fails — Attempts: 1 — DONE iteration 102, 2026-03-02
   - **Found:** Iteration 101 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` — template browser dialog
-  - **What:** When the templates API returns an error (e.g., missing migration), the dialog shows only the error message and hides all STARTER_TEMPLATES cards. Starter templates are hardcoded in memory and don't require a DB connection — they should still be available for deployment even when the DB is unavailable.
-  - **Design principle:** Nielsen H9: Help users recognize, diagnose, and recover from errors — show what IS available rather than a dead end.
-  - **Suggested fix:** Render starters unconditionally below the error message. Only hide DB templates when templateError is set.
+  - **Fix applied:** Restructured template dialog ternary: loading=skeletons; non-loading=grid with error message at top when templateError, DB templates hidden on error, STARTER_TEMPLATES always visible unconditionally.
+
+- [ ] #IMP-037 Load More button needs secondary loading indicator — Attempts: 0
+  - **Found:** Iteration 102 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** Load More button is disabled while loading but provides no visible affordance beyond opacity-50. Users who miss the skeleton rows may think the button is broken.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Add a subtle spinner icon inside the Load More button when loading=true as a secondary signal alongside skeleton rows.
+
+- [ ] #IMP-038 Full aria-label audit across all icon-only buttons — Attempts: 0
+  - **Found:** Iteration 102 (acceptance tester)
+  - **Category:** Accessibility
+  - **Where:** Multiple files (production page showed 4 unlabeled buttons in pre-iteration-102 code)
+  - **What:** Production canvas page has 4 icon-only buttons without aria-labels visible in older code. These may be resolved by iteration 102 deployment, but additional buttons in other code paths may need audit.
+  - **Design principle:** WCAG 2.1 SC 4.1.2: Name, Role, Value
+  - **Suggested fix:** Run full aria-label audit across all icon-only buttons as part of FEAT-053 testing gate.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

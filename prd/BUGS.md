@@ -79,9 +79,15 @@
   - **Steps to reproduce:** Open any workspace canvas → click Templates button → dialog shows error message instead of template cards.
   - **Suggested fix:** Run `npx supabase db push` to apply migration 020 (and migrations 014-019 if also pending). Verify the templates table exists after push.
 
-- [ ] #BUG-023 DialogTitle accessibility warning fires when Templates dialog opens (P2) — Attempts: 0
+- [x] #BUG-023 DialogTitle accessibility warning fires when Templates dialog opens (P2) — Attempts: 1 — DONE iteration 102, 2026-03-02
   - **Found:** Iteration 101 (acceptance tester — browser console)
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` — Templates dialog
-  - **What:** Opening the Templates dialog fires two console.error calls: "DialogContent requires a DialogTitle for the component to be accessible for screen reader users". canvas-view.tsx line 363 does include DialogTitle inside DialogHeader — may be caused by a different DialogContent in the render tree (workspace-summary-panel, coloring panel, or section-detail-panel) that lacks a DialogTitle.
-  - **Steps to reproduce:** Open workspace canvas → open browser console → click Templates button → observe two console.error messages.
-  - **Suggested fix:** Audit all DialogContent usages in the render tree for the canvas view. Ensure every DialogContent has a child DialogTitle (or VisuallyHidden DialogTitle if title is not desired).
+  - **What:** Root cause: custom `ui/dialog.tsx` DialogTitle wraps a plain `<h2>`, not `DialogPrimitive.Title`. Radix's internal context check cannot detect it.
+  - **Fix applied:** Imported `DialogPrimitive` from `@radix-ui/react-dialog` and replaced `<DialogTitle>` with `<DialogPrimitive.Title>` in canvas-view.tsx Templates dialog. Comment documents root cause. section-detail-panel.tsx has same issue (filed as BUG-024).
+
+- [ ] #BUG-024 section-detail-panel.tsx Save as Template dialog has same DialogTitle a11y warning (P2) — Attempts: 0
+  - **Found:** Iteration 102 (acceptance tester)
+  - **Where:** `src/components/panels/section-detail-panel.tsx` — Save as Template dialog
+  - **What:** Same root cause as BUG-023 — custom ui/dialog.tsx DialogTitle wraps `<h2>` not `DialogPrimitive.Title`. Radix a11y check fires console.error when dialog opens.
+  - **Steps to reproduce:** Navigate to canvas → click section → in section detail panel, click "Save as Template" → observe console.error.
+  - **Suggested fix:** Same as BUG-023 — import DialogPrimitive and use DialogPrimitive.Title. Alternatively, fix root cause in ui/dialog.tsx by changing DialogTitle to wrap DialogPrimitive.Title.

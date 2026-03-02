@@ -1,19 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 101
+- **Iteration:** 102
 - **Date:** 2026-03-02
-- **Suite:** feat-052-ui-acceptance
-- **Method:** Browser (Playwright) + static code analysis
-- **Result:** **15/16 PASS, 1 FAIL** (FEAT-052 UI 11/12 + IMP-032 4/4)
-- **Bugs found:** 2 (BUG-022 migration not pushed P1, BUG-023 DialogTitle a11y P2)
-- **Improvements found:** 1 (IMP-036 starters in error state)
-- **Note:** The 1 FAIL is "Dialog shows both DB templates and STARTER_TEMPLATES as cards" — DB error (migration 020 not pushed) prevents template list rendering. Code is correct per static analysis.
+- **Suite:** bug-023-imp-036-imp-030-acceptance + imp-020-acceptance
+- **Method:** Static code analysis
+- **Result:** **5/5 PASS** (BUG-023 1/1, IMP-036 1/1, IMP-030 1/1, IMP-020 2/2)
+- **Bugs found:** 1 (BUG-024 section-detail-panel DialogTitle same root cause P2)
+- **Improvements found:** 2 (IMP-037 Load More spinner, IMP-038 full aria-label audit)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 101 (2026-03-02) — 15/16 PASS (FEAT-052 UI 11/12 browser+static, IMP-032 4/4 static)
+- Last run: Iteration 102 (2026-03-02) — 5/5 PASS (BUG-023 + IMP-036 + IMP-030 + IMP-020 — static code analysis)
+- Previous: Iteration 101 (2026-03-02) — 15/16 PASS (FEAT-052 UI 11/12 browser+static, IMP-032 4/4 static)
 - Previous: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 DI 10, BUG-020 4, IMP-029 2 — static)
 
 ### Regression
@@ -102,7 +102,7 @@
 
 ### Performance
 - Last run: Iteration 100 (2026-03-02)
-- Result: 3/6 PASS, 3 WARN (node types module-level ✓, flow-canvas useCallback ✓, no circular imports ✓; canvas-view handlers not useCallback ⚠, nodes not React.memo ⚠, 5 files >500 lines ⚠)
+- Result: 3/6 PASS, 3 WARN (node types module-level ✓, flow-canvas useCallback ✓, no circular imports ✓; canvas-view handlers not useCallback ⚠, nodes not React.memo ⚠ [IMP-032 fixed iter 101], 5 files >500 lines ⚠)
 
 ### Forms
 - Last run: N/A
