@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "iteration": 80,
+  "slot": 1,
+  "task_id": "#FEAT-047",
+  "status": "completed",
+  "duration_seconds": 420,
+
+  "files_changed": [
+    {
+      "path": "supabase/migrations/016_runbooks.sql",
+      "action": "created",
+      "lines_added": 117,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/types/database.ts",
+      "action": "modified",
+      "lines_added": 33,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/runbooks/route.ts",
+      "action": "created",
+      "lines_added": 120,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/runbooks/[id]/route.ts",
+      "action": "created",
+      "lines_added": 112,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/runbook-steps/route.ts",
+      "action": "created",
+      "lines_added": 30,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/runbook-steps/[id]/route.ts",
+      "action": "created",
+      "lines_added": 51,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/lib/api/client.ts",
+      "action": "modified",
+      "lines_added": 61,
+      "lines_removed": 1
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "3 pre-existing warnings in journey-canvas-view.tsx and flow-canvas.tsx (documented in LEARNINGS.md). 0 errors." },
+    "build": { "status": "not_applicable", "output": "Full build not run — typecheck + lint passed" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit test suite configured" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "supabase/migrations/016_runbooks.sql",
+    "src/types/database.ts",
+    "src/app/api/v1/runbooks/route.ts",
+    "src/app/api/v1/runbooks/[id]/route.ts",
+    "src/app/api/v1/runbook-steps/route.ts",
+    "src/app/api/v1/runbook-steps/[id]/route.ts",
+    "src/lib/api/client.ts"
+  ],
+  "ownership_violations": [],
+  "notes": "POST /runbooks special behaviour: creates runbook, then fetches section steps ordered by position_x ASC (steps have no sequential position field, position_x is the canvas left-to-right proxy), and bulk-inserts runbook_steps with 0-indexed position values. runbook_steps.step_id is FK ON DELETE SET NULL so orphaned checklist items survive original step deletion. RLS on runbook_steps uses EXISTS subquery joining through runbooks.workspace_id since runbook_steps has no workspace_id column.",
+
+  "failure_details": null
+}

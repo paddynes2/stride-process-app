@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-79, 2026-03-02 -->
+<!-- Updated: iter-80, 2026-03-02 -->
 
 ## Project
 
@@ -69,6 +69,8 @@ npx supabase db push     # Push migrations
 - `annotations/route.ts` + `[id]/route.ts` — CRUD
 - `comments/route.ts` + `[id]/route.ts` — CRUD (GET filterable, POST, PATCH, DELETE)
 - `tasks/route.ts` + `[id]/route.ts` — CRUD (GET by step_id, POST, PATCH, DELETE)
+- `runbooks/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST create with step snapshot, GET/PATCH/DELETE by id)
+- `runbook-steps/route.ts` + `[id]/route.ts` — GET by runbook_id, PATCH by id
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
 
 ### Components
@@ -100,7 +102,7 @@ npx supabase db push     # Push migrations
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task + enums (CommentCategory, CommentableType) |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 
@@ -127,6 +129,7 @@ npx supabase db push     # Push migrations
 | 013 | Tools table + RLS policies |
 | 014 | Comments table + comment_category enum + RLS (reuses annotatable_type) |
 | 015 | Tasks table (step-scoped checklists) + RLS + indexes + update trigger |
+| 016 | Runbooks + runbook_steps tables + enums (runbook_status, runbook_step_status) + RLS + indexes + triggers |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->

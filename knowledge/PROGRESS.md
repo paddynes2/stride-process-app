@@ -724,3 +724,36 @@
 - Efficiency: 3 — tester initially failed to dispatch (documented as blocked), then executed successfully on retry
 - Observations: 1 (IMP-011)
 **Notes:** Tester initially failed to dispatch (previous reviewer pass committed "blocked" state). Tester subsequently executed and produced TEST_RESULT_2.json with 40/40 PASS. FEAT-046 tasks system fully acceptance-tested for the first time. All baseline features through Phase 4 verified. Stride dev server was not running during testing (port 3000 served another project) — all checks performed via static analysis of source files. Retrospective due at iteration 80.
+
+## Iteration 80 — 2026-03-02 06:30
+**Tasks:**
+- #FEAT-047 [1/3] Runbook instances data layer (migration + types + API + client) — slot 1 — completed
+- #IMP-011 journey-canvas handleAddTouchpoint/handleAddStage useCallback wrap — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Created: supabase/migrations/016_runbooks.sql (117 lines — enums, tables, triggers, indexes, RLS)
+- Created: src/app/api/v1/runbooks/route.ts (120 lines — GET list + POST create with step snapshot)
+- Created: src/app/api/v1/runbooks/[id]/route.ts (112 lines — GET, PATCH, DELETE)
+- Created: src/app/api/v1/runbook-steps/route.ts (30 lines — GET by runbook_id)
+- Created: src/app/api/v1/runbook-steps/[id]/route.ts (51 lines — PATCH)
+- Modified: src/types/database.ts (+33 lines — RunbookStatus, RunbookStepStatus enums, Runbook, RunbookStep interfaces)
+- Modified: src/lib/api/client.ts (+61/-1 — runbook + runbook-step client wrappers)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx (+4/-4 — useCallback wrap)
+**Verification:**
+- Type check: pass (POST_MERGE_CHECK: PASS, 0 errors)
+- Lint: pass (0 errors; IMP-011 resolves 2 journey-canvas-view.tsx warnings)
+- Build: N/A (typecheck + lint sufficient)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (no UI changes)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — migration follows 015_tasks.sql pattern exactly. API routes follow established CRUD pattern. RLS on runbook_steps uses EXISTS subquery through runbooks. POST /runbooks snapshot-copy logic is clean.
+- Test coverage: 2 — typecheck + lint only, no runtime testing
+- Confidence: 5 — purely additive (new tables, routes, types). Follows proven patterns.
+- Efficiency: 4 — both builders completed successfully. No manual code recovery needed.
+- Observations: 0
+**Notes:** First clean multi-task merge since iter 76 (no manual code recovery). Builder merge commits labeled "iteration 26" — likely counter bug in ralph.sh. FEAT-047 [1/3] complete. IMP-011 resolves last 2 journey-canvas-view.tsx lint warnings. Retrospective completed (iter 80 = multiple of 10). Codebase health check performed.

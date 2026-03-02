@@ -85,7 +85,7 @@
   - **Why it matters:** Nielsen H8 — Aesthetic and minimalist design. Too many expanded panels reduces usability.
   - **Suggested fix:** Each panel stores collapsed state in localStorage keyed by panel type. Single collapse chevron in panel header toggles it.
 
-- [ ] #IMP-011 Journey canvas handleAddTouchpoint/handleAddStage not wrapped in useCallback — Attempts: 0
+- [x] #IMP-011 Journey canvas handleAddTouchpoint/handleAddStage not wrapped in useCallback — Attempts: 1 — DONE iteration 80, 2026-03-02
   - **Found:** Iteration 79 (regression+acceptance tester)
   - **Category:** Performance
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx` lines 345, 363

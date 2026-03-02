@@ -25,3 +25,9 @@
 **Options:** (A) Modify FlowCanvas to pass commentCounts through (ownership violation), (B) React Context consumed directly by node components
 **Decision:** React Context — `CommentCountsContext` exported from `canvas.ts`, provided by canvas views, consumed by node components
 **Trade-off:** Bypasses FlowCanvas prop chain, making the data flow less explicit. But avoids ownership violation and prop-drilling through a shared component.
+
+## D-005 — runbook_steps RLS via EXISTS subquery (Phase 4, Iteration 80)
+**Context:** runbook_steps table has no workspace_id column (only runbook_id FK). RLS policies need workspace access verification.
+**Options:** (A) Add workspace_id column to runbook_steps (denormalization), (B) EXISTS subquery joining through runbooks table to check workspace_id
+**Decision:** EXISTS subquery — `EXISTS (SELECT 1 FROM runbooks r WHERE r.id = runbook_steps.runbook_id AND can_access_workspace(r.workspace_id))`
+**Trade-off:** Slightly slower queries due to join, but maintains normalized schema. Same pattern used by tasks (step → section → workspace) and annotations (polymorphic).

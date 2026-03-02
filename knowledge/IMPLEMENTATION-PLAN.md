@@ -101,7 +101,7 @@ Core consulting insight features:
   - [x] [2/3] Comment panel UI on detail panels — DONE iteration 73
   - [x] [3/3] Canvas badges + workspace comments view — DONE iteration 74
 - [x] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder) — [1/3] DONE iter 76, [2/3] DONE iter 77, [3/3] DONE iter 78
-- [ ] #FEAT-047 Runbook instances (turn sections into executable checklists)
+- [ ] #FEAT-047 Runbook instances (turn sections into executable checklists) — [1/3] DONE iter 80
 - [ ] #FEAT-048 Playbook mode (distraction-free runbook execution view)
 - [ ] #FEAT-049 Activity log (audit trail for consulting engagements)
 - [ ] #FEAT-050 Workspace cloning (deep copy for reuse)
@@ -138,3 +138,4 @@ Deferred indefinitely:
 - [2026-03-01] Iteration 77: FEAT-046 [2/3] and IMP-003 both completed. Builder worktree merge failed again (4th occurrence) — reviewer recovered code from unreachable commits (186099a, 262a973) via `git fsck`. TaskPanel UI built (254 lines), ARIA labels added to all 4 node types. Pipeline G007 bug still unfixed. Next: FEAT-046 [3/3] task count badges.
 - [2026-03-01] Iteration 78: FEAT-046 [3/3] completed — task count badges on step nodes (TaskCountsContext, mirrors CommentCountsContext), section-level task rollup in section-detail-panel. IMP-008 fixed (handleKeyDown deps). 5th worktree merge failure — code recovered from unreachable commits (6858b30, 287dbc2). FEAT-046 fully complete. Next: FEAT-047 Runbook instances.
 - [2026-03-02] Iteration 79: Testing-only — acceptance (#FEAT-046) + regression. 40/40 PASS (static analysis). FEAT-046 fully acceptance-tested. 1 improvement logged (IMP-011). Retrospective due at iteration 80.
+- [2026-03-02] Iteration 80: FEAT-047 [1/3] completed — runbook instances data layer (migration 016, types, API routes, client wrappers). IMP-011 completed — journey-canvas useCallback fix. Both builders merged cleanly. Retrospective performed (iter 80 = multiple of 10).

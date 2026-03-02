@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "iteration": 80,
+  "slot": 2,
+  "task_id": "#IMP-011",
+  "status": "completed",
+  "duration_seconds": 120,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx",
+      "action": "modified",
+      "lines_added": 4,
+      "lines_removed": 4
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused import — documented in LEARNINGS.md). No new warnings." },
+    "build": { "status": "not_applicable", "output": "Build not run — type check + lint sufficient for S-complexity hook fix" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for canvas components" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Wrapped handleAddTouchpoint (dep array: [workspaceId, tabId, touchpoints]) and handleAddStage (dep array: [workspaceId, tabId, stages]) in React.useCallback. Both were already listed in handleKeyDown's dependency array — no change needed there. The touchpoints dep is needed because offset=touchpoints.length reads the array directly (not via functional updater). Similarly stages.length is read directly in handleAddStage. Pattern matches IMP-008 fix in flow-canvas.tsx exactly.",
+
+  "failure_details": null
+}
