@@ -89,6 +89,9 @@ export function RunbooksListView({ runbooks, workspaceId }: RunbooksListViewProp
               const steps = runbook.runbook_steps ?? [];
               const total = steps.length;
               const completed = steps.filter((s) => s.status === "completed").length;
+              const inProgress = steps.filter((s) => s.status === "in_progress").length;
+              const completedPct = total > 0 ? (completed / total) * 100 : 0;
+              const inProgressPct = total > 0 ? (inProgress / total) * 100 : 0;
               const statusCfg = STATUS_CONFIG[runbook.status];
               return (
                 <Link
@@ -108,6 +111,10 @@ export function RunbooksListView({ runbooks, workspaceId }: RunbooksListViewProp
                     <span className="font-medium text-[var(--text-secondary)] shrink-0">{completed}/{total} steps</span>
                     <span>·</span>
                     <span className="shrink-0">{formatDate(runbook.created_at)}</span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 bg-[var(--bg-surface-active)] rounded-full overflow-hidden flex">
+                    <div style={{ width: `${completedPct}%` }} className="bg-[var(--brand)]" />
+                    <div style={{ width: `${inProgressPct}%` }} className="bg-[var(--accent-blue)]/60" />
                   </div>
                 </Link>
               );
