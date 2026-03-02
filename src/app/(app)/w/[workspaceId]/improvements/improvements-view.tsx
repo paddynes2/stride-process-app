@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Lightbulb, ChevronDown } from "lucide-react";
+import { Lightbulb, ChevronDown, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -10,7 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { updateImprovementIdea } from "@/lib/api/client";
+import { updateImprovementIdea, deleteImprovementIdea } from "@/lib/api/client";
 import { toastError } from "@/lib/api/toast-helpers";
 import type { ImprovementIdea, ImprovementStatus, ImprovementPriority } from "@/types/database";
 
@@ -61,6 +61,16 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
       setIdeas((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
     } catch (err) {
       toastError("Failed to update status", { error: err });
+    }
+  };
+
+  const handleDelete = async (idea: ImprovementIdea) => {
+    if (!window.confirm("Delete this improvement idea?")) return;
+    try {
+      await deleteImprovementIdea(idea.id);
+      setIdeas((prev) => prev.filter((i) => i.id !== idea.id));
+    } catch (err) {
+      toastError("Failed to delete improvement", { error: err });
     }
   };
 
@@ -192,6 +202,14 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
                       >
                         {priorityConf.label}
                       </span>
+
+                      {/* Delete button */}
+                      <button
+                        onClick={() => handleDelete(idea)}
+                        className="text-[var(--text-tertiary)] hover:text-[#EF4444] transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
 
