@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, ListTodo, Play, BookTemplate } from "lucide-react";
+import { X, Trash2, ListTodo, Play, BookTemplate, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,9 +30,9 @@ const RichTextEditor = dynamic(
   }
 );
 import { useRouter } from "next/navigation";
-import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch, createRunbook, createTemplate } from "@/lib/api/client";
+import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch, createRunbook, createTemplate, createImprovementIdea } from "@/lib/api/client";
 import type { StepRoleWithDetails } from "@/lib/api/client";
-import type { Section, Step } from "@/types/database";
+import type { Section, Step, ImprovementPriority } from "@/types/database";
 import { TaskCountsContext } from "@/types/canvas";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
@@ -56,6 +56,11 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
   const [saveTemplateDesc, setSaveTemplateDesc] = React.useState("");
   const [saveTemplateCat, setSaveTemplateCat] = React.useState("");
   const [savingTemplate, setSavingTemplate] = React.useState(false);
+  const [showImprovDialog, setShowImprovDialog] = React.useState(false);
+  const [improvTitle, setImprovTitle] = React.useState("");
+  const [improvDesc, setImprovDesc] = React.useState("");
+  const [improvPriority, setImprovPriority] = React.useState<ImprovementPriority>("medium");
+  const [improvSaving, setImprovSaving] = React.useState(false);
 
   React.useEffect(() => {
     setName(section.name);
@@ -155,6 +160,36 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
       toastError("Failed to save template", { error: err });
     } finally {
       setSavingTemplate(false);
+    }
+  };
+
+  const handleOpenImprovDialog = () => {
+    setImprovTitle("");
+    setImprovDesc("");
+    setImprovPriority("medium");
+    setShowImprovDialog(true);
+  };
+
+  const handleAddImprovement = async () => {
+    if (!improvTitle.trim()) {
+      toastError("Title is required");
+      return;
+    }
+    setImprovSaving(true);
+    try {
+      await createImprovementIdea({
+        workspace_id: section.workspace_id,
+        title: improvTitle.trim(),
+        description: improvDesc.trim() || undefined,
+        priority: improvPriority,
+        linked_section_id: section.id,
+      });
+      toast.success("Improvement added");
+      setShowImprovDialog(false);
+    } catch (err) {
+      toastError("Failed to add improvement", { error: err });
+    } finally {
+      setImprovSaving(false);
     }
   };
 
@@ -381,6 +416,10 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
           <Play className="h-3.5 w-3.5" />
           {creating ? "Creating..." : "Run as Checklist"}
         </Button>
+        <Button variant="secondary" size="sm" onClick={handleOpenImprovDialog} className="w-full">
+          <Lightbulb className="h-3.5 w-3.5" />
+          Add Improvement
+        </Button>
         <Button variant="destructive" size="sm" onClick={handleDelete} className="w-full">
           <Trash2 className="h-3.5 w-3.5" />
           Delete Section
@@ -433,6 +472,63 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
             </Button>
             <Button size="sm" onClick={handleSaveTemplate} disabled={savingTemplate}>
               {savingTemplate ? "Saving..." : "Save Template"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showImprovDialog} onOpenChange={setShowImprovDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogPrimitive.Title className="text-[16px] font-semibold text-[var(--text-primary)] tracking-[-0.01em]">
+              Add Improvement
+            </DialogPrimitive.Title>
+            <DialogDescription>Log an improvement idea for this section</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+                Title
+              </label>
+              <Input
+                value={improvTitle}
+                onChange={(e) => setImprovTitle(e.target.value)}
+                placeholder="Describe the improvement..."
+              />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+                Description
+              </label>
+              <Textarea
+                value={improvDesc}
+                onChange={(e) => setImprovDesc(e.target.value)}
+                placeholder="Additional details (optional)"
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+                Priority
+              </label>
+              <select
+                value={improvPriority}
+                onChange={(e) => setImprovPriority(e.target.value as ImprovementPriority)}
+                className="w-full px-3 py-2 rounded-[var(--radius-md)] text-[13px] bg-[var(--input-bg)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-default)]"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" size="sm" onClick={() => setShowImprovDialog(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleAddImprovement} disabled={improvSaving}>
+              {improvSaving ? "Adding..." : "Add Improvement"}
             </Button>
           </DialogFooter>
         </DialogContent>

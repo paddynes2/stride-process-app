@@ -20,6 +20,7 @@ import {
   ClipboardList,
   Clock,
   Target,
+  Lightbulb,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,13 +37,14 @@ const NAV_ITEMS = [
   { label: "Workflows", icon: GitBranch, href: "", active: (p: string, wsId: string) => {
     // Active when on /w/{wsId} or /w/{wsId}/{tabId} — excludes all named sub-routes
     const base = `/w/${wsId}`;
-    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list") && !p.includes("/gap-analysis") && !p.includes("/compare") && !p.includes("/dashboard") && !p.includes("/comments") && !p.includes("/runbooks") && !p.includes("/activity") && !p.includes("/perspectives") && !p.includes("/prioritization"));
+    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list") && !p.includes("/gap-analysis") && !p.includes("/compare") && !p.includes("/dashboard") && !p.includes("/comments") && !p.includes("/runbooks") && !p.includes("/activity") && !p.includes("/perspectives") && !p.includes("/prioritization") && !p.includes("/improvements"));
   }},
   { label: "List View", icon: List, href: "/list" },
   { label: "Gap Analysis", icon: TrendingDown, href: "/gap-analysis" },
   { label: "Compare", icon: Split, href: "/compare" },
   { label: "Perspectives", icon: Eye, href: "/perspectives/compare" },
   { label: "Prioritization", icon: Target, href: "/prioritization" },
+  { label: "Improvements", icon: Lightbulb, href: "/improvements" },
   { label: "Comments", icon: MessageSquare, href: "/comments" },
   { label: "Runbooks", icon: ClipboardList, href: "/runbooks" },
   { label: "Activity", icon: Clock, href: "/activity" },
@@ -55,6 +57,21 @@ const NAV_ITEMS = [
 export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const basePath = `/w/${workspaceId}`;
+  const [improvementsOpenCount, setImprovementsOpenCount] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/v1/improvement-ideas?workspace_id=${workspaceId}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (cancelled) return;
+        const ideas: Array<{ status: string }> = json.data ?? [];
+        const open = ideas.filter((i) => i.status !== "completed" && i.status !== "rejected").length;
+        setImprovementsOpenCount(open > 0 ? open : null);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspaceId]);
 
   return (
     <aside
@@ -109,6 +126,11 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
             >
               <item.icon className={cn("h-4 w-4 shrink-0", isActive && "text-[var(--brand)]")} />
               {!collapsed && <span>{item.label}</span>}
+              {!collapsed && item.label === "Improvements" && improvementsOpenCount != null && (
+                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-blue)] text-white">
+                  {improvementsOpenCount}
+                </span>
+              )}
             </Link>
           );
         })}
