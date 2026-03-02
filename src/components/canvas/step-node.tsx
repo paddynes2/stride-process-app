@@ -24,7 +24,7 @@ const EXECUTOR_ICONS: Record<string, string> = {
   empty: "",
 };
 
-export function StepNode({ data, selected }: NodeProps) {
+function StepNodeComponent({ data, selected }: NodeProps) {
   const nodeData = data as unknown as StepNodeData;
   const { step, heatMapMode, annotationColor } = nodeData;
   const maturityColor = step.maturity_score != null ? MATURITY_COLORS[step.maturity_score] ?? MATURITY_FALLBACK_COLOR : null;
@@ -141,3 +141,5 @@ export function StepNode({ data, selected }: NodeProps) {
     </div>
   );
 }
+
+export const StepNode = React.memo(StepNodeComponent);
