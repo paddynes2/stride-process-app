@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -95,6 +96,8 @@ export async function POST(request: NextRequest) {
   if (!task) {
     return errorResponse("forbidden", "Permission denied", 403);
   }
+
+  void logActivity({ supabase, workspace_id: task.workspace_id, user_id: user.id, action: "created", entity_type: "tasks", entity_id: task.id, entity_name: task.title });
 
   return successResponse(task, 201);
 }

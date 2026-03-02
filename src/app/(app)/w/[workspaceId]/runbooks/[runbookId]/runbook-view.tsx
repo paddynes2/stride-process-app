@@ -146,22 +146,24 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
             {runbook.name}
           </h1>
           <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
-          {!isReadOnly && (
-            <div className="flex items-center gap-1.5">
-              <Button variant="secondary" size="sm" asChild>
-                <Link href="./playbook">
-                  <Play className="h-3.5 w-3.5" aria-label="Playbook Mode" />
-                  Playbook
-                </Link>
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => setConfirmCancelOpen(true)}>
-                Cancel
-              </Button>
-              <Button size="sm" onClick={() => setConfirmCompleteOpen(true)}>
-                Complete
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center gap-1.5">
+            <Button variant="secondary" size="sm" asChild>
+              <Link href="./playbook">
+                <Play className="h-3.5 w-3.5" aria-label="Playbook Mode" />
+                Playbook
+              </Link>
+            </Button>
+            {!isReadOnly && (
+              <>
+                <Button variant="destructive" size="sm" onClick={() => setConfirmCancelOpen(true)}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={() => setConfirmCompleteOpen(true)}>
+                  Complete
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Progress bar */}

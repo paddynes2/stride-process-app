@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i;
 
@@ -73,6 +74,8 @@ export async function POST(request: NextRequest) {
   if (!perspective) {
     return errorResponse("forbidden", "Permission denied", 403);
   }
+
+  void logActivity({ supabase, workspace_id: perspective.workspace_id, user_id: user.id, action: "created", entity_type: "perspectives", entity_id: perspective.id, entity_name: perspective.name });
 
   return successResponse(perspective, 201);
 }
