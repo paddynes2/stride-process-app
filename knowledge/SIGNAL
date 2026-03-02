@@ -1,1 +1,1 @@
-BLOCKED: Pipeline merge step in ralph.sh is broken — 2 consecutive iterations (84, 85) lost ALL builder work. Builders complete code in worktrees but merge never executes and worktrees are cleaned up. Fix pipeline before re-attempting #FEAT-048 + #IMP-012.
+CONTINUE: #FEAT-049 Activity log OR regression+acceptance testing (FEAT-047 + FEAT-048 acceptance overdue)

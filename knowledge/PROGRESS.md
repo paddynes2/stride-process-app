@@ -901,3 +901,32 @@
 - Efficiency: 0 — entire iteration wasted on known-broken pipeline
 - Observations: 1 (pipeline merge step is consistently broken — must be fixed before next build iteration)
 **Notes:** Exact repeat of iter 84 failure. Both BUILD_RESULTs report `status: completed` with passing typecheck/lint, but no source files exist on filesystem. Playbook directory absent, window.confirm() still 2x in runbook-view.tsx. No builder branches exist. Pipeline merge step in ralph.sh is broken — builders complete work in worktrees but code never reaches session branch. 3 consecutive non-productive iterations (83 partial, 84 reverted, 85 reverted). Pipeline fix required before re-attempt.
+
+## Iteration 86 — 2026-03-02 22:30
+**Tasks:**
+- #FEAT-048 Playbook mode + #IMP-012 Styled confirm dialog — slot 1 — completed
+- #IMP-013 Segmented progress bar — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Created: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx (40 lines — server page, Supabase fetch)
+- Created: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx (219 lines — fixed overlay, step-by-step navigation, optimistic updates)
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx (+67/-10 — Radix Dialog replacing window.confirm, Playbook button in header)
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx (+7/-0 — segmented progress bar)
+**Verification:**
+- Type check: pass (0 errors — tsc --noEmit clean, POST_MERGE_CHECK: PASS)
+- Lint: pass (0 errors; 1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true for both slots)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — PlaybookView uses clean fixed overlay pattern (no workspace-shell.tsx modification needed). Optimistic updates with rollback on API error. Radix Dialog replaces window.confirm correctly. Segmented progress bar follows existing h-1.5 rounded-full pattern.
+- Test coverage: 2 — typecheck + lint only, no runtime testing
+- Confidence: 4 — code quality high but untested in browser. Fixed overlay approach is architecturally clean.
+- Efficiency: 5 — first successful iteration after 2 consecutive pipeline merge failures (iters 84, 85). Both builders completed and merged cleanly.
+- Observations: 0
+**Notes:** Pipeline merge fixed (or worked around) — first successful build since iter 82. FEAT-048 attempt 3 succeeded after 2 pipeline merge failures. PlaybookView uses fixed full-viewport overlay (z-50) covering workspace shell — elegant solution avoiding workspace-shell.tsx modifications. IMP-012 bundled into slot 1 since both touched runbook-view.tsx. IMP-013 is a clean 7-line addition. All Phase 4 P0 features now complete (FEAT-045 comments, FEAT-046 tasks, FEAT-047 runbooks). Next priorities: FEAT-048 acceptance testing, FEAT-047 acceptance testing (5 dispatch failures), then FEAT-049 activity log.

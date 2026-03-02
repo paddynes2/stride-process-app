@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-83, 2026-03-02 -->
+<!-- Updated: iter-86, 2026-03-02 -->
 
 ## Project
 
@@ -46,7 +46,8 @@ npx supabase db push     # Push migrations
 | `/w/.../tools` | `src/app/(app)/w/[workspaceId]/tools/page.tsx` | Tools management (flat table CRUD) |
 | `/w/.../comments` | `src/app/(app)/w/[workspaceId]/comments/page.tsx` | Workspace comments (all comments, category filter, entity nav links) |
 | `/w/.../runbooks` | `src/app/(app)/w/[workspaceId]/runbooks/page.tsx` | Runbook list (name, status, progress, section, date, filter tabs) |
-| `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with 4-state status, progress bar+text, notes, Complete/Cancel, read-only mode, metadata footer) |
+| `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with 4-state status, progress bar+text, notes, Complete/Cancel via Radix Dialog, read-only mode, metadata footer, Playbook button) |
+| `/w/.../runbooks/[id]/playbook` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx` | Playbook mode (distraction-free step-by-step execution, fixed overlay z-50, Mark Complete & Next, dot navigation, progress bar, mobile-responsive) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 

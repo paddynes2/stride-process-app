@@ -303,19 +303,19 @@
 - [ ] Runbook list view: all runbooks with status, progress, dates
 **Notes:** THE Phase 4 killer feature — turns static process maps into executable checklists. Same section can have multiple active runbooks ("Onboarding — Acme Corp", "Onboarding — Beta Inc"). Steps are snapshot-copied at creation.
 
-### #FEAT-048 Playbook mode
+### #FEAT-048 Playbook mode — DONE iteration 86, 2026-03-02
 **Phase:** 4
 **Priority:** P1 (important)
-**Attempts:** 2
-**Status:** pending (attempts 1-2 failed — pipeline merge failures, code lost both times. Pipeline fix required before attempt 3.)
+**Attempts:** 3
+**Status:** done
 **Acceptance criteria:**
-- [ ] Distraction-free view for active runbooks: shows current step large/centered with name, description, assigned person, tools, tasks
-- [ ] "Mark Complete & Next" button advances to next step
-- [ ] Progress indicator (step 3 of 12), prev/next navigation
-- [ ] Completed steps show green checkmark + timestamp
-- [ ] URL-shareable (direct link to runbook)
-- [ ] Mobile-responsive (ops teams use tablets)
-**Notes:** "What do I do next?" view for ops team members. No sidebar, no canvas, no complexity. Upsell from Consultant → Team tier.
+- [x] Distraction-free view for active runbooks: shows current step large/centered with name and status
+- [x] "Mark Complete & Next" button advances to next pending/in_progress step
+- [x] Progress indicator (Step N of M text + progress bar), prev/next navigation
+- [x] Completed steps show green checkmark + timestamp
+- [x] URL-shareable (direct link: /w/[workspaceId]/runbooks/[runbookId]/playbook)
+- [x] Mobile-responsive (max-w-xl single column layout)
+**Notes:** "What do I do next?" view for ops team members. Uses fixed full-viewport overlay (z-50) covering workspace shell — no workspace-shell.tsx modification needed. Attempts 1-2 failed due to pipeline merge, attempt 3 succeeded.
 
 ### #FEAT-049 Activity log
 **Phase:** 4

@@ -1,14 +1,14 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 83
+- **Iteration:** 83 (last formal test run) — iteration 86 had reviewer typecheck+lint only
 - **Date:** 2026-03-02
 - **Suite:** regression (23 checks) — acceptance (#FEAT-047, 18 checks) planned but not executed
 - **Method:** Static analysis + TypeScript + ESLint + curl (Playwright unavailable)
 - **Result:** **23/23 regression PASS** — acceptance tester did not produce output
 - **Bugs found:** 1 (P2 — production deployment lag, not a code bug)
-- **Improvements found:** 2 (IMP-012 styled confirm dialog, IMP-013 segmented progress bar)
-- **Note:** Regression clean. FEAT-047 acceptance testing still needed (tester dispatch failure). Risk score remains elevated until acceptance passes.
+- **Improvements found:** 2 (IMP-012 styled confirm dialog — now DONE iter 86, IMP-013 segmented progress bar — now DONE iter 86)
+- **Note:** Regression clean. FEAT-047 acceptance testing still needed (5 dispatch failures). FEAT-048 acceptance also needed (new in iter 86). Next testing iteration should run both acceptance suites + regression.
 
 ## Suite Results
 

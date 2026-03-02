@@ -102,7 +102,7 @@ Core consulting insight features:
   - [x] [3/3] Canvas badges + workspace comments view — DONE iteration 74
 - [x] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder) — [1/3] DONE iter 76, [2/3] DONE iter 77, [3/3] DONE iter 78
 - [x] #FEAT-047 Runbook instances (turn sections into executable checklists) — [1/3] DONE iter 80, [2/3] DONE iter 81, [3/3] DONE iter 82
-- [ ] #FEAT-048 Playbook mode (distraction-free runbook execution view)
+- [x] #FEAT-048 Playbook mode (distraction-free runbook execution view) — DONE iteration 86
 - [ ] #FEAT-049 Activity log (audit trail for consulting engagements)
 - [ ] #FEAT-050 Workspace cloning (deep copy for reuse)
 - [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting)
@@ -144,3 +144,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 83: Testing-only — regression 23/23 PASS. Acceptance testing for FEAT-047 not executed (tester dispatch failure). FEAT-047 acceptance still needed. 2 improvements found (IMP-012, IMP-013).
 - [2026-03-02] Iteration 84: FEAT-048 + IMP-012 — both builders reported success but pipeline merge step failed. No builder branches exist, no code on disk. Stash `ralph-auto-stash-1772431205` never popped. All builder work lost. Tasks need re-attempt. This is the 6th+ worktree merge failure incident (previously iters 73, 74, 77, 78).
 - [2026-03-02] Iteration 85: FEAT-048 + IMP-012 attempt 2 — IDENTICAL failure to iter 84. Both BUILD_RESULTs report success with passing typecheck/lint, but no builder branches exist, no source files on disk, no merge commits. Pipeline merge step is completely broken — not a conflict issue (those were recoverable in iters 73-78) but a total non-execution. 3 consecutive non-productive iterations (83 partial, 84 reverted, 85 reverted). **Pipeline infrastructure fix required before any more build iterations.**
+- [2026-03-02] Iteration 86: #FEAT-048 Playbook mode (attempt 3) + #IMP-012 styled confirm dialog + #IMP-013 segmented progress bar — ALL COMPLETED. Pipeline merge succeeded after 2 consecutive failures. PlaybookView uses fixed overlay (D-006). FEAT-048 acceptance testing needed next iteration. All Phase 4 P0 features now done (FEAT-045, 046, 047). Next: FEAT-049 Activity log or regression+acceptance testing.

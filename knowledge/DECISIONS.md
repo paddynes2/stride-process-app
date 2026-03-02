@@ -31,3 +31,9 @@
 **Options:** (A) Add workspace_id column to runbook_steps (denormalization), (B) EXISTS subquery joining through runbooks table to check workspace_id
 **Decision:** EXISTS subquery — `EXISTS (SELECT 1 FROM runbooks r WHERE r.id = runbook_steps.runbook_id AND can_access_workspace(r.workspace_id))`
 **Trade-off:** Slightly slower queries due to join, but maintains normalized schema. Same pattern used by tasks (step → section → workspace) and annotations (polymorphic).
+
+## D-006 — Fixed overlay for Playbook mode instead of workspace-shell modification (Phase 4, Iteration 86)
+**Context:** Playbook mode needs distraction-free display (no sidebar, header, or tab bar visible). Page is nested under runbooks/[runbookId]/playbook/ which inherits workspace shell layout.
+**Options:** (A) Modify workspace-shell.tsx to conditionally hide shell UI when on /playbook path — requires hook-order awareness and reserved path handling, (B) Fixed full-viewport overlay (position: fixed, inset: 0, z-50) in PlaybookView that covers the workspace shell visually
+**Decision:** Fixed overlay — PlaybookView renders `position: fixed; inset: 0; z-index: 50; bg-[var(--surface)]` covering everything beneath it. No workspace-shell.tsx changes needed.
+**Trade-off:** Shell components (sidebar, header, tab bar) still render in the DOM beneath the overlay (wasted render cycles), but this avoids hook-order issues, reserved path logic, and coupling between PlaybookView and workspace-shell. Simpler, safer, and zero risk of breaking the shell for other routes.
