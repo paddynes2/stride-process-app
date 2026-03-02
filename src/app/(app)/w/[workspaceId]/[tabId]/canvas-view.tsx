@@ -17,13 +17,17 @@ import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/
 import type { Section, Step, Connection, ColoringRule, Template } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+// NOTE (BUG-023): The custom DialogTitle in ui/dialog.tsx wraps a plain <h2> (not
+// DialogPrimitive.Title), so Radix cannot register it for a11y. We import
+// DialogPrimitive.Title directly here to fix the console.error in this dialog.
+// section-detail-panel.tsx has the same underlying issue but is not owned by this task.
 import { STARTER_TEMPLATES } from "@/lib/templates";
 import { Paintbrush, LayoutTemplate, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -360,7 +364,7 @@ export function CanvasView({
           <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Templates</DialogTitle>
+                <DialogPrimitive.Title className="text-[16px] font-semibold text-[var(--text-primary)] tracking-[-0.01em]">Templates</DialogPrimitive.Title>
                 <DialogDescription>Deploy a template to add a new section to the canvas</DialogDescription>
               </DialogHeader>
               {loadingTemplates ? (
@@ -369,16 +373,18 @@ export function CanvasView({
                     <div key={i} className="h-24 bg-[var(--bg-surface-secondary)] rounded-[var(--radius-md)] animate-pulse" />
                   ))}
                 </div>
-              ) : templateError ? (
-                <p className="text-[13px] text-red-400 py-6 text-center">{templateError}</p>
               ) : (
+                // IMP-036: starters always visible; error message at top only hides DB templates
                 <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto py-1">
-                  {dbTemplates.length === 0 && STARTER_TEMPLATES.length === 0 && (
+                  {templateError && (
+                    <p className="col-span-2 text-[13px] text-red-400 py-2 text-center">{templateError}</p>
+                  )}
+                  {!templateError && dbTemplates.length === 0 && STARTER_TEMPLATES.length === 0 && (
                     <p className="col-span-2 text-[13px] text-[var(--text-tertiary)] py-6 text-center">
                       No templates yet. Save a section as a template to get started.
                     </p>
                   )}
-                  {dbTemplates.map((t) => (
+                  {!templateError && dbTemplates.map((t) => (
                     <div key={`db-${t.id}`} className="bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] p-3 flex flex-col gap-2">
                       <div className="flex items-start gap-2">
                         <div className="flex-1 min-w-0">
