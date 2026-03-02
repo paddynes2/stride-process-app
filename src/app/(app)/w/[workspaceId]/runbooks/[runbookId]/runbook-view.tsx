@@ -66,8 +66,9 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
   const completedCount = steps.filter((s) => s.status === "completed").length;
   const inProgressCount = steps.filter((s) => s.status === "in_progress").length;
   const skippedCount = steps.filter((s) => s.status === "skipped").length;
+  const resolvedCount = completedCount + skippedCount;
   const total = steps.length;
-  const progressPct = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+  const progressPct = total === 0 ? 0 : Math.round((resolvedCount / total) * 100);
   const statusCfg = RUNBOOK_STATUS_CONFIG[runbook.status];
 
   const handleStepStatus = async (step: RunbookStepEnriched, newStatus: RunbookStepStatus) => {
@@ -172,23 +173,15 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
             />
           </div>
           <span className="text-[12px] font-medium text-[var(--text-secondary)] shrink-0">
-            {completedCount}/{total}
+            {resolvedCount}/{total}
           </span>
         </div>
 
         {/* Progress text */}
         <p className="mt-1 text-[11px] text-[var(--text-tertiary)]">
-          {completedCount} of {total} steps completed
-          {(inProgressCount > 0 || skippedCount > 0) && (
-            <>
-              {" · "}
-              {[
-                inProgressCount > 0 && `${inProgressCount} in progress`,
-                skippedCount > 0 && `${skippedCount} skipped`,
-              ]
-                .filter(Boolean)
-                .join(", ")}
-            </>
+          {resolvedCount} of {total} resolved
+          {inProgressCount > 0 && (
+            <> · {inProgressCount} in progress</>
           )}
         </p>
       </div>

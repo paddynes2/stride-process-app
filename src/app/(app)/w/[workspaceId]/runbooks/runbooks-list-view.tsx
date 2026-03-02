@@ -89,8 +89,11 @@ export function RunbooksListView({ runbooks, workspaceId }: RunbooksListViewProp
               const steps = runbook.runbook_steps ?? [];
               const total = steps.length;
               const completed = steps.filter((s) => s.status === "completed").length;
+              const skipped = steps.filter((s) => s.status === "skipped").length;
               const inProgress = steps.filter((s) => s.status === "in_progress").length;
+              const resolved = completed + skipped;
               const completedPct = total > 0 ? (completed / total) * 100 : 0;
+              const skippedPct = total > 0 ? (skipped / total) * 100 : 0;
               const inProgressPct = total > 0 ? (inProgress / total) * 100 : 0;
               const statusCfg = STATUS_CONFIG[runbook.status];
               return (
@@ -108,12 +111,13 @@ export function RunbooksListView({ runbooks, workspaceId }: RunbooksListViewProp
                   <div className="flex items-center gap-2 text-[11px] text-[var(--text-tertiary)]">
                     <span className="truncate max-w-[120px]">{runbook.sections?.name ?? "—"}</span>
                     <span>·</span>
-                    <span className="font-medium text-[var(--text-secondary)] shrink-0">{completed}/{total} steps</span>
+                    <span className="font-medium text-[var(--text-secondary)] shrink-0">{resolved}/{total} steps</span>
                     <span>·</span>
                     <span className="shrink-0">{formatDate(runbook.created_at)}</span>
                   </div>
                   <div className="mt-1.5 h-1.5 bg-[var(--bg-surface-active)] rounded-full overflow-hidden flex">
                     <div style={{ width: `${completedPct}%` }} className="bg-[var(--brand)]" />
+                    <div style={{ width: `${skippedPct}%` }} className="bg-white/20" />
                     <div style={{ width: `${inProgressPct}%` }} className="bg-[var(--accent-blue)]/60" />
                   </div>
                 </Link>
