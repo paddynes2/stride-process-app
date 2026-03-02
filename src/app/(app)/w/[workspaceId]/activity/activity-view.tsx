@@ -180,6 +180,15 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
                 </div>
               );
             })}
+            {loading && [0, 1, 2].map((i) => (
+              <div
+                key={`skeleton-${i}`}
+                className="rounded-[var(--radius-sm)] p-3 bg-[var(--bg-surface-active)] border border-[var(--border-subtle)]"
+              >
+                <div className="h-3 bg-[var(--bg-surface-secondary)] rounded-[var(--radius-md)] animate-pulse mb-1.5 w-3/4" />
+                <div className="h-2.5 bg-[var(--bg-surface-secondary)] rounded-[var(--radius-md)] animate-pulse w-2/5" />
+              </div>
+            ))}
           </div>
         )}
 
@@ -191,7 +200,7 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
               disabled={loading}
               className="px-4 py-2 text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--bg-surface-active)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] hover:border-[var(--border-default)] transition-colors disabled:opacity-50"
             >
-              {loading ? "Loading..." : "Load More"}
+              Load More
             </button>
           </div>
         )}
