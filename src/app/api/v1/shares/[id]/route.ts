@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 const EDITABLE_FIELDS = ["is_active"] as const;
 
@@ -40,6 +41,17 @@ export async function PATCH(
     return errorResponse("update_failed", error.message, 500);
   }
 
+  logActivity({
+    supabase,
+    workspace_id: share.workspace_id,
+    user_id: user.id,
+    action: "updated",
+    entity_type: "public_shares",
+    entity_id: share.id,
+    entity_name: "Shared Link",
+    details: { changed_fields: Object.keys(updates) },
+  });
+
   return successResponse(share);
 }
 
@@ -55,14 +67,26 @@ export async function DELETE(
     return errorResponse("unauthorized", "Not authenticated", 401);
   }
 
-  const { error } = await supabase
+  const { data: share, error } = await supabase
     .from("public_shares")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .select()
+    .single();
 
   if (error) {
     return errorResponse("delete_failed", error.message, 500);
   }
+
+  logActivity({
+    supabase,
+    workspace_id: share?.workspace_id,
+    user_id: user.id,
+    action: "deleted",
+    entity_type: "public_shares",
+    entity_id: id,
+    entity_name: "Shared Link",
+  });
 
   return successResponse({ deleted: true });
 }

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 export async function GET() {
   const supabase = await createClient();
@@ -143,6 +144,16 @@ export async function POST(request: NextRequest) {
       // Template seeding is best-effort — don't fail workspace creation
     }
   }
+
+  logActivity({
+    supabase,
+    workspace_id: workspace.id,
+    user_id: user.id,
+    action: "created",
+    entity_type: "workspaces",
+    entity_id: workspace.id,
+    entity_name: workspace.name,
+  });
 
   return successResponse(workspace, 201);
 }

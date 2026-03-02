@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 const EDITABLE_FIELDS = [
   "name",
@@ -48,6 +49,17 @@ export async function PATCH(
     return errorResponse("update_failed", error.message, 500);
   }
 
+  logActivity({
+    supabase,
+    workspace_id: section.workspace_id,
+    user_id: user.id,
+    action: "updated",
+    entity_type: "sections",
+    entity_id: section.id,
+    entity_name: section.name,
+    details: { changed_fields: Object.keys(updates) },
+  });
+
   return successResponse(section);
 }
 
@@ -63,14 +75,26 @@ export async function DELETE(
     return errorResponse("unauthorized", "Not authenticated", 401);
   }
 
-  const { error } = await supabase
+  const { data: section, error } = await supabase
     .from("sections")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .select()
+    .single();
 
   if (error) {
     return errorResponse("delete_failed", error.message, 500);
   }
+
+  logActivity({
+    supabase,
+    workspace_id: section?.workspace_id,
+    user_id: user.id,
+    action: "deleted",
+    entity_type: "sections",
+    entity_id: id,
+    entity_name: section?.name ?? "Section",
+  });
 
   return successResponse({ deleted: true });
 }
