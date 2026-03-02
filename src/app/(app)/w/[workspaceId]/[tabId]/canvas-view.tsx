@@ -8,11 +8,14 @@ import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-pan
 import { AnnotationPanel } from "@/components/panels/annotation-panel";
 import { CommentPanel } from "@/components/panels/comment-panel";
 import { TaskPanel } from "@/components/panels/task-panel";
+import { ColoringPanel } from "@/components/canvas/coloring-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations, fetchComments, fetchAllTasks } from "@/lib/api/client";
-import { CommentCountsContext, TaskCountsContext } from "@/types/canvas";
-import type { Section, Step, Connection } from "@/types/database";
+import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules } from "@/lib/api/client";
+import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
+import type { Section, Step, Connection, ColoringRule } from "@/types/database";
+import { Paintbrush } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CanvasViewProps {
   workspaceId: string;
@@ -156,7 +159,63 @@ export function CanvasView({
     return () => { cancelled = true; };
   }, [workspaceId]);
 
+  // Fetch workspace coloring rules for step background tint
+  const [coloringRules, setColoringRules] = React.useState<ColoringRule[]>([]);
+  const [showColoringPanel, setShowColoringPanel] = React.useState(false);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchColoringRules(workspaceId)
+      .then((rules) => {
+        if (!cancelled) setColoringRules(rules);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspaceId]);
+
+  // Evaluate coloring rules against each step in position order (last match wins).
+  // heatMapMode precedence is handled inside StepNode — when heatMap is active,
+  // the maturity tint is used instead. Here we just compute the tint map from rules.
+  const coloringTints = React.useMemo(() => {
+    const map = new Map<string, string>();
+    const activeRules = (coloringRules ?? []).filter((r) => r.is_active);
+    for (const step of steps ?? []) {
+      for (const rule of activeRules) {
+        let matches = false;
+        switch (rule.criteria_type) {
+          case "status":
+            matches = step.status === rule.criteria_value;
+            break;
+          case "executor":
+            matches = step.executor === rule.criteria_value;
+            break;
+          case "step_type":
+            matches = step.step_type === rule.criteria_value;
+            break;
+          case "maturity_below":
+            matches =
+              step.maturity_score !== null &&
+              step.maturity_score < parseInt(rule.criteria_value, 10);
+            break;
+          case "maturity_above":
+            matches =
+              step.maturity_score !== null &&
+              step.maturity_score > parseInt(rule.criteria_value, 10);
+            break;
+          case "has_role":
+            // Requires additional data fetch — skip visual evaluation for now
+            break;
+        }
+        if (matches) {
+          map.set(step.id, rule.color); // last matching rule wins (rules ordered by position)
+        }
+      }
+    }
+    return map;
+  }, [coloringRules, steps]);
+
   return (
+    <ColoringTintContext.Provider value={coloringTints}>
     <TaskCountsContext.Provider value={taskCounts}>
     <CommentCountsContext.Provider value={commentCounts}>
       <div className="flex h-full">
@@ -185,6 +244,31 @@ export function CanvasView({
             onExportPdf={handleExportPdf}
             onExportPng={handleExportPng}
           />
+
+          {/* Coloring rules button + panel — top-right overlay, away from react-flow toolbar */}
+          <div className="absolute top-2.5 right-2.5 z-10 flex flex-col items-end gap-1">
+            <button
+              onClick={() => setShowColoringPanel((p) => !p)}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium",
+                "bg-[var(--bg-surface)] shadow-[var(--shadow-sm)] transition-colors",
+                showColoringPanel
+                  ? "border-[var(--accent-blue)] text-[var(--accent-blue)]"
+                  : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+              )}
+              aria-label="Toggle coloring rules"
+            >
+              <Paintbrush className="h-3.5 w-3.5" />
+              Color
+            </button>
+            {showColoringPanel && (
+              <ColoringPanel
+                workspaceId={workspaceId}
+                rules={coloringRules}
+                onRulesChange={setColoringRules}
+              />
+            )}
+          </div>
         </div>
 
         {/* Detail Panel / Summary Panel */}
@@ -264,5 +348,6 @@ export function CanvasView({
       </div>
     </CommentCountsContext.Provider>
     </TaskCountsContext.Provider>
+    </ColoringTintContext.Provider>
   );
 }
