@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users } from "lucide-react";
+import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +53,14 @@ const MATURITY_OPTIONS = MATURITY_LEVELS.map((m) => ({
   label: `${m.level} — ${m.label}`,
   color: m.color,
 }));
+
+const SCORE_OPTIONS = [
+  { value: 1, label: "Very Low" },
+  { value: 2, label: "Low" },
+  { value: 3, label: "Medium" },
+  { value: 4, label: "High" },
+  { value: 5, label: "Very High" },
+];
 
 const EXECUTORS: { value: ExecutorType; label: string }[] = [
   { value: "person", label: "Person" },
@@ -421,6 +429,60 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
             {step.target_maturity - step.maturity_score > 0 && " levels to improve"}
           </div>
         )}
+
+        <Separator />
+
+        {/* Effort Score */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <Zap className="h-3 w-3" />
+            Effort Score
+          </label>
+          <div className="flex gap-1">
+            {SCORE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleFieldUpdate("effort_score", step.effort_score === opt.value ? null : opt.value)}
+                title={opt.label}
+                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                  step.effort_score === opt.value
+                    ? "border-[#F97316] text-white"
+                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                }`}
+                style={step.effort_score === opt.value ? { backgroundColor: "#F97316" } : undefined}
+              >
+                {opt.value}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low effort, 5 = high effort</p>
+        </div>
+
+        {/* Impact Score */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <TrendingUp className="h-3 w-3" />
+            Impact Score
+          </label>
+          <div className="flex gap-1">
+            {SCORE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleFieldUpdate("impact_score", step.impact_score === opt.value ? null : opt.value)}
+                title={opt.label}
+                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                  step.impact_score === opt.value
+                    ? "border-[var(--brand)] text-white"
+                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                }`}
+                style={step.impact_score === opt.value ? { backgroundColor: "var(--brand)" } : undefined}
+              >
+                {opt.value}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low impact, 5 = high impact</p>
+        </div>
 
         <Separator />
 

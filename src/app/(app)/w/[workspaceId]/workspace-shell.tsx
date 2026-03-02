@@ -44,7 +44,7 @@ export function WorkspaceShell({
   // Derive active tab from URL
   const pathParts = pathname.split("/");
   // /w/{workspaceId}/{tabId} → tabId is at index 3
-  const urlTabId = pathParts.length >= 4 && !["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity", "perspectives"].includes(pathParts[3])
+  const urlTabId = pathParts.length >= 4 && !["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity", "perspectives", "prioritization"].includes(pathParts[3])
     ? pathParts[3]
     : null;
 

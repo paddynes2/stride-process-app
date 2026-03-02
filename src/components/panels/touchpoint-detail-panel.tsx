@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Zap, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -181,6 +181,60 @@ export function TouchpointDetailPanel({ touchpoint, onUpdate, onDelete, onClose 
             ))}
           </div>
           <p className="text-[10px] text-[var(--text-tertiary)] mt-1">1 = low gain, 5 = high gain</p>
+        </div>
+
+        {/* Effort Score */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <Zap className="h-3 w-3" />
+            Effort Score
+          </label>
+          <div className="flex gap-1">
+            {SCORE_LEVELS.map((level) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => handleFieldUpdate("effort_score", touchpoint.effort_score === level ? null : level)}
+                className={`flex-1 h-8 rounded-[var(--radius-md)] text-[12px] font-medium border transition-colors ${
+                  touchpoint.effort_score === level
+                    ? "bg-[#F97316]/15 border-[#F97316] text-[#F97316]"
+                    : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+                }`}
+                aria-label={`Effort score ${level}`}
+                aria-pressed={touchpoint.effort_score === level}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-[var(--text-tertiary)] mt-1">1 = low effort, 5 = high effort</p>
+        </div>
+
+        {/* Impact Score */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <TrendingUp className="h-3 w-3" />
+            Impact Score
+          </label>
+          <div className="flex gap-1">
+            {SCORE_LEVELS.map((level) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => handleFieldUpdate("impact_score", touchpoint.impact_score === level ? null : level)}
+                className={`flex-1 h-8 rounded-[var(--radius-md)] text-[12px] font-medium border transition-colors ${
+                  touchpoint.impact_score === level
+                    ? "bg-[var(--brand)]/15 border-[var(--brand)] text-[var(--brand)]"
+                    : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+                }`}
+                aria-label={`Impact score ${level}`}
+                aria-pressed={touchpoint.impact_score === level}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-[var(--text-tertiary)] mt-1">1 = low impact, 5 = high impact</p>
         </div>
 
         <Separator />
