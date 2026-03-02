@@ -389,17 +389,17 @@
 ### #FEAT-050 Workspace cloning
 **Phase:** 4
 **Priority:** P2 (nice to have)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in_progress
 **Acceptance criteria:**
-- [ ] API route: `POST /api/v1/workspaces/[id]/clone`
+- [x] API route: `POST /api/v1/workspaces/[id]/clone`
 - [ ] "Duplicate Workspace" button in workspace settings. Loading spinner on button, timeout handling (clone may take 2-5s).
-- [ ] Deep copy: workspace + tabs + sections + steps + connections + teams + roles + people + tools + step_roles + stages + touchpoints + touchpoint_connections
-- [ ] New UUIDs throughout, internal FKs preserved using temporary mapping arrays (old UUID → new UUID) for all tables
-- [ ] Perspectives, annotations, comments, tasks, runbooks, activity log NOT copied
-- [ ] `clone_workspace` SECURITY DEFINER function for atomic transaction. Navigate to new workspace on success.
+- [x] Deep copy: workspace + tabs + sections + steps + connections + teams + roles + people + tools + step_roles + stages + touchpoints + touchpoint_connections
+- [x] New UUIDs throughout, internal FKs preserved using temporary mapping arrays (old UUID → new UUID) for all tables
+- [x] Perspectives, annotations, comments, tasks, runbooks, activity log NOT copied
+- [x] `clone_workspace` SECURITY DEFINER function for atomic transaction. Navigate to new workspace on success.
 **Sub-tasks:**
-- [ ] [1/2] Migration (`clone_workspace` SECURITY DEFINER function) + API route + client wrapper
+- [x] [1/2] Migration (`clone_workspace` SECURITY DEFINER function) + API route + client wrapper — DONE iteration 92, 2026-03-03
 - [ ] [2/2] UI: "Duplicate Workspace" button in settings, loading state, navigate to clone
 **Notes:** How consultants reuse frameworks. Clone template workspace for each client engagement.
 

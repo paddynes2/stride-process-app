@@ -1121,3 +1121,35 @@ Slot 2 (22 files modified):
 - Efficiency: 5 — both testers executed successfully in single iteration
 - Observations: 8 (2 bugs + 6 improvements)
 **Notes:** Iteration 91 validated FEAT-049 after 40 API route files were modified in iter 90. Both acceptance and regression passed all criteria via static analysis (Playwright unavailable — Chrome launch conflict). Acceptance verified: migration schema, RLS, API route, logActivity utility, activity page UI components, sidebar nav, special actions, parent-chain traversal. Regression covered all features through Phase 4. 2 P2 bugs and 6 improvements logged for future iterations. BUILD_RESULT_1.json contained stale iter 94 FEAT-050 data from a builder worktree — not relevant to this testing-only iteration. Risk score 4 from iter 90 is now cleared. Next: FEAT-050 Workspace cloning.
+
+## Iteration 92 — 2026-03-03 10:00
+**Tasks:**
+- #FEAT-050 [1/2] Workspace cloning data layer — slot 1 — completed
+- #BUG-019 Activity user email display — slot 2 — completed
+- #IMP-019 Entity type human-readable labels — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/BUGS.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- supabase/migrations/018_clone_workspace.sql (created — 249 lines, SECURITY DEFINER clone function)
+- src/app/api/v1/workspaces/[id]/clone/route.ts (created — 55 lines, POST handler)
+- src/lib/api/client.ts (modified — cloneWorkspace wrapper added)
+- src/app/(app)/w/[workspaceId]/activity/activity-view.tsx (modified — ENTITY_TYPE_SINGULAR map, user email display)
+- src/app/api/v1/activity/route.ts (modified — join users table via FK)
+- src/types/database.ts (modified — users join type on ActivityLog)
+**Verification:**
+- Type check: pass (0 errors)
+- Lint: pass (0 errors, 3 pre-existing warnings from flow-canvas copies in worktrees)
+- Build: N/A
+- Unit tests: N/A (no test suite)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (no UI changes requiring canary)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 4 — Migration is well-structured with FK-ordered cloning, temp tables for UUID mapping. Clone route follows existing API patterns. Review-level fix: added void to logActivity call.
+- Test coverage: 2 — Typecheck and lint only, no runtime verification
+- Confidence: 4 — Migration logic is sound (FK order, NULL handling), but untested against live Supabase. Activity join depends on FK constraint existing in deployed DB.
+- Efficiency: 2 — Code was built 3 times by pipeline (iterations 92-94) but never merged. Reviewer recovered from unreachable commits.
+- Observations: 0
+**Notes:** Pipeline merge step failed 3 consecutive times for this iteration's work (internal iters 38, 39, 40). Builder commits were unreachable (03896ad for slot 1, 77eaa98 for slot 2). Reviewer recovered files via `git checkout <sha> -- <files>`. This is the 9th+ pipeline merge failure occurrence (previously iters 73, 74, 77, 78, 84, 85). Pipeline worktree cleanup continues to destroy builder work before merge.

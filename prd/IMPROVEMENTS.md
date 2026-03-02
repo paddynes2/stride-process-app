@@ -133,12 +133,11 @@
   - **What:** Empty state shows Clock icon and "No activity yet" but no guidance on what generates activity.
   - **Suggested fix:** Add hint: "Actions like creating steps, adding comments, and completing runbooks appear here."
 
-- [ ] #IMP-019 Entity type human-readable labels in activity entries — Attempts: 0
+- [x] #IMP-019 Entity type human-readable labels in activity entries — Attempts: 1 — DONE iteration 92, 2026-03-03
   - **Found:** Iteration 91 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
-  - **What:** Entity type badges show raw DB table names (e.g., 'steps', 'runbook_steps'). Should use human-readable mapping.
-  - **Suggested fix:** Add ENTITY_TYPE_LABELS map (e.g., 'steps' → 'Step', 'runbook_steps' → 'Runbook Step') similar to ACTION_LABELS.
+  - **Fix applied:** Added ENTITY_TYPE_SINGULAR map (19 entity types: steps → step, runbook_steps → runbook step, etc.). Activity entries now show "Created step" instead of "created steps". Also uses ACTION_LABELS for capitalized action names.
 
 - [ ] #IMP-020 Load More skeleton placeholders for activity pagination — Attempts: 0
   - **Found:** Iteration 91 (regression tester)

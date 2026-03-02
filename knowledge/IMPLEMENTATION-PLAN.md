@@ -107,7 +107,7 @@ Core consulting insight features:
   - [x] [1/3] Data layer — DONE iter 88
   - [x] [2/3] Page UI — DONE iter 89
   - [x] [3/3] API route integration — DONE iter 90
-- [ ] #FEAT-050 Workspace cloning (deep copy for reuse)
+- [ ] #FEAT-050 Workspace cloning (deep copy for reuse) — [1/2] DONE iter 92
 - [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting)
 - [ ] #FEAT-052 Section templates (save & deploy)
 - [ ] #FEAT-053 Phase 4 testing gate
@@ -153,3 +153,4 @@ Deferred indefinitely:
 - [2026-03-03] Iteration 89: #FEAT-049 [2/3] activity page UI complete (page.tsx, activity-view.tsx, sidebar, workspace-shell). #IMP-014 done (skipped steps count as resolved in all 3 runbook views). Next: FEAT-049 [3/3] logActivity() integration.
 - [2026-03-03] Iteration 90: #FEAT-049 [3/3] logActivity() integration across 40 API route files. #IMP-016 done. FEAT-049 fully complete. Risk score 4 triggers testing-only iter 91.
 - [2026-03-03] Iteration 91: Testing-only — FEAT-049 acceptance 20/20 PASS + regression 37/37 PASS. 2 bugs (BUG-018 void keyword, BUG-019 user display) + 6 improvements logged. Next: FEAT-050 workspace cloning.
+- [2026-03-03] Iteration 92: #FEAT-050 [1/2] data layer + #BUG-019 + #IMP-019 completed. Code recovered from 3 consecutive pipeline merge failures (builder work in unreachable commits). Migration 018 clone_workspace SECURITY DEFINER function. Activity page now shows user email and human-readable entity types. Next: FEAT-050 [2/2] UI.

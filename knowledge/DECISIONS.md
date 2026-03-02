@@ -37,3 +37,9 @@
 **Options:** (A) Modify workspace-shell.tsx to conditionally hide shell UI when on /playbook path — requires hook-order awareness and reserved path handling, (B) Fixed full-viewport overlay (position: fixed, inset: 0, z-50) in PlaybookView that covers the workspace shell visually
 **Decision:** Fixed overlay — PlaybookView renders `position: fixed; inset: 0; z-index: 50; bg-[var(--surface)]` covering everything beneath it. No workspace-shell.tsx changes needed.
 **Trade-off:** Shell components (sidebar, header, tab bar) still render in the DOM beneath the overlay (wasted render cycles), but this avoids hook-order issues, reserved path logic, and coupling between PlaybookView and workspace-shell. Simpler, safer, and zero risk of breaking the shell for other routes.
+
+## D-007 — SECURITY DEFINER + temp tables for workspace cloning (Phase 4, Iteration 92)
+**Context:** Workspace cloning needs to deep-copy 13 table types with re-mapped UUIDs in a single atomic transaction.
+**Options:** (A) Application-level multi-step insert via API (N+1 round trips, not atomic), (B) SECURITY DEFINER PL/pgSQL function with ON COMMIT DROP temp tables for old→new UUID mapping
+**Decision:** SECURITY DEFINER function with temp tables — `clone_workspace(p_source_workspace_id UUID)` creates 7 temp mapping tables, loops through entities in FK dependency order, returns `{workspace_id}` JSONB.
+**Trade-off:** Complex PL/pgSQL (249 lines) harder to debug than application code, but guarantees atomicity, bypasses RLS safely (manual auth check via auth.uid()), and handles the 13-table deep copy in a single DB call. Temp tables auto-dropped on commit.

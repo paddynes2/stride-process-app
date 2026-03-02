@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-91, 2026-03-03 -->
+<!-- Updated: iter-92, 2026-03-03 -->
 
 ## Project
 
@@ -75,7 +75,8 @@ npx supabase db push     # Push migrations
 - `tasks/route.ts` + `[id]/route.ts` — CRUD (GET by step_id, POST, PATCH, DELETE)
 - `runbooks/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST create with step snapshot, GET/PATCH/DELETE by id)
 - `runbook-steps/route.ts` + `[id]/route.ts` — GET by runbook_id, PATCH by id
-- `activity/route.ts` — GET (workspace_id required, optional filters: user_id, action, entity_type, from/to, limit/offset)
+- `activity/route.ts` — GET (workspace_id required, optional filters: user_id, action, entity_type, from/to, limit/offset). Joins users table via FK for email display.
+- `workspaces/[id]/clone/route.ts` — POST (deep clone workspace via clone_workspace RPC)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
 
 ### Components
