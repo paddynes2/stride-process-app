@@ -49,7 +49,7 @@ export async function PATCH(
     return errorResponse("update_failed", error.message, 500);
   }
 
-  logActivity({
+  void logActivity({
     supabase,
     workspace_id: section.workspace_id,
     user_id: user.id,
@@ -86,7 +86,7 @@ export async function DELETE(
     return errorResponse("delete_failed", error.message, 500);
   }
 
-  logActivity({
+  void logActivity({
     supabase,
     workspace_id: section?.workspace_id,
     user_id: user.id,
