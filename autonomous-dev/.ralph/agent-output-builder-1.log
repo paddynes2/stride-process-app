@@ -1,7 +1,25 @@
-Done. Here's a summary of what was implemented:
+All tasks complete. Here's the summary:
 
-**BUG-019** — `page.tsx` line 25: Changed `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")`. This makes the server-side initial load use the same join as the API route, so user emails appear on first paint instead of "Unknown".
+---
 
-**IMP-018** — `activity-view.tsx`: Added guidance `<p className="text-[12px] text-[var(--text-tertiary)] mt-1">` below "No activity yet" in the `activeFilter === "all"` empty state: *"Actions like creating steps, adding comments, and completing runbooks appear here."*
+**#FEAT-052 — Section Templates [1/2] Data Layer: COMPLETED**
 
-**Verification**: typecheck ✅ (exit 0), lint ✅ (0 errors, 1 pre-existing warning in unowned file). Both files staged.
+**7 files staged** (all within `files_owned`):
+
+| File | Action | Notes |
+|------|--------|-------|
+| `supabase/migrations/020_section_templates.sql` | Created | `templates` table, RLS via `can_access_workspace()`, trigger, index |
+| `src/types/database.ts` | Modified | Added `Template`, `TemplateData`, `TemplateSectionData`, `TemplateStepData`, `TemplateConnectionData`, `TemplateStepRoleData` interfaces |
+| `src/app/api/v1/templates/route.ts` | Created | GET list by workspace_id; POST snapshot section→template_data JSONB |
+| `src/app/api/v1/templates/[id]/route.ts` | Created | DELETE with logActivity |
+| `src/app/api/v1/templates/[id]/deploy/route.ts` | Created | POST: creates section+steps+connections with UUID remapping, role matching by name |
+| `src/lib/api/client.ts` | Modified | Added `fetchTemplates`, `createTemplateFromSection`, `deployTemplate`, `deleteTemplate` |
+| `src/lib/templates.ts` | Created | `STARTER_TEMPLATES` — 4 templates × 5 steps each |
+
+**Verification:** `npx tsc --noEmit` → 0 errors | `npm run lint` → 0 errors, 3 pre-existing warnings only.
+
+**Key design decisions:**
+- Step positions in snapshots stored **relative to section origin** (offset from section's position_x/position_y) so templates are portable across canvas positions
+- Deploy route offsets step positions by adding the target section's deploy coordinates
+- `step_roles` snapshots store role names (not IDs); deploy remaps by name match in target workspace, silently skips unmatched
+- `git add -f` required to bypass `autonomous-dev/.ralph/worktrees/` gitignore

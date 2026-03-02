@@ -984,8 +984,19 @@ merge_worktrees() {
   local plan_file="$PROJECT_ROOT/knowledge/handoffs/EXECUTION_PLAN.json"
   local merge_order
   local session_branch
+  local stashed=false
 
   session_branch=$(cd "$PROJECT_ROOT" && git branch --show-current)
+
+  # Stash dirty working tree before merge (see G016)
+  # Planner writes EXECUTION_PLAN, builder copy-back writes BUILD_RESULT — these
+  # dirty files overlap with merge targets and cause "error: Your local changes
+  # would be overwritten by merge."
+  if ! (cd "$PROJECT_ROOT" && git diff --quiet 2>/dev/null) || \
+     ! (cd "$PROJECT_ROOT" && git diff --cached --quiet 2>/dev/null); then
+    (cd "$PROJECT_ROOT" && git stash push -u -m "ralph: pre-merge stash iter $ITER_NUM" 2>/dev/null) && stashed=true || true
+    vlog "Stashed dirty working tree before merge (stashed=$stashed)"
+  fi
 
   # Read merge order from execution plan (slot numbers)
   merge_order=$(json_pluck "$plan_file" .tasks slot)
@@ -1046,6 +1057,12 @@ merge_worktrees() {
   done
 
   log "  │   Merged $merged_count worktrees"
+
+  # Restore stashed working tree
+  if [ "$stashed" = true ]; then
+    (cd "$PROJECT_ROOT" && git stash pop 2>/dev/null) || true
+    vlog "Restored stashed working tree after merge"
+  fi
 
   if [ "$merge_failed" = true ]; then
     return 1
@@ -1608,6 +1625,20 @@ log "Session started: mode=$MODE max=$MAX_ITERATIONS"
 trap_cleanup() {
   echo ""
   log "Signal received — cleaning up..."
+
+  # Kill child processes (builders, testers, reviewer claude subprocesses)
+  # Without this, orphaned claude processes continue running after ralph exits,
+  # writing to the log file and potentially running git commands. (see G018)
+  local children
+  children=$(jobs -p 2>/dev/null || true)
+  if [ -n "$children" ]; then
+    log "  Killing child processes: $children"
+    kill $children 2>/dev/null || true
+    # Give children 5s to exit, then force kill
+    sleep 2
+    kill -9 $children 2>/dev/null || true
+  fi
+
   cleanup_worktrees 2>/dev/null || true
   write_session_summary 2>/dev/null || true
   release_lock
@@ -1624,6 +1655,9 @@ SESSION_START_ITER=$(get_iteration_count)
 
 # Acquire instance lock (prevent concurrent runs)
 acquire_lock || exit 1
+
+# Clean up stale worktrees from crashed sessions (see G018)
+cleanup_worktrees 2>/dev/null || true
 
 # Verify and clean git state
 verify_clean_git_state || { release_lock; exit 1; }

@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "iteration": 98,
+  "slot": 1,
+  "task_id": "#FEAT-052",
+  "status": "completed",
+  "duration_seconds": 1200,
+
+  "files_changed": [
+    {
+      "path": "supabase/migrations/020_section_templates.sql",
+      "action": "created",
+      "lines_added": 44,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/types/database.ts",
+      "action": "modified",
+      "lines_added": 58,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/templates/route.ts",
+      "action": "created",
+      "lines_added": 162,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/templates/[id]/route.ts",
+      "action": "created",
+      "lines_added": 40,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/templates/[id]/deploy/route.ts",
+      "action": "created",
+      "lines_added": 128,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/lib/api/client.ts",
+      "action": "modified",
+      "lines_added": 42,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/lib/templates.ts",
+      "action": "created",
+      "lines_added": 82,
+      "lines_removed": 0
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0, no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "3 pre-existing warnings in flow-canvas.tsx (known); 0 errors or new warnings from new files" },
+    "build": { "status": "not_applicable", "output": "build not run; typecheck sufficient for data-layer task" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "no unit tests for API routes in this codebase" }
+  },
+
+  "dependencies_added": [],
+
+  "staged_files": [
+    "autonomous-dev/.ralph/worktrees/build-1/supabase/migrations/020_section_templates.sql",
+    "autonomous-dev/.ralph/worktrees/build-1/src/types/database.ts",
+    "autonomous-dev/.ralph/worktrees/build-1/src/app/api/v1/templates/route.ts",
+    "autonomous-dev/.ralph/worktrees/build-1/src/app/api/v1/templates/[id]/route.ts",
+    "autonomous-dev/.ralph/worktrees/build-1/src/app/api/v1/templates/[id]/deploy/route.ts",
+    "autonomous-dev/.ralph/worktrees/build-1/src/lib/api/client.ts",
+    "autonomous-dev/.ralph/worktrees/build-1/src/lib/templates.ts"
+  ],
+
+  "ownership_violations": [],
+
+  "notes": "All acceptance criteria met. Migration 020 creates templates table with RLS policies using can_access_workspace(), update_updated_at trigger, and workspace_id index. Template interface + data shape types added to database.ts. GET/POST collection route snapshots section+steps+connections+step_roles into template_data JSONB (step positions stored relative to section origin for portability). DELETE route with activity log. Deploy route remaps connection source/target via oldStepId→newStepId Map, matches roles by name in target workspace (silently skips unmatched). 4 STARTER_TEMPLATES defined with 5 steps each. Client wrappers: fetchTemplates, createTemplateFromSection, deployTemplate, deleteTemplate. TypeScript error in step_roles join fixed by using any cast pattern consistent with step-roles/route.ts. git add -f required because autonomous-dev/.ralph/worktrees/ is in .gitignore.",
+
+  "failure_details": null
+}

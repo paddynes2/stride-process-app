@@ -1,0 +1,13 @@
+Task complete. Summary:
+
+**#IMP-028** — Replaced `window.confirm()` on workspace clone with a Radix Dialog.
+
+Changes to `src/app/(app)/w/[workspaceId]/settings/page.tsx`:
+- Imported `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter` from `@/components/ui/dialog`
+- Added `confirmCloneOpen` state (boolean)
+- `handleClone` no longer calls `confirm()` — it calls `setConfirmCloneOpen(false)` then runs clone logic
+- "Duplicate Workspace" button now calls `setConfirmCloneOpen(true)` instead of `handleClone` directly
+- Added Dialog with title "Duplicate Workspace", description listing all cloned table types, Cancel (secondary) and Duplicate (default) buttons
+- Wrapped return in `<>...</>` fragment to support sibling Dialog element
+
+Verification: `npx tsc --noEmit` — **pass**, `npm run lint` — **pass** (0 errors).

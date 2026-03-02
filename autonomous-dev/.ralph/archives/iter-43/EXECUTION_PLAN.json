@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0",
+  "iteration": 97,
+  "date": "2026-03-03T21:00:00Z",
+  "mode": "testing_only",
+  "validation": {
+    "last_commit_hash": "e4f53509bdac510c59c508e8ba489aa07e645941",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json"],
+    "owner": null,
+    "note": "Testing-only iteration — no builders, no file modifications."
+  },
+  "merge_order": [],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": true,
+    "regression_reason": "SIGNAL directive: iter 97 MUST be testing_only. Accumulated risk score 6+ from iters 92-96 (FEAT-050 workspace cloning with migration 018 + 19 files, FEAT-051 conditional coloring with migration 019 + new component, BUG-019 server query fix). FEAT-050 never acceptance-tested. Last full regression: iter 91 (6 iters ago).",
+    "suites_to_run": [
+      {
+        "suite": "regression_baseline",
+        "scope": "Full baseline — all phases through Phase 4 iteration 96",
+        "method": "Static analysis + API auth probing (Playwright unavailable)",
+        "checks": [
+          "Login page renders (curl /login → 200)",
+          "Workspaces redirects unauthed (curl /workspaces → 307→login)",
+          "Canvas view: canvas-view.tsx renders flow-canvas with buildNodes/buildEdges null guards",
+          "Step click → detail panel (onNodeClick → onStepSelect → StepDetailPanel)",
+          "Step name edit saves (debounced handleNameChange → updateStep)",
+          "Section click → panel (onSectionSelect → SectionDetailPanel)",
+          "Canvas zoom/pan (React Flow defaults + Controls + MiniMap)",
+          "Journey tab renders (journey-canvas-view.tsx, canvas_type discrimination)",
+          "Touchpoint click → panel (selectedTouchpointId → TouchpointDetailPanel)",
+          "Stage click → panel (selectedStageId → StageDetailPanel)",
+          "Step list displays (step-list-view.tsx — fetch, filter, sort, render)",
+          "Gap analysis displays (gap-analysis-view.tsx — maturity gaps + visual bars)",
+          "Comparison view renders (compare-view.tsx — side-by-side + match glow)",
+          "Settings page loads (settings/page.tsx — name, sharing, perspectives, Duplicate button)",
+          "Teams page with search/filter (teams-view.tsx)",
+          "People page with search/filter (people/page.tsx)",
+          "Tools page with search/filter (tools/page.tsx)",
+          "Perspectives management (settings PerspectivesSection + color picker)",
+          "Dashboard page (dashboard/page.tsx)",
+          "PDF export valid (pdf.ts imports valid)",
+          "PNG export valid (png.ts + use-canvas-export.ts)",
+          "Comments: comment-panel.tsx + CommentCountsContext + comments-view.tsx with entity nav links",
+          "Tasks: task-panel.tsx + TaskCountsContext + section-detail-panel task rollup",
+          "Runbooks: section-detail-panel createRunbook button, runbooks-list-view.tsx with filter tabs + segmented progress",
+          "Runbook view: runbook-view.tsx 4-state status, Complete/Cancel Radix dialogs, Playbook button outside readOnly guard",
+          "Playbook mode: playbook-view.tsx fixed overlay z-50, Mark Complete & Next, Skip, dot nav, progress bar",
+          "Activity log page: page.tsx FK join select, activity-view.tsx filter tabs + Load More + empty state guidance",
+          "Activity log API: route.ts FK join select matching page.tsx shape",
+          "Coloring: coloring-panel.tsx exists (~347 lines), step-node.tsx ColoringTintContext background tint",
+          "Sidebar nav: all items present (Dashboard, Activity, Comments, Runbooks, Teams, People, Tools, Settings)",
+          "Workspace shell: reserved paths array includes activity in list",
+          "Middleware: auth guard redirects unauthenticated",
+          "API auth guards (curl: workspaces 401, steps 401, perspectives 401, sections 405 POST-only)",
+          "Types: database.ts exports ColoringRule, CriteriaType, ActivityLog, ActivityAction, RunbookStatus, RunbookStepStatus",
+          "Context: workspace-context.tsx exports WorkspaceProvider + useWorkspace"
+        ]
+      },
+      {
+        "suite": "acceptance_FEAT-050",
+        "scope": "Workspace cloning — deep copy via SECURITY DEFINER RPC + settings UI",
+        "method": "Static analysis of migration, API route, client wrapper, settings page",
+        "checks": [
+          "Migration 018 defines clone_workspace(p_workspace_id, p_user_id, p_org_id) SECURITY DEFINER function",
+          "clone_workspace copies: workspace + tabs + sections + steps + connections + teams + roles + people + tools + step_roles + stages + touchpoints + touchpoint_connections (13 tables)",
+          "clone_workspace uses UUID remapping via temp tables (old→new mapping preserved for internal FKs)",
+          "clone_workspace does NOT copy: perspectives, annotations, comments, tasks, runbooks, activity_log, coloring_rules",
+          "Clone API route: POST /api/v1/workspaces/[id]/clone/route.ts exists with auth guard",
+          "Clone route calls supabase.rpc('clone_workspace') with workspace_id, user_id, org_id",
+          "Clone route returns new workspace data via successResponse envelope",
+          "Clone route calls void logActivity() for audit trail",
+          "Client wrapper: cloneWorkspace(workspaceId) in client.ts calls POST via apiFetch",
+          "Settings page: Duplicate Workspace button exists in page.tsx",
+          "Loading state: isCloning useState controls button disabled/spinner",
+          "Navigation: router.push to new workspace path on success",
+          "Error handling: try/catch with user-facing error message on failure"
+        ]
+      },
+      {
+        "suite": "verify_FEAT-051",
+        "scope": "Conditional step coloring — verify iter 96 acceptance still holds post-merge",
+        "method": "Static analysis (re-verify key acceptance points)",
+        "checks": [
+          "Migration 019 creates coloring_rules table with criteria_type enum",
+          "Coloring rules CRUD API: route.ts (GET list, POST) + [id]/route.ts (PATCH, DELETE)",
+          "HEX_COLOR_REGEX validation in POST and PATCH handlers",
+          "VALID_CRITERIA_TYPES validation in PATCH handler",
+          "ColoringTintContext defined in canvas.ts",
+          "canvas-view.tsx fetches rules, evaluates in position order (last match wins), provides tint map via context",
+          "step-node.tsx consumes ColoringTintContext, applies 15% opacity background (hex alpha 26)",
+          "Heat map precedence: coloring tint suppressed when heat map active",
+          "coloring-panel.tsx accessible via paintbrush button (absolute overlay z-10)",
+          "Process canvas only (canvas-view.tsx, not journey-canvas-view.tsx)"
+        ]
+      },
+      {
+        "suite": "verify_BUG-019",
+        "scope": "Activity page user display — server/client query parity",
+        "method": "Static analysis",
+        "checks": [
+          "page.tsx select uses: '*, users!activity_log_user_id_fkey(email)'",
+          "route.ts select uses identical shape: '*, users!activity_log_user_id_fkey(email)'",
+          "activity-view.tsx renders entry.users?.email (not 'Unknown' for valid entries)",
+          "Empty state guidance text: 'Actions like creating steps, adding comments, and completing runbooks appear here.'",
+          "Load More re-fetches from API with same joined select shape"
+        ]
+      }
+    ],
+    "cadence_trigger": "risk_score_6_mandatory"
+  },
+  "status_updates": {
+    "warnings_added": [
+      "Migration 019 (coloring_rules) still needs supabase db push to remote",
+      "Migrations 014-018 also still need push to remote DB",
+      "Accessibility cadence severely overdue — last audit iter 21, now iter 97 (76 iterations overdue)",
+      "Production (origin/main) behind ralph/init-stride by 13+ commits",
+      "After iter 97 passes: next is FEAT-052 section templates or FEAT-053 Phase 4 testing gate"
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

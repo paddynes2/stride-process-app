@@ -1,24 +1,13 @@
-**#FEAT-051 [2/2] complete.** Here's a summary of what was built:
+Task complete. Here's a summary of what was done:
 
----
+**#BUG-020 — Disable `has_role` criteria type in coloring panel**
 
-**Task: FEAT-051 [2/2] — Coloring Rules UI**
+Three minimal changes to `src/components/canvas/coloring-panel.tsx`:
 
-**Files changed (6):**
+1. **`CRITERIA_OPTIONS` array** — added `disabled?: boolean` to the type, set `has_role` entry to `disabled: true` with label `"Has Role (coming soon)"`
 
-1. **`src/types/canvas.ts`** — Added `ColoringTintContext` (`Map<stepId, hex>`) following the existing `CommentCountsContext`/`TaskCountsContext` pattern to avoid prop-drilling through the read-only `flow-canvas.tsx`.
+2. **Both `<select>` dropdowns** (Add form + Edit form) — each `<option>` now renders `disabled={opt.disabled}`, which grays out and prevents selection of `has_role`
 
-2. **`src/components/canvas/step-node.tsx`** — Consumes `ColoringTintContext`; applies `backgroundColor: \`${color}26\`` (15% hex opacity) when heatmap mode is off and a rule matches. HeatMap tint takes precedence (unchanged logic).
+3. **Display mode** — existing `has_role` rules now show a small amber warning line `"Not yet supported"` below the criteria row
 
-3. **`src/components/canvas/coloring-panel.tsx`** (new) — Lightweight floating panel with:
-   - Rule list: color swatch, name, `criteria_type: criteria_value`, active toggle (with CSS toggle animation), hover-reveal edit/delete buttons
-   - Inline edit mode per rule
-   - Add new rule form: name, color picker + hex input, criteria_type select, criteria_value input with hints
-
-4. **`src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`** — Fetches coloring rules on mount; evaluates rules in position order (last match wins) via `useMemo`; provides `ColoringTintContext`; renders paintbrush button overlay at `top-right` of canvas (away from react-flow toolbar at `top-left`).
-
-5. **`src/app/api/v1/coloring-rules/route.ts`** — Added `HEX_COLOR_REGEX` validation on POST.
-
-6. **`src/app/api/v1/coloring-rules/[id]/route.ts`** — Added `HEX_COLOR_REGEX` validation on color PATCH + `VALID_CRITERIA_TYPES` validation on criteria_type PATCH.
-
-**Verification:** typecheck ✓ clean, lint ✓ no new warnings, build ✓ compiled successfully.
+Verification: `npx tsc --noEmit` passes (exit 0), lint passes with only the pre-existing warning in `flow-canvas.tsx`. `canvas-view.tsx` untouched.

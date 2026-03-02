@@ -1,0 +1,41 @@
+The TEST_RESULT_1.json already exists and was produced by the prior acceptance pass. My static analysis via parallel sub-agents confirms its results are accurate. Here is a summary of what was verified:
+
+---
+
+## Iteration 97 — Acceptance Test Results
+
+**Status: PASSED**
+**Method: Static analysis (Playwright not required per plan)**
+
+### Suite Results
+
+| Suite | Checks | Result |
+|-------|--------|--------|
+| regression_baseline | 28 sampled | All PASS |
+| acceptance_FEAT-050 (workspace clone) | 9/9 | All PASS |
+| verify_FEAT-051 (coloring rules) | 9/9 | All PASS |
+| verify_BUG-019 (activity user display) | 5/5 | All PASS |
+
+### Key Findings
+
+**All critical checks pass:**
+- clone_workspace() RPC, API route, client wrapper, settings UI, router.push → PASS
+- 018 migration: deep copies 13 tables, 7 UUID-remapping temp tables, excludes transient data → PASS
+- Coloring rules: migration 019, DB types, API CRUD with hex/enum validation, context, step-node 15% tint, heat map precedence, paintbrush button, 347-line panel → PASS
+- BUG-019: both page.tsx and route.ts use identical FK join `users!activity_log_user_id_fkey(email)`, email renders correctly with null-safe fallback, empty state guidance text present, pagination parity → PASS
+- reservedPaths array in workspace-shell.tsx (line 47) includes 'activity' → PASS
+
+**Improvements noted (not bugs):**
+1. Clone confirm dialog understates what's included (only mentions "tabs, sections, steps, connections" — misses teams, roles, people, tools)
+2. Activity Load More has no "N of total" indicator
+
+**Outstanding warnings (from planner):**
+- Migrations 014-019 need `supabase db push` before production use
+- Accessibility cadence overdue (last audit iter 21, now iter 97)
+
+The `TEST_RESULT_1.json` is complete and ready for the reviewer.
+orted ✓
+- All sidebar nav items present ✓
+- `"activity"` in workspace shell reserved paths ✓
+
+**2 improvements logged** (clone confirm dialog understates what's copied; activity has no total count indicator).

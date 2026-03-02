@@ -1,7 +1,7 @@
 # Stride — CLAUDE.md
 
 ## What This Is
-Process mapping & continuous improvement SaaS (Puzzle.io clone). Currently in **Phase 4 — The Living Playbook** (iteration 90). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, and tracks activity.
+Process mapping & continuous improvement SaaS (Puzzle.io clone). Currently in **Phase 4 — The Living Playbook** (iteration 97). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, and applies conditional step coloring.
 
 ## Tech Stack
 - Next.js 16.1.6 + React 19.2 + TypeScript 5 + Tailwind CSS 4
@@ -55,7 +55,7 @@ src/
       workspace-shell.tsx  — client layout (sidebar, header, tab bar)
     layout.tsx             — server layout (fetch user, org, workspaces)
     layout-client.tsx      — client context provider wrapper
-  app/api/v1/              — REST routes (22 resource groups)
+  app/api/v1/              — REST routes (25 resource groups)
     auth/me/               — GET current user
     workspaces/            — GET list, POST create, GET/PATCH/DELETE by id
     tabs/                  — POST create, PATCH/DELETE by id
@@ -78,6 +78,9 @@ src/
     tools/                 — POST create, GET/PATCH/DELETE by id
     touchpoints/           — POST create, PATCH/DELETE by id
     touchpoint-connections/ — POST create, DELETE by id
+    coloring-rules/        — POST create, PATCH/DELETE by id
+    templates/             — GET list, POST from section, POST deploy, DELETE by id
+    workspaces/[id]/clone/ — POST clone workspace
     public/shares/[shareId]/ — GET public read-only data
   app/auth/callback/       — OAuth callback route
   components/
@@ -119,7 +122,7 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - Step status badges: draft (gray), in_progress (blue), testing (yellow), live (green), archived (dim)
 
 ## Database
-17 migration files in `supabase/migrations/`:
+19 migration files in `supabase/migrations/`:
 - 001: extensions (uuid-ossp, pg_trgm)
 - 002: enums (step_status, executor_type, workspace_role)
 - 003: core tables (users, organizations, organization_members, workspaces)
@@ -137,6 +140,8 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - 015: tasks (step-level checklists)
 - 016: runbooks (executable section snapshots)
 - 017: activity log (audit trail)
+- 018: clone_workspace (SECURITY DEFINER deep copy function)
+- 019: coloring_rules (conditional step coloring)
 
 ## Gotchas & Learnings
 - **NEXT_PUBLIC_ static replacement:** Never use dynamic property access for these vars. Browser has no `process.env`.

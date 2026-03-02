@@ -1,129 +1,193 @@
 {
   "schema_version": "1.0",
-  "iteration": 97,
-  "date": "2026-03-03T21:00:00Z",
-  "mode": "testing_only",
+  "iteration": 98,
+  "date": "2026-03-03T22:00:00Z",
+  "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "e4f53509bdac510c59c508e8ba489aa07e645941",
+    "last_commit_hash": "b94ebe4",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
     "revert_reason": null
   },
-  "tasks": [],
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-052",
+      "description": "Section templates [1/2] — data layer: migration (templates table), types, API routes (GET list, POST from section_id, POST deploy, DELETE), client wrappers, STARTER_TEMPLATES constant",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 3,
+      "acceptance_criteria": [
+        "New migration 020_section_templates.sql creates `templates` table: id UUID PK default uuid_generate_v4(), workspace_id UUID NOT NULL FK workspaces(id) ON DELETE CASCADE, name TEXT NOT NULL, description TEXT, category TEXT, template_data JSONB NOT NULL, created_by UUID NOT NULL FK users(id) ON DELETE CASCADE, created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now()",
+        "RLS policies using can_access_workspace(workspace_id) for SELECT, INSERT, UPDATE, DELETE",
+        "update_updated_at trigger on templates table",
+        "Index on (workspace_id)",
+        "Template interface added to src/types/database.ts with matching fields",
+        "GET /api/v1/templates?workspace_id=X returns Template[] — requires workspace_id param, auth check",
+        "POST /api/v1/templates with { workspace_id, section_id, name, description?, category? } — fetches section + steps + connections + step_roles, builds JSONB snapshot, creates template row, returns 201",
+        "DELETE /api/v1/templates/[id] — auth check, delete, return success",
+        "POST /api/v1/templates/[id]/deploy with { tab_id, position_x, position_y } — reads template_data, creates new section + steps + connections with new UUIDs, remaps connection source/target via old-to-new map, matches roles by name (skip unmatched), returns created section with 201",
+        "Client wrappers: fetchTemplates(workspaceId), createTemplateFromSection(data), deployTemplate(id, data), deleteTemplate(id)",
+        "STARTER_TEMPLATES constant in src/lib/templates.ts — 4 templates per PRD: Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing (each 5 steps)",
+        "void logActivity() on template create, deploy, and delete",
+        "npx tsc --noEmit passes"
+      ],
+      "files_owned": [
+        "supabase/migrations/020_section_templates.sql",
+        "src/types/database.ts",
+        "src/app/api/v1/templates/route.ts",
+        "src/app/api/v1/templates/[id]/route.ts",
+        "src/app/api/v1/templates/[id]/deploy/route.ts",
+        "src/lib/api/client.ts",
+        "src/lib/templates.ts"
+      ],
+      "files_read_only": [
+        "src/lib/api/response.ts",
+        "src/lib/api/activity.ts",
+        "src/lib/supabase/server.ts",
+        "src/app/api/v1/sections/route.ts",
+        "src/app/api/v1/steps/route.ts",
+        "src/app/api/v1/connections/route.ts",
+        "src/app/api/v1/step-roles/route.ts",
+        "src/app/api/v1/coloring-rules/route.ts",
+        "supabase/migrations/019_coloring_rules.sql"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/api/v1/coloring-rules/route.ts",
+          "src/app/api/v1/coloring-rules/[id]/route.ts",
+          "src/app/api/v1/runbooks/route.ts",
+          "supabase/migrations/019_coloring_rules.sql",
+          "supabase/migrations/018_clone_workspace.sql"
+        ],
+        "patterns_to_follow": [
+          "API envelope: successResponse(data, 201) / errorResponse(code, message, status) from lib/api/response.ts",
+          "RLS: can_access_workspace(workspace_id) for all policies — see migration 019 for latest pattern",
+          "Client: apiFetch<T> extracts json.data and returns T directly — do NOT add nested property access",
+          "Activity: void logActivity({ supabase, workspace_id, user_id, action, entity_type, entity_id, entity_name })",
+          "Migration: uuid_generate_v4() PKs, TIMESTAMPTZ DEFAULT now(), update_updated_at() trigger, workspace_id index",
+          "Auth: createClient() from lib/supabase/server.ts then supabase.auth.getUser()",
+          "Deploy route similar to clone_workspace RPC (migration 018) — old-to-new UUID mapping for connections"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — client wrappers return apiFetch<Type>() directly",
+          "void prefix on logActivity() to avoid floating promise warnings",
+          "Supabase RLS + INSERT RETURNING — .insert().select() checks SELECT policy"
+        ],
+        "affected_urls": [
+          "/api/v1/templates",
+          "/api/v1/templates/[id]",
+          "/api/v1/templates/[id]/deploy"
+        ]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "template_data JSONB shape: { section: { name, summary?, notes?, width?, height? }, steps: [{ name, description?, status?, executor?, time_minutes?, frequency?, cost_per_execution?, position_x, position_y, maturity_current?, maturity_target?, step_type?, roles: [{ role_name: string }] }], connections: [{ source_step_index: number, target_step_index: number, label?: string }] }. Connections use step ARRAY INDICES (not UUIDs) for portability. Deploy remaps indices to new UUIDs. Role assignments store role NAME (not ID) — deploy matches by name in target workspace. STARTER_TEMPLATES use same shape but have no connections or roles — just named steps. Do NOT create PATCH route — PRD specifies GET, POST create, POST deploy, DELETE only."
+    },
+    {
+      "slot": 2,
+      "id": "#BUG-020",
+      "description": "Disable has_role criteria type in coloring panel dropdown with '(coming soon)' indicator and inline warning for existing has_role rules",
+      "source": "prd/BUGS.md",
+      "type": "fix",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "has_role option in coloring panel criteria_type select is visually disabled (grayed out, not selectable) with '(coming soon)' text",
+        "If existing rules use has_role, show subtle warning: 'Not yet evaluated on canvas' below criteria row",
+        "Other 5 criteria types remain fully functional and unaffected",
+        "Canvas-view.tsx tint evaluation unchanged",
+        "npx tsc --noEmit passes"
+      ],
+      "files_owned": [
+        "src/components/canvas/coloring-panel.tsx"
+      ],
+      "files_read_only": [
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+        "src/types/database.ts"
+      ],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "Radix Select disabled items or native select option disabled={true}",
+          "Warning text: text-[var(--text-tertiary)] text-[11px]"
+        ],
+        "learnings_relevant": [
+          "has_role criteria is in enum but canvas-view has comment '// Requires additional data fetch' and skips evaluation"
+        ],
+        "affected_urls": []
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Read coloring-panel.tsx first. Disable has_role in the dropdown, do NOT remove from CriteriaType enum or API validation. Existing has_role rules remain saveable. Also resolves IMP-024."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-028",
+      "description": "Replace workspace clone confirm() with Radix Dialog + fix dialog text to list all cloned table types (also resolves IMP-026)",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Duplicate Workspace button triggers Radix UI Dialog instead of window.confirm()",
+        "Dialog title: 'Duplicate Workspace'",
+        "Dialog description: 'A full copy will be created with all canvas data — tabs, sections, steps, connections, teams, roles, people, and tools.'",
+        "Cancel button (secondary variant) and Duplicate button (default variant)",
+        "Clicking Duplicate triggers existing clone logic with loading state",
+        "Clicking Cancel or Escape closes dialog without action",
+        "Pattern matches runbook Complete/Cancel dialogs (controlled useState boolean)",
+        "Zero window.confirm() calls remain in settings/page.tsx",
+        "npx tsc --noEmit passes"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
+      ],
+      "files_read_only": [
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx"
+        ],
+        "patterns_to_follow": [
+          "Radix Dialog from IMP-012: useState boolean, Dialog/DialogContent/DialogHeader/DialogTitle/DialogDescription/DialogFooter",
+          "Button variants: secondary for cancel, default for confirm",
+          "Import Dialog from src/components/ui/dialog"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/settings"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Read runbook-view.tsx for the Radix Dialog pattern from IMP-012. Replicate that pattern. handleClone already exists — wire to dialog confirm button. Also resolves IMP-026 by using accurate clone description."
+    }
+  ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json"],
-    "owner": null,
-    "note": "Testing-only iteration — no builders, no file modifications."
+    "read_only": ["package.json", "tsconfig.json", "src/types/index.ts"],
+    "owner": "#FEAT-052",
+    "note": "FEAT-052 exclusively owns database.ts and client.ts. Other slots must not modify these."
   },
-  "merge_order": [],
+  "merge_order": ["#BUG-020", "#IMP-028", "#FEAT-052"],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": true,
-    "regression_reason": "SIGNAL directive: iter 97 MUST be testing_only. Accumulated risk score 6+ from iters 92-96 (FEAT-050 workspace cloning with migration 018 + 19 files, FEAT-051 conditional coloring with migration 019 + new component, BUG-019 server query fix). FEAT-050 never acceptance-tested. Last full regression: iter 91 (6 iters ago).",
-    "suites_to_run": [
-      {
-        "suite": "regression_baseline",
-        "scope": "Full baseline — all phases through Phase 4 iteration 96",
-        "method": "Static analysis + API auth probing (Playwright unavailable)",
-        "checks": [
-          "Login page renders (curl /login → 200)",
-          "Workspaces redirects unauthed (curl /workspaces → 307→login)",
-          "Canvas view: canvas-view.tsx renders flow-canvas with buildNodes/buildEdges null guards",
-          "Step click → detail panel (onNodeClick → onStepSelect → StepDetailPanel)",
-          "Step name edit saves (debounced handleNameChange → updateStep)",
-          "Section click → panel (onSectionSelect → SectionDetailPanel)",
-          "Canvas zoom/pan (React Flow defaults + Controls + MiniMap)",
-          "Journey tab renders (journey-canvas-view.tsx, canvas_type discrimination)",
-          "Touchpoint click → panel (selectedTouchpointId → TouchpointDetailPanel)",
-          "Stage click → panel (selectedStageId → StageDetailPanel)",
-          "Step list displays (step-list-view.tsx — fetch, filter, sort, render)",
-          "Gap analysis displays (gap-analysis-view.tsx — maturity gaps + visual bars)",
-          "Comparison view renders (compare-view.tsx — side-by-side + match glow)",
-          "Settings page loads (settings/page.tsx — name, sharing, perspectives, Duplicate button)",
-          "Teams page with search/filter (teams-view.tsx)",
-          "People page with search/filter (people/page.tsx)",
-          "Tools page with search/filter (tools/page.tsx)",
-          "Perspectives management (settings PerspectivesSection + color picker)",
-          "Dashboard page (dashboard/page.tsx)",
-          "PDF export valid (pdf.ts imports valid)",
-          "PNG export valid (png.ts + use-canvas-export.ts)",
-          "Comments: comment-panel.tsx + CommentCountsContext + comments-view.tsx with entity nav links",
-          "Tasks: task-panel.tsx + TaskCountsContext + section-detail-panel task rollup",
-          "Runbooks: section-detail-panel createRunbook button, runbooks-list-view.tsx with filter tabs + segmented progress",
-          "Runbook view: runbook-view.tsx 4-state status, Complete/Cancel Radix dialogs, Playbook button outside readOnly guard",
-          "Playbook mode: playbook-view.tsx fixed overlay z-50, Mark Complete & Next, Skip, dot nav, progress bar",
-          "Activity log page: page.tsx FK join select, activity-view.tsx filter tabs + Load More + empty state guidance",
-          "Activity log API: route.ts FK join select matching page.tsx shape",
-          "Coloring: coloring-panel.tsx exists (~347 lines), step-node.tsx ColoringTintContext background tint",
-          "Sidebar nav: all items present (Dashboard, Activity, Comments, Runbooks, Teams, People, Tools, Settings)",
-          "Workspace shell: reserved paths array includes activity in list",
-          "Middleware: auth guard redirects unauthenticated",
-          "API auth guards (curl: workspaces 401, steps 401, perspectives 401, sections 405 POST-only)",
-          "Types: database.ts exports ColoringRule, CriteriaType, ActivityLog, ActivityAction, RunbookStatus, RunbookStepStatus",
-          "Context: workspace-context.tsx exports WorkspaceProvider + useWorkspace"
-        ]
-      },
-      {
-        "suite": "acceptance_FEAT-050",
-        "scope": "Workspace cloning — deep copy via SECURITY DEFINER RPC + settings UI",
-        "method": "Static analysis of migration, API route, client wrapper, settings page",
-        "checks": [
-          "Migration 018 defines clone_workspace(p_workspace_id, p_user_id, p_org_id) SECURITY DEFINER function",
-          "clone_workspace copies: workspace + tabs + sections + steps + connections + teams + roles + people + tools + step_roles + stages + touchpoints + touchpoint_connections (13 tables)",
-          "clone_workspace uses UUID remapping via temp tables (old→new mapping preserved for internal FKs)",
-          "clone_workspace does NOT copy: perspectives, annotations, comments, tasks, runbooks, activity_log, coloring_rules",
-          "Clone API route: POST /api/v1/workspaces/[id]/clone/route.ts exists with auth guard",
-          "Clone route calls supabase.rpc('clone_workspace') with workspace_id, user_id, org_id",
-          "Clone route returns new workspace data via successResponse envelope",
-          "Clone route calls void logActivity() for audit trail",
-          "Client wrapper: cloneWorkspace(workspaceId) in client.ts calls POST via apiFetch",
-          "Settings page: Duplicate Workspace button exists in page.tsx",
-          "Loading state: isCloning useState controls button disabled/spinner",
-          "Navigation: router.push to new workspace path on success",
-          "Error handling: try/catch with user-facing error message on failure"
-        ]
-      },
-      {
-        "suite": "verify_FEAT-051",
-        "scope": "Conditional step coloring — verify iter 96 acceptance still holds post-merge",
-        "method": "Static analysis (re-verify key acceptance points)",
-        "checks": [
-          "Migration 019 creates coloring_rules table with criteria_type enum",
-          "Coloring rules CRUD API: route.ts (GET list, POST) + [id]/route.ts (PATCH, DELETE)",
-          "HEX_COLOR_REGEX validation in POST and PATCH handlers",
-          "VALID_CRITERIA_TYPES validation in PATCH handler",
-          "ColoringTintContext defined in canvas.ts",
-          "canvas-view.tsx fetches rules, evaluates in position order (last match wins), provides tint map via context",
-          "step-node.tsx consumes ColoringTintContext, applies 15% opacity background (hex alpha 26)",
-          "Heat map precedence: coloring tint suppressed when heat map active",
-          "coloring-panel.tsx accessible via paintbrush button (absolute overlay z-10)",
-          "Process canvas only (canvas-view.tsx, not journey-canvas-view.tsx)"
-        ]
-      },
-      {
-        "suite": "verify_BUG-019",
-        "scope": "Activity page user display — server/client query parity",
-        "method": "Static analysis",
-        "checks": [
-          "page.tsx select uses: '*, users!activity_log_user_id_fkey(email)'",
-          "route.ts select uses identical shape: '*, users!activity_log_user_id_fkey(email)'",
-          "activity-view.tsx renders entry.users?.email (not 'Unknown' for valid entries)",
-          "Empty state guidance text: 'Actions like creating steps, adding comments, and completing runbooks appear here.'",
-          "Load More re-fetches from API with same joined select shape"
-        ]
-      }
-    ],
-    "cadence_trigger": "risk_score_6_mandatory"
+    "run_regression": false,
+    "regression_reason": null,
+    "suites_to_run": ["FEAT-052-data-layer-acceptance", "BUG-020-verify", "IMP-028-verify"],
+    "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "Migration 019 (coloring_rules) still needs supabase db push to remote",
-      "Migrations 014-018 also still need push to remote DB",
-      "Accessibility cadence severely overdue — last audit iter 21, now iter 97 (76 iterations overdue)",
-      "Production (origin/main) behind ralph/init-stride by 13+ commits",
-      "After iter 97 passes: next is FEAT-052 section templates or FEAT-053 Phase 4 testing gate"
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

@@ -1,0 +1,400 @@
+// =============================================================================
+// Database entity types — mirrors the Supabase schema
+// =============================================================================
+
+export type StepStatus = "draft" | "in_progress" | "testing" | "live" | "archived";
+export type ExecutorType = "person" | "automation" | "ai_agent" | "empty";
+export type WorkspaceRole = "viewer" | "member" | "admin" | "owner";
+export type CanvasType = "process" | "journey";
+export type TouchpointSentiment = "positive" | "neutral" | "negative";
+
+export interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar_url: string | null;
+  settings: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  owner_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrganizationMember {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  role: WorkspaceRole;
+}
+
+export interface Workspace {
+  id: string;
+  organization_id: string;
+  name: string;
+  slug: string;
+  image_url: string | null;
+  is_active: boolean;
+  settings: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Tab {
+  id: string;
+  workspace_id: string;
+  name: string;
+  position: number;
+  canvas_type: CanvasType;
+  viewport: { x: number; y: number; zoom: number } | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Section {
+  id: string;
+  workspace_id: string;
+  tab_id: string;
+  name: string;
+  summary: string | null;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Step {
+  id: string;
+  workspace_id: string;
+  tab_id: string;
+  section_id: string | null;
+  name: string;
+  position_x: number;
+  position_y: number;
+  status: StepStatus;
+  step_type: string | null;
+  executor: ExecutorType;
+  notes: string | null;
+  video_url: string | null;
+  attributes: Record<string, unknown>;
+  time_minutes: number | null;
+  frequency_per_month: number | null;
+  maturity_score: number | null;
+  target_maturity: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Connection {
+  id: string;
+  workspace_id: string;
+  tab_id: string;
+  source_step_id: string;
+  target_step_id: string;
+  created_at: string;
+}
+
+export interface Team {
+  id: string;
+  workspace_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Role {
+  id: string;
+  team_id: string;
+  name: string;
+  hourly_rate: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Person {
+  id: string;
+  role_id: string;
+  name: string;
+  email: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Tool {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  vendor: string | null;
+  url: string | null;
+  cost_per_month: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StepRole {
+  id: string;
+  step_id: string;
+  role_id: string;
+  created_at: string;
+}
+
+export interface PublicShare {
+  id: string;
+  workspace_id: string;
+  share_id: string;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// =============================================================================
+// Journey canvas entities
+// =============================================================================
+
+export interface Stage {
+  id: string;
+  workspace_id: string;
+  tab_id: string;
+  name: string;
+  description: string | null;
+  channel: string | null;
+  owner: string | null;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Touchpoint {
+  id: string;
+  workspace_id: string;
+  tab_id: string;
+  stage_id: string | null;
+  name: string;
+  pain_score: number | null;
+  gain_score: number | null;
+  sentiment: TouchpointSentiment | null;
+  customer_emotion: string | null;
+  notes: string | null;
+  position_x: number;
+  position_y: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TouchpointConnection {
+  id: string;
+  workspace_id: string;
+  tab_id: string;
+  source_touchpoint_id: string;
+  target_touchpoint_id: string;
+  created_at: string;
+}
+
+// =============================================================================
+// Perspectives — stakeholder viewpoints on canvas elements
+// =============================================================================
+
+export type AnnotatableType = "step" | "section" | "touchpoint" | "stage";
+
+// =============================================================================
+// Comments — threaded comments on canvas elements
+// =============================================================================
+
+export type CommentCategory = "note" | "decision" | "pain_point" | "idea" | "question";
+export type CommentableType = AnnotatableType;
+
+export interface Comment {
+  id: string;
+  workspace_id: string;
+  commentable_type: CommentableType;
+  commentable_id: string;
+  parent_id: string | null;
+  author_id: string;
+  content: string;
+  category: CommentCategory;
+  is_resolved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Perspective {
+  id: string;
+  workspace_id: string;
+  name: string;
+  color: string;
+  icon: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PerspectiveAnnotation {
+  id: string;
+  perspective_id: string;
+  annotatable_type: AnnotatableType;
+  annotatable_id: string;
+  content: string | null;
+  rating: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// =============================================================================
+// Tasks — step-scoped checklist items
+// =============================================================================
+
+export interface Task {
+  id: string;
+  workspace_id: string;
+  step_id: string;
+  title: string;
+  is_completed: boolean;
+  position: number;
+  assigned_to: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// =============================================================================
+// Runbooks — checklist instances snapshot-copied from section steps
+// =============================================================================
+
+export type RunbookStatus = "active" | "completed" | "cancelled";
+export type RunbookStepStatus = "pending" | "in_progress" | "completed" | "skipped";
+
+export interface Runbook {
+  id: string;
+  workspace_id: string;
+  section_id: string;
+  name: string;
+  status: RunbookStatus;
+  started_at: string;
+  completed_at: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RunbookStep {
+  id: string;
+  runbook_id: string;
+  step_id: string | null;
+  status: RunbookStepStatus;
+  assigned_to: string | null;
+  completed_at: string | null;
+  notes: string | null;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// =============================================================================
+// Activity Log — append-only audit trail of workspace actions
+// =============================================================================
+
+export type ActivityAction = "created" | "updated" | "deleted" | "completed" | "assigned" | "commented" | "exported" | "shared";
+
+export interface ActivityLog {
+  id: string;
+  workspace_id: string;
+  user_id: string;
+  action: ActivityAction;
+  entity_type: string;
+  entity_id: string;
+  entity_name: string;
+  details: Record<string, unknown> | null;
+  created_at: string;
+  users?: { email: string } | null;
+}
+
+// =============================================================================
+// Coloring Rules — workspace-scoped conditional step coloring
+// =============================================================================
+
+export type CriteriaType = "status" | "executor" | "step_type" | "has_role" | "maturity_below" | "maturity_above";
+
+export interface ColoringRule {
+  id: string;
+  workspace_id: string;
+  name: string;
+  color: string;
+  criteria_type: CriteriaType;
+  criteria_value: string;
+  is_active: boolean;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// =============================================================================
+// Templates — reusable section+steps snapshots
+// =============================================================================
+
+export interface TemplateSectionData {
+  name: string;
+  summary?: string | null;
+  width?: number;
+  height?: number;
+  notes?: string | null;
+}
+
+export interface TemplateStepData {
+  id?: string;
+  name: string;
+  position_x: number;
+  position_y: number;
+  status?: string;
+  step_type?: string | null;
+  executor?: string;
+  notes?: string | null;
+  video_url?: string | null;
+  attributes?: Record<string, unknown>;
+  time_minutes?: number | null;
+  frequency_per_month?: number | null;
+  maturity_score?: number | null;
+  target_maturity?: number | null;
+}
+
+export interface TemplateConnectionData {
+  source_step_id: string;
+  target_step_id: string;
+}
+
+export interface TemplateStepRoleData {
+  step_id: string;
+  role_name: string;
+}
+
+export interface TemplateData {
+  section: TemplateSectionData;
+  steps: TemplateStepData[];
+  connections: TemplateConnectionData[];
+  step_roles: TemplateStepRoleData[];
+}
+
+export interface Template {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  template_data: TemplateData;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
