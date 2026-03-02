@@ -1,9 +1,7 @@
 Done. Here's a summary of what was implemented:
 
-**BUG-019 (1-line fix in `page.tsx`):**
-- Line 25: Changed `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")` so the server-side initial load query joins the users table exactly the same way `route.ts` does. This populates `entry.users?.email` so the already-correct `activity-view.tsx` line 171 renders the email instead of `"Unknown"`.
+**BUG-019** — `page.tsx` line 25: Changed `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")`. This makes the server-side initial load use the same join as the API route, so user emails appear on first paint instead of "Unknown".
 
-**IMP-018 (empty state guidance in `activity-view.tsx`):**
-- Added a guidance `<p>` below "No activity yet" (shown only when `activeFilter === "all"`) with the text: *"Actions like creating steps, adding comments, and completing runbooks appear here."*
+**IMP-018** — `activity-view.tsx`: Added guidance `<p className="text-[12px] text-[var(--text-tertiary)] mt-1">` below "No activity yet" in the `activeFilter === "all"` empty state: *"Actions like creating steps, adding comments, and completing runbooks appear here."*
 
-Both type-check (`npx tsc --noEmit`) and lint (`npm run lint`) pass with 0 errors.
+**Verification**: typecheck ✅ (exit 0), lint ✅ (0 errors, 1 pre-existing warning in unowned file). Both files staged.

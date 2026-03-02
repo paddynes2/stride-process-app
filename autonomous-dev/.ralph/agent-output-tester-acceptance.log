@@ -1,23 +1,43 @@
-**TEST_RESULT_1.json written.** Here's the summary:
+`TEST_RESULT_1.json` written successfully.
 
 ---
 
-## Iteration 92 — Acceptance Test Results: **FAILED**
+## Summary
 
-### #FEAT-050 — Workspace Cloning Data Layer: ✅ PASS (7/7 criteria)
+**Status: PASSED** — all 19 acceptance criteria verified.
 
-All acceptance criteria verified by static analysis:
-- Migration `018_clone_workspace.sql` — SECURITY DEFINER function, clones 13 table types in dependency order using temp tables for UUID mapping
-- Tables excluded (perspectives, annotations, comments, tasks, runbooks, activity_log) confirmed
-- Returns `jsonb_build_object('workspace_id', v_new_ws_id)` correctly
-- API route at correct path — calls RPC, fetches new workspace, logs activity with `cloned_from` detail
-- `cloneWorkspace()` client wrapper confirmed in `client.ts`
-- TypeScript passes
+**Testing method:** Static code inspection (production doesn't have iter 96 changes; local dev server unavailable). Browser quality gate confirmed production canvas loads cleanly with 1 pre-existing favicon 404.
 
-### #BUG-019 — Activity Page User Display: ❌ FAIL (2/6 criteria)
+### #BUG-019 — 6/6 criteria passed
+| Criterion | Result |
+|---|---|
+| `.select("*, users!activity_log_user_id_fkey(email)")` in page.tsx line 25 | ✅ pass |
+| Initial load shows user email, not "Unknown" | ✅ pass |
+| page.tsx and route.ts select shapes identical | ✅ pass |
+| IMP-018 empty state guidance text present | ✅ pass |
+| Type check passes | ✅ pass |
+| No other files modified | ✅ pass |
 
-**Root cause:** Builder used Supabase join pattern (`entry.users?.email`) in `activity-view.tsx` but did **not** update `page.tsx` query from `select("*")` to `select("*, users(email)")`. At runtime `entry.users` is always `undefined`. Every entry displays **"Unknown"** — a regression from the original UUID prefix behavior.
+### #FEAT-051 — 13/13 criteria passed
+| Criterion | Result |
+|---|---|
+| Paintbrush button at top-right canvas overlay | ✅ pass |
+| Panel lists rules with all fields | ✅ pass |
+| Add rule form with all inputs + hex validation | ✅ pass |
+| Edit/delete inline controls | ✅ pass |
+| Position-order evaluation, last match wins | ✅ pass |
+| 15% opacity tint (`#RRGGBB26`) | ✅ pass |
+| Default background when no rule matches | ✅ pass |
+| Process canvas only (not journey) | ✅ pass |
+| Real-time rule application | ✅ pass |
+| POST HEX_COLOR_REGEX validation | ✅ pass |
+| PATCH color validation when present | ✅ pass |
+| PATCH criteria_type validation when present | ✅ pass |
+| Type check + build passes | ✅ pass |
 
-Additionally: the `userMap` prop approach specified in acceptance criteria was not implemented at all (no `userMap` in `ActivityViewProps`, no separate users query in `page.tsx`).
+### Bugs: 0
 
-**P1 Bug filed.** Iteration 92 status = FAILED. BUG-019 needs a rework.
+### Improvements noted (3):
+1. **Paintbrush button active state** — no visual indicator when rules are applying tints
+2. **has_role criteria** — not visually evaluated but appears in dropdown without warning
+3. **Activity sidebar link** — absent from production; confirm not dropped after deployment

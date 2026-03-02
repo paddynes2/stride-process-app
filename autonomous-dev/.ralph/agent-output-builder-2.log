@@ -1,25 +1,24 @@
-All tasks complete. Here's a summary of what was built:
+**#FEAT-051 [2/2] complete.** Here's a summary of what was built:
 
 ---
 
-**#FEAT-051 — Conditional Step Coloring: Data Layer [1/2]**
+**Task: FEAT-051 [2/2] — Coloring Rules UI**
 
-All 5 owned files created/modified and staged:
+**Files changed (6):**
 
-| File | Action | Lines |
-|------|--------|-------|
-| `supabase/migrations/019_coloring_rules.sql` | created | +46 |
-| `src/app/api/v1/coloring-rules/route.ts` | created | +102 |
-| `src/app/api/v1/coloring-rules/[id]/route.ts` | created | +87 |
-| `src/types/database.ts` | modified | +19 |
-| `src/lib/api/client.ts` | modified | +38/-1 |
+1. **`src/types/canvas.ts`** — Added `ColoringTintContext` (`Map<stepId, hex>`) following the existing `CommentCountsContext`/`TaskCountsContext` pattern to avoid prop-drilling through the read-only `flow-canvas.tsx`.
 
-**Key implementation details:**
-- Migration 019: `criteria_type` enum + `coloring_rules` table with RLS via `can_access_workspace()`, `update_updated_at()` trigger reused (not recreated), `workspace_id` index
-- Types: `CriteriaType` union + `ColoringRule` interface appended to `database.ts`
-- API routes: GET (ordered by position) + POST with full validation, PATCH + DELETE — all with `void logActivity()` calls, exact comments pattern
-- Client wrappers: `fetchColoringRules`, `createColoringRule`, `updateColoringRule`, `deleteColoringRule` — exact existing pattern
+2. **`src/components/canvas/step-node.tsx`** — Consumes `ColoringTintContext`; applies `backgroundColor: \`${color}26\`` (15% hex opacity) when heatmap mode is off and a rule matches. HeatMap tint takes precedence (unchanged logic).
 
-**Verification:** `npx tsc --noEmit` — 0 errors. ESLint — 0 errors.
+3. **`src/components/canvas/coloring-panel.tsx`** (new) — Lightweight floating panel with:
+   - Rule list: color swatch, name, `criteria_type: criteria_value`, active toggle (with CSS toggle animation), hover-reveal edit/delete buttons
+   - Inline edit mode per rule
+   - Add new rule form: name, color picker + hex input, criteria_type select, criteria_value input with hints
 
-**Pipeline note:** The `build-2/` worktree directory is gitignored by `autonomous-dev/.gitignore`. All changes were staged from the main project git root at `stride/`.
+4. **`src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`** — Fetches coloring rules on mount; evaluates rules in position order (last match wins) via `useMemo`; provides `ColoringTintContext`; renders paintbrush button overlay at `top-right` of canvas (away from react-flow toolbar at `top-left`).
+
+5. **`src/app/api/v1/coloring-rules/route.ts`** — Added `HEX_COLOR_REGEX` validation on POST.
+
+6. **`src/app/api/v1/coloring-rules/[id]/route.ts`** — Added `HEX_COLOR_REGEX` validation on color PATCH + `VALID_CRITERIA_TYPES` validation on criteria_type PATCH.
+
+**Verification:** typecheck ✓ clean, lint ✓ no new warnings, build ✓ compiled successfully.

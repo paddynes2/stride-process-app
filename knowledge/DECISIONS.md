@@ -43,3 +43,9 @@
 **Options:** (A) Application-level multi-step insert via API (N+1 round trips, not atomic), (B) SECURITY DEFINER PL/pgSQL function with ON COMMIT DROP temp tables for old→new UUID mapping
 **Decision:** SECURITY DEFINER function with temp tables — `clone_workspace(p_source_workspace_id UUID)` creates 7 temp mapping tables, loops through entities in FK dependency order, returns `{workspace_id}` JSONB.
 **Trade-off:** Complex PL/pgSQL (249 lines) harder to debug than application code, but guarantees atomicity, bypasses RLS safely (manual auth check via auth.uid()), and handles the 13-table deep copy in a single DB call. Temp tables auto-dropped on commit.
+
+## D-008 — ColoringTintContext over prop-drilling for coloring rules (Phase 4, Iteration 96)
+**Context:** Coloring rule tints (stepId → hex color) need to reach StepNode components. FlowCanvas (`flow-canvas.tsx`) is a shared component — cannot add a coloringTints prop to it.
+**Options:** (A) Modify FlowCanvas to pass coloringTints through (ownership violation, prop-drilling), (B) React Context consumed directly by StepNode
+**Decision:** React Context — `ColoringTintContext` exported from `canvas.ts`, provided by CanvasView, consumed by StepNode. Same pattern as CommentCountsContext (D-004) and TaskCountsContext.
+**Trade-off:** Third Context bypassing FlowCanvas makes data flow less explicit, but avoids ownership violation and follows the established pattern for canvas node data injection.

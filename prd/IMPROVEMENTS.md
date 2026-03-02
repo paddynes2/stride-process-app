@@ -124,12 +124,11 @@
   - **What:** Filter tabs filter client-side on already-fetched entries. When Load More is used and then a filter applied, the filter only applies to loaded entries — DB may have matching entries not yet fetched.
   - **Suggested fix:** When a filter tab is activated, reset entries and re-fetch from API with the action= filter param. Ensures pagination aligns with selected filter.
 
-- [ ] #IMP-018 Activity empty state guidance text — Attempts: 1
+- [x] #IMP-018 Activity empty state guidance text — Attempts: 1 — DONE iteration 96, 2026-03-03
   - **Found:** Iteration 91 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
-  - **What:** Empty state shows Clock icon and "No activity yet" but no guidance on what generates activity.
-  - **Suggested fix:** Add hint: "Actions like creating steps, adding comments, and completing runbooks appear here."
+  - **Fix applied:** Added guidance paragraph below "No activity yet" in all-filter empty state: "Actions like creating steps, adding comments, and completing runbooks appear here." Styled text-[12px] text-[var(--text-tertiary)] mt-1.
 
 - [x] #IMP-019 Entity type human-readable labels in activity entries — Attempts: 1 — DONE iteration 92, 2026-03-03
   - **Found:** Iteration 91 (regression tester)
@@ -157,6 +156,27 @@
   - **Where:** `src/lib/api/activity.ts`, `supabase/migrations/017_activity_log.sql`
   - **What:** No distinction between user-initiated and automated/system actions. Future audit trail may need actor_type.
   - **Suggested fix:** Add optional actor_type:'user'|'system' to LogActivityParams in a future migration.
+
+- [ ] #IMP-023 Coloring rules active indicator on paintbrush button — Attempts: 0
+  - **Found:** Iteration 96 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`
+  - **What:** Paintbrush button has no indicator that coloring rules are currently active. Users cannot tell at a glance whether tinting is on after reloading.
+  - **Suggested fix:** Add a small dot indicator on the button when any active coloring rule exists.
+
+- [ ] #IMP-024 has_role criteria type not visually evaluated — Attempts: 0
+  - **Found:** Iteration 96 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/canvas/coloring-panel.tsx`, `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`
+  - **What:** has_role criteria type appears in the dropdown but is not visually evaluated. Users who create a has_role rule see no canvas effect and no explanation.
+  - **Suggested fix:** Show inline warning when has_role is selected, or remove from dropdown until implemented.
+
+- [ ] #IMP-025 Verify activity sidebar nav link present after deployment — Attempts: 0
+  - **Found:** Iteration 96 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/layout/sidebar.tsx`
+  - **What:** Activity sidebar nav link absent from production (iter 96 not deployed). If link was dropped in a prior merge the page is undiscoverable.
+  - **Suggested fix:** Confirm sidebar.tsx Activity link present after iter 96 deployment.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

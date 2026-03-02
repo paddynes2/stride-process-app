@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-94, 2026-03-03 -->
+<!-- Updated: iter-96, 2026-03-03 -->
 
 ## Project
 
@@ -172,6 +172,9 @@ Types: step, section, touchpoint, stage.
 
 ### Comment & Task Counts on Canvas Nodes
 `CommentCountsContext` (from `canvas.ts`) provides Map<entityId, count> to node components. `TaskCountsContext` provides Map<stepId, { completed, total }>. Canvas views fetch all workspace comments/tasks once, build count maps, and wrap React Flow in both providers. Node components consume via `useContext()`. Comment badge: bottom-right. Task badge: bottom-left (step nodes only). Section detail panel shows task rollup (per-step progress + summary). This avoids prop-drilling through FlowCanvas (D-004).
+
+### Coloring Rules (Conditional Step Tinting)
+`ColoringTintContext` (from `canvas.ts`) provides Map<stepId, hexColor> to step nodes. Canvas-view evaluates workspace coloring rules against each step in position order (last match wins). Step nodes apply matching rule's color as background tint at 15% opacity (hex alpha `26`). HeatMapMode takes precedence over coloring rules. Coloring panel (`coloring-panel.tsx`, 347 lines) accessible via paintbrush button at top-right of canvas (absolute overlay, z-10). Panel supports full CRUD for rules. API routes validate color with `HEX_COLOR_REGEX` and criteria_type against `VALID_CRITERIA_TYPES`. has_role criteria type is in the enum but not visually evaluated (requires step-role data fetch). Process canvas only — does not apply to journey canvas.
 
 ### Reserved Paths in Workspace Shell
 `workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity"]`

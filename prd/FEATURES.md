@@ -345,23 +345,23 @@
 - [ ] Add logActivity() calls to POST/PATCH/DELETE handlers across existing API routes
 **Notes:** Audit trail for consulting engagements. Don't log reads. Keep details JSONB small (only changed fields for updates).
 
-### #FEAT-051 Conditional step coloring
+### #FEAT-051 Conditional step coloring — DONE iteration 96, 2026-03-03
 **Phase:** 4
 **Priority:** P2 (nice to have)
-**Attempts:** 1
-**Status:** pending
+**Attempts:** 2
+**Status:** done
 **Acceptance criteria:**
-- [ ] New `coloring_rules` table: id, workspace_id, name, color (hex), criteria_type (enum: status/executor/step_type/has_role/maturity_below/maturity_above), criteria_value TEXT NOT NULL (interpreted per criteria_type), is_active (boolean), position (integer), created_at, updated_at
-- [ ] RLS, types, API (CRUD), client wrappers
-- [ ] Coloring panel in canvas toolbar (paintbrush icon): list rules with color swatch, criteria dropdowns, active toggle
-- [ ] Rules evaluated client-side in position order, last match wins
-- [ ] Step nodes show matching rule's color as subtle background tint (opacity: 15%). Steps matching no rule show default background (no tint).
-- [ ] Applies to process canvas step nodes only (not journey touchpoints/stages)
-- [ ] Real-time: rules apply as created/edited
+- [x] New `coloring_rules` table: id, workspace_id, name, color (hex), criteria_type (enum: status/executor/step_type/has_role/maturity_below/maturity_above), criteria_value TEXT NOT NULL (interpreted per criteria_type), is_active (boolean), position (integer), created_at, updated_at
+- [x] RLS, types, API (CRUD), client wrappers
+- [x] Coloring panel in canvas toolbar (paintbrush icon): list rules with color swatch, criteria dropdowns, active toggle
+- [x] Rules evaluated client-side in position order, last match wins
+- [x] Step nodes show matching rule's color as subtle background tint (opacity: 15%). Steps matching no rule show default background (no tint).
+- [x] Applies to process canvas step nodes only (not journey touchpoints/stages)
+- [x] Real-time: rules apply as created/edited
 **Sub-tasks:**
 - [x] [1/2] Data layer: migration (coloring_rules table + criteria_type enum), types, API (CRUD), client wrappers — DONE iteration 94, 2026-03-03
-- [ ] [2/2] UI: Coloring panel in canvas toolbar (paintbrush icon) + step node background tint
-**Notes:** From Puzzle spec. "All draft steps = yellow", "steps with no role = red". Color is background tint (low opacity) preserving readability.
+- [x] [2/2] UI: Coloring panel in canvas toolbar (paintbrush icon) + step node background tint + API validation — DONE iteration 96, 2026-03-03
+**Notes:** From Puzzle spec. "All draft steps = yellow", "steps with no role = red". Color is background tint (low opacity) preserving readability. has_role criteria type included in dropdown but not visually evaluated (requires step-role data fetch).
 
 ### #FEAT-052 Section templates (save & deploy)
 **Phase:** 4

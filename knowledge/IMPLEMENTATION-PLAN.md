@@ -108,7 +108,7 @@ Core consulting insight features:
   - [x] [2/3] Page UI — DONE iter 89
   - [x] [3/3] API route integration — DONE iter 90
 - [x] #FEAT-050 Workspace cloning (deep copy for reuse) — [1/2] DONE iter 92, [2/2] DONE iter 93
-- [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting) — [1/2] DONE iter 94
+- [x] #FEAT-051 Conditional step coloring (rule-based canvas highlighting) — [1/2] DONE iter 94, [2/2] DONE iter 96
 - [ ] #FEAT-052 Section templates (save & deploy)
 - [ ] #FEAT-053 Phase 4 testing gate
 
@@ -157,3 +157,4 @@ Deferred indefinitely:
 - [2026-03-03] Iteration 93: #FEAT-050 [2/2] UI complete (Duplicate Workspace button in settings). #BUG-018 resolved (void prefix on 25 logActivity calls). FEAT-050 fully done. Slot 2 diverged from plan (IMP-018 assigned, BUG-018 built). Next: BUG-019 fix, then FEAT-051 or FEAT-052.
 - [2026-03-03] Iteration 94: PARTIAL — #FEAT-051 [1/2] data layer completed (reviewer recovered code from working tree — builder wrote files but didn't commit). #IMP-007 completed (kbd hints, partial run carry-over). #BUG-019 attempt 2 FAILED (builder completed but worktree merge failure — code lost). Next: BUG-019 attempt 3 + FEAT-051 [2/2] UI.
 - [2026-03-03] Iteration 95: BLOCKED — planner produced no EXECUTION_PLAN.json (agent dispatch failure). No code changes. Acceptance tester re-validated iter 94: BUG-019 still broken (3/5 FAIL), FEAT-051 [1/2] minor validation gaps (2/9 FAIL — HEX_COLOR_REGEX missing in POST/PATCH). Both findings already known. Next: BUG-019 attempt 3 + FEAT-051 [2/2] UI.
+- [2026-03-03] Iteration 96: #BUG-019 resolved (attempt 3 — page.tsx select join). #IMP-018 done (activity empty state guidance). #FEAT-051 [2/2] done (coloring panel UI, step node tint, API validation). FEAT-051 fully complete. 3 new improvements logged (IMP-023-025). Next: iter 97 MUST be testing_only.
