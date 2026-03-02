@@ -460,7 +460,7 @@ function PerspectivesSection({ workspaceId, perspectives, setPerspectives, loadi
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleConfirmDeletePerspective} loading={deletingPerspective}>
-              Delete
+              Delete Perspective
             </Button>
           </DialogFooter>
         </DialogContent>
