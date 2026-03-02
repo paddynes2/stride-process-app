@@ -269,3 +269,36 @@ export interface Task {
   created_at: string;
   updated_at: string;
 }
+
+// =============================================================================
+// Runbooks — checklist instances snapshot-copied from section steps
+// =============================================================================
+
+export type RunbookStatus = "active" | "completed" | "cancelled";
+export type RunbookStepStatus = "pending" | "in_progress" | "completed" | "skipped";
+
+export interface Runbook {
+  id: string;
+  workspace_id: string;
+  section_id: string;
+  name: string;
+  status: RunbookStatus;
+  started_at: string;
+  completed_at: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RunbookStep {
+  id: string;
+  runbook_id: string;
+  step_id: string | null;
+  status: RunbookStepStatus;
+  assigned_to: string | null;
+  completed_at: string | null;
+  notes: string | null;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}
