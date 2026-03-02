@@ -90,6 +90,8 @@ export interface Step {
   frequency_per_month: number | null;
   maturity_score: number | null;
   target_maturity: number | null;
+  effort_score: number | null;
+  impact_score: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -192,6 +194,8 @@ export interface Touchpoint {
   notes: string | null;
   position_x: number;
   position_y: number;
+  effort_score: number | null;
+  impact_score: number | null;
   created_at: string;
   updated_at: string;
 }
