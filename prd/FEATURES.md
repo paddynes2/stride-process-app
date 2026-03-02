@@ -366,7 +366,7 @@
 ### #FEAT-052 Section templates (save & deploy)
 **Phase:** 4
 **Priority:** P2 (nice to have)
-**Attempts:** 0
+**Attempts:** 1
 **Status:** pending
 **Acceptance criteria:**
 - [ ] New `templates` table: id, workspace_id UUID NOT NULL, name, description, category, template_data (JSONB snapshot), created_by, created_at, updated_at

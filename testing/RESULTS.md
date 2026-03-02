@@ -1,19 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 97
-- **Date:** 2026-03-03
-- **Suite:** Regression baseline (35 checks) + FEAT-050 acceptance (13 checks) + FEAT-051 verify (10 checks) + BUG-019 verify (5 checks) — 4 suites total
+- **Iteration:** 98
+- **Date:** 2026-03-02
+- **Suite:** Acceptance testing for IMP-028, BUG-020, FEAT-052
 - **Method:** Static code analysis (Playwright unavailable)
-- **Result:** **87/87 ALL PASS** (24 acceptance + 63 regression, both testers independent)
-- **Bugs found:** 1 (BUG-020: has_role criteria silently skipped)
-- **Improvements found:** 4 (IMP-026, IMP-027, IMP-028 + doc accuracy note)
-- **Note:** FEAT-050 fully acceptance-tested for the first time. All Phase 4 features through iter 96 verified. Risk score fully resolved.
+- **Result:** **IMP-028: 7/7 PASS, BUG-020: 0/4 FAIL (not merged), FEAT-052: all PASS (static, files at wrong paths)**
+- **Bugs found:** 2 (pipeline issues: BUG-020 never committed, FEAT-052 at wrong paths)
+- **Improvements found:** 3 (IMP-029 body text mismatch, 2 FEAT-052 spec deviations)
+- **Note:** Only IMP-028 produced working code. FEAT-052 and BUG-020 are pipeline failures requiring re-attempt.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 97 (2026-03-03) — 87/87 PASS (35 regression baseline + 13 FEAT-050 acceptance + 10 FEAT-051 verify + 5 BUG-019 verify, static analysis)
+- Last run: Iteration 98 (2026-03-02) — IMP-028 7/7 PASS, BUG-020 0/4 FAIL (not merged), FEAT-052 all PASS (static, wrong paths)
+- Previous run: Iteration 97 (2026-03-03) — 87/87 PASS (35 regression baseline + 13 FEAT-050 acceptance + 10 FEAT-051 verify + 5 BUG-019 verify, static analysis)
 - Previous run: Iteration 96 (2026-03-03) — 19/19 PASS (6 BUG-019 + 1 IMP-018 + 12 FEAT-051 acceptance, static analysis + production quality gate)
 - Previous run: Iteration 91 (2026-03-03) — 57/57 PASS (20 FEAT-049 acceptance + 37 regression baseline, static analysis)
 - Previous run: Iteration 87 (2026-03-02) — 33/33 PASS (5 regression + 16 FEAT-047 acceptance + 12 FEAT-048 acceptance)

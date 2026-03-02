@@ -1,1 +1,1 @@
-CONTINUE: FEAT-052 section templates (save & deploy reusable section patterns) or FEAT-053 Phase 4 testing gate (full regression + acceptance for all Phase 4 features)
+CONTINUE: Re-attempt FEAT-052 [1/2] section templates data layer (files must go to src/ not worktree paths) + BUG-020 disable has_role in coloring panel dropdown
