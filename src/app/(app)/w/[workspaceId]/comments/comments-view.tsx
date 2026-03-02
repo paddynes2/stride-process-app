@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { MessageSquare, CheckCircle2, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -36,9 +37,11 @@ function formatRelativeTime(dateString: string): string {
 interface CommentsViewProps {
   initialComments: Comment[];
   entityNames: Record<string, string>;
+  workspaceId: string;
+  entityTabMap: Record<string, string>;
 }
 
-export function CommentsView({ initialComments, entityNames }: CommentsViewProps) {
+export function CommentsView({ initialComments, entityNames, workspaceId, entityTabMap }: CommentsViewProps) {
   const [activeFilter, setActiveFilter] = React.useState<FilterTab>("all");
 
   const topLevel = React.useMemo(
@@ -117,9 +120,14 @@ export function CommentsView({ initialComments, entityNames }: CommentsViewProps
                 >
                   {/* Entity label + type + category + resolved state */}
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span className="text-[11px] font-medium text-[var(--text-secondary)] truncate max-w-[160px]">
+                    <Link
+                      href={entityTabMap[comment.commentable_id]
+                        ? `/w/${workspaceId}/${entityTabMap[comment.commentable_id]}`
+                        : `/w/${workspaceId}`}
+                      className="text-[11px] font-medium text-[var(--accent-blue)] hover:underline truncate max-w-[160px]"
+                    >
                       {entityName}
-                    </span>
+                    </Link>
                     <span className="text-[10px] text-[var(--text-quaternary)] px-1.5 py-0.5 rounded-sm bg-[var(--bg-surface)]">
                       {entityTypeLabel}
                     </span>
