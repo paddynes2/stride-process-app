@@ -287,11 +287,11 @@
 ### #FEAT-047 Runbook instances
 **Phase:** 4
 **Priority:** P0 (critical path)
-**Attempts:** 1
+**Attempts:** 2
 **Status:** in_progress
 **Sub-tasks:**
 - [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 80, 2026-03-02
-- [ ] [2/3] Runbook UI — "Run as Checklist" button on section panel, runbook view (linear checklist with progress bar), runbook list page
+- [x] [2/3] Runbook UI — "Run as Checklist" button on section panel, runbook view (linear checklist with progress bar), runbook list page, sidebar nav — DONE iteration 81, 2026-03-02
 - [ ] [3/3] Polish — status transitions, "Complete Runbook" button, progress indicators
 **Acceptance criteria:**
 - [ ] New `runbooks` table: id, workspace_id, section_id (FK), name, status (enum: active/completed/cancelled), started_at, completed_at, created_by (FK users), created_at, updated_at

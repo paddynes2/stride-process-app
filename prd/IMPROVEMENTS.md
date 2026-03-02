@@ -69,13 +69,11 @@
   - **Why it matters:** Not a runtime bug currently (functions close over stable props), but could cause staleness bugs if handlers are refactored to use local state.
   - **Suggested fix:** Add handleAddStep and handleAddSection to the dependency array, or wrap them in useCallback.
 
-- [ ] #IMP-009 Workspace comments page lacks navigation links to source entities — Attempts: 0
+- [x] #IMP-009 Workspace comments page navigation links to source entities — DONE iteration 81, 2026-03-02
   - **Found:** Iteration 75 (regression tester)
   - **Category:** Usability
-  - **Where:** `src/app/(app)/w/[workspaceId]/comments/comments-view.tsx`
-  - **What:** CommentsView renders comments with entity type+name but no clickable link to navigate to the specific step/section/stage/touchpoint the comment belongs to.
-  - **Why it matters:** Nielsen H6 — Recognition rather than recall. Users should be able to navigate from a comment to its source entity without memorizing IDs.
-  - **Suggested fix:** Add a clickable link/button on each comment row that navigates to `/w/[id]/[tabId]` and selects the relevant entity.
+  - **Where:** `src/app/(app)/w/[workspaceId]/comments/comments-view.tsx`, `page.tsx`
+  - **Fix applied:** Server page.tsx builds entityTabMap (entity_id → tab_id) from steps/sections/stages/touchpoints. CommentsView wraps entity names in `<Link>` to `/w/{workspaceId}/{tabId}`, styled `text-[var(--accent-blue)] hover:underline`. Falls back to workspace root when tab_id unavailable.
 
 - [ ] #IMP-010 Collapsible side panels with persistent state — Attempts: 0
   - **Found:** Iteration 77 (regression tester)

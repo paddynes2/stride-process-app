@@ -757,3 +757,37 @@
 - Efficiency: 4 — both builders completed successfully. No manual code recovery needed.
 - Observations: 0
 **Notes:** First clean multi-task merge since iter 76 (no manual code recovery). Builder merge commits labeled "iteration 26" — likely counter bug in ralph.sh. FEAT-047 [1/3] complete. IMP-011 resolves last 2 journey-canvas-view.tsx lint warnings. Retrospective completed (iter 80 = multiple of 10). Codebase health check performed.
+
+## Iteration 81 — 2026-03-02 09:00
+**Tasks:**
+- #FEAT-047 [2/3] Runbook UI (section panel button, runbook view, list page, sidebar nav) — slot 1 — completed
+- #IMP-009 Comment navigation links to source entities — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Created: src/app/(app)/w/[workspaceId]/runbooks/page.tsx (27 lines — server page)
+- Created: src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx (85 lines — client list view)
+- Created: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx (39 lines — server page)
+- Created: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx (170 lines — checklist view with toggle, progress bar, debounced notes)
+- Modified: src/components/panels/section-detail-panel.tsx (+29/-2 — "Run as Checklist" button)
+- Modified: src/app/(app)/w/[workspaceId]/workspace-shell.tsx (+1/-1 — 'runbooks' in reserved paths)
+- Modified: src/components/layout/sidebar.tsx (+2/-2 — Runbooks nav item with ClipboardList icon)
+- Modified: src/app/(app)/w/[workspaceId]/comments/page.tsx (+8/-4 — tab_id in entity queries, entityTabMap)
+- Modified: src/app/(app)/w/[workspaceId]/comments/comments-view.tsx (+8/-3 — Link import, entity nav links)
+**Verification:**
+- Type check: pass (0 errors — POST_MERGE_CHECK: PASS)
+- Lint: pass (0 errors; 1 pre-existing warning in flow-canvas.tsx)
+- Build: pass (slot 1 builder verified via next build)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true for both slots)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — follows established server page + client view pattern. RunbookView has optimistic toggle with rollback, debounced notes save. Clean checklist UI with progress bar. IMP-009 minimal and correct.
+- Test coverage: 2 — typecheck + lint + build only, no runtime testing
+- Confidence: 5 — purely additive (new pages, new components). No existing behavior changed. Uses existing API client wrappers from iter 80.
+- Efficiency: 4 — both builders completed and merged cleanly. No manual recovery needed.
+- Observations: 0
+**Notes:** Second consecutive clean multi-task merge (after iter 80). Builder merge commits labeled "iteration 27" (counter bug persists in ralph.sh). FEAT-047 [2/3] complete — UI layer built on top of iter 80's data layer. IMP-009 resolves a regression-found usability issue. [3/3] polish (status transitions, Complete Runbook button) is next. Acceptance testing for runbook UI recommended next testing iteration.

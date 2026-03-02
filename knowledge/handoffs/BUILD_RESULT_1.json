@@ -1,75 +1,75 @@
 {
   "schema_version": "1.0",
-  "iteration": 80,
+  "iteration": 81,
   "slot": 1,
-  "task_id": "#FEAT-047",
+  "task_id": "#FEAT-047 [2/3]",
   "status": "completed",
-  "duration_seconds": 420,
+  "duration_seconds": 540,
 
   "files_changed": [
     {
-      "path": "supabase/migrations/016_runbooks.sql",
+      "path": "src/app/(app)/w/[workspaceId]/runbooks/page.tsx",
       "action": "created",
-      "lines_added": 117,
+      "lines_added": 27,
       "lines_removed": 0
     },
     {
-      "path": "src/types/database.ts",
+      "path": "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+      "action": "created",
+      "lines_added": 85,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx",
+      "action": "created",
+      "lines_added": 39,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
+      "action": "created",
+      "lines_added": 170,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/components/panels/section-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 33,
-      "lines_removed": 0
+      "lines_added": 29,
+      "lines_removed": 2
     },
     {
-      "path": "src/app/api/v1/runbooks/route.ts",
-      "action": "created",
-      "lines_added": 120,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/api/v1/runbooks/[id]/route.ts",
-      "action": "created",
-      "lines_added": 112,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/api/v1/runbook-steps/route.ts",
-      "action": "created",
-      "lines_added": 30,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/api/v1/runbook-steps/[id]/route.ts",
-      "action": "created",
-      "lines_added": 51,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/lib/api/client.ts",
+      "path": "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
       "action": "modified",
-      "lines_added": 61,
+      "lines_added": 1,
       "lines_removed": 1
+    },
+    {
+      "path": "src/components/layout/sidebar.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 2
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "3 pre-existing warnings in journey-canvas-view.tsx and flow-canvas.tsx (documented in LEARNINGS.md). 0 errors." },
-    "build": { "status": "not_applicable", "output": "Full build not run — typecheck + lint passed" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — clean, no output" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused) — documented in LEARNINGS.md, not introduced by this task" },
+    "build": { "status": "pass", "output": "next build — compiled successfully. /w/[workspaceId]/runbooks and /w/[workspaceId]/runbooks/[runbookId] both appear in route table." },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit test suite configured" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "supabase/migrations/016_runbooks.sql",
-    "src/types/database.ts",
-    "src/app/api/v1/runbooks/route.ts",
-    "src/app/api/v1/runbooks/[id]/route.ts",
-    "src/app/api/v1/runbook-steps/route.ts",
-    "src/app/api/v1/runbook-steps/[id]/route.ts",
-    "src/lib/api/client.ts"
+    "src/app/(app)/w/[workspaceId]/runbooks/page.tsx",
+    "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+    "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx",
+    "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
+    "src/components/panels/section-detail-panel.tsx",
+    "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
+    "src/components/layout/sidebar.tsx"
   ],
   "ownership_violations": [],
-  "notes": "POST /runbooks special behaviour: creates runbook, then fetches section steps ordered by position_x ASC (steps have no sequential position field, position_x is the canvas left-to-right proxy), and bulk-inserts runbook_steps with 0-indexed position values. runbook_steps.step_id is FK ON DELETE SET NULL so orphaned checklist items survive original step deletion. RLS on runbook_steps uses EXISTS subquery joining through runbooks.workspace_id since runbook_steps has no workspace_id column.",
+  "notes": "Runbook list page: queries runbooks with nested sections(id,name) and runbook_steps(id,status) in one Supabase call to compute progress. Runbook view page: queries runbook_steps with steps(id,name) join to display step names. RunbookStep type has no name field — step names come from FK join (deleted steps show 'Deleted Step'). Section-detail-panel uses section.workspace_id for navigation (no new prop needed). Sidebar Workflows active-check updated to exclude /runbooks.",
 
   "failure_details": null
 }

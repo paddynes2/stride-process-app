@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 80,
-  "date": "2026-03-02T06:00:00Z",
+  "iteration": 81,
+  "date": "2026-03-02T08:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "d1a1b7a909cc7f61538d3546f8a8c35d0dd0305c",
+    "last_commit_hash": "c5e25a9c5a8ec221ef16fb9e64eb4b0cef35fbd3",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,84 +13,68 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-047",
-      "description": "Runbook instances [1/3] — data layer: migration 016 (runbooks + runbook_steps tables, enums, RLS, indexes, triggers), TypeScript types (RunbookStatus, RunbookStepStatus, Runbook, RunbookStep), API routes (GET/POST /runbooks, GET/PATCH/DELETE /runbooks/[id], GET /runbook-steps?runbook_id=, PATCH /runbook-steps/[id]), client wrappers. POST /runbooks snapshot-copies section steps into runbook_steps.",
+      "id": "#FEAT-047 [2/3]",
+      "description": "Runbook UI — 'Run as Checklist' button on section panel, runbook view (linear checklist with progress bar), runbook list page, sidebar nav link",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 4: The Living Playbook",
       "complexity": "M",
       "attempts": 1,
-      "risk_score": 3,
+      "risk_score": 2,
       "acceptance_criteria": [
-        "Migration 016_runbooks.sql creates enums runbook_status (active/completed/cancelled) and runbook_step_status (pending/in_progress/completed/skipped)",
-        "runbooks table: id, workspace_id (FK), section_id (FK), name, status (runbook_status DEFAULT active), started_at (DEFAULT now()), completed_at (nullable), created_by (FK users), created_at, updated_at",
-        "runbook_steps table: id, runbook_id (FK CASCADE), step_id (FK SET NULL — original step reference), status (runbook_step_status DEFAULT pending), assigned_to (FK users nullable), completed_at (nullable), notes (TEXT nullable), position (INTEGER), created_at, updated_at",
-        "RLS on both tables via can_access_workspace() — runbooks has workspace_id directly, runbook_steps joins through runbook",
-        "Indexes: runbooks(workspace_id), runbook_steps(runbook_id), runbook_steps(runbook_id, position)",
-        "updated_at triggers on both tables",
-        "TypeScript types in database.ts: RunbookStatus, RunbookStepStatus enums, Runbook and RunbookStep interfaces",
-        "GET /api/v1/runbooks?workspace_id= returns Runbook[] — list for workspace",
-        "POST /api/v1/runbooks with { workspace_id, section_id, name } — creates runbook AND fetches section's steps ordered by position, bulk-inserts as runbook_steps",
-        "GET /api/v1/runbooks/[id] returns single Runbook",
-        "PATCH /api/v1/runbooks/[id] updates name, status, completed_at",
-        "DELETE /api/v1/runbooks/[id] deletes runbook (CASCADE deletes runbook_steps)",
-        "GET /api/v1/runbook-steps?runbook_id= returns RunbookStep[] ordered by position",
-        "PATCH /api/v1/runbook-steps/[id] updates status, assigned_to, completed_at, notes",
-        "Client wrappers: fetchRunbooks(workspaceId), createRunbook(data), fetchRunbook(id), updateRunbook(id, data), deleteRunbook(id), fetchRunbookSteps(runbookId), updateRunbookStep(id, data)"
+        "'Run as Checklist' button visible on section detail panel — calls createRunbook API (workspace_id, section_id, name derived from section name) and navigates to runbook view",
+        "Runbook view page at /w/[workspaceId]/runbooks/[runbookId] — shows runbook name, status badge, progress bar (completed/total), linear checklist of runbook_steps with checkbox, step name, status, notes field",
+        "Clicking checkbox on a runbook step calls updateRunbookStep to toggle status (pending↔completed), sets completed_at",
+        "Runbook list page at /w/[workspaceId]/runbooks — lists all workspace runbooks with name, status badge, progress (e.g. '3/7'), section name, created date",
+        "Sidebar nav link for Runbooks (below Comments in nav order)",
+        "'runbooks' added to workspace-shell.tsx reserved paths array"
       ],
       "files_owned": [
-        "supabase/migrations/016_runbooks.sql",
-        "src/types/database.ts",
-        "src/app/api/v1/runbooks/route.ts",
-        "src/app/api/v1/runbooks/[id]/route.ts",
-        "src/app/api/v1/runbook-steps/route.ts",
-        "src/app/api/v1/runbook-steps/[id]/route.ts",
-        "src/lib/api/client.ts"
+        "src/app/(app)/w/[workspaceId]/runbooks/**/*",
+        "src/components/panels/section-detail-panel.tsx",
+        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
+        "src/components/layout/sidebar.tsx"
       ],
       "files_read_only": [
-        "supabase/migrations/015_tasks.sql",
-        "supabase/migrations/014_comments.sql",
-        "src/app/api/v1/tasks/route.ts",
-        "src/app/api/v1/tasks/[id]/route.ts",
-        "src/app/api/v1/comments/route.ts",
-        "src/app/api/v1/comments/[id]/route.ts",
-        "src/lib/api/response.ts"
+        "src/lib/api/client.ts",
+        "src/types/database.ts",
+        "src/types/canvas.ts",
+        "src/app/(app)/w/[workspaceId]/comments/page.tsx"
       ],
       "context": {
         "similar_files": [
-          "supabase/migrations/015_tasks.sql",
-          "supabase/migrations/014_comments.sql",
-          "src/app/api/v1/tasks/route.ts",
-          "src/app/api/v1/tasks/[id]/route.ts"
+          "src/app/(app)/w/[workspaceId]/comments/page.tsx",
+          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
+          "src/components/panels/task-panel.tsx"
         ],
         "patterns_to_follow": [
-          "Migration pattern: CREATE TABLE + trigger + indexes + RLS (see 015_tasks.sql)",
-          "API envelope: successResponse(data)/errorResponse(code, msg) from lib/api/response.ts",
-          "Client wrapper: apiFetch<T>() returns T directly — no nested access",
-          "RLS: can_access_workspace(workspace_id) for tables with workspace_id. For runbook_steps: RLS via subquery joining runbooks to get workspace_id",
-          "POST create pattern: validate required fields, insert, return created entity",
-          "POST /runbooks special: after creating runbook, query steps WHERE section_id = X ORDER BY position, bulk-insert as runbook_steps with same position values"
+          "Comments page pattern: server page.tsx fetches data via Supabase server client, passes to client CommentsView component",
+          "TaskPanel pattern: checkbox list with inline editing, status toggles via API calls",
+          "Sidebar nav: lucide-react icon + label, link to /w/[workspaceId]/runbooks",
+          "workspace-shell.tsx line 47: add 'runbooks' to reserved paths array",
+          "Badge variants: default (blue), secondary (gray), destructive (red), warning (yellow) — use for runbook status",
+          "Progress bar: simple div with width% for completed/total ratio",
+          "Dark theme: bg-[var(--bg-primary)], text-white/90, borders via var(--border-subtle)"
         ],
         "learnings_relevant": [
-          "apiFetch unwraps envelope — client functions return apiFetch<T>() directly",
-          "Supabase RLS silent mutations — check if data is null after mutations, return 403",
-          "API route HTTP methods: sections/stages are POST-only at collection (no GET list). Runbooks SHOULD have GET list."
+          "apiFetch unwraps envelope — return apiFetch<T>() directly",
+          "React 19 useRef requires initial value",
+          "Canvas null guards: (arr ?? []).filter(Boolean) before .map()",
+          "Never sort prop arrays directly — use [...arr].sort()"
         ],
         "affected_urls": [
-          "/api/v1/runbooks",
-          "/api/v1/runbooks/[id]",
-          "/api/v1/runbook-steps",
-          "/api/v1/runbook-steps/[id]"
+          "/w/[workspaceId]/runbooks",
+          "/w/[workspaceId]/runbooks/[runbookId]"
         ]
       },
-      "has_ui_changes": false,
-      "has_data_model_changes": true,
-      "special_instructions": "POST /runbooks is the key endpoint: creates runbook AND snapshot-copies section's steps. Use Supabase server client to fetch steps WHERE section_id = req.section_id ORDER BY position ASC. Insert runbook_steps with step_id as reference to original step (for linking back to canvas), but the runbook checklist is independent — status changes on runbook_steps do NOT affect original steps. runbook_steps.step_id should be FK with ON DELETE SET NULL (if original step is deleted, runbook step remains as orphaned checklist item). The name field on runbook should default to section.name if not provided."
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "The runbook API and types already exist from iteration 80 (FEAT-047 [1/3]). Client wrappers (fetchRunbooks, createRunbook, fetchRunbook, updateRunbook, deleteRunbook, fetchRunbookSteps, updateRunbookStep) are all in client.ts. Types (Runbook, RunbookStep, RunbookStatus, RunbookStepStatus) are in database.ts. This task is UI-only — no API or migration work needed. For the 'Run as Checklist' button: use createRunbook({ workspace_id, section_id, name: section.name + ' — ' + new Date().toLocaleDateString() }), then navigate to the new runbook's view page using router.push. For the runbook view: fetch runbook + runbook_steps, render as linear checklist. Steps should be ordered by position field. Status toggles: pending→completed sets completed_at to now, completed→pending clears completed_at. For navigation from section panel to runbook view, import next/navigation useRouter."
     },
     {
       "slot": 2,
-      "id": "#IMP-011",
-      "description": "Wrap handleAddTouchpoint and handleAddStage in useCallback in journey-canvas-view.tsx — same fix pattern as IMP-008 for flow-canvas.tsx",
+      "id": "#IMP-009",
+      "description": "Add clickable navigation links from workspace comments page to source entities (steps, sections, stages, touchpoints)",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 4: The Living Playbook",
@@ -98,53 +82,56 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "handleAddTouchpoint wrapped in useCallback with appropriate dependency array",
-        "handleAddStage wrapped in useCallback with appropriate dependency array",
-        "Both added to handleKeyDown useCallback dependency array if not already",
-        "ESLint exhaustive-deps warnings for these handlers resolved",
-        "No new lint warnings introduced",
-        "npx tsc --noEmit passes"
+        "Each comment row in CommentsView shows entity name as a clickable link",
+        "Clicking the link navigates to /w/[workspaceId]/[tabId] for the correct tab containing the entity",
+        "If tab ID is not available in the comment data, link to the workspace root instead",
+        "Link styled consistently with dark theme (text-[var(--accent-blue)] hover:underline)"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
+        "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
+        "src/app/(app)/w/[workspaceId]/comments/page.tsx"
       ],
       "files_read_only": [
-        "src/components/canvas/flow-canvas.tsx"
+        "src/types/database.ts",
+        "src/lib/api/client.ts"
       ],
       "context": {
         "similar_files": [
-          "src/components/canvas/flow-canvas.tsx"
+          "src/app/(app)/w/[workspaceId]/dashboard/dashboard-view.tsx"
         ],
         "patterns_to_follow": [
-          "IMP-008 fix: handleAddStep and handleAddSection in flow-canvas.tsx were wrapped in useCallback and added to handleKeyDown's dependency array (iter 78, commit e0e95d8)"
+          "CommentsView receives initialComments and entityNames as props from server page.tsx",
+          "Comments have commentable_type (step|section|stage|touchpoint) and commentable_id fields",
+          "To resolve tab_id: the server page.tsx needs to fetch steps/sections/stages/touchpoints to map entity IDs to their parent tab IDs",
+          "Use Next.js Link component for client-side navigation"
         ],
-        "learnings_relevant": [],
-        "affected_urls": []
+        "learnings_relevant": [
+          "apiFetch unwraps envelope"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/comments"
+        ]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Read flow-canvas.tsx to see the exact IMP-008 pattern. Apply the same useCallback wrapping to handleAddTouchpoint (line ~345) and handleAddStage (line ~363) in journey-canvas-view.tsx. Verify the dependency arrays are correct for each handler."
+      "special_instructions": "The page.tsx server component already fetches comments. It needs to also build a mapping of entity_id → tab_id so CommentsView can construct navigation links. For steps: step.section_id → section.tab_id. For sections: section.tab_id directly. For stages/touchpoints: stage.tab_id / touchpoint.stage_id → stage.tab_id. Pass this mapping as a new prop (entityTabMap: Record<string, string>) to CommentsView. In CommentsView, wrap entity name in a Link to /w/{workspaceId}/{tabId}."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/canvas.ts", "src/types/index.ts"],
-    "owner": "#FEAT-047",
-    "note": "FEAT-047 owns database.ts and client.ts. IMP-011 touches only journey-canvas-view.tsx — zero overlap."
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts"],
+    "owner": null,
+    "note": "No shared file modifications needed. Both tasks use existing API client wrappers and types from iteration 80."
   },
-  "merge_order": ["#IMP-011", "#FEAT-047"],
+  "merge_order": ["#FEAT-047 [2/3]", "#IMP-009"],
   "testing_plan": {
-    "run_acceptance": false,
+    "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": null,
-    "suites_to_run": [],
+    "regression_reason": "Last regression was iteration 79 (40/40 PASS, 2 iterations ago). Risk score 2 (UI-only changes). Next regression due at iteration 87 (cadence floor).",
+    "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "Performance cadence due (iter 80 per 20/40/60/80 schedule) — deferred: just ran testing_only at iter 79 (40/40 PASS). Bundle performance checks into next testing iteration or Phase 4 testing gate.",
-      "Retrospective due at iteration 80 (per STATUS.md). Reviewer should append retrospective summary to PROGRESS.md.",
-      "Migrations 014-016 need npx supabase db push to deploy to remote DB."
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }
