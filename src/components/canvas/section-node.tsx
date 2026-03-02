@@ -8,7 +8,7 @@ import type { SectionNodeData } from "@/types/canvas";
 import { CommentCountsContext } from "@/types/canvas";
 import { getMaturityColor } from "@/lib/maturity";
 
-export function SectionNode({ data, selected }: NodeProps) {
+function SectionNodeComponent({ data, selected }: NodeProps) {
   const nodeData = data as unknown as SectionNodeData;
   const { section, averageMaturity, averageTargetMaturity, heatMapMode, annotationColor } = nodeData;
   const maturityColor = getMaturityColor(averageMaturity);
@@ -92,3 +92,5 @@ export function SectionNode({ data, selected }: NodeProps) {
     </>
   );
 }
+
+export const SectionNode = React.memo(SectionNodeComponent);
