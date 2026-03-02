@@ -242,7 +242,7 @@ export default function SettingsPage() {
       <div>
         <h2 className="text-[14px] font-semibold text-[var(--text-primary)] mb-2">Duplicate Workspace</h2>
         <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
-          Create a full copy of this workspace, including all tabs, sections, steps, connections, teams, roles, people, and tools.
+          Create a full copy of &quot;{workspace.name}&quot;, including all tabs, sections, steps, connections, teams, roles, people, and tools.
         </p>
         <Button variant="outline" onClick={() => setConfirmCloneOpen(true)} loading={cloning}>
           <Copy className="h-4 w-4" />
@@ -270,7 +270,7 @@ export default function SettingsPage() {
         <DialogHeader>
           <DialogTitle>Duplicate Workspace</DialogTitle>
           <DialogDescription>
-            A full copy will be created with all canvas data — tabs, sections, steps, connections, teams, roles, people, and tools.
+            A full copy of &quot;{workspace.name}&quot; will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
