@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template, ImprovementIdea, ImprovementStatus, ImprovementPriority } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -747,4 +747,47 @@ export async function deployTemplate(id: string, data: {
 
 export async function deleteTemplate(id: string): Promise<void> {
   await apiFetch(`/api/v1/templates/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Improvement Ideas
+// ---------------------------------------------------------------------------
+
+export async function fetchImprovementIdeas(workspaceId: string, filters?: {
+  status?: ImprovementStatus;
+  priority?: ImprovementPriority;
+}): Promise<ImprovementIdea[]> {
+  const params = new URLSearchParams({ workspace_id: workspaceId });
+  if (filters?.status) params.set("status", filters.status);
+  if (filters?.priority) params.set("priority", filters.priority);
+  return apiFetch<ImprovementIdea[]>(`/api/v1/improvement-ideas?${params}`);
+}
+
+export async function createImprovementIdea(data: {
+  workspace_id: string;
+  title: string;
+  description?: string;
+  status?: ImprovementStatus;
+  priority?: ImprovementPriority;
+  linked_step_id?: string | null;
+  linked_touchpoint_id?: string | null;
+  linked_section_id?: string | null;
+}): Promise<ImprovementIdea> {
+  return apiFetch<ImprovementIdea>("/api/v1/improvement-ideas", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateImprovementIdea(id: string, data: Partial<Pick<ImprovementIdea, "title" | "description" | "status" | "priority" | "linked_step_id" | "linked_touchpoint_id" | "linked_section_id">>): Promise<ImprovementIdea> {
+  return apiFetch<ImprovementIdea>(`/api/v1/improvement-ideas/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteImprovementIdea(id: string): Promise<void> {
+  await apiFetch(`/api/v1/improvement-ideas/${id}`, { method: "DELETE" });
 }
