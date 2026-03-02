@@ -351,6 +351,9 @@ interface PerspectivesSectionProps {
 
 function PerspectivesSection({ workspaceId, perspectives, setPerspectives, loading }: PerspectivesSectionProps) {
   const [adding, setAdding] = React.useState(false);
+  const [confirmDeletePerspectiveOpen, setConfirmDeletePerspectiveOpen] = React.useState(false);
+  const [perspectiveToDelete, setPerspectiveToDelete] = React.useState<Perspective | null>(null);
+  const [deletingPerspective, setDeletingPerspective] = React.useState(false);
 
   const handleAdd = async () => {
     setAdding(true);
@@ -375,61 +378,94 @@ function PerspectivesSection({ workspaceId, perspectives, setPerspectives, loadi
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this perspective? All annotations will be permanently removed.")) return;
+  const handleDelete = (id: string) => {
+    const p = perspectives.find((p) => p.id === id) ?? null;
+    setPerspectiveToDelete(p);
+    setConfirmDeletePerspectiveOpen(true);
+  };
+
+  const handleConfirmDeletePerspective = async () => {
+    if (!perspectiveToDelete) return;
+    setConfirmDeletePerspectiveOpen(false);
+    setDeletingPerspective(true);
     try {
-      await deletePerspective(id);
-      setPerspectives((prev) => prev.filter((p) => p.id !== id));
+      await deletePerspective(perspectiveToDelete.id);
+      setPerspectives((prev) => prev.filter((p) => p.id !== perspectiveToDelete.id));
       toast.success("Perspective deleted");
+      setPerspectiveToDelete(null);
     } catch (err) {
       toastError("Failed to delete perspective", { error: err });
+    } finally {
+      setDeletingPerspective(false);
     }
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-[14px] font-semibold text-[var(--text-primary)]">Perspectives</h2>
-        <Button onClick={handleAdd} disabled={adding} size="sm">
-          <Plus className="h-3.5 w-3.5" />
-          Add Perspective
-        </Button>
-      </div>
-      <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
-        Define stakeholder viewpoints to annotate process and journey elements from different perspectives.
-      </p>
-
-      {loading ? (
-        <div className="space-y-2">
-          {[1, 2].map((i) => (
-            <div key={i} className="h-12 rounded-[var(--radius-md)] bg-[var(--bg-surface)] animate-pulse" />
-          ))}
-        </div>
-      ) : perspectives.length === 0 ? (
-        <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-center">
-          <Eye className="h-6 w-6 text-[var(--text-tertiary)] mx-auto mb-2" />
-          <p className="text-[13px] text-[var(--text-secondary)] mb-1">No perspectives yet</p>
-          <p className="text-[12px] text-[var(--text-tertiary)] mb-3">
-            Add perspectives like &quot;Customer&quot;, &quot;Operations Manager&quot;, or &quot;IT&quot; to capture different stakeholder viewpoints.
-          </p>
+    <>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-[14px] font-semibold text-[var(--text-primary)]">Perspectives</h2>
           <Button onClick={handleAdd} disabled={adding} size="sm">
             <Plus className="h-3.5 w-3.5" />
             Add Perspective
           </Button>
         </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {perspectives.map((p) => (
-            <PerspectiveRow
-              key={p.id}
-              perspective={p}
-              onUpdate={(data) => handleUpdate(p.id, data)}
-              onDelete={() => handleDelete(p.id)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+        <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+          Define stakeholder viewpoints to annotate process and journey elements from different perspectives.
+        </p>
+
+        {loading ? (
+          <div className="space-y-2">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-12 rounded-[var(--radius-md)] bg-[var(--bg-surface)] animate-pulse" />
+            ))}
+          </div>
+        ) : perspectives.length === 0 ? (
+          <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-center">
+            <Eye className="h-6 w-6 text-[var(--text-tertiary)] mx-auto mb-2" />
+            <p className="text-[13px] text-[var(--text-secondary)] mb-1">No perspectives yet</p>
+            <p className="text-[12px] text-[var(--text-tertiary)] mb-3">
+              Add perspectives like &quot;Customer&quot;, &quot;Operations Manager&quot;, or &quot;IT&quot; to capture different stakeholder viewpoints.
+            </p>
+            <Button onClick={handleAdd} disabled={adding} size="sm">
+              <Plus className="h-3.5 w-3.5" />
+              Add Perspective
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {perspectives.map((p) => (
+              <PerspectiveRow
+                key={p.id}
+                perspective={p}
+                onUpdate={(data) => handleUpdate(p.id, data)}
+                onDelete={() => handleDelete(p.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Delete Perspective confirmation dialog */}
+      <Dialog open={confirmDeletePerspectiveOpen} onOpenChange={setConfirmDeletePerspectiveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Perspective</DialogTitle>
+            <DialogDescription>
+              Permanently delete &quot;{perspectiveToDelete?.name}&quot;? All annotations for this perspective will be permanently removed.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setConfirmDeletePerspectiveOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDeletePerspective} loading={deletingPerspective}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
