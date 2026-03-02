@@ -424,3 +424,21 @@ export interface ImprovementIdea {
   created_at: string;
   updated_at: string;
 }
+
+// =============================================================================
+// AI Analysis — process optimization insights
+// =============================================================================
+
+export interface AIInsight {
+  title: string;
+  description: string;
+  severity: "high" | "medium" | "low";
+  affected_step_ids: string[];
+}
+
+export interface AIAnalysisResult {
+  bottlenecks: AIInsight[];
+  redundancies: AIInsight[];
+  automation_candidates: AIInsight[];
+  maturity_recommendations: AIInsight[];
+}

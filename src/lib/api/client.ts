@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template, ImprovementIdea, ImprovementStatus, ImprovementPriority } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template, ImprovementIdea, ImprovementStatus, ImprovementPriority, AIAnalysisResult } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -790,4 +790,16 @@ export async function updateImprovementIdea(id: string, data: Partial<Pick<Impro
 
 export async function deleteImprovementIdea(id: string): Promise<void> {
   await apiFetch(`/api/v1/improvement-ideas/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// AI Analysis
+// ---------------------------------------------------------------------------
+
+export async function analyzeProcess(workspaceId: string): Promise<AIAnalysisResult> {
+  return apiFetch<AIAnalysisResult>("/api/v1/ai/analyze-process", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ workspace_id: workspaceId }),
+  });
 }
