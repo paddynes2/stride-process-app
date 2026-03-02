@@ -115,10 +115,13 @@ export function RunbooksListView({ runbooks, workspaceId }: RunbooksListViewProp
                     <span>·</span>
                     <span className="shrink-0">{formatDate(runbook.created_at)}</span>
                   </div>
-                  <div className="mt-1.5 h-1.5 bg-[var(--bg-surface-active)] rounded-full overflow-hidden flex">
-                    <div style={{ width: `${completedPct}%` }} className="bg-[var(--brand)]" />
-                    <div style={{ width: `${skippedPct}%` }} className="bg-white/20" />
-                    <div style={{ width: `${inProgressPct}%` }} className="bg-[var(--accent-blue)]/60" />
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-[var(--bg-surface-active)] rounded-full overflow-hidden flex">
+                      <div style={{ width: `${completedPct}%` }} className="bg-[var(--brand)]" />
+                      <div style={{ width: `${skippedPct}%` }} className="bg-white/20" />
+                      <div style={{ width: `${inProgressPct}%` }} className="bg-[var(--accent-blue)]/60" />
+                    </div>
+                    <span className="text-[11px] text-[var(--text-tertiary)] shrink-0 tabular-nums">{resolved} / {total}</span>
                   </div>
                 </Link>
               );
