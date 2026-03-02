@@ -142,6 +142,11 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
                 ? "No activity yet"
                 : `No ${ACTION_LABELS[activeFilter].toLowerCase()} activity`}
             </p>
+            {activeFilter === "all" && (
+              <p className="text-[12px] text-[var(--text-tertiary)] mt-1">
+                Actions like creating steps, adding comments, and completing runbooks appear here.
+              </p>
+            )}
           </div>
         ) : (
           <div className="space-y-2">

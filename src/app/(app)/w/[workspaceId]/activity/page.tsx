@@ -22,7 +22,7 @@ export default async function ActivityPage({
   ] = await Promise.all([
     supabase
       .from("activity_log")
-      .select("*")
+      .select("*, users!activity_log_user_id_fkey(email)")
       .eq("workspace_id", workspaceId)
       .order("created_at", { ascending: false })
       .range(0, 49),
