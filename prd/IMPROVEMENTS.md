@@ -45,13 +45,11 @@
   - **Why it matters:** Data hygiene. Not urgent because orphaned records don't break anything, but accumulate over time.
   - **Suggested fix:** Add a DB trigger or periodic cleanup. FK constraints are complex here due to polymorphic annotatable_type pointing to different tables.
 
-- [ ] #IMP-006 AnnotationPanel/CommentPanel visibility asymmetry — Attempts: 0
+- [x] #IMP-006 AnnotationPanel/CommentPanel visibility asymmetry — Attempts: 1 — DONE iteration 82, 2026-03-02
   - **Found:** Iteration 73 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`, `journey-canvas-view.tsx`
-  - **What:** AnnotationPanel is gated on activePerspective (hidden when none selected). CommentPanel always shows when entity selected. Users may be confused by this asymmetry.
-  - **Why it matters:** Nielsen H6 — Recognition rather than recall. Users need to understand when each panel appears.
-  - **Suggested fix:** Add empty state on AnnotationPanel area when no perspective active ("Select a perspective to add annotations").
+  - **Fix applied:** Replaced `{activePerspective && selected && <AnnotationPanel />}` with ternary showing empty state message ("Select a perspective to add annotations") when no perspective active. Applied to both canvas-view.tsx and journey-canvas-view.tsx for step/section and stage/touchpoint selection paths.
 
 - [ ] #IMP-007 Journey canvas keyboard shortcuts undocumented in UI — Attempts: 0
   - **Found:** Iteration 73 (regression tester)

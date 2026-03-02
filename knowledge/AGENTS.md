@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-81, 2026-03-02 -->
+<!-- Updated: iter-82, 2026-03-02 -->
 
 ## Project
 
@@ -45,8 +45,8 @@ npx supabase db push     # Push migrations
 | `/w/.../people` | `src/app/(app)/w/[workspaceId]/people/page.tsx` | People management (flat table CRUD) |
 | `/w/.../tools` | `src/app/(app)/w/[workspaceId]/tools/page.tsx` | Tools management (flat table CRUD) |
 | `/w/.../comments` | `src/app/(app)/w/[workspaceId]/comments/page.tsx` | Workspace comments (all comments, category filter, entity nav links) |
-| `/w/.../runbooks` | `src/app/(app)/w/[workspaceId]/runbooks/page.tsx` | Runbook list (name, status, progress, section, date) |
-| `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with progress bar, notes, status toggle) |
+| `/w/.../runbooks` | `src/app/(app)/w/[workspaceId]/runbooks/page.tsx` | Runbook list (name, status, progress, section, date, filter tabs) |
+| `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with 4-state status, progress bar+text, notes, Complete/Cancel, read-only mode, metadata footer) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 

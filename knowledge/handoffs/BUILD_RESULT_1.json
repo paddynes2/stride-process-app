@@ -1,75 +1,47 @@
 {
   "schema_version": "1.0",
-  "iteration": 81,
+  "iteration": 82,
   "slot": 1,
-  "task_id": "#FEAT-047 [2/3]",
+  "task_id": "#FEAT-047",
   "status": "completed",
-  "duration_seconds": 540,
+  "duration_seconds": 420,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/runbooks/page.tsx",
-      "action": "created",
-      "lines_added": 27,
-      "lines_removed": 0
+      "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
+      "action": "modified",
+      "lines_added": 183,
+      "lines_removed": 50
     },
     {
       "path": "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
-      "action": "created",
-      "lines_added": 85,
-      "lines_removed": 0
+      "action": "modified",
+      "lines_added": 41,
+      "lines_removed": 10
     },
     {
       "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx",
-      "action": "created",
-      "lines_added": 39,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
-      "action": "created",
-      "lines_added": 170,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/components/panels/section-detail-panel.tsx",
-      "action": "modified",
-      "lines_added": 29,
-      "lines_removed": 2
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
       "action": "modified",
       "lines_added": 1,
-      "lines_removed": 1
-    },
-    {
-      "path": "src/components/layout/sidebar.tsx",
-      "action": "modified",
-      "lines_added": 2,
-      "lines_removed": 2
+      "lines_removed": 0
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — clean, no output" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused) — documented in LEARNINGS.md, not introduced by this task" },
-    "build": { "status": "pass", "output": "next build — compiled successfully. /w/[workspaceId]/runbooks and /w/[workspaceId]/runbooks/[runbookId] both appear in route table." },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit test suite configured" }
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit: no output, exit 0" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused). No new errors or warnings introduced." },
+    "build": { "status": "pass", "output": "npm run build: compiled successfully. Pre-existing Turbopack workspace root warning only. All runbook routes listed in build output." },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for this area." }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/runbooks/page.tsx",
-    "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
-    "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx",
     "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
-    "src/components/panels/section-detail-panel.tsx",
-    "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
-    "src/components/layout/sidebar.tsx"
+    "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+    "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Runbook list page: queries runbooks with nested sections(id,name) and runbook_steps(id,status) in one Supabase call to compute progress. Runbook view page: queries runbook_steps with steps(id,name) join to display step names. RunbookStep type has no name field — step names come from FK join (deleted steps show 'Deleted Step'). Section-detail-panel uses section.workspace_id for navigation (no new prop needed). Sidebar Workflows active-check updated to exclude /runbooks.",
+  "notes": "All 7 acceptance criteria implemented. (1) Complete Runbook button calls updateRunbook with status=completed + completed_at, requires window.confirm. (2) Cancel Runbook button calls updateRunbook with status=cancelled, requires window.confirm. Both buttons hidden when isReadOnly. (3) Checkbox replaced with 4-button status group (pending/in_progress/completed/skipped); completed sets completed_at, others clear it. (4) Read-only banner shown for completed/cancelled runbooks; step buttons + notes textarea disabled. (5) Progress text 'X of Y steps completed · N in progress, N skipped' below progress bar. (6) Metadata footer with started_at, completed_at (if set), created_by (shows 'by you' when userId matches). (7) List view has All/Active/Completed/Cancelled filter tabs with client-side filtering; count updates with filter.",
 
   "failure_details": null
 }

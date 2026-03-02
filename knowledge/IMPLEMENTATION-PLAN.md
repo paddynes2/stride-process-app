@@ -101,7 +101,7 @@ Core consulting insight features:
   - [x] [2/3] Comment panel UI on detail panels — DONE iteration 73
   - [x] [3/3] Canvas badges + workspace comments view — DONE iteration 74
 - [x] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder) — [1/3] DONE iter 76, [2/3] DONE iter 77, [3/3] DONE iter 78
-- [ ] #FEAT-047 Runbook instances (turn sections into executable checklists) — [1/3] DONE iter 80, [2/3] DONE iter 81
+- [x] #FEAT-047 Runbook instances (turn sections into executable checklists) — [1/3] DONE iter 80, [2/3] DONE iter 81, [3/3] DONE iter 82
 - [ ] #FEAT-048 Playbook mode (distraction-free runbook execution view)
 - [ ] #FEAT-049 Activity log (audit trail for consulting engagements)
 - [ ] #FEAT-050 Workspace cloning (deep copy for reuse)
@@ -140,3 +140,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 79: Testing-only — acceptance (#FEAT-046) + regression. 40/40 PASS (static analysis). FEAT-046 fully acceptance-tested. 1 improvement logged (IMP-011). Retrospective due at iteration 80.
 - [2026-03-02] Iteration 80: FEAT-047 [1/3] completed — runbook instances data layer (migration 016, types, API routes, client wrappers). IMP-011 completed — journey-canvas useCallback fix. Both builders merged cleanly. Retrospective performed (iter 80 = multiple of 10).
 - [2026-03-02] Iteration 81: FEAT-047 [2/3] completed — runbook UI (list page, view page, section panel button, sidebar nav). IMP-009 completed (comment nav links). Both builders merged cleanly. [3/3] polish remaining.
+- [2026-03-02] Iteration 82: FEAT-047 [3/3] completed — runbook polish (Complete/Cancel buttons, 4-state step status, read-only view, progress text, metadata footer, list filter). IMP-006 completed (annotation panel empty state). FEAT-047 fully done. Next: acceptance testing for FEAT-047.

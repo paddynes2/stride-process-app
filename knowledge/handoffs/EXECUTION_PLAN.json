@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 81,
-  "date": "2026-03-02T08:00:00Z",
+  "iteration": 82,
+  "date": "2026-03-02T12:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "c5e25a9c5a8ec221ef16fb9e64eb4b0cef35fbd3",
+    "last_commit_hash": "80067f6c3b5f06dd99a3793da3dcf2d4778fc878",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,68 +13,66 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-047 [2/3]",
-      "description": "Runbook UI — 'Run as Checklist' button on section panel, runbook view (linear checklist with progress bar), runbook list page, sidebar nav link",
+      "id": "#FEAT-047",
+      "description": "[3/3] Runbook polish — 'Complete Runbook' button, step status transitions (all 4 states), cancel runbook, read-only completed view, progress text, runbook metadata footer, list view status filter",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 4: The Living Playbook",
       "complexity": "M",
-      "attempts": 1,
+      "attempts": 3,
       "risk_score": 2,
       "acceptance_criteria": [
-        "'Run as Checklist' button visible on section detail panel — calls createRunbook API (workspace_id, section_id, name derived from section name) and navigates to runbook view",
-        "Runbook view page at /w/[workspaceId]/runbooks/[runbookId] — shows runbook name, status badge, progress bar (completed/total), linear checklist of runbook_steps with checkbox, step name, status, notes field",
-        "Clicking checkbox on a runbook step calls updateRunbookStep to toggle status (pending↔completed), sets completed_at",
-        "Runbook list page at /w/[workspaceId]/runbooks — lists all workspace runbooks with name, status badge, progress (e.g. '3/7'), section name, created date",
-        "Sidebar nav link for Runbooks (below Comments in nav order)",
-        "'runbooks' added to workspace-shell.tsx reserved paths array"
+        "'Complete Runbook' button on runbook-view header — calls updateRunbook(id, { status: 'completed', completed_at: new Date().toISOString() }). Requires confirmation dialog before executing. Button disabled when runbook already completed/cancelled.",
+        "'Cancel Runbook' option (dropdown or secondary button) — sets status='cancelled'. Requires confirmation. No completed_at timestamp for cancellation.",
+        "Step status transitions: replace simple checkbox toggle with a dropdown or button group exposing all 4 states: pending, in_progress, completed, skipped. Completed sets completed_at, others clear it. Use existing STEP_STATUS_CONFIG for badge colors.",
+        "Completed/cancelled runbooks are read-only — step toggles disabled, notes textarea disabled, Complete/Cancel buttons hidden. Show a banner: 'This runbook was completed on {date}' or 'This runbook was cancelled'.",
+        "Progress text below progress bar: 'X of Y steps completed' with optional breakdown (e.g., '2 in progress, 1 skipped').",
+        "Runbook metadata footer: started_at date, completed_at date (if set), created_by (show 'by you' or user email if available).",
+        "Runbooks list view: add status filter tabs or dropdown (All / Active / Completed / Cancelled). Default to 'All'. Client-side filter on existing data."
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/runbooks/**/*",
-        "src/components/panels/section-detail-panel.tsx",
-        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
-        "src/components/layout/sidebar.tsx"
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
+        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+        "src/app/(app)/w/[workspaceId]/runbooks/page.tsx",
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx"
       ],
       "files_read_only": [
         "src/lib/api/client.ts",
         "src/types/database.ts",
-        "src/types/canvas.ts",
-        "src/app/(app)/w/[workspaceId]/comments/page.tsx"
+        "src/components/ui/badge.tsx",
+        "src/components/ui/button.tsx",
+        "src/components/ui/dropdown-menu.tsx"
       ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/comments/page.tsx",
-          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
-          "src/components/panels/task-panel.tsx"
+          "src/components/panels/task-panel.tsx — checkbox + status pattern",
+          "src/components/panels/comment-panel.tsx — category filter pattern"
         ],
         "patterns_to_follow": [
-          "Comments page pattern: server page.tsx fetches data via Supabase server client, passes to client CommentsView component",
-          "TaskPanel pattern: checkbox list with inline editing, status toggles via API calls",
-          "Sidebar nav: lucide-react icon + label, link to /w/[workspaceId]/runbooks",
-          "workspace-shell.tsx line 47: add 'runbooks' to reserved paths array",
-          "Badge variants: default (blue), secondary (gray), destructive (red), warning (yellow) — use for runbook status",
-          "Progress bar: simple div with width% for completed/total ratio",
-          "Dark theme: bg-[var(--bg-primary)], text-white/90, borders via var(--border-subtle)"
+          "Use updateRunbook(id, { status, completed_at }) from client.ts — already exists",
+          "Use updateRunbookStep(id, { status, completed_at }) from client.ts — already exists",
+          "Status badge configs already defined in runbook-view.tsx (RUNBOOK_STATUS_CONFIG, STEP_STATUS_CONFIG)",
+          "Optimistic updates with rollback on error — existing pattern in runbook-view.tsx",
+          "Confirmation before destructive actions — use window.confirm() or dialog component",
+          "Client-side filtering — see comments-view.tsx category filter pattern"
         ],
         "learnings_relevant": [
-          "apiFetch unwraps envelope — return apiFetch<T>() directly",
-          "React 19 useRef requires initial value",
-          "Canvas null guards: (arr ?? []).filter(Boolean) before .map()",
-          "Never sort prop arrays directly — use [...arr].sort()"
+          "React state immutability — use [...arr].map() for updates, never mutate",
+          "React 19 useRef requires initial value"
         ],
         "affected_urls": [
-          "/w/[workspaceId]/runbooks",
-          "/w/[workspaceId]/runbooks/[runbookId]"
+          "/w/{workspaceId}/runbooks",
+          "/w/{workspaceId}/runbooks/{runbookId}"
         ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The runbook API and types already exist from iteration 80 (FEAT-047 [1/3]). Client wrappers (fetchRunbooks, createRunbook, fetchRunbook, updateRunbook, deleteRunbook, fetchRunbookSteps, updateRunbookStep) are all in client.ts. Types (Runbook, RunbookStep, RunbookStatus, RunbookStepStatus) are in database.ts. This task is UI-only — no API or migration work needed. For the 'Run as Checklist' button: use createRunbook({ workspace_id, section_id, name: section.name + ' — ' + new Date().toLocaleDateString() }), then navigate to the new runbook's view page using router.push. For the runbook view: fetch runbook + runbook_steps, render as linear checklist. Steps should be ordered by position field. Status toggles: pending→completed sets completed_at to now, completed→pending clears completed_at. For navigation from section panel to runbook view, import next/navigation useRouter."
+      "special_instructions": "The API already supports all needed operations (updateRunbook for status/completed_at, updateRunbookStep for status/completed_at). This is pure UI work. Do NOT modify API routes or client.ts. Step assignment UI (assigned_to) is out of scope for this sub-task — the field exists but showing a user picker is a separate feature. Focus on the 7 acceptance criteria items."
     },
     {
       "slot": 2,
-      "id": "#IMP-009",
-      "description": "Add clickable navigation links from workspace comments page to source entities (steps, sections, stages, touchpoints)",
+      "id": "#IMP-006",
+      "description": "Add empty state to annotation panel area when no perspective is active — 'Select a perspective to add annotations' message",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 4: The Living Playbook",
@@ -82,56 +80,57 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Each comment row in CommentsView shows entity name as a clickable link",
-        "Clicking the link navigates to /w/[workspaceId]/[tabId] for the correct tab containing the entity",
-        "If tab ID is not available in the comment data, link to the workspace root instead",
-        "Link styled consistently with dark theme (text-[var(--accent-blue)] hover:underline)"
+        "When a step/section is selected on the process canvas BUT no perspective is active, show a subtle empty state message where AnnotationPanel would appear: 'Select a perspective to add annotations'. Match existing panel section styling (text-white/55, small text).",
+        "Same behavior on journey canvas (touchpoint/stage selected, no perspective active).",
+        "When a perspective IS active, AnnotationPanel renders as before (no change to existing behavior).",
+        "When nothing is selected, nothing changes (panels don't show at all)."
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
-        "src/app/(app)/w/[workspaceId]/comments/page.tsx"
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
       ],
       "files_read_only": [
-        "src/types/database.ts",
-        "src/lib/api/client.ts"
+        "src/components/panels/annotation-panel.tsx",
+        "src/lib/context/workspace-context.tsx"
       ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/dashboard/dashboard-view.tsx"
+          "src/components/panels/annotation-panel.tsx — see how it renders when active"
         ],
         "patterns_to_follow": [
-          "CommentsView receives initialComments and entityNames as props from server page.tsx",
-          "Comments have commentable_type (step|section|stage|touchpoint) and commentable_id fields",
-          "To resolve tab_id: the server page.tsx needs to fetch steps/sections/stages/touchpoints to map entity IDs to their parent tab IDs",
-          "Use Next.js Link component for client-side navigation"
+          "activePerspective from useWorkspace() context — already used in both canvas views",
+          "Conditional rendering: {activePerspective ? <AnnotationPanel /> : <EmptyState />}",
+          "Empty state text: text-white/55 text-sm, centered in panel area"
         ],
-        "learnings_relevant": [
-          "apiFetch unwraps envelope"
-        ],
+        "learnings_relevant": [],
         "affected_urls": [
-          "/w/[workspaceId]/comments"
+          "/w/{workspaceId}/{tabId}"
         ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The page.tsx server component already fetches comments. It needs to also build a mapping of entity_id → tab_id so CommentsView can construct navigation links. For steps: step.section_id → section.tab_id. For sections: section.tab_id directly. For stages/touchpoints: stage.tab_id / touchpoint.stage_id → stage.tab_id. Pass this mapping as a new prop (entityTabMap: Record<string, string>) to CommentsView. In CommentsView, wrap entity name in a Link to /w/{workspaceId}/{tabId}."
+      "special_instructions": "Minimal change. Find the conditional render of AnnotationPanel in both canvas views (gated on activePerspective). Add an else branch with a small message div. Do NOT restructure existing panel layout or add new components — just a conditional text message."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
     "owner": null,
-    "note": "No shared file modifications needed. Both tasks use existing API client wrappers and types from iteration 80."
+    "note": "No shared file modifications needed. Both tasks are pure UI changes using existing APIs and types."
   },
-  "merge_order": ["#FEAT-047 [2/3]", "#IMP-009"],
+  "merge_order": ["#FEAT-047", "#IMP-006"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Last regression was iteration 79 (40/40 PASS, 2 iterations ago). Risk score 2 (UI-only changes). Next regression due at iteration 87 (cadence floor).",
+    "regression_reason": "Last regression iter 79 (40/40 PASS, 3 iterations ago). Risk score 4 from iter 81 recommends regression — schedule for iter 83 if FEAT-047 completes this iteration.",
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": [
+      "Risk score 4 from iteration 81 (9 files, shared components). Regression recommended for iteration 83.",
+      "Migrations 014-016 still need npx supabase db push for remote DB.",
+      "Acceptance testing for FEAT-047 [2/3] UI (iter 81) was not performed — testers should cover it alongside [3/3]."
+    ],
     "diagnoses_written": false,
     "signal_override": null
   }

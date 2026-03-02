@@ -791,3 +791,33 @@
 - Efficiency: 4 — both builders completed and merged cleanly. No manual recovery needed.
 - Observations: 0
 **Notes:** Second consecutive clean multi-task merge (after iter 80). Builder merge commits labeled "iteration 27" (counter bug persists in ralph.sh). FEAT-047 [2/3] complete — UI layer built on top of iter 80's data layer. IMP-009 resolves a regression-found usability issue. [3/3] polish (status transitions, Complete Runbook button) is next. Acceptance testing for runbook UI recommended next testing iteration.
+
+## Iteration 82 — 2026-03-02 14:00
+**Tasks:**
+- #FEAT-047 [3/3] Runbook polish — Complete/Cancel buttons, 4-state step status, read-only view, progress text, metadata footer, list filter — slot 1 — completed
+- #IMP-006 Annotation panel empty state when no perspective active — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx (+183/-50 — Complete/Cancel buttons, 4-state step status group, read-only mode, progress text, metadata footer)
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx (+41/-10 — status filter tabs with client-side filtering)
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx (+1 — userId prop)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (+20/-10 — annotation empty state)
+- Modified: src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx (+20/-10 — annotation empty state)
+**Verification:**
+- Type check: pass (0 errors — POST_MERGE_CHECK: PASS)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: pass (both builders verified)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true for both slots)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — clean optimistic updates with rollback on Complete/Cancel. Step status button group follows design system. Read-only mode properly guards all interactive elements. Filter tabs match existing patterns.
+- Test coverage: 2 — typecheck + lint + build only, no runtime testing
+- Confidence: 5 — purely UI changes using existing API wrappers. No data model or API modifications.
+- Efficiency: 5 — third consecutive clean multi-task merge (iter 80, 81, 82). No manual recovery needed.
+- Observations: 0
+**Notes:** Third consecutive clean merge. FEAT-047 is now fully complete (3/3): data layer (iter 80), UI (iter 81), polish (iter 82). IMP-006 resolves annotation panel visibility asymmetry found by regression tester in iter 73. Builder merge commits labeled "iteration 28" (counter bug persists). Acceptance testing for FEAT-047 recommended as next priority.

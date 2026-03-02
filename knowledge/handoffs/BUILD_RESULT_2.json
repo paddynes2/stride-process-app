@@ -1,40 +1,40 @@
 {
   "schema_version": "1.0",
-  "iteration": 81,
+  "iteration": 82,
   "slot": 2,
-  "task_id": "#IMP-009",
+  "task_id": "#IMP-006",
   "status": "completed",
   "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/comments/page.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
       "action": "modified",
-      "lines_added": 8,
-      "lines_removed": 4
+      "lines_added": 20,
+      "lines_removed": 10
     },
     {
-      "path": "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx",
       "action": "modified",
-      "lines_added": 8,
-      "lines_removed": 3
+      "lines_added": 20,
+      "lines_removed": 10
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exit 0, no errors" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused — documented in LEARNINGS.md). 0 errors, 0 new warnings." },
-    "build": { "status": "not_applicable", "output": "Full build not run; typecheck sufficient for S-complexity UI change" },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for this area" }
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known, documented in LEARNINGS.md). 0 errors." },
+    "build": { "status": "pass", "output": "Compiled successfully in 5.4s, 29/29 static pages generated" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests for canvas view components" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/comments/page.tsx",
-    "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx"
+    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+    "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "page.tsx: added tab_id to all 4 entity select queries (steps, sections, stages, touchpoints); built entityTabMap Record<string,string> mapping entity_id -> tab_id; passed workspaceId and entityTabMap as new props to CommentsView. comments-view.tsx: added workspaceId:string and entityTabMap:Record<string,string> to CommentsViewProps; imported Link from next/link; replaced entity name <span> with <Link> using href=/w/{workspaceId}/{tabId} when tabId in map, fallback /w/{workspaceId}; styled with text-[var(--accent-blue)] hover:underline. All entity types (step, section, stage, touchpoint) have tab_id directly on the DB row — no join traversal needed.",
+  "notes": "Minimal change: replaced `{activePerspective && selectedStep && <AnnotationPanel />}` pattern with ternary `{selectedStep && (activePerspective ? <AnnotationPanel /> : <empty-state div />)}` in both canvas views. The empty state div uses `border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center` matching the design system conventions. Same change applied for section/stage/touchpoint selection cases. When nothing is selected, panels still don't show at all — unchanged behavior.",
 
   "failure_details": null
 }
