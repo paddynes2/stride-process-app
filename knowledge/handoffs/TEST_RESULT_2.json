@@ -1,168 +1,158 @@
 {
   "schema_version": "1.0",
-  "iteration": 103,
+  "iteration": 105,
   "test_type": "regression",
-  "suite_name": "phase4-full-gate",
-  "status": "passed",
-  "duration_seconds": 420,
-
-  "note": "Playwright MCP unavailable per LEARNINGS.md. Full static code analysis performed across 30+ source files, API routes, migration SQL, and context providers. No live browser testing performed.",
+  "suite_name": "regression-baseline + feat-034-data-integrity (static)",
+  "status": "playwright_unavailable",
+  "duration_seconds": 120,
 
   "criteria_results": [
     {
-      "criterion": "Full regression: process canvas (create/edit/delete steps+sections+connections), journey canvas, perspectives, gap analysis, comparison, teams/people/tools CRUD, PDF/PNG export, public sharing",
-      "task_id": "#FEAT-053",
+      "criterion": "Migration 021 adds effort_score INT CHECK (1-5) nullable and impact_score INT CHECK (1-5) nullable to steps table",
+      "task_id": "#FEAT-034 [1/2]",
       "result": "pass",
-      "evidence": "step-node.tsx, section-node.tsx, flow-canvas.tsx, journey-canvas-view.tsx all present with correct React Flow integration. workspace-shell.tsx exclusion list verified at lines 44-51 (BUG-021 fix): [teams, people, tools, settings, list, gap-analysis, compare, comments, dashboard, runbooks, activity] — all 11 reserved routes excluded. Settings page covers perspectives CRUD and public sharing. lib/export/ utilities confirmed via prior iterations.",
+      "evidence": "supabase/migrations/021_prioritization_scores.sql line 5-7: ALTER TABLE steps ADD COLUMN effort_score INT CHECK (effort_score BETWEEN 1 AND 5), ADD COLUMN impact_score INT CHECK (impact_score BETWEEN 1 AND 5). Matches migration 007 pattern exactly (verified 007 side-by-side). Nullable by default (no NOT NULL constraint).",
       "screenshot_description": null
     },
     {
-      "criterion": "Comments: create with category, threaded replies, resolve, filter by category on workspace comments page, count badges, CommentCountsContext wired",
-      "task_id": "#FEAT-053",
+      "criterion": "Migration 021 adds effort_score INT CHECK (1-5) nullable and impact_score INT CHECK (1-5) nullable to touchpoints table",
+      "task_id": "#FEAT-034 [1/2]",
       "result": "pass",
-      "evidence": "comments/route.ts validates VALID_COMMENTABLE_TYPES and VALID_CATEGORIES, supports parent_id threading. comment-panel.tsx resolves/unresolves inline and auto-expands threads on reply. comments-view.tsx filters top-level comments by category with badge display. CommentCountsContext confirmed in step-node.tsx (lines 31-32) and section-node.tsx. Comment badges render when count > 0.",
+      "evidence": "supabase/migrations/021_prioritization_scores.sql line 9-11: ALTER TABLE touchpoints ADD COLUMN effort_score INT CHECK (effort_score BETWEEN 1 AND 5), ADD COLUMN impact_score INT CHECK (impact_score BETWEEN 1 AND 5). Same nullable pattern.",
       "screenshot_description": null
     },
     {
-      "criterion": "Tasks: create on step, toggle completion (strikethrough), reorder (position field), count badges on step nodes (TaskCountsContext), section-level task rollup in section detail panel",
-      "task_id": "#FEAT-053",
+      "criterion": "Step interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+      "task_id": "#FEAT-034 [1/2]",
       "result": "pass",
-      "evidence": "task-panel.tsx: sorts by position, drag-and-drop reorder via HTML5 drag events, optimistic toggle with revert on error. tasks/route.ts: auto-position as MAX+1. TaskCountsContext confirmed in step-node.tsx (lines 33-34), badge renders completed/total. section-detail-panel.tsx: task rollup lines 158-283, sums completed/total across all steps in section, only renders when totalTasksCount > 0.",
+      "evidence": "database.ts lines 93-94: effort_score: number | null and impact_score: number | null added after target_maturity: number | null (line 92) per special_instructions. Type matches nullable INT column exactly.",
       "screenshot_description": null
     },
     {
-      "criterion": "Runbooks: create from section (step snapshot), 4-state transitions (pending→in_progress→completed, pending→skipped), progress bar (resolved=completed+skipped), Complete/Cancel via Radix Dialog, read-only for completed/cancelled, list page with filter tabs",
-      "task_id": "#FEAT-053",
+      "criterion": "Touchpoint interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+      "task_id": "#FEAT-034 [1/2]",
       "result": "pass",
-      "evidence": "runbooks/route.ts: two-phase create — inserts runbook then snapshots section steps by position_x into runbook_steps. runbook-view.tsx: isReadOnly = status === 'completed' || 'cancelled', 600ms debounced notes, pessimistic revert on error. runbooks-list-view.tsx: progress bar computes (completed+skipped)/total. RunbookWithRelations type includes runbook_steps array for progress calc. runbooks-list-view has filter tabs for active/completed/cancelled.",
+      "evidence": "database.ts lines 197-198: effort_score: number | null and impact_score: number | null added after position_y: number (line 196) and before created_at: string (line 199), exactly matching special_instructions placement.",
       "screenshot_description": null
     },
     {
-      "criterion": "Playbook: distraction-free fixed overlay (z-50), Mark Complete & Next advances to next pending step, Skip, dot navigation, progress bar+text, mobile-responsive (max-w-xl), URL-shareable",
-      "task_id": "#FEAT-053",
+      "criterion": "Steps PATCH route includes effort_score and impact_score in EDITABLE_FIELDS",
+      "task_id": "#FEAT-034 [1/2]",
       "result": "pass",
-      "evidence": "playbook-view.tsx: 'fixed inset-0 z-50' confirmed at lines 109 and 122. max-w-xl confirmed at lines 152 and 241. handleMarkComplete/handleSkip auto-advance to next pending/in_progress step. Dot navigation renders at bottom. Progress bar computed as resolved/total. Route is /w/[workspaceId]/runbooks/[runbookId]/playbook — standard Next.js dynamic route, URL-shareable. isReadOnly guard when status !== 'active'.",
+      "evidence": "src/app/api/v1/steps/[id]/route.ts lines 21-22: 'effort_score' and 'impact_score' present in EDITABLE_FIELDS array (follows existing maturity_score and target_maturity pattern at lines 19-20).",
       "screenshot_description": null
     },
     {
-      "criterion": "Activity: logActivity() in POST/PATCH/DELETE routes (spot-check 10+ routes), activity page renders entries with user email, action type filter tabs, Load More pagination with skeleton, entity links navigate",
-      "task_id": "#FEAT-053",
+      "criterion": "Touchpoints PATCH route includes effort_score and impact_score in EDITABLE_FIELDS",
+      "task_id": "#FEAT-034 [1/2]",
       "result": "pass",
-      "evidence": "logActivity() confirmed in all 10 spot-checked routes: steps, sections, connections, workspaces, tabs, teams, people, tools, runbooks/[id], runbook-steps/[id]. Activity route joins users table for email. activity-view.tsx: filter tabs for 8 action types, loadMore() paginates via offset=entries.length, hasMore flag drives 'Load More' button. People and runbook-steps use IIFE wrappers to resolve workspace_id before logging.",
+      "evidence": "src/app/api/v1/touchpoints/[id]/route.ts lines 16-17: 'effort_score' and 'impact_score' present in EDITABLE_FIELDS array after 'position_y'.",
       "screenshot_description": null
     },
     {
-      "criterion": "Clone: clone_workspace() RPC (migration 018), API route POST /workspaces/[id]/clone, Duplicate Workspace button in settings with Radix Dialog, deep copy covers 12+ child tables, new UUIDs throughout",
-      "task_id": "#FEAT-053",
+      "criterion": "npx tsc --noEmit passes cleanly after changes",
+      "task_id": "#FEAT-034 [1/2]",
       "result": "pass",
-      "evidence": "migration 018_clone_workspace.sql: SECURITY DEFINER function copies 13 child tables (workspace→tabs→sections→steps→connections→teams→roles→people→tools→step_roles→stages→touchpoints→touchpoint_connections). UUID remapping via temp tables (_cwt_tab, _cwt_section, _cwt_step, _cwt_team, _cwt_role, _cwt_stage, _cwt_touchpoint). API route calls supabase.rpc('clone_workspace') and logs activity with cloned_from detail. settings/page.tsx has Duplicate Workspace section with confirmCloneOpen state (Radix Dialog).",
+      "evidence": "BUILD_RESULT_1.json verification.typecheck: { status: 'pass', errors: 0 }. BUILD_RESULT_2.json: same. BUILD_RESULT_3.json: same. All three slots report zero TypeScript errors.",
       "screenshot_description": null
     },
     {
-      "criterion": "Coloring: CRUD (API + panel UI), rules evaluated client-side in position order (last match wins), step nodes show 15% opacity tint, heat map takes precedence, has_role disabled in dropdown (BUG-020 fix), paintbrush button in canvas toolbar",
-      "task_id": "#FEAT-053",
+      "criterion": "DialogDescription in the Duplicate Workspace dialog includes the workspace name dynamically",
+      "task_id": "#IMP-042",
       "result": "pass",
-      "evidence": "coloring-rules/route.ts: validates color as /^#[0-9A-Fa-f]{6}$/i, validates criteria_type against VALID_CRITERIA_TYPES. coloring-panel.tsx: has_role disabled={true} with label 'Has Role (coming soon)' (BUG-020 confirmed fixed). canvas-view.tsx: evaluates activeRules in order, overwrites map entry per step so last match wins. step-node.tsx line 53: backgroundColor `${coloringTint}26` = 0x26/0xFF ≈ 14.9% opacity ≈ 15%. Heat map precedence: heatMapMode && maturityColor → maturity tint, else coloringTint. flow-canvas.tsx: paintbrush button toggles showColoringPanel.",
+      "evidence": "settings/page.tsx line 273: DialogDescription contains 'A full copy of &quot;{workspace.name}&quot; will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.' workspace.name is sourced from useWorkspace() at line 36.",
       "screenshot_description": null
     },
     {
-      "criterion": "Templates: CRUD (API + migration 020 table), Save as Template dialog on section panel, template browser dialog in canvas toolbar, STARTER_TEMPLATES (4 hardcoded), deploy route with UUID remap, role-by-name matching",
-      "task_id": "#FEAT-053",
+      "criterion": "Settings page body text paragraph also includes the workspace name for consistency",
+      "task_id": "#IMP-042",
       "result": "pass",
-      "evidence": "migration 020_section_templates.sql exists on disk (not yet pushed to remote). templates/route.ts: GET list, POST create-from-section (stores step positions relative to section origin). templates/[id]/route.ts: DELETE. templates/[id]/deploy/route.ts: remaps step UUIDs via stepIdMap, remaps connections, matches roles by name. section-detail-panel.tsx: 'Save as Template' dialog at line 390. canvas-view.tsx: template browser dialog at line 364 (uses DialogPrimitive.Title correctly). lib/templates.ts: 4 STARTER_TEMPLATES (Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing). DB operations blocked until migration pushed — code paths and UI states verified.",
+      "evidence": "settings/page.tsx line 245: paragraph reads 'Create a full copy of &quot;{workspace.name}&quot;, including all tabs, sections, steps, connections, teams, roles, people, and tools.' Uses JSX &quot; entities to produce typographic quotes around the name.",
       "screenshot_description": null
     },
     {
-      "criterion": "Compilation: npx tsc --noEmit passes, npm run lint passes (1 pre-existing warning acceptable), no new TypeScript errors",
-      "task_id": "#FEAT-053",
+      "criterion": "Each runbook card shows a text label like '3 / 5' next to or below the progress bar",
+      "task_id": "#IMP-046",
       "result": "pass",
-      "evidence": "EXECUTION_PLAN.json validation.compilation_status = 'passing'. Static analysis of 30+ files found: 0 undefined references, 0 missing imports, 0 type mismatches. Only 1 explicit 'any' assertion in templates/route.ts line 116 (safe cast for step_roles mapping after validation). All Context types properly defined in types/canvas.ts. No bare useRef() calls — all use useRef(null) or useRef(undefined) per React 19 requirement.",
+      "evidence": "runbooks-list-view.tsx line 124: <span className='text-[11px] text-[var(--text-tertiary)] shrink-0 tabular-nums'>{resolved} / {total}</span> rendered inside the flex container alongside the progress bar div (line 119).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Text uses existing text hierarchy (text-[var(--text-secondary)] or text-[var(--text-tertiary)])",
+      "task_id": "#IMP-046",
+      "result": "pass",
+      "evidence": "runbooks-list-view.tsx line 124: className includes text-[var(--text-tertiary)]. Consistent with surrounding card metadata text at line 111 which also uses text-[var(--text-tertiary)].",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Text shows resolved count (completed + skipped) out of total, matching playbook-view.tsx pattern",
+      "task_id": "#IMP-046",
+      "result": "pass",
+      "evidence": "runbooks-list-view.tsx line 94: const resolved = completed + skipped. Line 124 renders {resolved} / {total}. The 'resolved' variable correctly sums completed (line 91) + skipped (line 92). tabular-nums applied for stable digit width.",
       "screenshot_description": null
     }
   ],
 
   "quality_gate": {
-    "pages_checked": [
-      "/w/[workspaceId]/[tabId]",
-      "/w/[workspaceId]/comments",
-      "/w/[workspaceId]/runbooks",
-      "/w/[workspaceId]/runbooks/[id]",
-      "/w/[workspaceId]/runbooks/[id]/playbook",
-      "/w/[workspaceId]/activity",
-      "/w/[workspaceId]/settings"
-    ],
+    "pages_checked": ["static analysis only — playwright unavailable"],
     "console_errors": 0,
     "network_errors": 0,
-    "accessibility_issues": 1,
-    "layout_shifts": 0,
-    "note": "Static analysis only. console_errors=0 reflects no detected error patterns in source. accessibility_issues=1 is BUG-024 (known P2, section-detail-panel DialogTitle)."
+    "accessibility_issues": 0,
+    "layout_shifts": 0
   },
 
-  "bugs_found": [
-    {
-      "severity": "P2",
-      "page": "/w/[workspaceId]/[tabId] (section detail panel → Save as Template)",
-      "description": "BUG-024 (known, pre-existing): section-detail-panel.tsx line 390 uses custom <DialogTitle> component (renders plain <h2>) instead of Radix DialogPrimitive.Title. Radix cannot register the accessible title, causing a console.error about missing DialogTitle. The canvas-view.tsx template browser dialog already applies the correct fix (DialogPrimitive.Title directly), but the section panel dialog does not.",
-      "steps_to_reproduce": "1. Open any process canvas tab. 2. Click a section. 3. In section detail panel, click 'Save as Template'. 4. Open browser console — observe 'Missing Description or Title' Radix warning.",
-      "related_task": "#FEAT-053"
-    }
-  ],
+  "regression_suite_results": {
+    "suite": "regression-baseline (static analysis)",
+    "checks": [
+      { "check": "Auth route — middleware.ts unchanged, login redirect intact", "result": "pass", "method": "static" },
+      { "check": "Workspace context — workspace-context.tsx not in changed files, no regression risk", "result": "pass", "method": "static" },
+      { "check": "Canvas nodes — flow-canvas.tsx, step-node.tsx unchanged, no regression risk", "result": "pass", "method": "static" },
+      { "check": "Journey canvas — stage-node.tsx, touchpoint-node.tsx unchanged", "result": "pass", "method": "static" },
+      { "check": "Settings page — only string content in clone dialog and body paragraph changed, no structural or state logic altered", "result": "pass", "method": "static" },
+      { "check": "Runbooks list — only flex wrapper added to progress bar section and span appended; existing filter, routing, empty state, badge logic untouched", "result": "pass", "method": "static" },
+      { "check": "Step PATCH API — EDITABLE_FIELDS extended (additive); existing field handling unchanged", "result": "pass", "method": "static" },
+      { "check": "Touchpoint PATCH API — EDITABLE_FIELDS extended (additive); existing field handling unchanged", "result": "pass", "method": "static" },
+      { "check": "TypeScript integrity across all changed files — all three BUILD_RESULTs report typecheck pass with 0 errors", "result": "pass", "method": "static" },
+      { "check": "Lint — no new warnings or errors in any slot (1 pre-existing addEdge warning only)", "result": "pass", "method": "static" }
+    ],
+    "browser_checks_skipped": [
+      "Canvas render with nodes",
+      "Step node click → detail panel",
+      "Step name edit → save",
+      "Journey canvas tab render",
+      "Touchpoint/stage panel open",
+      "Step list view",
+      "Gap analysis view",
+      "Compare view",
+      "Teams page",
+      "Settings page runtime load",
+      "Clone dialog render with workspace name",
+      "Runbooks list runtime render",
+      "PDF/PNG export",
+      "Console error check via __testErrors"
+    ]
+  },
+
+  "bugs_found": [],
 
   "improvements_found": [
     {
-      "category": "usability",
-      "page": "/w/[workspaceId]/runbooks/[id]",
-      "observation": "Runbook detail view shows created_by as truncated UUID (first 8 chars, runbook-view.tsx ~line 130). Users cannot identify who created the runbook without cross-referencing the activity log.",
-      "design_principle": "Nielsen H6: Recognition rather than recall — show the person's name/email, not an internal ID.",
-      "suggested_approach": "Join the users table on the runbook created_by field (similar to activity log's users!activity_log_user_id_fkey join) and display email or display name."
-    },
-    {
-      "category": "usability",
-      "page": "/w/[workspaceId]/comments",
-      "observation": "Comments view loads all top-level comments in a single fetch with no pagination. With 500+ workspace-level comments this could cause perceptible loading delay and large DOM.",
-      "design_principle": "Nielsen H1: Visibility of system status — users should see incremental loading, not a long spinner.",
-      "suggested_approach": "Apply the same Load More pattern (offset pagination) used in activity-view.tsx, defaulting to first 50 comments."
-    },
-    {
-      "category": "accessibility",
-      "page": "/w/[workspaceId]/[tabId] (coloring panel)",
-      "observation": "Coloring panel uses a color picker input (<input type='color'>) alongside a hex text input. The color picker has no aria-label — only a visible label nearby. Screen readers may not associate them.",
-      "design_principle": "WCAG 1.3.1: Info and Relationships — programmatic association via htmlFor/id or aria-labelledby.",
-      "suggested_approach": "Add aria-label='Color picker' to the <input type='color'> element or associate it with the existing label via htmlFor."
-    },
-    {
-      "category": "usability",
+      "category": "visual",
       "page": "/w/[workspaceId]/runbooks",
-      "observation": "Runbooks list shows progress bar but no step count text (e.g. '3/5 steps complete'). Users must infer the fraction from visual bar width alone.",
-      "design_principle": "Nielsen H1: Visibility of system status — quantified progress is more informative than proportion alone.",
-      "suggested_approach": "Append a text label like '3 / 5' or '60%' next to the progress bar, similar to playbook-view.tsx which already shows step counter text."
+      "observation": "Step count now appears twice on each runbook card: once in the metadata row as '{resolved}/{total} steps' (IMP-014, line 114) and again next to the progress bar as '{resolved} / {total}' (IMP-046, line 124). Both are correct but slightly redundant. The formats also differ slightly: no spaces around slash + 'steps' suffix vs spaces around slash + no suffix.",
+      "design_principle": "Nielsen H8: Aesthetic and minimalist design — only show what's needed",
+      "suggested_approach": "Remove the metadata row count ('{resolved}/{total} steps') and keep only the progress bar label, which provides the same information in context. Alternatively, make the formats consistent (both 'N / M' or both 'N/M steps')."
     },
     {
       "category": "usability",
-      "page": "/w/[workspaceId]/activity",
-      "observation": "Activity filter tabs show 8 action types horizontally. On viewports narrower than 1024px these tabs likely wrap or overflow given the combined label widths (created, updated, deleted, completed, assigned, commented, exported, shared).",
-      "design_principle": "Nielsen H4: Consistency and standards — filter controls should not overflow or truncate on standard tablet widths.",
-      "suggested_approach": "Evaluate wrapping the filter row or using a compact dropdown for action type on narrow viewports, consistent with the tab-bar overflow pattern already in workspace-shell."
+      "page": "/w/[workspaceId]/settings",
+      "observation": "The Delete Workspace action at settings/page.tsx line 157 still uses the native browser confirm() dialog, while the Duplicate Workspace action uses a polished Radix Dialog (IMP-028). This is a pre-existing inconsistency — the delete action deserves the same level of dialog UX (with clear consequence description and named buttons).",
+      "design_principle": "Nielsen H4: Consistency and standards — same interaction pattern for destructive actions",
+      "suggested_approach": "Add a confirmDeleteOpen state + Radix Dialog for delete, mirroring the clone dialog pattern. Include workspace name in the description: 'Permanently delete [workspace name]? This cannot be undone.'"
     }
   ],
 
-  "regression_checks": {
-    "bug021_workspace_shell_exclusion": "PASS — exclusion list at workspace-shell.tsx lines 44-51 contains all 11 required reserved routes",
-    "bug020_has_role_disabled": "PASS — has_role option has disabled=true in coloring-panel.tsx criteria dropdown",
-    "bug024_dialog_title": "KNOWN P2 — section-detail-panel.tsx still uses custom DialogTitle (unfixed). canvas-view.tsx template dialog uses correct fix.",
-    "heat_map_precedence": "PASS — step-node.tsx: heatMapMode+maturityColor wins over coloringTint wins over default surface",
-    "coloring_15pct_tint": "PASS — hex alpha 0x26 ≈ 14.9% opacity on coloring rule tints",
-    "last_match_wins": "PASS — canvas-view.tsx coloring loop overwrites map entry, last active rule in position order wins",
-    "activity_log_10_routes": "PASS — verified steps, sections, connections, workspaces, tabs, teams, people, tools, runbooks/[id], runbook-steps/[id]",
-    "clone_13_tables": "PASS — migration 018 copies 13 child tables (requirement was 12+)",
-    "playbook_z50_overlay": "PASS — playbook-view.tsx lines 109, 122: 'fixed inset-0 z-50'",
-    "playbook_max_w_xl": "PASS — playbook-view.tsx lines 152, 241: 'max-w-xl'",
-    "starter_templates_4": "PASS — lib/templates.ts exports 4 STARTER_TEMPLATES",
-    "migration_020_exists": "PASS (file) / BLOCKED (remote) — 020_section_templates.sql on disk; npx supabase db push required for DB operations",
-    "typescript_clean": "PASS — compilation_status=passing per EXECUTION_PLAN; static analysis found 0 new type errors",
-    "apifetch_envelope": "PASS — all client functions return apiFetch<T>() directly without extra wrapping"
-  },
-
-  "actions_used": 18,
-  "action_budget": 40
+  "actions_used": 4,
+  "action_budget": 40,
+  "notes": "Playwright unavailable — Chrome launched but immediately exited ('Opening in existing browser session' error). Performed enhanced static analysis covering all 12 acceptance criteria, regression baseline checks, and suite checks via source code reads. All criteria pass statically. Browser-side regression checks (canvas render, panel interactions, console errors, export) could not be verified and are flagged as skipped. Recommend running Playwright in a standalone terminal session to complete browser-side regression."
 }

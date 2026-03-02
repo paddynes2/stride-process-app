@@ -288,13 +288,11 @@
   - **Design principle:** WCAG 2.5.3 Label in Name
   - **Suggested fix:** Remove aria-label from decorative icons adjacent to visible text. Use aria-hidden='true' on decorative icons.
 
-- [ ] #IMP-042 Clone confirmation dialog should display workspace name — Attempts: 0
+- [x] #IMP-042 Clone confirmation dialog should display workspace name — Attempts: 1 — DONE iteration 105, 2026-03-02
   - **Found:** Iteration 103 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`
-  - **What:** Duplicate Workspace dialog does not display the workspace name. Unclear which workspace is being duplicated.
-  - **Design principle:** Nielsen H5: Error prevention
-  - **Suggested fix:** Include workspace.name in DialogDescription: 'A full copy of "{workspace.name}" will be created...'
+  - **Fix applied:** Injected workspace.name into DialogDescription and body paragraph using JSX &quot; entities. Both now read 'A full copy of "{workspace.name}" will be created...'
 
 - [ ] #IMP-043 Runbook detail shows truncated UUID instead of creator email — Attempts: 0
   - **Found:** Iteration 103 (regression tester)
@@ -320,13 +318,11 @@
   - **Design principle:** WCAG 1.3.1: Info and Relationships
   - **Suggested fix:** Add aria-label='Color picker' or associate via htmlFor/id.
 
-- [ ] #IMP-046 Runbooks list progress bar lacks step count text — Attempts: 0
+- [x] #IMP-046 Runbooks list progress bar lacks step count text — Attempts: 1 — DONE iteration 105, 2026-03-02
   - **Found:** Iteration 103 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
-  - **What:** Progress bar has no step count text (e.g. '3/5'). Users infer fraction from bar width alone.
-  - **Design principle:** Nielsen H1: Visibility of system status
-  - **Suggested fix:** Append text label like '3 / 5' next to progress bar, matching playbook-view.tsx.
+  - **Fix applied:** Wrapped progress bar in flex container, appended span showing '{resolved} / {total}' in text-[11px] text-[var(--text-tertiary)] with tabular-nums for stable digit width.
 
 - [ ] #IMP-047 Activity filter tabs overflow on narrow viewports — Attempts: 0
   - **Found:** Iteration 103 (regression tester)
@@ -351,6 +347,22 @@
   - **What:** Top-3 divergent elements and table element names link to the tab (canvas), but not to the specific element within that tab. User lands on the full canvas and must find the element manually.
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** If deep-linking to specific canvas nodes is supported in future (e.g. via URL hash or query param), pre-select the element on navigation. Current behaviour is functional but not optimal.
+
+- [ ] #IMP-050 Redundant step count display on runbook cards — Attempts: 0
+  - **Found:** Iteration 105 (acceptance + regression testers)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
+  - **What:** Step count now appears twice per runbook card: once in metadata row as '{resolved}/{total} steps' (IMP-014, line 114) and again next to progress bar as '{resolved} / {total}' (IMP-046, line 124). Visually redundant.
+  - **Design principle:** Nielsen H8: Aesthetic and minimalist design
+  - **Suggested fix:** Remove the metadata row count ('{resolved}/{total} steps') and keep only the progress bar label, or make formats consistent.
+
+- [ ] #IMP-051 Delete Workspace action uses native browser confirm() dialog — Attempts: 0
+  - **Found:** Iteration 105 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`
+  - **What:** Delete Workspace still uses native `confirm()` while Duplicate Workspace uses polished Radix Dialog (IMP-028). Inconsistent destructive action UX.
+  - **Design principle:** Nielsen H4: Consistency and standards
+  - **Suggested fix:** Add confirmDeleteOpen state + Radix Dialog for delete, mirroring clone dialog pattern. Include workspace name: 'Permanently delete "{workspace.name}"? This cannot be undone.'
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

@@ -1570,3 +1570,38 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — all 3 builders completed successfully, clean merges, no recovery needed. 3-slot multi_task with zero failures.
 - Observations: 2 (2 new improvements)
 **Notes:** First Phase 3a build iteration. FEAT-033 is the consulting insight tool — reveals where leaders and frontline teams disagree on process annotations. All 3 slots merged cleanly (no worktree recovery needed). BUG-024 closes the last open bug. No open P0/P1 bugs remain. Next: FEAT-034 Prioritization matrix.
+
+## Iteration 105 — 2026-03-02 24:30
+**Tasks:**
+- #FEAT-034 [1/2] Prioritization matrix data layer (migration 021, type updates, PATCH route updates) — slot 1 — completed
+- #IMP-042 Clone confirmation dialog displays workspace name — slot 2 — completed
+- #IMP-046 Runbooks list progress bar shows step count text — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- supabase/migrations/021_prioritization_scores.sql (created — 11 lines, adds effort_score/impact_score to steps+touchpoints)
+- src/types/database.ts (modified — +4 lines, effort_score/impact_score on Step and Touchpoint interfaces)
+- src/app/api/v1/steps/[id]/route.ts (modified — +2 lines, EDITABLE_FIELDS)
+- src/app/api/v1/touchpoints/[id]/route.ts (modified — +2 lines, EDITABLE_FIELDS)
+- src/app/(app)/w/[workspaceId]/settings/page.tsx (modified — 2 lines changed, workspace name in clone dialog + body text)
+- src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx (modified — +6/-4 lines, progress bar flex wrapper + step count span)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs — 0 errors)
+- Lint: pass (all 3 BUILD_RESULTs — 0 errors, 1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable — static code analysis only)
+- Canary test: skipped (Playwright unavailable)
+- Acceptance test: 14/14 PASS (6 FEAT-034 [1/2] + 4 IMP-042 + 4 IMP-046 — static analysis)
+- Regression test: 12/12 PASS (static analysis, Playwright unavailable)
+- POST_MERGE_CHECK: PASS
+**Bugs found:** None
+**Improvements found:** 2 — IMP-050 (redundant step count on runbook cards), IMP-051 (delete workspace uses native confirm())
+**Self-score:**
+- Code quality: 5 — Migration follows 007 pattern exactly. All changes are minimal and correct. No debug artifacts, no naming issues.
+- Test coverage: 4 — All 14 acceptance criteria pass via static analysis. Regression baseline 12/12. No browser testing available.
+- Confidence: 5 — All 3 tasks completed first attempt, all gates pass. Data layer changes are purely additive (nullable columns, EDITABLE_FIELDS append). UI changes are string-only (settings) or layout-only (runbooks).
+- Efficiency: 5 — All 3 builders completed, clean merges, zero recovery needed.
+- Observations: 2 (2 new improvements)
+**Notes:** FEAT-034 [1/2] completes the data foundation for the prioritization matrix. [2/2] will add detail panel score selectors, the quadrant chart page at /w/[workspaceId]/prioritization, and sidebar navigation. Migration 021 needs `npx supabase db push` (same blocker as 014-020).

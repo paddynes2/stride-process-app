@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 103,
-  "date": "2026-03-02T00:00:00Z",
-  "mode": "testing_only",
+  "iteration": 105,
+  "date": "2026-03-02T23:59:00Z",
+  "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "054d7bf778a5775f677be0f1607ba3830b1672ac",
+    "last_commit_hash": "1099b6e429d63ec9fb920b50131430ca0587612c",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,140 +13,146 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-053",
-      "description": "Phase 4 testing gate — full regression across all phases + acceptance testing for all Phase 4 features (FEAT-045 through FEAT-052)",
+      "id": "#FEAT-034 [1/2]",
+      "description": "Prioritization matrix data layer: migration adding effort_score and impact_score columns to steps and touchpoints tables, TypeScript type updates, API PATCH support for new columns",
       "source": "prd/FEATURES.md",
-      "type": "regression",
+      "type": "build",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "New migration file 021_prioritization_scores.sql adds effort_score INT CHECK (1-5) nullable and impact_score INT CHECK (1-5) nullable to both steps AND touchpoints tables",
+        "Step interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+        "Touchpoint interface in src/types/database.ts includes effort_score: number | null and impact_score: number | null",
+        "Steps PATCH route (src/app/api/v1/steps/[id]/route.ts) includes effort_score and impact_score in EDITABLE_FIELDS",
+        "Touchpoints PATCH route (src/app/api/v1/touchpoints/[id]/route.ts) includes effort_score and impact_score in EDITABLE_FIELDS",
+        "npx tsc --noEmit passes cleanly after changes"
+      ],
+      "files_owned": [
+        "supabase/migrations/021_prioritization_scores.sql",
+        "src/types/database.ts",
+        "src/app/api/v1/steps/[id]/route.ts",
+        "src/app/api/v1/touchpoints/[id]/route.ts"
+      ],
+      "files_read_only": [
+        "supabase/migrations/007_maturity_scoring.sql",
+        "src/lib/maturity.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "supabase/migrations/007_maturity_scoring.sql"
+        ],
+        "patterns_to_follow": [
+          "Migration 007 pattern: ALTER TABLE ... ADD COLUMN ... INT CHECK (col BETWEEN 1 AND 5) — nullable by default",
+          "Steps EDITABLE_FIELDS already includes maturity_score and target_maturity — add effort_score and impact_score to the same array",
+          "Touchpoints EDITABLE_FIELDS: add effort_score and impact_score to the existing array",
+          "database.ts Step interface: existing maturity_score: number | null pattern — add effort_score and impact_score with same type"
+        ],
+        "learnings_relevant": [
+          "NEXT_PUBLIC_ static replacement — not relevant for data layer",
+          "apiFetch unwraps envelope — existing pattern, follow it"
+        ],
+        "affected_urls": []
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "Follow migration 007 pattern exactly. Two ALTER TABLE statements (one for steps, one for touchpoints). Each adds two nullable INT columns with CHECK constraint BETWEEN 1 AND 5. The Touchpoint interface currently has no maturity fields — add effort_score and impact_score after the position_y field, before created_at."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-042",
+      "description": "Clone confirmation dialog should display workspace name in the description text",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
       "phase": "Phase 4: The Living Playbook",
-      "complexity": "L",
+      "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Full regression: process canvas (create/edit/delete steps+sections+connections), journey canvas (stages+touchpoints), perspectives (create+annotate), gap analysis, comparison view, teams/people/tools CRUD, PDF/PNG export (static code analysis), public sharing",
-        "Comments acceptance: create comment with category, reply to comment (threading), resolve comment, filter by category on workspace comments page, comment count badges on canvas nodes, CommentCountsContext wired",
-        "Tasks acceptance: create task on step, toggle completion (strikethrough), reorder tasks (position field), task count badges on step nodes (TaskCountsContext), section-level task rollup in section detail panel",
-        "Runbooks acceptance: create runbook from section (step snapshot), 4-state step status transitions (pending→in_progress→completed, pending→skipped), progress bar (resolved=completed+skipped), Complete/Cancel via Radix Dialog, read-only mode for completed/cancelled, list page with filter tabs",
-        "Playbook acceptance: distraction-free fixed overlay (z-50), Mark Complete & Next advances to next pending step, Skip button, dot navigation, progress bar+text, mobile-responsive (max-w-xl), URL-shareable",
-        "Activity acceptance: logActivity() calls present in POST/PATCH/DELETE routes (spot-check 10+ routes), activity page renders entries with user email (not 'Unknown'), action type filter tabs, Load More pagination with skeleton placeholders, entity links navigate correctly",
-        "Clone acceptance: clone_workspace() RPC exists (migration 018), API route POST /workspaces/[id]/clone, Duplicate Workspace button in settings with Radix Dialog confirmation, deep copy covers 12+ child tables, new UUIDs throughout",
-        "Coloring acceptance: coloring_rules CRUD (API + panel UI), rules evaluated client-side in position order (last match wins), step nodes show 15% opacity tint, heat map takes precedence, has_role disabled in dropdown (BUG-020 fix), paintbrush button in canvas toolbar",
-        "Templates acceptance: templates CRUD (API + migration 020 table), Save as Template dialog on section panel, template browser dialog in canvas toolbar, STARTER_TEMPLATES constant (4 hardcoded), deploy route with UUID remap, role-by-name matching. Note: DB operations blocked until migration 020 pushed — test code paths and UI states, not end-to-end DB flow",
-        "Compilation: npx tsc --noEmit passes, npm run lint passes (1 pre-existing warning acceptable), no new TypeScript errors"
+        "DialogDescription in the Duplicate Workspace dialog includes the workspace name dynamically",
+        "Text reads something like: 'A full copy of \"[workspace name]\" will be created including all tabs, sections, steps, connections, teams, roles, people, and tools.'",
+        "The settings page body text paragraph also includes the workspace name for consistency",
+        "No TypeScript errors"
       ],
-      "files_owned": [],
-      "files_read_only": [
-        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
-        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx",
-        "src/components/canvas/flow-canvas.tsx",
-        "src/components/canvas/step-node.tsx",
-        "src/components/canvas/section-node.tsx",
-        "src/components/canvas/stage-node.tsx",
-        "src/components/canvas/touchpoint-node.tsx",
-        "src/components/panels/step-detail-panel.tsx",
-        "src/components/panels/section-detail-panel.tsx",
-        "src/components/panels/comment-panel.tsx",
-        "src/components/panels/task-panel.tsx",
-        "src/components/canvas/coloring-panel.tsx",
-        "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
-        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx",
-        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
-        "src/app/(app)/w/[workspaceId]/settings/page.tsx",
-        "src/lib/api/client.ts",
-        "src/lib/api/activity.ts",
-        "src/lib/templates.ts",
-        "src/types/database.ts",
-        "src/types/canvas.ts",
-        "src/app/api/v1/comments/route.ts",
-        "src/app/api/v1/tasks/route.ts",
-        "src/app/api/v1/runbooks/route.ts",
-        "src/app/api/v1/runbook-steps/route.ts",
-        "src/app/api/v1/activity/route.ts",
-        "src/app/api/v1/workspaces/[id]/clone/route.ts",
-        "src/app/api/v1/coloring-rules/route.ts",
-        "src/app/api/v1/templates/route.ts",
-        "src/app/api/v1/templates/[id]/route.ts",
-        "src/app/api/v1/templates/[id]/deploy/route.ts",
-        "src/app/api/v1/steps/route.ts",
-        "src/app/api/v1/sections/route.ts",
-        "src/app/api/v1/connections/route.ts",
-        "src/components/layout/sidebar.tsx",
-        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx",
-        "supabase/migrations/014_comments.sql",
-        "supabase/migrations/015_tasks.sql",
-        "supabase/migrations/016_runbooks.sql",
-        "supabase/migrations/017_activity_log.sql",
-        "supabase/migrations/018_clone_workspace.sql",
-        "supabase/migrations/019_coloring_rules.sql",
-        "supabase/migrations/020_section_templates.sql"
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx"
       ],
+      "files_read_only": [],
       "context": {
         "similar_files": [],
         "patterns_to_follow": [
-          "Static code analysis + API probing (Playwright unavailable per LEARNINGS.md)",
-          "Regression baseline from iteration 100 (29/32 checks — 3 FAIL were BUG-021 routing, now fixed in codebase)",
-          "Acceptance test patterns from iterations 87 (FEAT-047+048), 91 (FEAT-049), 97 (FEAT-050+051)"
+          "IMP-028 already replaced confirm() with Radix Dialog — modify the existing DialogDescription content",
+          "IMP-029 already updated body text — modify it to include workspace name",
+          "Workspace object is available in the settings page context (useWorkspace hook or server-side fetch)"
         ],
-        "learnings_relevant": [
-          "Playwright MCP unavailable — use static analysis + curl for testing",
-          "workspace-shell route exclusion list — verify all segments present",
-          "Server/API query mismatch — check page.tsx and route.ts use same .select() shape",
-          "apiFetch unwraps envelope — verify client functions return apiFetch<T>() directly",
-          "Migration 020 not pushed — templates DB operations will fail, test code paths only"
-        ],
+        "learnings_relevant": [],
         "affected_urls": [
-          "/w/[workspaceId]/[tabId]",
-          "/w/[workspaceId]/comments",
-          "/w/[workspaceId]/runbooks",
-          "/w/[workspaceId]/runbooks/[id]",
-          "/w/[workspaceId]/runbooks/[id]/playbook",
-          "/w/[workspaceId]/activity",
-          "/w/[workspaceId]/settings",
-          "/w/[workspaceId]/list",
-          "/w/[workspaceId]/gap-analysis",
-          "/w/[workspaceId]/compare",
-          "/w/[workspaceId]/dashboard",
-          "/w/[workspaceId]/teams",
-          "/w/[workspaceId]/people",
-          "/w/[workspaceId]/tools"
+          "/w/[workspaceId]/settings"
         ]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "This is the Phase 4 testing gate — the largest and most comprehensive test suite to date. Test the FULL CHAIN: section with tasks → create runbook → execute in playbook → activity log captures all. For templates, test code structure and UI states only (migration 020 not pushed — DB calls will fail). BUG-021 (workspace-shell exclusion) is fixed in current codebase — verify fix is present. BUG-024 (section-detail-panel DialogTitle) is known P2 — log but don't fail on it. Open improvements (IMP-004, IMP-010, IMP-017, IMP-021-027, IMP-031, IMP-033-034, IMP-037-038) are not blockers — note any new findings but don't block gate on them."
+      "special_instructions": "The workspace object should already be available in the settings page. Find where the clone dialog is rendered (look for confirmCloneOpen state) and inject workspace.name into the DialogDescription string. Use template literal with quotes around the name."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-046",
+      "description": "Runbooks list progress bar should show step count text (e.g. '3 / 5') alongside the bar",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Each runbook card in the list view shows a text label like '3 / 5' next to or below the progress bar",
+        "Text uses existing text hierarchy (text-[var(--text-secondary)] or text-[var(--text-tertiary)])",
+        "Text shows resolved count (completed + skipped) out of total, matching playbook-view.tsx pattern",
+        "No TypeScript errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
+      ],
+      "files_read_only": [
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx"
+        ],
+        "patterns_to_follow": [
+          "IMP-014 already established resolvedCount = completedCount + skippedCount pattern in this file",
+          "playbook-view.tsx shows 'Step N of M' text — follow similar compact format for list cards",
+          "IMP-013 added the segmented progress bar — add text label adjacent to it"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/runbooks"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "The runbooks-list-view already has completedCount, skippedCount, and total step counts computed per runbook card (from IMP-014). Add a small text label showing the fraction, matching the existing text sizing pattern in the card."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "tailwind.config.ts", "next.config.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/lib/utils.ts"],
     "owner": null,
-    "note": "Testing-only iteration — no files modified"
+    "note": "database.ts is owned by slot 1. No other slot should modify it."
   },
-  "merge_order": [],
+  "merge_order": ["#FEAT-034 [1/2]", "#IMP-042", "#IMP-046"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": true,
-    "regression_reason": "FEAT-053 Phase 4 testing gate — comprehensive regression + acceptance across all Phase 4 features before phase completion",
-    "suites_to_run": [
-      "regression-full-baseline",
-      "phase4-comments-acceptance",
-      "phase4-tasks-acceptance",
-      "phase4-runbooks-acceptance",
-      "phase4-playbook-acceptance",
-      "phase4-activity-acceptance",
-      "phase4-clone-acceptance",
-      "phase4-coloring-acceptance",
-      "phase4-templates-acceptance",
-      "compilation-verification"
-    ],
+    "regression_reason": "risk_score=4 from iteration 104 (7 source files changed including shared components sidebar.tsx, workspace-shell.tsx)",
+    "suites_to_run": ["feat-034-data-integrity", "regression-baseline"],
     "cadence_trigger": null
   },
   "status_updates": {
     "warnings_added": [
-      "Accessibility cadence severely overdue (last audit iteration 21, now iteration 103 — 82 iterations). Schedule accessibility audit immediately after Phase 4 gate passes.",
-      "BUG-024 (section-detail-panel DialogTitle a11y) remains open P2 — same root cause as fixed BUG-023.",
-      "Migration 020 not pushed — templates feature untestable end-to-end. Human action required: npx supabase db push.",
-      "Production (origin/main) is 20+ commits behind ralph/init-stride."
+      "Migration 021 will need npx supabase db push (human action) — same as migration 020 blocker",
+      "Accessibility audit still overdue (84 iterations). Next cadence trigger: iteration 110."
     ],
     "diagnoses_written": false,
     "signal_override": null

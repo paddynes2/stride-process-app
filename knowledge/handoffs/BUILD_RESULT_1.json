@@ -1,23 +1,35 @@
 {
   "schema_version": "1.0",
-  "iteration": 101,
+  "iteration": 105,
   "slot": 1,
-  "task_id": "#FEAT-052",
+  "task_id": "#FEAT-034 [1/2]",
   "status": "completed",
-  "duration_seconds": 420,
+  "duration_seconds": 180,
 
   "files_changed": [
     {
-      "path": "src/components/panels/section-detail-panel.tsx",
-      "action": "modified",
-      "lines_added": 95,
-      "lines_removed": 7
+      "path": "supabase/migrations/021_prioritization_scores.sql",
+      "action": "created",
+      "lines_added": 10,
+      "lines_removed": 0
     },
     {
-      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+      "path": "src/types/database.ts",
       "action": "modified",
-      "lines_added": 168,
-      "lines_removed": 20
+      "lines_added": 4,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/steps/[id]/route.ts",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/touchpoints/[id]/route.ts",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 0
     }
   ],
 
@@ -30,11 +42,13 @@
 
   "dependencies_added": [],
   "staged_files": [
-    "src/components/panels/section-detail-panel.tsx",
-    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+    "supabase/migrations/021_prioritization_scores.sql",
+    "src/types/database.ts",
+    "src/app/api/v1/steps/[id]/route.ts",
+    "src/app/api/v1/touchpoints/[id]/route.ts"
   ],
   "ownership_violations": [],
-  "notes": "All acceptance criteria met with one deviation: For deploying starter templates, the task spec said 'call createTemplate first (saves to DB), then deployTemplate'. However, POST /api/v1/templates requires section_id (server-side validation returns 400 without it) — there is no path to save a pre-built TemplateData JSONB blob without a real DB section. client.ts is read-only. Rather than leaving starters non-deployable, starters are deployed directly via createSection + createStep calls (functionally equivalent to what the deploy route does internally). DB templates still use the standard deployTemplate() path. Template browser dialog is inline in canvas-view.tsx (not extracted to separate file) — total file size stays manageable.",
+  "notes": "Migration follows 007 pattern exactly: two ALTER TABLE statements with INT CHECK (col BETWEEN 1 AND 5), nullable by default. Step interface fields added after target_maturity. Touchpoint interface fields added after position_y, before created_at per special_instructions. EDITABLE_FIELDS arrays in both PATCH routes updated.",
 
   "failure_details": null
 }

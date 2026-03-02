@@ -73,7 +73,7 @@ Prioritized features:
 
 Core consulting insight features:
 - [x] #FEAT-033 Perspective comparison view — DONE iteration 104
-- [ ] #FEAT-034 Prioritization matrix (effort/impact scoring + quadrant chart)
+- [ ] #FEAT-034 Prioritization matrix (effort/impact scoring + quadrant chart) — [1/2] data layer DONE iteration 105
 - [ ] #FEAT-035 Improvement ideas tracker (proposals → approval → completion)
 - [ ] #FEAT-036 AI process analysis (Anthropic API, structured bottleneck/redundancy/automation analysis)
 - [ ] #FEAT-037 AI gap narrative generator (consulting-grade summary text)
@@ -166,3 +166,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 102: COMPLETED — Cleanup iteration. #BUG-023 fixed (DialogPrimitive.Title in canvas-view.tsx). #IMP-036 done (starters always visible in template dialog). #IMP-030 verified resolved. #IMP-020 done (activity skeleton placeholders). #IMP-035 verified resolved. 1 new bug (BUG-024). Next: FEAT-053 Phase 4 testing gate.
 - [2026-03-02] Iteration 103: **PHASE 4 COMPLETE.** FEAT-053 Phase 4 testing gate passed — acceptance 9/9, regression 10/10. All 9 Phase 4 features (FEAT-045 through FEAT-053) done. 9 new improvements logged (IMP-039-047). BUG-024 only open bug (P2). Phase 3a: Analysis Intelligence now ACTIVE, starting with FEAT-033 Perspective comparison view.
 - [2026-03-02] Iteration 104: COMPLETED — #FEAT-033 perspective comparison view (first Phase 3a feature). #BUG-024 resolved (last open bug). #IMP-039 resolved. All 3 slots completed cleanly with zero merge failures. 2 new improvements (IMP-048, IMP-049). Next: FEAT-034 Prioritization matrix.
+- [2026-03-02] Iteration 105: COMPLETED — #FEAT-034 [1/2] data layer (migration 021, types, PATCH routes). #IMP-042 clone dialog name. #IMP-046 runbook progress text. All 3 slots clean. 2 new improvements (IMP-050, IMP-051). Next: FEAT-034 [2/2] UI (detail panel selectors + quadrant chart page).

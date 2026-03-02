@@ -77,8 +77,8 @@
 ### #FEAT-034 Prioritization matrix
 **Phase:** 3a
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in_progress — [1/2] data layer DONE iteration 105, 2026-03-02
 **Acceptance criteria:**
 - [ ] New columns on `steps` table: `effort_score` (integer 1-5 nullable), `impact_score` (integer 1-5 nullable) — via Supabase migration
 - [ ] Same columns on `touchpoints` table

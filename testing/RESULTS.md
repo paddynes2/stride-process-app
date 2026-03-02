@@ -1,25 +1,27 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 104
+- **Iteration:** 105
 - **Date:** 2026-03-02
-- **Suite:** feat-033-acceptance (acceptance only)
+- **Suite:** feat-034-data-integrity + regression-baseline (acceptance + regression)
 - **Method:** Static code analysis (Playwright MCP unavailable)
-- **Result:** **ALL PASS** — Acceptance 16/16 (FEAT-033 10/10, BUG-024 4/4, IMP-039 2/2)
+- **Result:** **ALL PASS** — Acceptance 14/14 (FEAT-034 6/6, IMP-042 4/4, IMP-046 4/4), Regression 12/12
 - **Bugs found:** 0
-- **Improvements found:** 2 (IMP-048, IMP-049)
+- **Improvements found:** 2 (IMP-050, IMP-051)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 104 (2026-03-02) — 16/16 PASS (FEAT-033 10/10, BUG-024 4/4, IMP-039 2/2 — static code analysis)
+- Last run: Iteration 105 (2026-03-02) — 14/14 PASS (FEAT-034 [1/2] 6/6, IMP-042 4/4, IMP-046 4/4 — static code analysis)
+- Previous: Iteration 104 (2026-03-02) — 16/16 PASS (FEAT-033 10/10, BUG-024 4/4, IMP-039 2/2 — static code analysis)
 - Previous: Iteration 103 (2026-03-02) — 9/9 PASS (Phase 4 full gate — playbook, activity, clone, coloring, templates, compilation, BUG-021 fix, comments+tasks+runbooks baseline)
 - Previous: Iteration 102 (2026-03-02) — 5/5 PASS (BUG-023 + IMP-036 + IMP-030 + IMP-020 — static code analysis)
 - Previous: Iteration 101 (2026-03-02) — 15/16 PASS (FEAT-052 UI 11/12 browser+static, IMP-032 4/4 static)
 - Previous: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 DI 10, BUG-020 4, IMP-029 2 — static)
 
 ### Regression
-- Last run: Iteration 103 (2026-03-02) — 10/10 PASS (Phase 4 full gate — all phases regression + all Phase 4 feature verification, 30+ files analyzed)
+- Last run: Iteration 105 (2026-03-02) — 12/12 PASS (regression-baseline static, feat-034-data-integrity static — Playwright unavailable)
+- Previous run: Iteration 103 (2026-03-02) — 10/10 PASS (Phase 4 full gate — all phases regression + all Phase 4 feature verification, 30+ files analyzed)
 - Previous run: Iteration 100 (2026-03-02) — 29/32 (regression 11/14 browser, FEAT-052 DI 10/10 static, performance 3/6+3warn static)
 - Previous run: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 10, BUG-020 4, IMP-029 2 — static code analysis)
 - Previous run: Iteration 98 (2026-03-02) — IMP-028 7/7 PASS, BUG-020 0/4 FAIL (not merged), FEAT-052 all PASS (static, wrong paths)

@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-104, 2026-03-02 — Phase 3a started -->
+<!-- Updated: iter-105, 2026-03-02 — Phase 3a, FEAT-034 data layer -->
 
 ## Project
 
@@ -147,6 +147,7 @@ npx supabase db push     # Push migrations
 | 018 | clone_workspace() SECURITY DEFINER function (deep-copies workspace + 12 child table types with UUID remapping via temp tables) |
 | 019 | Coloring rules (criteria_type enum + coloring_rules table + RLS + index + update_updated_at trigger) |
 | 020 | Section templates (templates table with JSONB template_data + RLS via can_access_workspace + index + update_updated_at trigger) |
+| 021 | Prioritization scores (effort_score + impact_score INT CHECK 1-5 nullable on steps + touchpoints) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->
