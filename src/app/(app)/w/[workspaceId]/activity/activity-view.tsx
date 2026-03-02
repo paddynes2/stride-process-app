@@ -173,7 +173,7 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
 
                   {/* Author + timestamp */}
                   <div className="flex items-center gap-2 text-[11px] text-[var(--text-tertiary)]">
-                    <span>{entry.users?.email ?? "Unknown"}</span>
+                    <span>{entry.users?.email ?? "[Deleted User]"}</span>
                     <span>·</span>
                     <span>{formatRelativeTime(entry.created_at)}</span>
                   </div>
