@@ -1,1 +1,1 @@
-CONTINUE: Re-attempt FEAT-052 [1/2] section templates data layer (files must go to src/ not worktree paths) + BUG-020 disable has_role in coloring panel dropdown
+CONTINUE: FEAT-052 [2/2] section templates UI + BUG-021 workspace-shell routing fix
