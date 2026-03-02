@@ -1,1 +1,1 @@
-CONTINUE: #BUG-019 attempt 3 (page.tsx line 25: .select("*") → .select("*, users!activity_log_user_id_fkey(email)") — ONE LINE FIX), #IMP-018 (activity empty state guidance text), then #FEAT-051 [2/2] coloring rules UI (toolbar panel + step node background tint + add HEX_COLOR_REGEX validation to POST/PATCH routes)
+CONTINUE: iter 97 MUST be testing_only — regression + acceptance for FEAT-050, FEAT-051, BUG-019 (risk score 6 from iter 94). Then FEAT-052 section templates or FEAT-053 Phase 4 testing gate.
