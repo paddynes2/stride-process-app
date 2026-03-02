@@ -13,6 +13,8 @@ const EDITABLE_FIELDS = [
   "notes",
   "position_x",
   "position_y",
+  "effort_score",
+  "impact_score",
 ] as const;
 
 export async function PATCH(
