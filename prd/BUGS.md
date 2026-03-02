@@ -39,3 +39,10 @@
   - **Found:** Iteration 57 (quality audit)
   - **Where:** `src/components/panels/annotation-panel.tsx` line ~63-64
   - **Fix applied:** Added `toastError("Failed to load annotation", { error: err })` in the `.catch()` block before `setLoading(false)`. Passes error object for network error detection.
+
+- [ ] #BUG-017 PlaybookView optimistic rollback doesn't restore currentIndex — Attempts: 0
+  - **Found:** Iteration 87 (acceptance tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx` — handleMarkComplete
+  - **What:** When Mark Complete & Next triggers an optimistic update, it advances currentIndex to the next pending/in_progress step. On API failure, the steps state is rolled back correctly but currentIndex is NOT restored to the original value. The user sees the previous step's status reverted, but they're now viewing a different step.
+  - **Steps to reproduce:** Open Playbook mode → Click "Mark Complete & Next" on step 1 while offline/network throttled → Observe: UI advances to step 2, then API fails, step 1 reverts to "pending" but focus stays on step 2.
+  - **Suggested fix:** Capture `const prevIndex = currentIndex` before the optimistic advance, then in the catch block add `setCurrentIndex(prevIndex)` alongside the steps rollback.

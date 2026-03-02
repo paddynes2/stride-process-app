@@ -101,5 +101,29 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
   - **Fix applied:** Added segmented progress bar below step count text. Teal segment (`--brand`) for completed, blue/60 (`--accent-blue/60`) for in_progress. Proportional widths. Empty state shows gray background bar only. Follows h-1.5 rounded-full overflow-hidden flex pattern from runbook-view.tsx.
 
+- [ ] #IMP-014 Progress bar should count skipped steps as "resolved" — Attempts: 0
+  - **Found:** Iteration 87 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
+  - **What:** Progress bar uses completedCount/total, so skipped steps count against progress (e.g., 0/5 even if 2 are intentionally skipped). Users who skip irrelevant steps feel the bar misrepresents actual completion.
+  - **Why it matters:** Nielsen H1 — Visibility of system status. Progress should match user's mental model of "done."
+  - **Suggested fix:** Count (completed + skipped) as "resolved" for progress, or add a secondary skipped segment (similar to IMP-013 in list view).
+
+- [ ] #IMP-015 Playbook mode needs Skip action button — Attempts: 0
+  - **Found:** Iteration 87 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx`
+  - **What:** Only "Mark Complete & Next" exists. Users who want to skip a step must exit playbook mode, skip in checklist view, then re-enter playbook mode.
+  - **Why it matters:** Nielsen H7 — Flexibility and efficiency of use. Power users need skip without extra navigation.
+  - **Suggested fix:** Add secondary "Skip" button below "Mark Complete & Next" for pending steps.
+
+- [ ] #IMP-016 Playbook button should be visible on read-only runbooks — Attempts: 0
+  - **Found:** Iteration 87 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
+  - **What:** "Playbook" button is hidden when runbook is completed/cancelled (isReadOnly). No way to review a completed runbook in the focused playbook UI.
+  - **Why it matters:** Nielsen H6 — Recognition rather than recall. Familiar interfaces should remain accessible for review.
+  - **Suggested fix:** Show Playbook button even in read-only mode. "Mark Complete & Next" is already guarded by isReadOnly in handleMarkComplete.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

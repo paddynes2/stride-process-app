@@ -1,151 +1,89 @@
 {
   "schema_version": "1.0",
-  "iteration": 86,
-  "date": "2026-03-02T22:00:00Z",
-  "mode": "multi_task",
+  "iteration": 87,
+  "date": "2026-03-02T23:15:00Z",
+  "mode": "testing_only",
   "validation": {
-    "last_commit_hash": "102bfe8621b0c59cc54b8824fa4360f2fc81f8ce",
+    "last_commit_hash": "88aad0eed8bc39a4087b688534d3bb4578663820",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
     "revert_reason": null
   },
-  "tasks": [
-    {
-      "slot": 1,
-      "id": "#FEAT-048",
-      "description": "Playbook mode — distraction-free runbook execution view. New page nested at /w/[workspaceId]/runbooks/[runbookId]/playbook showing one step at a time, large/centered, with Mark Complete & Next, prev/next navigation, and progress indicator. Add Playbook Mode button to existing runbook-view header. Also replace window.confirm() with Radix Dialog in runbook-view.tsx (IMP-012).",
-      "source": "prd/FEATURES.md",
-      "type": "build",
-      "phase": "Phase 4: The Living Playbook",
-      "complexity": "M",
-      "attempts": 3,
-      "risk_score": 2,
-      "acceptance_criteria": [
-        "New server page at src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx fetching runbook + steps from Supabase",
-        "PlaybookView client component renders full-viewport overlay (position fixed, z-50+) covering workspace shell — distraction-free with no sidebar/header/tab bar visible",
-        "Current step shown large/centered with step name and status",
-        "'Mark Complete & Next' primary button sets current step to completed and auto-advances to next pending/in_progress step",
-        "Progress indicator: 'Step N of M' text + progress bar",
-        "Prev/Next navigation buttons to browse steps without changing status",
-        "Completed steps show green checkmark with completion timestamp",
-        "Back/Exit button to return to full runbook view (/w/{workspaceId}/runbooks/{runbookId})",
-        "Mobile-responsive single-column layout with large touch targets",
-        "'Playbook Mode' button added to runbook-view.tsx header next to Complete/Cancel (Link to ./playbook)",
-        "window.confirm() in handleCompleteRunbook and handleCancelRunbook replaced with Radix Dialog (IMP-012)",
-        "Complete dialog: consequence text explaining completion locks steps",
-        "Cancel dialog: consequence text explaining cancellation stops the runbook"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx",
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx",
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx"
-      ],
-      "files_read_only": [
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx",
-        "src/types/database.ts",
-        "src/lib/api/client.ts",
-        "src/lib/api/toast-helpers.ts",
-        "src/components/ui/button.tsx",
-        "src/components/ui/badge.tsx",
-        "src/components/ui/dialog.tsx"
-      ],
-      "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx — reuse RunbookStepEnriched type export, STEP_STATUS_CONFIG, RUNBOOK_STATUS_CONFIG, status class mappings, handleStepStatus pattern, formatDate util",
-          "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx — server component pattern: fetch runbook+steps from Supabase, pass to client View component"
-        ],
-        "patterns_to_follow": [
-          "Server page.tsx: createClient() → supabase.auth.getUser() → fetch runbook+steps → notFound() if missing → render View",
-          "Client View: useState for local state, optimistic updates with rollback on API error",
-          "updateRunbookStep(id, { status, completed_at }) from @/lib/api/client",
-          "Badge, Button from @/components/ui/ with variant props",
-          "Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter from @/components/ui/dialog",
-          "cn() from @/lib/utils for conditional classnames",
-          "Dark theme tokens: --text-primary (white/90), --text-secondary (white/55), --text-tertiary (white/30), --brand (#14B8A6), --accent-blue (#3B82F6), --success, --bg-surface-active, --border-subtle, --surface",
-          "ArrowLeft, Play, ChevronLeft, ChevronRight icons from lucide-react"
-        ],
-        "learnings_relevant": [
-          "React 19 useRef requires initial value: useRef(null) not bare useRef()",
-          "apiFetch unwraps envelope — returns T directly, no nested property access",
-          "Lucide-react has no title prop — use aria-label instead"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/runbooks/[runbookId]/playbook",
-          "/w/[workspaceId]/runbooks/[runbookId]"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "ATTEMPT 3 — previous 2 attempts produced working code but were lost to pipeline merge failures (not code issues). Same approach is valid.\n\nPLAYBOOK VIEW ARCHITECTURE:\n- The playbook page is NESTED under runbooks/[runbookId]/playbook/ so it inherits the workspace shell layout. To achieve distraction-free display, PlaybookView must render as a FIXED full-viewport overlay (position: fixed, inset: 0, z-index: 50+, bg-[var(--surface)]) that covers the shell.\n- page.tsx follows the same Supabase fetch pattern as the sibling runbook page.tsx — copies its exact queries.\n- PlaybookView receives runbook + steps as props (same types as RunbookView).\n- Can import and reuse RunbookStepEnriched type from '../runbook-view'.\n\nSTEP NAVIGATION:\n- useState<number>(0) for currentStepIndex\n- Show steps[currentStepIndex] large/centered\n- Prev button: decrement index (disabled at 0)\n- Next button: increment index (disabled at last)\n- 'Mark Complete & Next': call updateRunbookStep(step.id, { status: 'completed', completed_at: now }), optimistic update, then auto-advance to next non-completed step\n\nRUNBOOK-VIEW CHANGES:\n- Add 'Playbook' button in header next to Complete/Cancel using Link to './playbook'\n- Replace both window.confirm() calls with controlled Radix Dialog state\n- Use two boolean states: confirmCompleteOpen, confirmCancelOpen\n- Each Dialog has DialogTitle, DialogDescription (consequence sentence), Cancel + Confirm buttons"
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-013",
-      "description": "Add segmented progress bar to runbook list cards — visually distinguish completed (teal) vs in-progress (blue) steps",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 4: The Living Playbook",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Each runbook card in runbooks-list-view.tsx shows a small progress bar below the step count text",
-        "Bar has two segments: teal/brand for completed steps, lighter blue/signal for in_progress steps",
-        "Segment widths are proportional: completedPct = completed/total*100, inProgressPct = inProgress/total*100",
-        "Empty state (0 completed, 0 in_progress): gray background bar only",
-        "All-completed state: full teal bar",
-        "Bar height matches runbook-view pattern (h-1.5), with rounded-full",
-        "No layout shift — bar integrates cleanly into existing card layout"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
-      ],
-      "files_read_only": [
-        "src/types/database.ts",
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx"
-      ],
-      "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx lines 151-157 — single-segment progress bar pattern (outer bg-[var(--bg-surface-active)] rounded-full, inner bg-[var(--brand)])"
-        ],
-        "patterns_to_follow": [
-          "Progress bar: <div class='h-1.5 bg-[var(--bg-surface-active)] rounded-full overflow-hidden flex'> with inner divs",
-          "Completed segment: bg-[var(--brand)] (teal #14B8A6)",
-          "In-progress segment: bg-[var(--signal)] (blue) or bg-[var(--accent-blue)] with lower opacity",
-          "RunbookStepStatus enum: pending | in_progress | completed | skipped",
-          "Data available: runbook.runbook_steps is { id, status }[]"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/runbooks"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Currently line 108 shows '{completed}/{total} steps' text. Add a progress bar BELOW this text line (inside the existing <div> at line 105). Calculate from runbook.runbook_steps:\n  const inProgress = steps.filter(s => s.status === 'in_progress').length;\n  const completedPct = total > 0 ? (completed / total) * 100 : 0;\n  const inProgressPct = total > 0 ? (inProgress / total) * 100 : 0;\nRender: flex container with two divs side-by-side — first div width=completedPct% bg-[var(--brand)], second div width=inProgressPct% bg-[var(--accent-blue)]/60 (60% opacity for visual distinction). Keep bar small (h-1 or h-1.5) and add mt-1.5 spacing."
-    }
-  ],
+  "tasks": [],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts", "src/lib/utils.ts"],
+    "read_only": ["package.json", "tsconfig.json", "next.config.ts", "tailwind.config.ts"],
     "owner": null,
-    "note": "No shared file modifications needed. Both tasks are UI-only with zero file overlap."
+    "note": "Testing-only iteration — no builders, no source changes."
   },
-  "merge_order": ["#FEAT-048", "#IMP-013"],
+  "merge_order": [],
   "testing_plan": {
-    "run_acceptance": false,
-    "run_regression": false,
-    "regression_reason": "Risk score 3 from last iteration would normally trigger regression, but last regression (iter 83) was 23/23 PASS and ZERO code changed since (iters 84+85 were both reverted with no code reaching the branch). Regression deferred to next testing iteration.",
-    "suites_to_run": [],
+    "run_acceptance": true,
+    "run_regression": true,
+    "regression_reason": "FEAT-047 acceptance overdue 5+ iterations (dispatch failures iters 72, 79, 83, 84, 85). FEAT-048 new UI from iter 86 — never acceptance tested. All Phase 4 P0 features complete — natural testing inflection point.",
+    "suites_to_run": [
+      {
+        "suite": "regression",
+        "scope": "full",
+        "method": "static_analysis + tsc + eslint + curl + API probing",
+        "expected_checks": 23,
+        "notes": "Baseline regression from iter 83 (23 checks). Verify nothing regressed from FEAT-048/IMP-012/IMP-013 additions."
+      },
+      {
+        "suite": "acceptance",
+        "feature_id": "#FEAT-047",
+        "feature_name": "Runbook instances",
+        "scope": "full feature",
+        "method": "static_analysis + API probing + code review",
+        "checks": [
+          "Runbooks API route exists: GET /api/v1/runbooks returns 401 for unauthed",
+          "Runbook-steps API route exists: GET /api/v1/runbook-steps returns 401 for unauthed",
+          "Runbooks POST route creates runbook from section (static analysis of route.ts POST handler)",
+          "Runbook GET by id returns runbook with steps (static analysis)",
+          "Runbook PATCH updates status (static analysis of [id]/route.ts PATCH handler)",
+          "RunbookStep PATCH updates step status (static analysis of runbook-steps/[id]/route.ts PATCH)",
+          "Runbook list page renders with filter tabs (static analysis of runbooks-list-view.tsx)",
+          "Runbook view page renders checklist with progress bar (static analysis of runbook-view.tsx)",
+          "4-state step status transitions: pending → in_progress → completed, pending → skipped (static analysis)",
+          "Complete/Cancel buttons use Radix Dialog confirmation (static analysis — IMP-012 verify)",
+          "Read-only mode for completed/cancelled runbooks (static analysis of runbook-view.tsx)",
+          "Section detail panel has 'Run as Checklist' button (static analysis of section-detail-panel.tsx)",
+          "Sidebar navigation includes runbooks link (static analysis of sidebar.tsx)",
+          "Runbook types defined: Runbook, RunbookStep, RunbookStatus, RunbookStepStatus (static analysis of database.ts)",
+          "Migration 016 creates runbooks + runbook_steps tables with RLS (file exists + structure check)",
+          "workspace-shell.tsx reserved paths includes 'runbooks' (static analysis)"
+        ],
+        "notes": "5+ consecutive dispatch failures. This acceptance test covers the full FEAT-047 feature (iters 80-82) plus IMP-012 (iter 86)."
+      },
+      {
+        "suite": "acceptance",
+        "feature_id": "#FEAT-048",
+        "feature_name": "Playbook mode",
+        "scope": "full feature",
+        "method": "static_analysis + code review",
+        "checks": [
+          "Playbook page.tsx exists at correct route path (file existence check)",
+          "Playbook server page fetches runbook + steps via Supabase (static analysis of playbook/page.tsx)",
+          "PlaybookView renders fixed overlay (z-50) covering workspace shell (static analysis of playbook-view.tsx)",
+          "Mark Complete & Next button advances to next pending/in_progress step (static analysis)",
+          "Optimistic update with rollback on API error (static analysis of handleMarkComplete)",
+          "Dot navigation allows jumping to any step (static analysis)",
+          "Progress bar shows completion (static analysis)",
+          "Step N of M text displayed (static analysis)",
+          "Completed steps show green checkmark (static analysis)",
+          "Exit/back navigation returns to runbook view (static analysis)",
+          "Mobile-responsive layout (max-w-xl or similar constraint, static analysis)",
+          "Runbook view has 'Playbook' button linking to playbook route (static analysis of runbook-view.tsx)"
+        ],
+        "notes": "New in iter 86 (attempt 3 after 2 pipeline merge failures). First acceptance test."
+      }
+    ],
     "cadence_trigger": null
   },
   "status_updates": {
     "warnings_added": [
-      "Stash 'ralph-auto-stash-iter85-cleanup' created (SIGNAL + deleted handoffs + pid from iter 85). Safe to drop after successful iteration.",
-      "Previous stash 'ralph-auto-stash-1772431205' from iter 84 still exists — both can be dropped after successful iteration.",
-      "FEAT-048 attempt 3 — previous 2 failures were pipeline merge (not code). Same approach valid.",
-      "IMP-012 bundled into FEAT-048 slot 1 (both touch runbook-view.tsx). Slot 2 is IMP-013 instead.",
-      "FEAT-047 acceptance testing still overdue (5 dispatch failures: iters 72, 79, 83, 84, 85)."
+      "Migrations 014-016 still need `npx supabase db push` to deploy to remote DB",
+      "Production (origin/main) is behind ralph/init-stride"
     ],
     "diagnoses_written": false,
     "signal_override": null

@@ -930,3 +930,39 @@
 - Efficiency: 5 — first successful iteration after 2 consecutive pipeline merge failures (iters 84, 85). Both builders completed and merged cleanly.
 - Observations: 0
 **Notes:** Pipeline merge fixed (or worked around) — first successful build since iter 82. FEAT-048 attempt 3 succeeded after 2 pipeline merge failures. PlaybookView uses fixed full-viewport overlay (z-50) covering workspace shell — elegant solution avoiding workspace-shell.tsx modifications. IMP-012 bundled into slot 1 since both touched runbook-view.tsx. IMP-013 is a clean 7-line addition. All Phase 4 P0 features now complete (FEAT-045 comments, FEAT-046 tasks, FEAT-047 runbooks). Next priorities: FEAT-048 acceptance testing, FEAT-047 acceptance testing (5 dispatch failures), then FEAT-049 activity log.
+
+## Iteration 87 — 2026-03-02 23:45
+**Tasks:**
+- Regression (5 checks) — passed
+- #FEAT-047 acceptance (16 checks) — passed
+- #FEAT-048 acceptance (12 checks) — passed
+**Source:** EXECUTION_PLAN.json (testing_only mode)
+**Mode:** testing_only
+**Result:** completed
+**Changes:** Documentation only (testing iteration — no code changes)
+- knowledge/STATUS.md (updated handoff)
+- knowledge/PROGRESS.md (this entry)
+- knowledge/METRICS.jsonl (appended)
+- testing/RESULTS.md (updated with iter 87 results)
+- prd/BUGS.md (added BUG-017)
+- prd/IMPROVEMENTS.md (added IMP-014, IMP-015, IMP-016)
+**Verification:**
+- Type check: pass (confirmed via POST_MERGE_CHECK.txt: PASS, and tester static analysis of tsc)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx, 0 errors)
+- Build: N/A (testing-only iteration)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable — all checks via static analysis + code review)
+- Canary test: skipped (no code changes this iteration)
+**Bugs found:** 1
+- BUG-017 (P2): PlaybookView handleMarkComplete rollback doesn't restore currentIndex after API failure — user ends up viewing wrong step after rollback
+**Improvements found:** 3
+- IMP-014: Progress bar should count skipped steps as "resolved" (usability)
+- IMP-015: Playbook mode needs a Skip action button (usability)
+- IMP-016: Playbook button should be available on read-only runbooks for review (usability)
+**Self-score:**
+- Code quality: N/A — no code changes
+- Test coverage: 5 — 33/33 checks across 3 suites, comprehensive static analysis resolving 5+ iterations of overdue FEAT-047 acceptance
+- Confidence: 5 — all acceptance criteria for FEAT-047 (16/16) and FEAT-048 (12/12) verified, regression clean
+- Efficiency: 5 — single tester covered all 3 suites in 38/40 actions
+- Observations: 4 (1 bug + 3 improvements)
+**Notes:** Testing inflection point — all Phase 4 P0 features acceptance-tested. FEAT-047 acceptance was overdue 5+ iterations due to tester dispatch failures (iters 72, 79, 83, 84, 85) — finally resolved. BUG-017 is a real but edge-case issue (only triggers on API failure during optimistic advance). Three usability improvements logged for future consideration. Next: FEAT-049 Activity log.

@@ -1,19 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 83 (last formal test run) — iteration 86 had reviewer typecheck+lint only
+- **Iteration:** 87
 - **Date:** 2026-03-02
-- **Suite:** regression (23 checks) — acceptance (#FEAT-047, 18 checks) planned but not executed
-- **Method:** Static analysis + TypeScript + ESLint + curl (Playwright unavailable)
-- **Result:** **23/23 regression PASS** — acceptance tester did not produce output
-- **Bugs found:** 1 (P2 — production deployment lag, not a code bug)
-- **Improvements found:** 2 (IMP-012 styled confirm dialog — now DONE iter 86, IMP-013 segmented progress bar — now DONE iter 86)
-- **Note:** Regression clean. FEAT-047 acceptance testing still needed (5 dispatch failures). FEAT-048 acceptance also needed (new in iter 86). Next testing iteration should run both acceptance suites + regression.
+- **Suite:** regression (5 checks) + acceptance #FEAT-047 (16 checks) + acceptance #FEAT-048 (12 checks)
+- **Method:** Static analysis + TypeScript + ESLint + code review (Playwright unavailable)
+- **Result:** **33/33 ALL PASS**
+- **Bugs found:** 1 (BUG-017 P2 — PlaybookView optimistic rollback doesn't restore currentIndex)
+- **Improvements found:** 3 (IMP-014 skipped steps in progress, IMP-015 playbook skip button, IMP-016 playbook read-only access)
+- **Note:** Testing inflection point — all Phase 4 P0 features acceptance-tested. FEAT-047 acceptance overdue resolved (5+ dispatch failures). Next testing: after FEAT-049 implementation.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 83 (2026-03-02) — 23/23 PASS (static analysis + curl + API probing)
+- Last run: Iteration 87 (2026-03-02) — 33/33 PASS (5 regression + 16 FEAT-047 acceptance + 12 FEAT-048 acceptance)
+- Previous run: Iteration 83 (2026-03-02) — 23/23 PASS (static analysis + curl + API probing)
 - Previous run: Iteration 79 (2026-03-02) — 40/40 PASS (27 baseline + 13 acceptance, static analysis)
 - Previous run: Iteration 77 (2026-03-01) — 19/19 baseline PASS, 0/6 acceptance FAIL (code absent — merge failures)
 - Previous run: Iteration 75 (2026-03-01) — 32/32 PASS (19 baseline + 13 extended)
