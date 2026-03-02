@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -45,6 +46,16 @@ export async function POST(request: NextRequest) {
     }
     return errorResponse("create_failed", error.message, 500);
   }
+
+  logActivity({
+    supabase,
+    workspace_id,
+    user_id: user.id,
+    action: "created",
+    entity_type: "connections",
+    entity_id: connection.id,
+    entity_name: "Connection",
+  });
 
   return successResponse(connection, 201);
 }

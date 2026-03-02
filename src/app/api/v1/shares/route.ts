@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
+import { logActivity } from "@/lib/api/activity";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -55,6 +56,16 @@ export async function POST(request: NextRequest) {
   if (error) {
     return errorResponse("create_failed", error.message, 500);
   }
+
+  logActivity({
+    supabase,
+    workspace_id,
+    user_id: user.id,
+    action: "shared",
+    entity_type: "public_shares",
+    entity_id: share.id,
+    entity_name: "Shared Link",
+  });
 
   return successResponse(share, 201);
 }
