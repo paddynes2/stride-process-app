@@ -75,6 +75,7 @@ npx supabase db push     # Push migrations
 - `tasks/route.ts` + `[id]/route.ts` — CRUD (GET by step_id, POST, PATCH, DELETE)
 - `runbooks/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST create with step snapshot, GET/PATCH/DELETE by id)
 - `runbook-steps/route.ts` + `[id]/route.ts` — GET by runbook_id, PATCH by id
+- `coloring-rules/route.ts` + `[id]/route.ts` — CRUD (GET list by workspace_id, POST, PATCH, DELETE)
 - `activity/route.ts` — GET (workspace_id required, optional filters: user_id, action, entity_type, from/to, limit/offset). Joins users table via FK for email display.
 - `workspaces/[id]/clone/route.ts` — POST (deep clone workspace via clone_workspace RPC)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
@@ -109,7 +110,7 @@ npx supabase db push     # Push migrations
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction) |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 
@@ -139,6 +140,7 @@ npx supabase db push     # Push migrations
 | 016 | Runbooks + runbook_steps tables + enums (runbook_status, runbook_step_status) + RLS + indexes + triggers |
 | 017 | Activity log (activity_action enum + activity_log table, append-only, SELECT+INSERT RLS, workspace+created_at index) |
 | 018 | clone_workspace() SECURITY DEFINER function (deep-copies workspace + 12 child table types with UUID remapping via temp tables) |
+| 019 | Coloring rules (criteria_type enum + coloring_rules table + RLS + index + update_updated_at trigger) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->

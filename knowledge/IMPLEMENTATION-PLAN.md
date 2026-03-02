@@ -108,7 +108,7 @@ Core consulting insight features:
   - [x] [2/3] Page UI — DONE iter 89
   - [x] [3/3] API route integration — DONE iter 90
 - [x] #FEAT-050 Workspace cloning (deep copy for reuse) — [1/2] DONE iter 92, [2/2] DONE iter 93
-- [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting)
+- [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting) — [1/2] DONE iter 94
 - [ ] #FEAT-052 Section templates (save & deploy)
 - [ ] #FEAT-053 Phase 4 testing gate
 
@@ -155,4 +155,4 @@ Deferred indefinitely:
 - [2026-03-03] Iteration 91: Testing-only — FEAT-049 acceptance 20/20 PASS + regression 37/37 PASS. 2 bugs (BUG-018 void keyword, BUG-019 user display) + 6 improvements logged. Next: FEAT-050 workspace cloning.
 - [2026-03-03] Iteration 92: #FEAT-050 [1/2] data layer + #IMP-019 completed. #BUG-019 FAILED (4/6 acceptance criteria) — builder updated API route join but not page.tsx server query, causing "Unknown" regression on initial load. Code recovered from 3 pipeline merge failures. Result: partial. Next: fix BUG-019 (page.tsx query), then FEAT-050 [2/2] UI.
 - [2026-03-03] Iteration 93: #FEAT-050 [2/2] UI complete (Duplicate Workspace button in settings). #BUG-018 resolved (void prefix on 25 logActivity calls). FEAT-050 fully done. Slot 2 diverged from plan (IMP-018 assigned, BUG-018 built). Next: BUG-019 fix, then FEAT-051 or FEAT-052.
-- [2026-03-03] Iteration 94: PARTIAL — #IMP-007 completed (kbd hints, partial run carry-over). #BUG-019 attempt 2 FAILED (builder completed but worktree merge failure — code lost). #FEAT-051 [1/2] attempt 1 FAILED (slot 2 builder produced no commits). Testing-only iteration deferred until FEAT-051 is actually built. Next: BUG-019 attempt 3 + FEAT-051 [1/2] retry.
+- [2026-03-03] Iteration 94: PARTIAL — #FEAT-051 [1/2] data layer completed (reviewer recovered code from working tree — builder wrote files but didn't commit). #IMP-007 completed (kbd hints, partial run carry-over). #BUG-019 attempt 2 FAILED (builder completed but worktree merge failure — code lost). Next: BUG-019 attempt 3 + FEAT-051 [2/2] UI.

@@ -359,7 +359,7 @@
 - [ ] Applies to process canvas step nodes only (not journey touchpoints/stages)
 - [ ] Real-time: rules apply as created/edited
 **Sub-tasks:**
-- [ ] [1/2] Data layer: migration (coloring_rules table + criteria_type enum), types, API (CRUD), client wrappers
+- [x] [1/2] Data layer: migration (coloring_rules table + criteria_type enum), types, API (CRUD), client wrappers — DONE iteration 94, 2026-03-03
 - [ ] [2/2] UI: Coloring panel in canvas toolbar (paintbrush icon) + step node background tint
 **Notes:** From Puzzle spec. "All draft steps = yellow", "steps with no role = red". Color is background tint (low opacity) preserving readability.
 
