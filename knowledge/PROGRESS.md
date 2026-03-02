@@ -1030,3 +1030,52 @@
 - Efficiency: 5 — Both slots succeeded on first attempt, no merge issues. 5th consecutive clean merge (iters 86-89).
 - Observations: 0
 **Notes:** FEAT-049 [2/3] complete. One remaining sub-task: [3/3] integrate logActivity() into existing API routes. IMP-014 resolved across all 3 runbook views. Activity page follows comments page pattern (server fetch + entityTabMap + client view with filters).
+
+## Iteration 90 — 2026-03-03 04:30
+**Tasks:**
+- #FEAT-049 [3/3] logActivity() calls across all POST/PATCH/DELETE API routes — slot 1 (canvas/journey/share) — completed
+- #FEAT-049 [3/3] logActivity() calls across all POST/PATCH/DELETE API routes — slot 2 (org/overlay) — completed
+- #IMP-016 Playbook button visible on read-only runbooks — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+Slot 1 (18 files modified):
+- src/app/api/v1/workspaces/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/tabs/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/sections/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/steps/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/connections/route.ts, [id]/route.ts — logActivity on POST/DELETE
+- src/app/api/v1/stages/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/touchpoints/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/touchpoint-connections/route.ts, [id]/route.ts — logActivity on POST/DELETE
+- src/app/api/v1/shares/route.ts, [id]/route.ts — logActivity on POST(shared)/PATCH/DELETE
+Slot 2 (22 files modified):
+- src/app/api/v1/teams/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/roles/route.ts, [id]/route.ts — logActivity via async IIFE (workspace_id traversal)
+- src/app/api/v1/people/route.ts, [id]/route.ts — logActivity via async IIFE (workspace_id traversal)
+- src/app/api/v1/tools/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/step-roles/route.ts, [id]/route.ts — logActivity via async IIFE (workspace_id traversal)
+- src/app/api/v1/perspectives/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/annotations/route.ts, [id]/route.ts — logActivity via async IIFE (workspace_id traversal)
+- src/app/api/v1/comments/route.ts, [id]/route.ts — logActivity on POST(commented)/PATCH/DELETE
+- src/app/api/v1/tasks/route.ts, [id]/route.ts — logActivity on POST/PATCH/DELETE
+- src/app/api/v1/runbooks/route.ts, [id]/route.ts — logActivity on POST/PATCH(completed)/DELETE
+- src/app/api/v1/runbook-steps/[id]/route.ts — logActivity via async IIFE (workspace_id traversal)
+- src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx — IMP-016 Playbook button outside isReadOnly guard
+**Verification:**
+- Type check: pass (both builders + POST_MERGE_CHECK all pass, 0 errors)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx, 0 errors)
+- Build: pass (slot 2 verified Next.js build)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true for slot 2)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Formulaic pattern applied consistently across 40 files. Fire-and-forget correct. Special actions (commented, completed, shared) correct per spec. Entities without workspace_id use async IIFE traversal. DELETE handlers now capture entity data via .select().single().
+- Test coverage: 2 — typecheck + lint + build only. No runtime testing. FEAT-049 acceptance recommended for iter 91.
+- Confidence: 5 — Purely additive (logActivity calls after successful operations). No existing behavior changed. Fire-and-forget means failure can't break API responses.
+- Efficiency: 5 — Both slots succeeded on first attempt. 6th consecutive clean merge (iters 86-90).
+- Observations: 0
+**Notes:** FEAT-049 fully complete (3/3): data layer (iter 88), page UI (iter 89), API route integration (iter 90). IMP-016 resolved — Playbook button now visible for completed/cancelled runbooks while Cancel/Complete buttons remain guarded. Minor style inconsistency: slot 1 uses bare `logActivity()` without `void` prefix, slot 2 uses `void logActivity()`. Both pass lint. Functional behavior identical. FEAT-049 acceptance testing + regression recommended for iter 91.

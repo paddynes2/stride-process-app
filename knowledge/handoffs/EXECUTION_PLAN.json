@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 89,
-  "date": "2026-03-03T02:00:00Z",
+  "iteration": 90,
+  "date": "2026-03-03T04:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "d7611da3ca75750a0934d91c4f2d8a4bea0e4111",
+    "last_commit_hash": "ac524ff565d8c2101863954525e24ce3d55eb605",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -14,120 +14,160 @@
     {
       "slot": 1,
       "id": "#FEAT-049",
-      "description": "[2/3] Activity log page UI — chronological feed at /w/[workspaceId]/activity with action type filter tabs, entity links, relative timestamps, pagination via load-more",
+      "description": "Add logActivity() calls to POST/PATCH/DELETE handlers for core canvas + journey + share API routes (workspaces, tabs, sections, steps, connections, stages, touchpoints, touchpoint-connections, shares)",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 4: The Living Playbook",
-      "complexity": "M",
-      "attempts": 1,
+      "complexity": "L",
+      "attempts": 2,
       "risk_score": 2,
       "acceptance_criteria": [
-        "New route /w/[workspaceId]/activity renders activity feed",
-        "Server page.tsx fetches initial activity log entries (limit 50) and passes to client ActivityView component",
-        "Each entry shows: action verb sentence (e.g. 'created step \"Onboarding\"'), entity type badge, relative timestamp",
-        "Entity name is a clickable link to the entity's tab (build entityTabMap from steps/sections/stages/touchpoints like comments page.tsx)",
-        "Filter tabs at top: All + one per ActivityAction value (Created, Updated, Deleted, Completed, Assigned, Commented, Exported, Shared)",
-        "Empty state when no entries match filter",
-        "'Load More' button at bottom fetches next page (offset-based pagination via fetchActivityLog)",
-        "Sidebar nav: 'Activity' item added with Clock icon, between Runbooks and Teams",
-        "workspace-shell.tsx: 'activity' added to reserved paths array"
+        "Every POST handler in owned routes calls logActivity() with action='created' after successful insert",
+        "Every PATCH handler in owned routes calls logActivity() with action='updated' after successful update, with details containing changed field names",
+        "Every DELETE handler in owned routes calls logActivity() with action='deleted' after successful delete, using entity name snapshot",
+        "logActivity() is fire-and-forget — do NOT await in the response chain or block the response on it",
+        "For DELETE routes that don't already use .select().single(), add it to capture entity_name before deletion",
+        "All logActivity() calls include workspace_id, user_id (from user.id), entity_type (table name), entity_id, entity_name",
+        "TypeScript compiles cleanly (npx tsc --noEmit)"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/activity/page.tsx",
-        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
-        "src/components/layout/sidebar.tsx",
-        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
+        "src/app/api/v1/workspaces/route.ts",
+        "src/app/api/v1/workspaces/[id]/route.ts",
+        "src/app/api/v1/tabs/route.ts",
+        "src/app/api/v1/tabs/[id]/route.ts",
+        "src/app/api/v1/sections/route.ts",
+        "src/app/api/v1/sections/[id]/route.ts",
+        "src/app/api/v1/steps/route.ts",
+        "src/app/api/v1/steps/[id]/route.ts",
+        "src/app/api/v1/connections/route.ts",
+        "src/app/api/v1/connections/[id]/route.ts",
+        "src/app/api/v1/stages/route.ts",
+        "src/app/api/v1/stages/[id]/route.ts",
+        "src/app/api/v1/touchpoints/route.ts",
+        "src/app/api/v1/touchpoints/[id]/route.ts",
+        "src/app/api/v1/touchpoint-connections/route.ts",
+        "src/app/api/v1/touchpoint-connections/[id]/route.ts",
+        "src/app/api/v1/shares/route.ts",
+        "src/app/api/v1/shares/[id]/route.ts"
       ],
       "files_read_only": [
-        "src/types/database.ts",
-        "src/lib/api/client.ts",
-        "src/app/api/v1/activity/route.ts",
-        "src/app/(app)/w/[workspaceId]/comments/page.tsx",
-        "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx"
+        "src/lib/api/activity.ts",
+        "src/types/database.ts"
       ],
       "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/comments/page.tsx",
-          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
-          "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
-        ],
+        "similar_files": ["src/app/api/v1/runbooks/[id]/route.ts"],
         "patterns_to_follow": [
-          "Server page.tsx fetches data via Supabase, builds entityTabMap, passes to client view component (see comments/page.tsx)",
-          "Client view component uses filter tabs pattern (see comments-view.tsx: activeFilter useState, cn() conditional styling)",
-          "formatRelativeTime() helper for timestamps (see comments-view.tsx line 29-35)",
-          "Entity type badge using <span> with bg-[var(--bg-surface)] styling (see comments-view.tsx line 131)",
-          "Empty state: centered icon + message (see comments-view.tsx line 100-107)",
-          "Sidebar nav items: { label, icon, href } objects in NAV_ITEMS array (see sidebar.tsx line 31-42)",
-          "Reserved paths: array of strings at workspace-shell.tsx line 47"
+          "Import: import { logActivity } from '@/lib/api/activity'",
+          "logActivity signature: { supabase, workspace_id, user_id, action, entity_type, entity_id, entity_name, details? }",
+          "ActivityAction enum: 'created' | 'updated' | 'deleted' | 'completed' | 'assigned' | 'commented' | 'exported' | 'shared'",
+          "For POST: call after successful insert, use returned data.id and data.name (or body.name)",
+          "For PATCH: call after successful update, use returned data. Include { changed_fields: Object.keys(updates) } in details",
+          "For DELETE: modify to .delete().eq('id', id).select().single() if needed, use returned data for entity_name. If entity has no name field (connections, touchpoint-connections), use entity_type as entity_name",
+          "Fire-and-forget pattern: call logActivity() without awaiting in the response path. The function handles its own errors internally",
+          "For shares routes: use action='shared' for POST instead of 'created'",
+          "workspace_id source: POST routes get it from body.workspace_id or body; PATCH/DELETE routes get it from the returned entity data"
         ],
         "learnings_relevant": [
-          "apiFetch unwraps envelope — fetchActivityLog returns ActivityLog[] directly",
-          "WCAG AA: never use text-white/15 for functional content, minimum text-white/55",
-          "React 19 useRef requires initial value"
+          "apiFetch unwraps envelope — logActivity is server-side only, no envelope concern",
+          "Supabase RLS silent mutations — routes with PGRST116 handling already check for empty results"
         ],
-        "affected_urls": [
-          "/w/[workspaceId]/activity"
-        ]
+        "affected_urls": ["/w/[workspaceId]/activity"]
       },
-      "has_ui_changes": true,
+      "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "Follow comments page pattern exactly: server page.tsx fetches initial data via Supabase + builds entityTabMap from steps/sections/stages/touchpoints for entity_id→tab_id linking. Client ActivityView uses fetchActivityLog() for 'Load More' pagination. Use ActivityAction type for filter tabs — map each action to a user-friendly label. Action sentence format: '{action} {entity_type} \"{entity_name}\"'. Icon: Clock from lucide-react for sidebar. User ID shown as truncated UUID (author_id.slice(0,8)) same as comments-view.tsx."
+      "special_instructions": "This is a formulaic task: add the same pattern (import + logActivity call) to every POST/PATCH/DELETE handler. For entities without a 'name' field (connections, touchpoint-connections), use a descriptive string like 'Connection' or the source/target step names if available. Do NOT modify GET handlers. Do NOT modify the logActivity utility itself."
     },
     {
       "slot": 2,
-      "id": "#IMP-014",
-      "description": "Progress bar counts skipped steps as 'resolved' — (completed + skipped) / total for progress computation",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
+      "id": "#FEAT-049",
+      "description": "Add logActivity() calls to POST/PATCH/DELETE handlers for org/overlay API routes (teams, roles, people, tools, step-roles, perspectives, annotations, comments, tasks, runbooks, runbook-steps) + IMP-016 playbook button on read-only runbooks",
+      "source": "prd/FEATURES.md",
+      "type": "build",
       "phase": "Phase 4: The Living Playbook",
-      "complexity": "S",
-      "attempts": 0,
-      "risk_score": 0,
+      "complexity": "L",
+      "attempts": 2,
+      "risk_score": 2,
       "acceptance_criteria": [
-        "runbook-view.tsx progress bar uses (completed + skipped) as 'resolved' count instead of completed only",
-        "Progress text shows 'N of M resolved' or equivalent that reflects skipped steps counting toward progress",
-        "runbooks-list-view.tsx segmented progress bar also counts skipped steps — add skipped segment (or merge with completed segment)",
-        "Playbook mode progress (playbook-view.tsx) also counts skipped steps toward progress if applicable"
+        "Every POST handler in owned API routes calls logActivity() with action='created' after successful insert",
+        "Every PATCH handler in owned API routes calls logActivity() with action='updated' after successful update, with details containing changed field names",
+        "Every DELETE handler in owned API routes calls logActivity() with action='deleted' after successful delete, using entity name snapshot",
+        "Comments POST handler uses action='commented' instead of 'created'",
+        "Runbook PATCH to status='completed' uses action='completed' instead of 'updated'",
+        "logActivity() is fire-and-forget — do NOT await in the response chain",
+        "For DELETE routes that don't already use .select().single(), add it to capture entity_name",
+        "IMP-016: Playbook button is visible on completed/cancelled runbooks (read-only mode) in runbook-view.tsx",
+        "TypeScript compiles cleanly (npx tsc --noEmit)"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
-        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
-        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx"
+        "src/app/api/v1/teams/route.ts",
+        "src/app/api/v1/teams/[id]/route.ts",
+        "src/app/api/v1/roles/route.ts",
+        "src/app/api/v1/roles/[id]/route.ts",
+        "src/app/api/v1/people/route.ts",
+        "src/app/api/v1/people/[id]/route.ts",
+        "src/app/api/v1/tools/route.ts",
+        "src/app/api/v1/tools/[id]/route.ts",
+        "src/app/api/v1/step-roles/route.ts",
+        "src/app/api/v1/step-roles/[id]/route.ts",
+        "src/app/api/v1/perspectives/route.ts",
+        "src/app/api/v1/perspectives/[id]/route.ts",
+        "src/app/api/v1/annotations/route.ts",
+        "src/app/api/v1/annotations/[id]/route.ts",
+        "src/app/api/v1/comments/route.ts",
+        "src/app/api/v1/comments/[id]/route.ts",
+        "src/app/api/v1/tasks/route.ts",
+        "src/app/api/v1/tasks/[id]/route.ts",
+        "src/app/api/v1/runbooks/route.ts",
+        "src/app/api/v1/runbooks/[id]/route.ts",
+        "src/app/api/v1/runbook-steps/[id]/route.ts",
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx"
       ],
-      "files_read_only": [],
+      "files_read_only": [
+        "src/lib/api/activity.ts",
+        "src/types/database.ts"
+      ],
       "context": {
-        "similar_files": [],
+        "similar_files": ["src/app/api/v1/steps/route.ts", "src/app/api/v1/steps/[id]/route.ts"],
         "patterns_to_follow": [
-          "Segmented progress bar pattern in runbooks-list-view.tsx (IMP-013): h-1.5 rounded-full overflow-hidden flex, teal for completed, blue/60 for in_progress",
-          "Add a third segment color for skipped (e.g. amber/40 or white/20) or merge skipped into completed segment"
+          "Import: import { logActivity } from '@/lib/api/activity'",
+          "logActivity signature: { supabase, workspace_id, user_id, action, entity_type, entity_id, entity_name, details? }",
+          "ActivityAction enum: 'created' | 'updated' | 'deleted' | 'completed' | 'assigned' | 'commented' | 'exported' | 'shared'",
+          "For comments: use action='commented' on POST",
+          "For runbooks: use action='completed' on PATCH when status changes to 'completed'",
+          "For runbook-steps: use action='updated' on PATCH, include { status: body.status } in details if status changed",
+          "For entities without 'name' field (step-roles, annotations), use entity_type or a descriptive label as entity_name",
+          "Fire-and-forget: call logActivity() without awaiting in response path",
+          "IMP-016: In runbook-view.tsx, the Playbook Link button is currently behind an !isReadOnly guard. Remove or adjust the guard so the button shows for read-only runbooks too. The playbook-view.tsx already handles isReadOnly correctly."
         ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/runbooks",
-          "/w/[workspaceId]/runbooks/[runbookId]",
-          "/w/[workspaceId]/runbooks/[runbookId]/playbook"
-        ]
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — logActivity is server-side only",
+          "Supabase RLS silent mutations — PGRST116 handling already exists in some routes"
+        ],
+        "affected_urls": ["/w/[workspaceId]/activity", "/w/[workspaceId]/runbooks/[runbookId]"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Three files to update: runbook-view.tsx (main progress bar + text), runbooks-list-view.tsx (list card progress bar), playbook-view.tsx (playbook progress). In each, find where completedCount is calculated and change to resolvedCount = completed + skipped. Update display text. For segmented bar in list view, consider adding a 'skipped' segment in a distinct color (amber or white/20) between completed (teal) and in_progress (blue)."
+      "special_instructions": "Formulaic task: add import + logActivity call to every POST/PATCH/DELETE handler. Special actions: comments POST='commented', runbooks PATCH to completed='completed'. For IMP-016: find the Playbook Link button in runbook-view.tsx and ensure it renders even when isReadOnly is true. The button should be visible for completed/cancelled runbooks. Do NOT modify GET handlers. Do NOT modify the logActivity utility itself."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "read_only": ["src/lib/api/activity.ts", "src/types/database.ts", "package.json", "tsconfig.json"],
     "owner": null,
-    "note": "types/database.ts and client.ts are read-only this iteration — slot 1 reads ActivityLog type and fetchActivityLog, no modifications needed"
+    "note": "Both slots read activity.ts for the logActivity import. Neither modifies it."
   },
-  "merge_order": ["#FEAT-049", "#IMP-014"],
+  "merge_order": ["#FEAT-049"],
   "testing_plan": {
     "run_acceptance": false,
     "run_regression": false,
-    "regression_reason": null,
+    "regression_reason": "Risk score 4 from iter 89 (>5 files + shared components). Last regression was iter 87 (2 iters ago). Deferring to iter 91 to combine regression + FEAT-049 full acceptance testing after [3/3] completes.",
     "suites_to_run": [],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": [
+      "Risk score 4 from iter 89 — regression recommended for iter 91 (combined with FEAT-049 acceptance)",
+      "Accessibility cadence floor approaching (last accessibility audit was iteration 21, cadence = every 10th even iter = 90 overdue)"
+    ],
     "diagnoses_written": false,
     "signal_override": null
   }

@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 89
-- **Date:** 2026-03-03 03:00
+- **Iteration:** 90
+- **Date:** 2026-03-03 04:30
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-049 [2/3] Activity log page UI, #IMP-014 Progress bar counts skipped steps
+- **Last task(s):** #FEAT-049 [3/3] logActivity() across all API routes (slot 1: canvas/journey/share, slot 2: org/overlay), #IMP-016 Playbook button on read-only runbooks
 - **Result:** completed
-- **Next task:** #FEAT-049 [3/3] Integrate logActivity() into existing POST/PATCH/DELETE routes
+- **Next task:** #FEAT-050 Workspace cloning (deep copy for reuse) or Phase 4 testing gate (FEAT-049 acceptance + regression)
 - **Blockers:** None
 
 ## Context
 
-Iteration 89 completed two parallel slots. Slot 1 built the activity log page UI at /w/[workspaceId]/activity — server page.tsx fetches initial 50 entries + builds entityTabMap, client ActivityView has filter tabs (All + 8 action types), action sentence entries with entity links, relative timestamps, and Load More pagination. Sidebar updated with Clock icon + Activity nav item. workspace-shell.tsx reserved paths updated. Slot 2 implemented IMP-014 — progress bar now counts (completed + skipped) as "resolved" in runbook-view.tsx, runbooks-list-view.tsx (with white/20 skipped segment), and playbook-view.tsx. FEAT-049 has one remaining sub-task: [3/3] integrate logActivity() calls into existing API routes.
+Iteration 90 completed FEAT-049 [3/3] — the final sub-task integrating logActivity() fire-and-forget calls into all existing POST/PATCH/DELETE API route handlers across 40 files (18 route files slot 1, 22 route files slot 2). Slot 1 covered core canvas + journey + share routes (workspaces, tabs, sections, steps, connections, stages, touchpoints, touchpoint-connections, shares). Slot 2 covered org/overlay routes (teams, roles, people, tools, step-roles, perspectives, annotations, comments, tasks, runbooks, runbook-steps) plus IMP-016 fix. Entities without direct workspace_id (roles, people, step-roles, annotations, runbook-steps) use async IIFE fire-and-forget to traverse parent chain. Special actions: comments POST='commented', runbooks PATCH to completed='completed', shares POST='shared'. IMP-016 moved Playbook button outside the isReadOnly guard in runbook-view.tsx.
 
 ## Dev Server
 
@@ -26,3 +26,5 @@ Iteration 89 completed two parallel slots. Slot 1 built the activity log page UI
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation)
+- Risk score 4 from iter 89 — regression recommended for iter 91
+- Accessibility cadence floor approaching (last accessibility audit was iteration 21)

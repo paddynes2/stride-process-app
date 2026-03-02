@@ -103,7 +103,10 @@ Core consulting insight features:
 - [x] #FEAT-046 Tasks system (step-level checklists with drag-to-reorder) — [1/3] DONE iter 76, [2/3] DONE iter 77, [3/3] DONE iter 78
 - [x] #FEAT-047 Runbook instances (turn sections into executable checklists) — [1/3] DONE iter 80, [2/3] DONE iter 81, [3/3] DONE iter 82
 - [x] #FEAT-048 Playbook mode (distraction-free runbook execution view) — DONE iteration 86
-- [ ] #FEAT-049 Activity log (audit trail for consulting engagements) — [1/3] DONE iter 88, [2/3] DONE iter 89
+- [x] #FEAT-049 Activity log (audit trail for consulting engagements) — DONE iter 90
+  - [x] [1/3] Data layer — DONE iter 88
+  - [x] [2/3] Page UI — DONE iter 89
+  - [x] [3/3] API route integration — DONE iter 90
 - [ ] #FEAT-050 Workspace cloning (deep copy for reuse)
 - [ ] #FEAT-051 Conditional step coloring (rule-based canvas highlighting)
 - [ ] #FEAT-052 Section templates (save & deploy)

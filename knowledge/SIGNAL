@@ -1,1 +1,1 @@
-CONTINUE: #FEAT-049 [3/3] Integrate logActivity() into existing POST/PATCH/DELETE API routes
+CONTINUE: FEAT-049 acceptance testing + regression (risk score 4, 40 files changed), then #FEAT-050 Workspace cloning

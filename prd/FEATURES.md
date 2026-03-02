@@ -317,14 +317,14 @@
 - [x] Mobile-responsive (max-w-xl single column layout)
 **Notes:** "What do I do next?" view for ops team members. Uses fixed full-viewport overlay (z-50) covering workspace shell — no workspace-shell.tsx modification needed. Attempts 1-2 failed due to pipeline merge, attempt 3 succeeded.
 
-### #FEAT-049 Activity log
+### #FEAT-049 Activity log — DONE iteration 90, 2026-03-03
 **Phase:** 4
 **Priority:** P1 (important)
-**Attempts:** 2
-**Status:** in_progress
+**Attempts:** 3
+**Status:** done
   - [x] [1/3] Data layer (migration 017, types, API route, client wrapper, logActivity utility) — DONE iteration 88, 2026-03-03
   - [x] [2/3] Activity page UI at `/w/[workspaceId]/activity` — DONE iteration 89, 2026-03-03
-  - [ ] [3/3] Integrate logActivity() into existing POST/PATCH/DELETE routes
+  - [x] [3/3] Integrate logActivity() into existing POST/PATCH/DELETE routes — DONE iteration 90, 2026-03-03
 **Acceptance criteria:**
 - [ ] New `activity_log` table: id, workspace_id, user_id (FK), action (enum: created/updated/deleted/completed/assigned/commented/exported/shared), entity_type, entity_id, entity_name (snapshot), details (JSONB nullable), created_at
 - [ ] RLS, types. Utility function `logActivity()` called from API routes.

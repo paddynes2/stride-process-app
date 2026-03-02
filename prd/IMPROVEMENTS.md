@@ -113,13 +113,11 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx`
   - **Fix applied:** Added handleSkip function with identical optimistic+rollback pattern (status='skipped', prevIndex saved/restored). Skip button (variant=secondary) placed below Mark Complete & Next, hidden for completed/skipped steps and in read-only mode, disabled while isUpdating.
 
-- [ ] #IMP-016 Playbook button should be visible on read-only runbooks — Attempts: 0
+- [x] #IMP-016 Playbook button visible on read-only runbooks — Attempts: 1 — DONE iteration 90, 2026-03-03
   - **Found:** Iteration 87 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
-  - **What:** "Playbook" button is hidden when runbook is completed/cancelled (isReadOnly). No way to review a completed runbook in the focused playbook UI.
-  - **Why it matters:** Nielsen H6 — Recognition rather than recall. Familiar interfaces should remain accessible for review.
-  - **Suggested fix:** Show Playbook button even in read-only mode. "Mark Complete & Next" is already guarded by isReadOnly in handleMarkComplete.
+  - **Fix applied:** Moved Playbook button outside `!isReadOnly` guard. Cancel and Complete buttons remain inside the guard. Button container div always renders; only action buttons are conditionally hidden.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->
