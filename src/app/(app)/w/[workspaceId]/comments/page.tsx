@@ -25,10 +25,10 @@ export default async function CommentsPage({
       .select("*")
       .eq("workspace_id", workspaceId)
       .order("created_at", { ascending: false }),
-    supabase.from("steps").select("id, name").eq("workspace_id", workspaceId),
-    supabase.from("sections").select("id, name").eq("workspace_id", workspaceId),
-    supabase.from("stages").select("id, name").eq("workspace_id", workspaceId),
-    supabase.from("touchpoints").select("id, name").eq("workspace_id", workspaceId),
+    supabase.from("steps").select("id, name, tab_id").eq("workspace_id", workspaceId),
+    supabase.from("sections").select("id, name, tab_id").eq("workspace_id", workspaceId),
+    supabase.from("stages").select("id, name, tab_id").eq("workspace_id", workspaceId),
+    supabase.from("touchpoints").select("id, name, tab_id").eq("workspace_id", workspaceId),
   ]);
 
   // Build entity ID → name lookup used to label each comment row
@@ -38,10 +38,19 @@ export default async function CommentsPage({
   for (const s of stages ?? []) entityNames[s.id] = s.name;
   for (const t of touchpoints ?? []) entityNames[t.id] = t.name;
 
+  // Build entity ID → tab_id mapping for navigation links
+  const entityTabMap: Record<string, string> = {};
+  for (const s of steps ?? []) if (s.tab_id) entityTabMap[s.id] = s.tab_id;
+  for (const s of sections ?? []) if (s.tab_id) entityTabMap[s.id] = s.tab_id;
+  for (const s of stages ?? []) if (s.tab_id) entityTabMap[s.id] = s.tab_id;
+  for (const t of touchpoints ?? []) if (t.tab_id) entityTabMap[t.id] = t.tab_id;
+
   return (
     <CommentsView
       initialComments={(comments ?? []) as Comment[]}
       entityNames={entityNames}
+      workspaceId={workspaceId}
+      entityTabMap={entityTabMap}
     />
   );
 }
