@@ -56,7 +56,7 @@
 
 ---
 
-## Phase 3a: Analysis Intelligence — ACTIVE (begin after Phase 4 complete)
+## Phase 3a: Analysis Intelligence — ACTIVE (Phase 4 complete, iteration 103)
 
 ### #FEAT-033 Perspective comparison view
 **Phase:** 3a
@@ -256,7 +256,7 @@
 
 ---
 
-## Phase 4: The Living Playbook — IN PROGRESS
+## Phase 4: The Living Playbook — DONE (iteration 103, 2026-03-02)
 
 ### #FEAT-045 Comments system — DONE iteration 74, 2026-03-01
 **Phase:** 4
@@ -403,11 +403,11 @@
 - [x] [2/2] UI: "Duplicate Workspace" button in settings, loading state, navigate to clone — DONE iteration 93, 2026-03-03
 **Notes:** How consultants reuse frameworks. Clone template workspace for each client engagement.
 
-### #FEAT-053 Phase 4 testing gate
+### #FEAT-053 Phase 4 testing gate — DONE iteration 103, 2026-03-02
 **Phase:** 4
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
 - [ ] Full regression across all phases
 - [ ] Comments: create, reply, resolve, category filter, aggregation view

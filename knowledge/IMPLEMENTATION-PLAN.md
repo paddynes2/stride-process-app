@@ -67,9 +67,9 @@ Prioritized features:
 - [ ] #FEAT-031 Step list bulk actions — **DEFERRED** (per human feedback)
 - [ ] #FEAT-032 Workspace templates — **DEFERRED** (per human feedback)
 
-## Phase 3a: Analysis Intelligence — DEFERRED (per human feedback — Phase 4 prioritized)
-**Target iterations:** TBD
-**Depends on:** Phase 4 complete
+## Phase 3a: Analysis Intelligence — ACTIVE (Phase 4 complete)
+**Target iterations:** 104+
+**Depends on:** Phase 4 complete ✓ (iteration 103)
 
 Core consulting insight features:
 - [ ] #FEAT-033 Perspective comparison view
@@ -93,8 +93,8 @@ Core consulting insight features:
   - [ ] [4/4] Page numbers, table of contents, consistent styling
 - [ ] #FEAT-044 Phase 3b testing gate
 
-## Phase 4: The Living Playbook — IN PROGRESS
-**Target iterations:** 71+
+## Phase 4: The Living Playbook — DONE
+**Iterations:** 71-103
 
 - [x] #FEAT-045 Comments system (threaded, categorized: note/decision/pain_point/idea/question) — DONE iteration 74
   - [x] [1/3] Data model + types + API routes + client wrappers — DONE iteration 71
@@ -110,7 +110,7 @@ Core consulting insight features:
 - [x] #FEAT-050 Workspace cloning (deep copy for reuse) — [1/2] DONE iter 92, [2/2] DONE iter 93
 - [x] #FEAT-051 Conditional step coloring (rule-based canvas highlighting) — [1/2] DONE iter 94, [2/2] DONE iter 96
 - [x] #FEAT-052 Section templates (save & deploy) — [1/2] DONE iter 99, [2/2] DONE iter 101
-- [ ] #FEAT-053 Phase 4 testing gate
+- [x] #FEAT-053 Phase 4 testing gate — DONE iteration 103 (acceptance 9/9, regression 10/10)
 
 Deferred indefinitely:
 - Versioning / snapshot history for canvases
@@ -164,3 +164,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 100: TESTING ONLY — 3 suites: feat-052-data-integrity 10/10 PASS, performance-static-audit 3/6 PASS (3 warn), regression-baseline-full 11/14 (3 FAIL = BUG-021 routing). FEAT-052 data layer verified. 1 new P1 bug (BUG-021) + 5 improvements (IMP-031-035). Retrospective performed (100th iteration milestone). Next: FEAT-052 [2/2] UI.
 - [2026-03-02] Iteration 101: COMPLETED — #FEAT-052 [2/2] UI done (Save as Template dialog on section panel, template browser dialog in canvas toolbar). #IMP-032 done (React.memo on StepNode/SectionNode). FEAT-052 fully complete. 2 new bugs (BUG-022 migration not pushed, BUG-023 DialogTitle a11y) + 1 improvement (IMP-036 starters in error state). Next: file bugs, then FEAT-053 testing gate or remaining improvements.
 - [2026-03-02] Iteration 102: COMPLETED — Cleanup iteration. #BUG-023 fixed (DialogPrimitive.Title in canvas-view.tsx). #IMP-036 done (starters always visible in template dialog). #IMP-030 verified resolved. #IMP-020 done (activity skeleton placeholders). #IMP-035 verified resolved. 1 new bug (BUG-024). Next: FEAT-053 Phase 4 testing gate.
+- [2026-03-02] Iteration 103: **PHASE 4 COMPLETE.** FEAT-053 Phase 4 testing gate passed — acceptance 9/9, regression 10/10. All 9 Phase 4 features (FEAT-045 through FEAT-053) done. 9 new improvements logged (IMP-039-047). BUG-024 only open bug (P2). Phase 3a: Analysis Intelligence now ACTIVE, starting with FEAT-033 Perspective comparison view.

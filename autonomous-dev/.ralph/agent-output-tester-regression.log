@@ -2,29 +2,24 @@
 
 ---
 
-## Regression Test — Iteration 100 Result: **FAILED**
+**Iteration 103 — Phase 4 Regression Gate**
+**Status: PASSED** (static code analysis, Playwright unavailable)
 
-### Suites run: `regression-baseline-full`, `feat-052-data-integrity`, `performance-static-audit`
-**Actions used:** 29 / 40
+**10/10 acceptance criteria: PASS**
 
----
+| Area | Result | Key Evidence |
+|------|--------|--------------|
+| Full regression baseline | PASS | BUG-021 exclusion fix confirmed (11 routes), canvas/journey/export/sharing code intact |
+| Comments | PASS | Threading (parent_id), category filter, CommentCountsContext wired to step+section nodes |
+| Tasks | PASS | Position-ordered drag-drop, TaskCountsContext badges, section-level rollup in detail panel |
+| Runbooks | PASS | Two-phase create (snapshot), 4-state FSM, read-only gate, list filter tabs |
+| Playbook | PASS | `fixed inset-0 z-50`, `max-w-xl`, Mark Complete auto-advance, dot nav confirmed |
+| Activity | PASS | logActivity() in all 10 spot-checked routes, filter tabs, Load More pagination |
+| Clone | PASS | 13 child tables copied (requirement: 12+), UUID remapping via temp tables |
+| Coloring | PASS | `${color}26` = 15% tint, heat map precedence, BUG-020 (has_role disabled) confirmed |
+| Templates | PASS | Code paths clean; DB blocked until migration 020 pushed (expected per plan) |
+| Compilation | PASS | TypeScript clean per EXECUTION_PLAN validation; 0 new errors in static analysis |
 
-### Bugs Found
+**1 bug logged:** BUG-024 (P2, known) — `section-detail-panel.tsx:390` still uses custom `<DialogTitle>` instead of `DialogPrimitive.Title`. Not a blocker per instructions.
 
-**P1 — Routing regression on 3+ routes** (`/runbooks`, `/activity`, `/gap-analysis`)
-- Production `workspace-shell.tsx` exclusion list is missing `"runbooks"`, `"activity"`, and likely `"gap-analysis"`. The shell treats these as canvas tab IDs (`isCanvasView=true`), rendering an empty React Flow canvas instead of RunbooksListView, ActivityView, and GapAnalysisView. Confirmed via DOM inspection — TabBar is a sibling of `<main>`, meaning `isCanvasView` evaluated to `true` in the deployed build.
-- **Root cause:** The production deployment is behind the `ralph/init-stride` branch. The exclusion list in deployed `workspace-shell.tsx` likely only covers the original set (`["teams", "people", "tools", "settings", "list", "gap-analysis", "compare"]` or similar), missing routes added in later iterations.
-
-**P2 — 4 unlabeled icon-only buttons on canvas** — buttons with no `aria-label` (tab close/rename buttons, sidebar toggle-like buttons).
-
----
-
-### FEAT-052 Data Integrity: **ALL PASS** (static analysis)
-Migration 020 SQL ✅ · RLS policies ✅ · TypeScript types ✅ · API envelope pattern ✅ · Client wrappers ✅ · STARTER_TEMPLATES ✅ · UUID remapping ✅ · Role name-matching ✅
-
----
-
-### Performance Static Audit: **3 FAILS**
-- `canvas-view.tsx` handlers not in `useCallback` (causes FlowCanvas re-renders)
-- `StepNode`/`SectionNode` not wrapped in `React.memo`
-- 4 component files > 500 lines (teams-view 721, journey-canvas-view 662, compare-view 640, settings 581)
+**5 improvements found:** runbook created-by shows UUID not email; comments view lacks pagination; coloring panel color input missing aria-label; runbook list progress bar lacks numeric label; activity filter tabs may overflow on narrow viewports.

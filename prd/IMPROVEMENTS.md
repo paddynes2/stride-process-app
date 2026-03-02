@@ -265,5 +265,77 @@
   - **Design principle:** WCAG 2.1 SC 4.1.2: Name, Role, Value
   - **Suggested fix:** Run full aria-label audit across all icon-only buttons as part of FEAT-053 testing gate.
 
+- [ ] #IMP-039 Activity 'Unknown' fallback should be '[Deleted User]' for deleted accounts — Attempts: 0
+  - **Found:** Iteration 103 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx` line 176
+  - **What:** Activity entries show 'Unknown' when the users join is null (deleted user accounts). '[Deleted User]' would be more informative for audit trail purposes.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Change fallback from '"Unknown"' to '"[Deleted User]"' in activity-view.tsx:176.
+
+- [ ] #IMP-040 Playbook step notes/description panel during execution — Attempts: 0
+  - **Found:** Iteration 103 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx`
+  - **What:** Playbook has no notes/description panel for the current step. Users may need step context during execution without exiting to step detail panel.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Add optional collapsible 'Step Notes' section below step name showing the step's notes field if present.
+
+- [ ] #IMP-041 Playbook Exit icon aria-label redundancy with visible text — Attempts: 0
+  - **Found:** Iteration 103 (acceptance tester)
+  - **Category:** Accessibility
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx`
+  - **What:** ArrowLeft icon in playbook Exit link has aria-label='Back' redundant with visible 'Exit' text. Multiple icons have duplicate aria-labels.
+  - **Design principle:** WCAG 2.5.3 Label in Name
+  - **Suggested fix:** Remove aria-label from decorative icons adjacent to visible text. Use aria-hidden='true' on decorative icons.
+
+- [ ] #IMP-042 Clone confirmation dialog should display workspace name — Attempts: 0
+  - **Found:** Iteration 103 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`
+  - **What:** Duplicate Workspace dialog does not display the workspace name. Unclear which workspace is being duplicated.
+  - **Design principle:** Nielsen H5: Error prevention
+  - **Suggested fix:** Include workspace.name in DialogDescription: 'A full copy of "{workspace.name}" will be created...'
+
+- [ ] #IMP-043 Runbook detail shows truncated UUID instead of creator email — Attempts: 0
+  - **Found:** Iteration 103 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx` ~line 130
+  - **What:** Runbook detail shows created_by as truncated UUID (first 8 chars). Users cannot identify creator.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Join users table on created_by field and display email/name (same pattern as activity log).
+
+- [ ] #IMP-044 Comments view lacks pagination (single fetch) — Attempts: 0
+  - **Found:** Iteration 103 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/comments/comments-view.tsx`
+  - **What:** Comments view loads all top-level comments in a single fetch with no pagination. Could cause delay with 500+ comments.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Apply Load More pattern (offset pagination) from activity-view.tsx, default first 50 comments.
+
+- [ ] #IMP-045 Coloring panel color picker input lacks aria-label — Attempts: 0
+  - **Found:** Iteration 103 (regression tester)
+  - **Category:** Accessibility
+  - **Where:** `src/components/canvas/coloring-panel.tsx`
+  - **What:** `<input type='color'>` has no aria-label. Screen readers cannot associate it with the hex input.
+  - **Design principle:** WCAG 1.3.1: Info and Relationships
+  - **Suggested fix:** Add aria-label='Color picker' or associate via htmlFor/id.
+
+- [ ] #IMP-046 Runbooks list progress bar lacks step count text — Attempts: 0
+  - **Found:** Iteration 103 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
+  - **What:** Progress bar has no step count text (e.g. '3/5'). Users infer fraction from bar width alone.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Append text label like '3 / 5' next to progress bar, matching playbook-view.tsx.
+
+- [ ] #IMP-047 Activity filter tabs overflow on narrow viewports — Attempts: 0
+  - **Found:** Iteration 103 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** 8 action type filter tabs likely overflow on viewports narrower than 1024px.
+  - **Design principle:** Nielsen H4: Consistency and standards
+  - **Suggested fix:** Wrap filter row or use compact dropdown on narrow viewports, matching workspace-shell tab-bar pattern.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

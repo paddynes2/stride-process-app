@@ -1,20 +1,19 @@
-**#FEAT-052 complete.** Here's a summary of what was built:
+Done. Here's a summary of what was done:
 
-### section-detail-panel.tsx
-- Added `BookTemplate` icon + `createTemplate` API import + Radix Dialog imports
-- 5 state vars for the Save as Template dialog (`showSaveDialog`, `saveTemplateName`, `saveTemplateDesc`, `saveTemplateCat`, `savingTemplate`)
-- `handleOpenSaveDialog` pre-fills the name from `section.name`
-- `handleSaveTemplate` calls `createTemplate({ workspace_id, section_id, name, description, category })`, shows success toast, closes dialog
-- **Save as Template** button (secondary variant) placed ABOVE Run as Checklist in the footer
-- Radix Dialog with name/description/category inputs
+---
 
-### canvas-view.tsx
-- Added `useRouter`, `Button`, `Badge`, Dialog components, `STARTER_TEMPLATES`, `LayoutTemplate`, `Trash2`, `toast`, `toastError` imports
-- Template state: `showTemplateDialog`, `dbTemplates`, `loadingTemplates`, `templateError`, `deployingKey`, `deletingId`
-- `useEffect` fetches DB templates when dialog opens
-- `handleDeployTemplate`: DB templates → `deployTemplate(id, { tab_id, position_x, position_y })`; Starters → direct `createSection` + `createStep` (API deviation noted — server requires `section_id` for `createTemplate`)
-- `handleDeleteTemplate`: calls `deleteTemplate(id)`, removes from local state
-- **Templates** button (next to Color button, top-right canvas overlay)
-- Inline dialog: loading skeletons, error state, grid of cards (DB templates + starters), each card shows name/description/category badge/step count, deploy button, trash button (DB only)
+**BUG-023 — DialogTitle a11y warning**
 
-**Verification:** TypeScript ✅ (0 errors) · Lint ✅ (0 errors, 1 pre-existing warning in flow-canvas.tsx)
+Root cause: The custom `DialogTitle` in `ui/dialog.tsx` renders a plain `<h2>` — not `DialogPrimitive.Title`. Radix's `DialogContent` wraps `DialogPrimitive.Content`, which uses React context to check at mount whether a `DialogPrimitive.Title` has registered itself. A plain `<h2>` is invisible to this check, so the console.error fires regardless of visual title presence.
+
+Fix: In `canvas-view.tsx`, import `* as DialogPrimitive from "@radix-ui/react-dialog"` and use `<DialogPrimitive.Title className="...">` directly (styled to match the existing visual). Added a comment documenting the root cause and that `section-detail-panel.tsx` has the same issue (read-only, not fixable in this task).
+
+**IMP-036 — Starters hidden on DB error**
+
+Restructured the `loadingTemplates ? ... : templateError ? ... : ...` ternary into a two-branch form: loading=skeletons; non-loading=grid. Inside the grid: error message appears at top (conditional), DB templates hidden on error, starters always render. Empty state only shown when no error and both lists are empty.
+
+**IMP-030 — Icon button aria-labels**
+
+Audited both owned files. All icon-only buttons already had `aria-label`: Templates (`"Browse templates"`), Color (`"Toggle coloring rules"`), Delete template (`"Delete template"`), Close tab (`"Close ${tab.name} tab"`), Add tab (`"Add new tab"`). No changes needed.
+
+**Verification:** TypeScript clean (0 errors), lint clean (0 errors, 1 pre-existing warning in unowned file).
