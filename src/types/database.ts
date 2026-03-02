@@ -402,3 +402,25 @@ export interface Template {
   created_at: string;
   updated_at: string;
 }
+
+// =============================================================================
+// Improvement Ideas — workspace-scoped improvement tracking
+// =============================================================================
+
+export type ImprovementStatus = "proposed" | "approved" | "in_progress" | "completed" | "rejected";
+export type ImprovementPriority = "low" | "medium" | "high" | "critical";
+
+export interface ImprovementIdea {
+  id: string;
+  workspace_id: string;
+  title: string;
+  description: string | null;
+  status: ImprovementStatus;
+  priority: ImprovementPriority;
+  linked_step_id: string | null;
+  linked_touchpoint_id: string | null;
+  linked_section_id: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
