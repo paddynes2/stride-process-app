@@ -342,7 +342,7 @@ export function JourneyCanvasView({
   }, []);
 
   // Add touchpoint
-  const handleAddTouchpoint = async () => {
+  const handleAddTouchpoint = React.useCallback(async () => {
     try {
       const offset = touchpoints.length;
       const tp = await createTouchpoint({
@@ -357,10 +357,10 @@ export function JourneyCanvasView({
     } catch (err) {
       toastError("Failed to create touchpoint", { error: err, retry: handleAddTouchpoint });
     }
-  };
+  }, [workspaceId, tabId, touchpoints]);
 
   // Add stage
-  const handleAddStage = async () => {
+  const handleAddStage = React.useCallback(async () => {
     try {
       const stage = await createStage({
         workspace_id: workspaceId,
@@ -375,7 +375,7 @@ export function JourneyCanvasView({
     } catch (err) {
       toastError("Failed to create stage", { error: err, retry: handleAddStage });
     }
-  };
+  }, [workspaceId, tabId, stages]);
 
   // Handle delete key
   const handleKeyDown = React.useCallback(
