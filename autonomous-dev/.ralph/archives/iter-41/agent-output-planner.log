@@ -1,0 +1,31 @@
+Planner complete. Here's the summary:
+
+## Iteration 96 — Execution Plan
+
+**Mode:** `multi_task` (2 parallel builders)
+
+### Slot 1: #BUG-019 (attempt 3) + #IMP-018
+- **Type:** fix (P1 regression)
+- **Complexity:** S
+- **Fix:** `page.tsx` line 25: `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")`
+- **Plus:** IMP-018 empty state guidance text in `activity-view.tsx`
+- **Files:** `activity/page.tsx`, `activity/activity-view.tsx`
+- **Diagnosis written** to `knowledge/DIAGNOSES.md` (attempts 1-2 failed due to wrong file and merge failure)
+
+### Slot 2: #FEAT-051 [2/2] — Coloring Rules UI
+- **Type:** build
+- **Complexity:** M
+- **What:** Paintbrush toolbar button → coloring panel (rule CRUD), step node background tint (15% opacity), HEX_COLOR_REGEX + criteria_type validation on API routes
+- **Files:** New `coloring-panel.tsx`, modified `flow-canvas.tsx`, `canvas-view.tsx`, `step-node.tsx`, `canvas.ts`, coloring-rules API routes
+- **Data layer already exists** from iter 94
+
+### Independence
+Zero file overlap between slots — fully parallelizable.
+
+### Testing
+Risk score 6 from iter 94. **Iteration 97 should be `testing_only`** with regression + acceptance for FEAT-050, FEAT-051, and BUG-019.
+
+### Files Updated
+- `knowledge/handoffs/EXECUTION_PLAN.json` — the plan
+- `knowledge/STATUS.md` — iteration 96 context
+- `knowledge/DIAGNOSES.md` — BUG-019 root cause analysis

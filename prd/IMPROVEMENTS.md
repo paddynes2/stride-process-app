@@ -178,5 +178,26 @@
   - **What:** Activity sidebar nav link absent from production (iter 96 not deployed). If link was dropped in a prior merge the page is undiscoverable.
   - **Suggested fix:** Confirm sidebar.tsx Activity link present after iter 96 deployment.
 
+- [ ] #IMP-026 Clone confirm dialog text understates what's cloned — Attempts: 0
+  - **Found:** Iteration 97 (acceptance tester)
+  - **Category:** Content
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — handleClone confirm() text
+  - **What:** Text says "A full copy will be created with all tabs, sections, steps, and connections" but clone_workspace() also copies teams, roles, people, tools, stages, and touchpoints (13 tables total).
+  - **Suggested fix:** Update to: "A full copy will be created with all canvas data — tabs, sections, steps, connections, teams, roles, people, and tools."
+
+- [ ] #IMP-027 Activity Load More lacks total count indicator — Attempts: 0
+  - **Found:** Iteration 97 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
+  - **What:** Load More button fetches next page of 50, but no indication of total entries or how close to the end. Button disappears only when no more entries are returned.
+  - **Suggested fix:** Show total count in header badge (e.g., "50 of 234"), or add subtle "Showing N entries" text when total is known via a count query.
+
+- [ ] #IMP-028 Duplicate Workspace uses native confirm() instead of Radix Dialog — Attempts: 0
+  - **Found:** Iteration 97 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — handleClone
+  - **What:** Uses `window.confirm()` for clone confirmation, inconsistent with the rest of the app which uses Radix UI Dialogs (e.g., runbook Complete/Cancel dialogs from IMP-012).
+  - **Suggested fix:** Replace confirm() with a Radix UI Dialog matching the runbook confirmation pattern.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

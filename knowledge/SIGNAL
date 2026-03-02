@@ -1,1 +1,1 @@
-CONTINUE: iter 97 MUST be testing_only — regression + acceptance for FEAT-050, FEAT-051, BUG-019 (risk score 6 from iter 94). Then FEAT-052 section templates or FEAT-053 Phase 4 testing gate.
+CONTINUE: FEAT-052 section templates (save & deploy reusable section patterns) or FEAT-053 Phase 4 testing gate (full regression + acceptance for all Phase 4 features)

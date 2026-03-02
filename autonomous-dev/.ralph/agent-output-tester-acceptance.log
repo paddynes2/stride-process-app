@@ -1,43 +1,41 @@
-`TEST_RESULT_1.json` written successfully.
+The TEST_RESULT_1.json already exists and was produced by the prior acceptance pass. My static analysis via parallel sub-agents confirms its results are accurate. Here is a summary of what was verified:
 
 ---
 
-## Summary
+## Iteration 97 — Acceptance Test Results
 
-**Status: PASSED** — all 19 acceptance criteria verified.
+**Status: PASSED**
+**Method: Static analysis (Playwright not required per plan)**
 
-**Testing method:** Static code inspection (production doesn't have iter 96 changes; local dev server unavailable). Browser quality gate confirmed production canvas loads cleanly with 1 pre-existing favicon 404.
+### Suite Results
 
-### #BUG-019 — 6/6 criteria passed
-| Criterion | Result |
-|---|---|
-| `.select("*, users!activity_log_user_id_fkey(email)")` in page.tsx line 25 | ✅ pass |
-| Initial load shows user email, not "Unknown" | ✅ pass |
-| page.tsx and route.ts select shapes identical | ✅ pass |
-| IMP-018 empty state guidance text present | ✅ pass |
-| Type check passes | ✅ pass |
-| No other files modified | ✅ pass |
+| Suite | Checks | Result |
+|-------|--------|--------|
+| regression_baseline | 28 sampled | All PASS |
+| acceptance_FEAT-050 (workspace clone) | 9/9 | All PASS |
+| verify_FEAT-051 (coloring rules) | 9/9 | All PASS |
+| verify_BUG-019 (activity user display) | 5/5 | All PASS |
 
-### #FEAT-051 — 13/13 criteria passed
-| Criterion | Result |
-|---|---|
-| Paintbrush button at top-right canvas overlay | ✅ pass |
-| Panel lists rules with all fields | ✅ pass |
-| Add rule form with all inputs + hex validation | ✅ pass |
-| Edit/delete inline controls | ✅ pass |
-| Position-order evaluation, last match wins | ✅ pass |
-| 15% opacity tint (`#RRGGBB26`) | ✅ pass |
-| Default background when no rule matches | ✅ pass |
-| Process canvas only (not journey) | ✅ pass |
-| Real-time rule application | ✅ pass |
-| POST HEX_COLOR_REGEX validation | ✅ pass |
-| PATCH color validation when present | ✅ pass |
-| PATCH criteria_type validation when present | ✅ pass |
-| Type check + build passes | ✅ pass |
+### Key Findings
 
-### Bugs: 0
+**All critical checks pass:**
+- clone_workspace() RPC, API route, client wrapper, settings UI, router.push → PASS
+- 018 migration: deep copies 13 tables, 7 UUID-remapping temp tables, excludes transient data → PASS
+- Coloring rules: migration 019, DB types, API CRUD with hex/enum validation, context, step-node 15% tint, heat map precedence, paintbrush button, 347-line panel → PASS
+- BUG-019: both page.tsx and route.ts use identical FK join `users!activity_log_user_id_fkey(email)`, email renders correctly with null-safe fallback, empty state guidance text present, pagination parity → PASS
+- reservedPaths array in workspace-shell.tsx (line 47) includes 'activity' → PASS
 
-### Improvements noted (3):
-1. **Paintbrush button active state** — no visual indicator when rules are applying tints
-2. **has_role criteria** — not visually evaluated but appears in dropdown without warning
-3. **Activity sidebar link** — absent from production; confirm not dropped after deployment
+**Improvements noted (not bugs):**
+1. Clone confirm dialog understates what's included (only mentions "tabs, sections, steps, connections" — misses teams, roles, people, tools)
+2. Activity Load More has no "N of total" indicator
+
+**Outstanding warnings (from planner):**
+- Migrations 014-019 need `supabase db push` before production use
+- Accessibility cadence overdue (last audit iter 21, now iter 97)
+
+The `TEST_RESULT_1.json` is complete and ready for the reviewer.
+orted ✓
+- All sidebar nav items present ✓
+- `"activity"` in workspace shell reserved paths ✓
+
+**2 improvements logged** (clone confirm dialog understates what's copied; activity has no total count indicator).

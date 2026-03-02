@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "iteration": 94,
+  "slot": 1,
+  "task_id": "#BUG-019",
+  "status": "completed",
+  "duration_seconds": 90,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+      "action": "modified",
+      "lines_added": 1,
+      "lines_removed": 1
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
+      "action": "modified",
+      "lines_added": 5,
+      "lines_removed": 0
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge import, not touched)" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+    "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "BUG-019: Changed .select('*') to .select('*, users!activity_log_user_id_fkey(email)') in page.tsx — now matches route.ts select shape so initial load entries include user email (fixes 'Unknown' display). IMP-018: Added guidance paragraph 'Actions like creating steps, adding comments, and completing runbooks appear here.' below 'No activity yet' in the all-filter empty state in activity-view.tsx.",
+
+  "failure_details": null
+}

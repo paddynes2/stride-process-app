@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0",
+  "iteration": 94,
+  "test_type": "acceptance",
+  "suite_name": null,
+  "status": "failed",
+  "duration_seconds": 120,
+
+  "testing_method": "static_code_analysis",
+  "testing_notes": "Stride dev server not running at localhost:3000 (different app 'Kernel' served instead). Tested via static code analysis: read page.tsx, activity-view.tsx, route.ts, [id]/route.ts, database.ts, client.ts, migration SQL, and git log to verify committed state. Key finding: BUG-019 slot-1 builder changes were never committed — no 'ralph: builder slot 1 iteration 40' commit exists in git history.",
+
+  "criteria_results": [
+    {
+      "criterion": "page.tsx line 25: change .select('*') to .select('*, users!activity_log_user_id_fkey(email)') so initial load entries include user email",
+      "task_id": "#BUG-019",
+      "result": "fail",
+      "evidence": "page.tsx line 25 still reads `.select('*')`. Git log confirms this file was last modified in commit 3f811f0 (ralph: builder slot 1 iteration 89) — no commit for slot-1 iteration 40 exists. BUILD_RESULT_1.json claims 'completed' with staged files, but no corresponding git commit was found. The builder's worktree changes were staged but never committed/merged into ralph/init-stride.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Activity entries on initial load show user email instead of 'Unknown'",
+      "task_id": "#BUG-019",
+      "result": "fail",
+      "evidence": "Because page.tsx still uses .select('*') without the user join, ActivityLog entries on initial page load have entry.users === undefined, causing activity-view.tsx line 171 (`entry.users?.email ?? 'Unknown'`) to render 'Unknown'. Bug persists unchanged.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Load More entries continue to work (API route already has the correct join)",
+      "task_id": "#BUG-019",
+      "result": "pass",
+      "evidence": "src/app/api/v1/activity/route.ts was not modified in this iteration and already contains `.select('*, users!activity_log_user_id_fkey(email)')`. Load More correctly shows user emails for paginated entries.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Both page.tsx server query and route.ts client query use identical .select() shape",
+      "task_id": "#BUG-019",
+      "result": "fail",
+      "evidence": "page.tsx: `.select('*')`. route.ts: `.select('*, users!activity_log_user_id_fkey(email)')`. Shapes remain mismatched — exactly the root cause BUG-019 was meant to fix.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "IMP-018: Activity empty state shows guidance hint below 'No activity yet': 'Actions like creating steps, adding comments, and completing runbooks appear here.'",
+      "task_id": "#BUG-019",
+      "result": "fail",
+      "evidence": "activity-view.tsx lines 138-145: empty state contains only a Clock icon and a single <p> for 'No activity yet' / filtered variant. No guidance paragraph added. Expected text 'Actions like creating steps, adding comments, and completing runbooks appear here.' is absent.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Migration 019_coloring_rules.sql creates criteria_type enum, coloring_rules table with all required columns, RLS, index, trigger",
+      "task_id": "#FEAT-051",
+      "result": "pass",
+      "evidence": "019_coloring_rules.sql confirmed: CREATE TYPE criteria_type AS ENUM with all 6 values (status, executor, step_type, has_role, maturity_below, maturity_above). Table has all 10 required columns with correct types. RLS enabled. Four policies using can_access_workspace(). Trigger coloring_rules_updated_at reuses update_updated_at() (not recreated). Index idx_coloring_rules_workspace on (workspace_id).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "ColoringRule interface and CriteriaType union type added to src/types/database.ts",
+      "task_id": "#FEAT-051",
+      "result": "pass",
+      "evidence": "database.ts lines 329-342: CriteriaType union type with all 6 values matches enum. ColoringRule interface has all 10 required fields: id, workspace_id, name, color, criteria_type, criteria_value, is_active, position, created_at, updated_at.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "GET /api/v1/coloring-rules?workspace_id= returns ColoringRule[] ordered by position ASC",
+      "task_id": "#FEAT-051",
+      "result": "pass",
+      "evidence": "route.ts GET: validates workspace_id (400 if missing), auth guard, .from('coloring_rules').select('*').eq('workspace_id', workspaceId).order('position', { ascending: true }). Returns successResponse(rules).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "POST /api/v1/coloring-rules validates workspace_id, name, color (hex format via HEX_COLOR_REGEX), criteria_type, criteria_value",
+      "task_id": "#FEAT-051",
+      "result": "fail",
+      "evidence": "POST route validates workspace_id, name, criteria_type (enum check vs VALID_CRITERIA_TYPES array), criteria_value correctly. BUT color validation only checks non-empty string — NO HEX_COLOR_REGEX check (`/^#[0-9A-Fa-f]{6}$/i`). Values like 'red', 'rgb(0,0,0)', or 'invalid' are accepted. Spec explicitly requires hex format validation via HEX_COLOR_REGEX pattern from perspectives/route.ts.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "PATCH /api/v1/coloring-rules/[id] updates provided fields, validates color format if provided",
+      "task_id": "#FEAT-051",
+      "result": "fail",
+      "evidence": "[id]/route.ts PATCH iterates EDITABLE_FIELDS and copies body values with no validation. No color format check when color is provided. No criteria_type enum check when criteria_type is provided. Spec requires 'validates color format if provided'.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "DELETE /api/v1/coloring-rules/[id] removes rule",
+      "task_id": "#FEAT-051",
+      "result": "pass",
+      "evidence": "[id]/route.ts DELETE: auth guard, .delete().eq('id', id).select().single(), handles PGRST116 as 404, calls void logActivity on success, returns successResponse({ deleted: true }).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "All mutation routes include void logActivity() calls with entity_type: 'coloring_rules'",
+      "task_id": "#FEAT-051",
+      "result": "pass",
+      "evidence": "POST: `void logActivity({ ..., action: 'created', entity_type: 'coloring_rules', ... })`. PATCH: `void logActivity({ ..., action: 'updated', entity_type: 'coloring_rules', ..., details: { changed_fields: Object.keys(updates) } })`. DELETE: `void logActivity({ ..., action: 'deleted', entity_type: 'coloring_rules', ... })`. All three use void prefix correctly.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Client wrappers added to client.ts: fetchColoringRules, createColoringRule, updateColoringRule, deleteColoringRule",
+      "task_id": "#FEAT-051",
+      "result": "pass",
+      "evidence": "client.ts line 6 imports ColoringRule, CriteriaType. Lines 682-712: fetchColoringRules(apiFetch<ColoringRule[]>), createColoringRule(apiFetch<ColoringRule> POST), updateColoringRule(apiFetch<ColoringRule> PATCH with Partial<Pick<...>>), deleteColoringRule(apiFetch DELETE void). All four present with correct signatures.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "npx tsc --noEmit passes",
+      "task_id": "#FEAT-051",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_1.json reports typecheck: { status: 'pass', errors: 0 }. FEAT-051 types correctly imported in client.ts and route.ts. No type mismatches observed in static review.",
+      "screenshot_description": null
+    }
+  ],
+
+  "quality_gate": {
+    "pages_checked": [],
+    "console_errors": 0,
+    "network_errors": 0,
+    "accessibility_issues": 0,
+    "layout_shifts": 0,
+    "notes": "Browser quality gate not run: Stride dev server not active at localhost:3000 (different app running there). FEAT-051 has no UI changes (has_ui_changes: false). BUG-019 failure confirmed via static analysis — page.tsx fix not committed, activity page behavior unchanged from pre-iteration state."
+  },
+
+  "bugs_found": [
+    {
+      "severity": "P1",
+      "page": "/w/[workspaceId]/activity",
+      "description": "BUG-019 fix not committed. page.tsx still uses .select('*') without user join, so initial page load shows 'Unknown' for all activity entry authors. This is a regression from the intended fix — the bug remains open at attempt 2.",
+      "steps_to_reproduce": "1. Navigate to any workspace /activity page. 2. Observe the author field on activity entries from initial server render. 3. All entries show 'Unknown' instead of user email. (Load More entries correctly show email since route.ts was already fixed.)",
+      "related_task": "#BUG-019"
+    },
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/activity",
+      "description": "IMP-018 not implemented. Empty state for 'All' filter shows only 'No activity yet' without the required guidance text 'Actions like creating steps, adding comments, and completing runbooks appear here.'",
+      "steps_to_reproduce": "1. Navigate to a workspace with zero activity. 2. Observe the All filter empty state. 3. Guidance text is absent.",
+      "related_task": "#BUG-019"
+    },
+    {
+      "severity": "P2",
+      "page": "API POST /api/v1/coloring-rules",
+      "description": "FEAT-051: Missing HEX_COLOR_REGEX validation in POST route. Color field accepts any non-empty string instead of requiring #RRGGBB format. Spec requires /^#[0-9A-Fa-f]{6}$/i validation (pattern from perspectives/route.ts).",
+      "steps_to_reproduce": "1. POST /api/v1/coloring-rules with valid fields but color='red'. 2. Observe 201 response — should be 400 validation error.",
+      "related_task": "#FEAT-051"
+    },
+    {
+      "severity": "P2",
+      "page": "API PATCH /api/v1/coloring-rules/[id]",
+      "description": "FEAT-051: PATCH route accepts any string for color (no hex format check) and any string for criteria_type (no enum membership check). Both validations required by spec.",
+      "steps_to_reproduce": "1. PATCH /api/v1/coloring-rules/{id} with { color: 'not-a-hex', criteria_type: 'invalid_type' }. 2. Observe 200 response — should be 400 validation error.",
+      "related_task": "#FEAT-051"
+    }
+  ],
+
+  "improvements_found": [
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/activity",
+      "observation": "Filter tabs (Created, Updated, etc.) filter client-side on already-fetched entries. After Load More, applying a filter only covers loaded entries — DB may have matching entries not yet fetched.",
+      "design_principle": "Nielsen H6: Recognition rather than recall — filter results should be complete and accurate",
+      "suggested_approach": "When a filter tab is activated, reset entries and re-fetch from API with the action= filter param instead of filtering client-side."
+    }
+  ],
+
+  "pipeline_notes": {
+    "slot_1_build": "BUILD_RESULT_1.json claims 'completed' with staged files (page.tsx, activity-view.tsx), but NO git commit for 'ralph: builder slot 1 iteration 40' exists in git history. page.tsx was last modified in commit 3f811f0 (iteration 89). Builder's worktree changes were staged but never committed/merged. Pipeline failure: builder subshell exited before git commit step.",
+    "slot_2_build": "Commit 67986ac contains all FEAT-051 files. BUILD_RESULT_2.json incorrectly reports 'failed' (agent exited without producing BUILD_RESULT) — the build did succeed and was committed. BUILD_RESULT file write failed, not the build itself."
+  },
+
+  "actions_used": 2,
+  "action_budget": 10
+}

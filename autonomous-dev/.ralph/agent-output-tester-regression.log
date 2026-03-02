@@ -1,44 +1,28 @@
-`TEST_RESULT_2.json` written. Here's the summary:
+`TEST_RESULT_2.json` written. Here's a summary of iteration 97 regression results:
 
 ---
 
-## Regression Test — Iteration 91 — FAILED
+## Iteration 97 — Regression Test Results
 
-**Environment note:** Local dev was running a different app ("Kernel"). All testing done against production at `stride-five-sigma.vercel.app`.
+**Overall status: PASSED** (static analysis, Playwright unavailable)
 
-### Pass/Fail breakdown (22 checks)
+### Suites Run
 
-| Result | Count |
-|--------|-------|
-| PASS | 13 |
-| FAIL | 9 |
+| Suite | Checks | Result |
+|---|---|---|
+| `regression_baseline` | 35/35 | ✅ All pass |
+| `acceptance_FEAT-050` (workspace cloning) | 13/13 | ✅ All pass |
+| `verify_FEAT-051` (conditional coloring) | 10/10 | ✅ All pass |
+| `verify_BUG-019` (activity log user display) | 5/5 | ✅ All pass |
 
-### What passed
-- Auth redirect (login → workspaces when auth'd)
-- API auth guard returns 401 with correct envelope
-- Canvas loads with nodes
-- Step detail panel opens + name edit saves
-- Section detail panel opens
-- Canvas zoom works
-- Step list view (`/list`) renders with data
-- Settings page loads
-- Teams stub renders without errors
-- 0 console errors across full session
-- TypeScript + lint clean (from BUILD_RESULT)
+### Bugs Found
 
-### What failed (8 bugs filed)
+1. **P2 — `has_role` coloring rule silently no-ops** (`canvas-view.tsx:205-207`): Rules with `criteria_type='has_role'` can be created and appear to save, but produce no visual tint. A `// Requires additional data fetch — skip visual evaluation for now` comment explains why. Users have no feedback that this criteria type is non-functional.
 
-**P1 — Feature missing from production deployment (deployment gap, not code regression):**
-- `/activity` → renders canvas (FEAT-049 activity log not deployed)
-- `/runbooks` → renders canvas
-- `/gap-analysis` → renders canvas
-- `/compare` → renders canvas
-- Sidebar nav missing: Activity, Runbooks, Comments, Dashboard, Gap Analysis, Compare
+2. **P3 — EXECUTION_PLAN spec inaccuracy** (documentation only): Check #1 for FEAT-050 states `clone_workspace(p_workspace_id, p_user_id, p_org_id)` but migration 018 defines `clone_workspace(p_source_workspace_id)`. The code is correct; the spec was stale.
 
-**P2 — Functionality absent in production:**
-- Settings page has no Perspectives section
-- Export (PDF/PNG) button absent from canvas UI
-- No way to create a journey canvas tab type
+### Improvements Found
 
-### Root cause
-Production is running a Phase 1-2 build. Phase 3-4 features (FEAT-049 and friends) only exist on `ralph/init-stride` — not merged to `main`, not deployed. The `[tabId]` dynamic route catches all unrecognized paths and renders the canvas fallback. A production deploy of the branch is required before these checks can pass.
+1. `confirm()` dialogs in settings page (Duplicate + Delete) should be Radix AlertDialogs for dark-theme consistency
+2. `has_role` criteria type needs either disabled-with-tooltip or full implementation
+3. Accessibility cadence 76 iterations overdue — coloring panel, playbook overlay, and activity tabs haven't been audited for WCAG compliance

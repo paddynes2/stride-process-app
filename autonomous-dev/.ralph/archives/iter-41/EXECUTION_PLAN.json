@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "iteration": 96,
+  "date": "2026-03-03T19:00:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "40bd2c3063e0cca830e40ac10c672bccc80ec5f7",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#BUG-019",
+      "description": "Fix activity page 'Unknown' user display + add empty state guidance text (IMP-018)",
+      "source": "prd/BUGS.md",
+      "type": "fix",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 3,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "page.tsx line 25 uses .select('*, users!activity_log_user_id_fkey(email)') — matching the API route join exactly",
+        "Initial page load shows user emails instead of 'Unknown' for all activity entries",
+        "Load More entries continue to work (API route join already correct)",
+        "activity-view.tsx empty state shows guidance text: 'Actions like creating steps, adding comments, and completing runbooks appear here.'",
+        "TypeScript compiles with zero errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+      ],
+      "files_read_only": [
+        "src/app/api/v1/activity/route.ts"
+      ],
+      "context": {
+        "similar_files": ["src/app/api/v1/activity/route.ts"],
+        "patterns_to_follow": ["Server/API query mismatch gotcha — BOTH page.tsx and route.ts must use identical .select() shape"],
+        "learnings_relevant": ["LEARNINGS.md: Server/API query mismatch — updating API route join but not page.tsx server query causes initial load regression"],
+        "affected_urls": ["/w/[workspaceId]/activity"]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "DIAGNOSIS (attempt 3 — see DIAGNOSES.md): Attempts 1-2 failed due to wrong file (iter 92) and merge failure (iter 94). The fix is ONE LINE: page.tsx line 25, change .select(\"*\") to .select(\"*, users!activity_log_user_id_fkey(email)\"). Do NOT touch route.ts (it already has the correct join). Also add IMP-018: in activity-view.tsx, find the empty state (the section showing Clock icon + 'No activity yet') and add a hint paragraph below it: 'Actions like creating steps, adding comments, and completing runbooks appear here.' styled text-[var(--text-tertiary)] text-sm. After committing, verify with: grep -n 'select' src/app/(app)/w/[workspaceId]/activity/page.tsx"
+    },
+    {
+      "slot": 2,
+      "id": "#FEAT-051",
+      "description": "Coloring rules UI: toolbar panel with rule CRUD + step node background tint [2/2]",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "Paintbrush icon button in canvas toolbar (next to Heat Map button) toggles coloring panel visibility",
+        "Coloring panel shows list of rules with: color swatch, name input, criteria_type dropdown, criteria_value dropdown/input, active toggle, delete button",
+        "Add Rule button creates a new rule via API and appends to list",
+        "Editing rule fields persists changes via PATCH API on blur/change",
+        "Deleting a rule removes it via DELETE API",
+        "Rules evaluated client-side in position order — last active matching rule wins",
+        "Step nodes show matching rule color as background tint at ~15% opacity (hex color + '26' suffix)",
+        "Steps matching no rule show default background (no tint)",
+        "Coloring applies to process canvas step nodes only (NOT journey canvas)",
+        "Rules apply in real-time as created/toggled/edited (no page reload needed)",
+        "HEX_COLOR_REGEX validation added to coloring-rules POST and PATCH routes",
+        "criteria_type enum validation added to coloring-rules POST and PATCH routes",
+        "TypeScript compiles with zero errors"
+      ],
+      "files_owned": [
+        "src/components/canvas/coloring-panel.tsx",
+        "src/components/canvas/flow-canvas.tsx",
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+        "src/components/canvas/step-node.tsx",
+        "src/types/canvas.ts",
+        "src/app/api/v1/coloring-rules/route.ts",
+        "src/app/api/v1/coloring-rules/[id]/route.ts"
+      ],
+      "files_read_only": [
+        "src/lib/api/client.ts",
+        "src/types/database.ts",
+        "src/components/canvas/section-node.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/components/panels/annotation-panel.tsx",
+          "src/components/panels/comment-panel.tsx"
+        ],
+        "patterns_to_follow": [
+          "Heat Map toggle pattern in flow-canvas.tsx (heatMapMode state + toolbar Button variant toggle)",
+          "CommentCountsContext/TaskCountsContext pattern for passing data to nodes without prop-drilling",
+          "Existing StepNodeData interface in canvas.ts — add coloringRuleColor field",
+          "HEX_COLOR_REGEX from perspectives API (IMP-001): /^#[0-9A-Fa-f]{6}$/i",
+          "buildNodes() in flow-canvas.tsx — where to pass coloring data to step nodes"
+        ],
+        "learnings_relevant": [
+          "FEAT-051 POST/PATCH routes missing HEX_COLOR_REGEX color validation (STATUS.md warning)",
+          "FEAT-051 POST/PATCH routes missing criteria_type enum validation (iter 95 acceptance test)"
+        ],
+        "affected_urls": ["/w/[workspaceId]/[tabId]"]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Data layer already complete (iter 94): migration 019, ColoringRule/CriteriaType types in database.ts, API routes (GET/POST/PATCH/DELETE), client wrappers (fetchColoringRules, createColoringRule, updateColoringRule, deleteColoringRule). Architecture: (1) canvas-view.tsx fetches coloring rules via fetchColoringRules(workspaceId), evaluates rules against steps in position order (last active match wins), builds Map<stepId, hexColor>, passes both rules array and color map to FlowCanvas. (2) flow-canvas.tsx receives coloringRules + stepColorMap props, adds Paintbrush toolbar button (from lucide-react) that toggles coloring panel, passes coloringRuleColor to buildNodes for each step. (3) New coloring-panel.tsx renders as a Panel (from @xyflow/react) or absolute-positioned div below toolbar — shows rule list with inline editing. Takes workspaceId, rules, onRulesChange callback. (4) step-node.tsx reads coloringRuleColor from data and applies as background: `${color}26` (~15% opacity). When heatMapMode is active, heatMap takes precedence over coloring rules. (5) Add HEX_COLOR_REGEX validation (same as perspectives API: /^#[0-9A-Fa-f]{6}$/i) to coloring-rules POST and PATCH routes. Also add VALID_CRITERIA_TYPES constant and validate criteria_type in both routes (same pattern as annotations API BUG-014 fix). Criteria type 'step_type' may not have a corresponding field on Step — support as freeform text input for now. criteria_value options: status → step status enum values; executor → executor type enum values; has_role → 'true'/'false'; maturity_below/maturity_above → number 1-5."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/lib/utils.ts"],
+    "owner": null,
+    "note": "Neither slot needs to modify shared config files. database.ts and client.ts already have coloring rule types/wrappers from iter 94."
+  },
+  "merge_order": ["#BUG-019", "#FEAT-051"],
+  "testing_plan": {
+    "run_acceptance": false,
+    "run_regression": false,
+    "regression_reason": "Risk score 6 from iter 94 (migration 019 + 6 files + partial result). Regression + acceptance for BUG-019, FEAT-050, FEAT-051 should run NEXT iteration (iter 97 = testing_only).",
+    "suites_to_run": [],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [
+      "Risk score 6 — iter 97 should be testing_only (regression + acceptance for FEAT-050, FEAT-051, BUG-019)",
+      "Accessibility cadence severely overdue (last: iter 21, now: iter 96, gap: 75 iterations)"
+    ],
+    "diagnoses_written": true,
+    "signal_override": null
+  }
+}

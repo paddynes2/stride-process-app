@@ -1,0 +1,268 @@
+{
+  "schema_version": "1.0",
+  "iteration": 91,
+  "test_type": "regression",
+  "suite_name": "regression",
+  "status": "failed",
+  "duration_seconds": 420,
+  "testing_environment": {
+    "note": "Local dev server (localhost:3000) was running a DIFFERENT app ('Kernel'). All testing performed against production: https://stride-five-sigma.vercel.app",
+    "local_dev_unavailable": true
+  },
+
+  "criteria_results": [
+    {
+      "criterion": "/login renders (200)",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "GET /login redirects to /workspaces when authenticated (correct auth guard behavior). Page title 'Stride — Process Mapping & Continuous Improvement' confirmed.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "/workspaces redirects unauthed (307→login)",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "API /api/v1/workspaces with credentials:omit returns HTTP 401 with envelope { data: null, error: { code: 'unauthorized', message: 'Not authenticated' } }. Auth guards are working.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Canvas tab loads with nodes (static analysis)",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Navigated to canvas tab. Rendered with 'New Section' section node and 'Regression Test Step' step node. Zoom controls and Step/Section toolbar visible.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Step detail panel opens on node click",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Clicked 'Regression Test Step' node. Detail panel appeared with Name, Status (Draft/In Progress/Testing/Live/Archived), Type, Executor, Minutes, Per Month, Notes, Video, Delete Step fields.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Step name edit saves without error",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Typed in step name textbox, pressed Tab to blur. 0 console errors, 0 network errors captured.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Section detail panel opens on node click",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Clicked 'New Section' section node. Detail panel opened with Name, Summary, Steps (0), Notes, Delete Section fields.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Canvas zoom/pan works",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Clicked Zoom In button — button became disabled at max zoom level, confirming zoom functionality is working.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Journey canvas renders with stages/touchpoints",
+      "task_id": "regression-baseline",
+      "result": "fail",
+      "evidence": "No journey-type tab exists in test workspace. Clicking '+' in tab bar creates only a new workflow-type canvas tab. No UI affordance to create a journey canvas type. Cannot test journey canvas.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Step list displays data",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Navigated to /list. Page rendered 'All Steps (1)' with table showing Regression Test Step in Workflow tab, Draft status, created 3/2/2026. Search, status filter, executor filter all present.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Gap analysis view renders",
+      "task_id": "regression-baseline",
+      "result": "fail",
+      "evidence": "Navigated to /gap-analysis. Page rendered the canvas application (zoom controls + Step/Section toolbar) instead of a maturity gap ranking view. Gap Analysis not in sidebar nav. Feature not deployed to production.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Comparison view renders",
+      "task_id": "regression-baseline",
+      "result": "fail",
+      "evidence": "Navigated to /compare. Page rendered the canvas application instead of a side-by-side comparison view. Compare not in sidebar nav. Feature not deployed to production.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Settings page loads",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Navigated to /settings. Rendered with 'Workspace Settings' heading, workspace name field, Save Changes button, Danger Zone with Delete Workspace button.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Teams/People/Tools pages render",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Navigated to /teams. Page rendered 'Teams Canvas / Coming in Phase 1' stub without errors. Known issue per stride.md.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to perspectives (in settings) → list displays",
+      "task_id": "regression-baseline",
+      "result": "fail",
+      "evidence": "Settings page only shows Workspace Name form and Danger Zone. No perspectives section found. scrollHeight === clientHeight (897px) — no hidden content. Perspectives management absent from production settings page.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "PDF export triggers without errors",
+      "task_id": "regression-baseline",
+      "result": "fail",
+      "evidence": "Full button enumeration on canvas page found: All Workspaces, S (user menu), Zoom In, Zoom Out, Fit View, Step, Section only. No export button present. Export functionality not accessible in current production UI.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "PNG export triggers without errors",
+      "task_id": "regression-baseline",
+      "result": "fail",
+      "evidence": "Same as PDF — no export button found. Export functionality not accessible in current production UI.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "No new console errors",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "Playwright console_messages at error level: 0 errors, 0 warnings across full test session. Only expected 401 from intentional auth guard test.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Activity page: renders with filter tabs and pagination",
+      "task_id": "#FEAT-049",
+      "result": "fail",
+      "evidence": "Navigated to /activity. Page rendered the canvas application instead of the activity log feed. Activity link MISSING from sidebar nav. FEAT-049 not deployed to production — only on ralph/init-stride branch, not merged to main.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Runbooks: list view, detail view, playbook mode",
+      "task_id": "regression-baseline",
+      "result": "fail",
+      "evidence": "Navigated to /runbooks. Page rendered the canvas application instead of the runbooks list. Runbooks link MISSING from sidebar nav. Feature not deployed to production.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Type check passes (npx tsc --noEmit)",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2.json: typecheck.status = 'pass', errors = 0.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Lint passes (npm run lint)",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2.json: lint.status = 'pass', errors = 0. 1 pre-existing warning in flow-canvas.tsx (addEdge unused) — pre-existing, not new.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "API auth guards return 401 for unauthenticated requests",
+      "task_id": "regression-baseline",
+      "result": "pass",
+      "evidence": "GET /api/v1/workspaces with credentials:'omit' returned HTTP 401 with body { data: null, error: { code: 'unauthorized', message: 'Not authenticated' } }. Correct envelope format confirmed.",
+      "screenshot_description": null
+    }
+  ],
+
+  "quality_gate": {
+    "pages_checked": [
+      "/workspaces",
+      "/w/{id}/{tabId} (canvas)",
+      "/w/{id}/list",
+      "/w/{id}/gap-analysis",
+      "/w/{id}/compare",
+      "/w/{id}/settings",
+      "/w/{id}/teams",
+      "/w/{id}/activity",
+      "/w/{id}/runbooks"
+    ],
+    "console_errors": 0,
+    "network_errors": 0,
+    "accessibility_issues": 0,
+    "layout_shifts": 0
+  },
+
+  "bugs_found": [
+    {
+      "severity": "P1",
+      "page": "/w/{workspaceId}/activity",
+      "description": "Activity page (/activity route) renders the canvas application instead of the activity log feed. Activity link is absent from sidebar navigation. FEAT-049 activity log feature is not deployed to production — only exists on ralph/init-stride branch, not merged to main.",
+      "steps_to_reproduce": "1. Navigate to /w/{workspaceId}/activity. 2. Observe: canvas application renders with Step/Section toolbar, zoom controls, mini map. Expected: chronological activity feed with action type filter tabs and Load More pagination.",
+      "related_task": "#FEAT-049"
+    },
+    {
+      "severity": "P1",
+      "page": "/w/{workspaceId}/runbooks",
+      "description": "Runbooks page (/runbooks route) renders the canvas application instead of the runbooks list. Runbooks link is absent from sidebar navigation. Feature not deployed to production.",
+      "steps_to_reproduce": "1. Navigate to /w/{workspaceId}/runbooks. 2. Observe: canvas renders. Expected: runbooks list with Create Runbook button.",
+      "related_task": "regression-baseline"
+    },
+    {
+      "severity": "P1",
+      "page": "/w/{workspaceId}/gap-analysis",
+      "description": "Gap Analysis page renders the canvas instead of the maturity gap ranking view. Gap Analysis absent from sidebar navigation.",
+      "steps_to_reproduce": "1. Navigate to /gap-analysis. 2. Observe: canvas renders. Expected: maturity gap ranking table.",
+      "related_task": "regression-baseline"
+    },
+    {
+      "severity": "P1",
+      "page": "/w/{workspaceId}/compare",
+      "description": "Compare page renders the canvas instead of the side-by-side perspective comparison view. Compare absent from sidebar navigation.",
+      "steps_to_reproduce": "1. Navigate to /compare. 2. Observe: canvas renders. Expected: perspective selector + side-by-side canvas comparison.",
+      "related_task": "regression-baseline"
+    },
+    {
+      "severity": "P2",
+      "page": "/w/{workspaceId}/settings",
+      "description": "Settings page missing Perspectives management section. Only Workspace Name and Danger Zone present. Per CLAUDE.md and testing routes, settings should include perspectives management and public sharing.",
+      "steps_to_reproduce": "1. Navigate to /settings. 2. Observe: only Workspace Name form and Danger Zone. Expected: perspectives list and public sharing section also present.",
+      "related_task": "regression-baseline"
+    },
+    {
+      "severity": "P2",
+      "page": "/w/{workspaceId}/{tabId} (canvas)",
+      "description": "Export functionality (PDF/PNG) is absent from canvas UI. Full button enumeration found no export-related buttons. Golden path step 11 (Export canvas as PDF) is not achievable.",
+      "steps_to_reproduce": "1. Navigate to canvas tab. 2. Enumerate all buttons — only All Workspaces, user menu, Zoom In/Out/Fit View, Step, Section present. No export button found.",
+      "related_task": "regression-baseline"
+    },
+    {
+      "severity": "P2",
+      "page": "All workspace views — sidebar",
+      "description": "Sidebar navigation is missing multiple expected items: Activity, Runbooks, Comments, Dashboard, Gap Analysis, Compare. Current sidebar shows only: Workflows, List View, Teams (Soon), People (Soon), Tools (Soon), Settings, All Workspaces. Production is running a version predating Phase 3-4 features.",
+      "steps_to_reproduce": "1. Navigate to any workspace page. 2. Observe sidebar. Expected: sidebar should include Activity, Runbooks, and other Phase 3-4 nav items per FEAT-049 spec.",
+      "related_task": "#FEAT-049"
+    },
+    {
+      "severity": "P2",
+      "page": "Canvas / tab bar",
+      "description": "No journey canvas tab type can be created from the UI. Clicking '+' creates a new workflow canvas immediately with no type selection. Journey canvas cannot be tested.",
+      "steps_to_reproduce": "1. Navigate to canvas. 2. Click '+' tab button. 3. Observe: new workflow canvas created immediately. Expected: type selection (workflow vs journey) before creating tab.",
+      "related_task": "regression-baseline"
+    }
+  ],
+
+  "improvements_found": [
+    {
+      "category": "usability",
+      "page": "/workspaces (new workspace)",
+      "observation": "Fresh workspace has no onboarding prompt. User landing on empty canvas with 0 sections/0 steps has no guidance on what to do first.",
+      "design_principle": "Nielsen H6: Recognition rather than recall",
+      "suggested_approach": "Add empty-state overlay or onboarding checklist for newly created workspaces on first canvas view."
+    },
+    {
+      "category": "usability",
+      "page": "All workspace views — sidebar",
+      "observation": "Teams/People/Tools items show 'Soon' badge but are still navigable, taking the user away from the canvas to a stub page. This interrupts workflow for no benefit.",
+      "design_principle": "Nielsen H1: Visibility of system status",
+      "suggested_approach": "Either disable navigation for stub items or show an inline tooltip/popover explaining upcoming features without navigating away."
+    }
+  ],
+
+  "root_cause_note": "The majority of failures are a DEPLOYMENT GAP, not code-level regressions. Multiple Phase 3-4 features (activity log, runbooks, gap-analysis, compare, perspectives) exist only on the ralph/init-stride branch and have not been merged to main or deployed to production. The routes /activity, /runbooks, /gap-analysis, /compare all fall through to the [tabId] dynamic route (rendering the canvas) because Next.js cannot find the corresponding page.tsx files in the deployed build. All core Phase 1-2 functionality is working correctly. A production deployment of the ralph/init-stride branch is required before FEAT-049 and related features can be regression-tested.",
+
+  "actions_used": 38,
+  "action_budget": 40
+}

@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "iteration": 94,
+  "date": "2026-03-03T15:30:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "46963c4d710b9ca2c6f9ac42e9f78d21a50308e1",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#BUG-019",
+      "secondary_ids": ["#IMP-018"],
+      "description": "Fix activity page 'Unknown' user display (P1 regression) + add empty state guidance text",
+      "source": "prd/BUGS.md",
+      "type": "fix",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 2,
+      "risk_score": 1,
+      "acceptance_criteria": [
+        "page.tsx line 25: change .select(\"*\") to .select(\"*, users!activity_log_user_id_fkey(email)\") so initial load entries include user email",
+        "Activity entries on initial load show user email instead of 'Unknown'",
+        "Load More entries continue to work (API route already has the correct join)",
+        "Both page.tsx server query and route.ts client query use identical .select() shape",
+        "IMP-018: Activity empty state shows guidance hint below 'No activity yet': 'Actions like creating steps, adding comments, and completing runbooks appear here.'"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+      ],
+      "files_read_only": [
+        "src/app/api/v1/activity/route.ts",
+        "src/types/database.ts"
+      ],
+      "context": {
+        "similar_files": ["src/app/api/v1/activity/route.ts"],
+        "patterns_to_follow": [
+          "API route line 32: .select(\"*, users!activity_log_user_id_fkey(email)\") — page.tsx must match this exact shape",
+          "ActivityLog type in database.ts already has users?: { email: string } | null — no type changes needed",
+          "activity-view.tsx line 171: entry.users?.email ?? 'Unknown' already handles the optional field correctly"
+        ],
+        "learnings_relevant": [
+          "Server/API query mismatch: BOTH page.tsx (server) and route.ts (client) queries must use the same .select() shape. Updating only one causes initial vs Load More display discrepancy. See LEARNINGS.md.",
+          "activity-view.tsx line 171 reads entry.users?.email — this works once page.tsx adds the join"
+        ],
+        "affected_urls": ["/w/[workspaceId]/activity"]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "BUG-019 attempt 2. Previous attempt (iter 92) updated route.ts but forgot page.tsx. The fix is ONE LINE: page.tsx line 25 change .select(\"*\") to .select(\"*, users!activity_log_user_id_fkey(email)\"). Do NOT touch route.ts — it already has the correct join. IMP-018: Add a <p> guidance text below the 'No activity yet' message in the empty state block at activity-view.tsx lines 138-145. Style: text-[12px] text-[var(--text-tertiary)] mt-1."
+    },
+    {
+      "slot": 2,
+      "id": "#FEAT-051",
+      "description": "Conditional step coloring — data layer [1/2]: migration (coloring_rules table + criteria_type enum), types, API CRUD routes, client wrappers",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "New migration 019_coloring_rules.sql creates: criteria_type enum (status, executor, step_type, has_role, maturity_below, maturity_above), coloring_rules table with id (uuid PK default uuid_generate_v4()), workspace_id (FK workspaces NOT NULL), name (text NOT NULL), color (text NOT NULL), criteria_type (criteria_type NOT NULL), criteria_value (text NOT NULL), is_active (boolean DEFAULT true), position (integer DEFAULT 0), created_at (timestamptz DEFAULT now()), updated_at (timestamptz DEFAULT now())",
+        "RLS enabled: SELECT/INSERT/UPDATE/DELETE policies via can_access_workspace(workspace_id)",
+        "Reuse existing set_updated_at() trigger function — do NOT recreate it",
+        "Index on (workspace_id) for list query performance",
+        "ColoringRule interface and CriteriaType union type added to src/types/database.ts",
+        "GET /api/v1/coloring-rules?workspace_id= returns ColoringRule[] ordered by position ASC",
+        "POST /api/v1/coloring-rules creates rule, validates: workspace_id required, name required, color required (hex format via HEX_COLOR_REGEX), criteria_type required (must be valid enum value), criteria_value required",
+        "PATCH /api/v1/coloring-rules/[id] updates provided fields, validates color format if provided",
+        "DELETE /api/v1/coloring-rules/[id] removes rule",
+        "All mutation routes include void logActivity() calls with entity_type: 'coloring_rules'",
+        "Client wrappers added to client.ts: fetchColoringRules, createColoringRule, updateColoringRule, deleteColoringRule",
+        "npx tsc --noEmit passes"
+      ],
+      "files_owned": [
+        "supabase/migrations/019_coloring_rules.sql",
+        "src/types/database.ts",
+        "src/app/api/v1/coloring-rules/route.ts",
+        "src/app/api/v1/coloring-rules/[id]/route.ts",
+        "src/lib/api/client.ts"
+      ],
+      "files_read_only": [
+        "supabase/migrations/014_comments.sql",
+        "supabase/migrations/015_tasks.sql",
+        "src/app/api/v1/comments/route.ts",
+        "src/app/api/v1/comments/[id]/route.ts",
+        "src/lib/api/response.ts",
+        "src/lib/api/activity.ts",
+        "src/app/api/v1/perspectives/route.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "supabase/migrations/014_comments.sql — enum + table + RLS + indexes + trigger pattern",
+          "supabase/migrations/015_tasks.sql — set_updated_at trigger reuse pattern",
+          "src/app/api/v1/comments/route.ts — GET list + POST create pattern with workspace_id",
+          "src/app/api/v1/comments/[id]/route.ts — PATCH + DELETE by id pattern",
+          "src/app/api/v1/perspectives/route.ts — HEX_COLOR_REGEX validation pattern (IMP-001)"
+        ],
+        "patterns_to_follow": [
+          "Migration: CREATE TYPE criteria_type AS ENUM (...); CREATE TABLE coloring_rules (...); ALTER TABLE ENABLE ROW LEVEL SECURITY; CREATE POLICY ... USING (can_access_workspace(workspace_id)); CREATE TRIGGER set_updated_at BEFORE UPDATE",
+          "API: auth guard → validate params → Supabase query → successResponse/errorResponse",
+          "Color validation: HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/i from perspectives route (IMP-001)",
+          "Client: apiFetch<ColoringRule[]> for list, apiFetch<ColoringRule> for mutations",
+          "logActivity: void logActivity({ workspace_id, user_id, action, entity_type: 'coloring_rules', entity_id, entity_name })"
+        ],
+        "learnings_relevant": [
+          "void prefix on logActivity() — BUG-018 resolution pattern",
+          "Supabase RLS silent mutations — check if data is null after mutations, return 403/404",
+          "set_updated_at() trigger exists from migration 015 — reuse it, do NOT CREATE OR REPLACE"
+        ],
+        "affected_urls": []
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "Data layer only — no UI in this sub-task ([2/2] UI will be next iteration). Follow exact patterns from comments (014) and tasks (015) migrations. Enum name: criteria_type. Table: coloring_rules. Migration number: 019 (018 = clone_workspace). Reuse set_updated_at() trigger — DO NOT recreate it. Add HEX_COLOR_REGEX validation in POST/PATCH routes (copy from perspectives/route.ts). Shared files (database.ts, client.ts) are exclusively owned by this slot — slot 1 does NOT modify them. Import ColoringRule and CriteriaType in client.ts alongside existing type imports."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/lib/utils.ts", "src/lib/api/response.ts", "src/lib/api/activity.ts"],
+    "owner": "#FEAT-051",
+    "note": "FEAT-051 exclusively owns types/database.ts and lib/api/client.ts for this iteration. BUG-019 slot reads them but does NOT modify."
+  },
+  "merge_order": ["#BUG-019", "#FEAT-051"],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": false,
+    "regression_reason": "Last regression iter 91 (3 iters ago). Risk score 2 (normal). Not due until ~iter 99. Next iteration (95) should be testing-only with full regression + accessibility cadence.",
+    "suites_to_run": ["acceptance"],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [
+      "IMP-007 already completed — kbd shortcut hints (N/S) added to journey canvas toolbar in commit 46963c4 (iter 93 builder slot 2 merge). Reviewer should mark IMP-007 done in IMPROVEMENTS.md.",
+      "Iteration 95 MUST be testing-only: FEAT-050 acceptance + FEAT-051 acceptance + accessibility cadence (overdue 73 iterations) + full regression baseline."
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

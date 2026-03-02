@@ -1,0 +1,27 @@
+STATUS.md is already up to date and consistent with the execution plan. The plan is complete.
+
+## PLANNER Summary — Iteration 94
+
+**Validation:** Codebase compiles clean (`tsc --noEmit` exit 0). Last commit `46963c4` valid. No revert needed.
+
+**Plan: 2 parallel builders**
+
+| Slot | Task | Complexity | Files |
+|------|------|-----------|-------|
+| 1 | **#BUG-019** fix (attempt 2) + **#IMP-018** | S | `activity/page.tsx`, `activity/activity-view.tsx` |
+| 2 | **#FEAT-051 [1/2]** data layer | M | migration 019, `database.ts`, API routes, `client.ts` |
+
+**Slot 1 — BUG-019 + IMP-018:**
+- 1-line fix: `page.tsx` line 25 `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")`
+- Add guidance text to activity empty state
+
+**Slot 2 — FEAT-051 [1/2]:**
+- New `coloring_rules` table + `criteria_type` enum (migration 019)
+- TypeScript types, API CRUD routes, client wrappers
+- Follows comments/tasks migration pattern exactly
+
+**Zero file overlap** between slots. Merge order: BUG-019 first.
+
+**Observations:**
+- **IMP-007 already done** — `<kbd>` shortcut hints present in `46963c4`. Reviewer should mark done.
+- **Iter 95 MUST be testing-only:** FEAT-050 acceptance + FEAT-051 acceptance + accessibility cadence (73 iters overdue) + regression baseline.

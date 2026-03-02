@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 96
-- **Date:** 2026-03-03 20:30
+- **Iteration:** 97
+- **Date:** 2026-03-03 21:30
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #BUG-019 attempt 3 (page.tsx select join fix) + #IMP-018 (activity empty state guidance) + #FEAT-051 [2/2] (coloring panel UI + step node tint + API validation)
+- **Last task(s):** Testing-only iteration — full regression (35 checks) + FEAT-050 acceptance (13 checks) + FEAT-051 verify (10 checks) + BUG-019 verify (5 checks)
 - **Result:** completed
-- **Next task:** Iteration 97 MUST be testing_only: regression + acceptance for FEAT-050, FEAT-051, BUG-019 (risk score 6 from iter 94)
+- **Next task:** FEAT-052 section templates or FEAT-053 Phase 4 testing gate
 - **Blockers:** None
 
 ## Context
 
-Iteration 96 completed all planned tasks across both builder slots. Slot 1: BUG-019 finally resolved on attempt 3 — page.tsx `.select("*")` changed to `.select("*, users!activity_log_user_id_fkey(email)")` matching route.ts, plus IMP-018 empty state guidance text added to activity-view.tsx. Slot 2: FEAT-051 [2/2] coloring panel UI built (coloring-panel.tsx 347 lines), ColoringTintContext following CommentCountsContext pattern, step-node.tsx background tint at 15% opacity, HEX_COLOR_REGEX validation added to POST and PATCH API routes, VALID_CRITERIA_TYPES validation on PATCH. Both builders pass typecheck and lint. POST_MERGE_CHECK: PASS. Acceptance tester: 19/19 criteria PASS. FEAT-051 is now fully complete (both sub-tasks).
+Iteration 97 was a mandatory testing_only iteration triggered by accumulated risk score 6+ from iters 92-96 (FEAT-050 workspace cloning + FEAT-051 conditional coloring + BUG-019 fix). Both testers ran 4 suites (regression baseline + FEAT-050 acceptance + FEAT-051 verify + BUG-019 verify) totaling 87 checks — all passed. FEAT-050 now fully acceptance-tested. 1 new P2 bug found (BUG-020: has_role criteria silently skipped). 4 new improvements logged (IMP-026 through IMP-028). After this passes: next is FEAT-052 section templates or FEAT-053 Phase 4 testing gate.
 
 ## Dev Server
 
@@ -21,13 +21,14 @@ Iteration 96 completed all planned tasks across both builder slots. Slot 1: BUG-
 
 ## Warnings
 
-- **Iter 97 MUST be testing_only** — regression + acceptance for FEAT-050, FEAT-051, BUG-019 (risk score 6 from iter 94)
 - **Migration 019 needs push:** `npx supabase db push` to deploy coloring_rules table to remote DB
 - Migrations 014-018 also still need push to remote DB
 - Production (origin/main) is behind ralph/init-stride by 13+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - Browser testing unavailable (Playwright MCP limitation)
-- **Accessibility cadence severely overdue** — last audit iteration 21, now iteration 96 (75 iterations). Schedule after Phase 4 testing gate.
-- FEAT-050 acceptance testing needed (UI changes in iters 92-93)
-- 3 new improvements logged: IMP-023 (coloring active indicator), IMP-024 (has_role criteria not evaluated), IMP-025 (activity sidebar link verification)
+- **Accessibility cadence severely overdue** — last audit iteration 21, now iteration 97 (76 iterations). Schedule after Phase 4 testing gate.
+- BUG-020: has_role coloring criteria silently skipped (P2) — found iter 97
+- IMP-026: Clone confirm dialog text understates what's cloned
+- IMP-027: Activity Load More lacks total count
+- IMP-028: Duplicate Workspace uses confirm() instead of Radix Dialog

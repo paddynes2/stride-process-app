@@ -1,19 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 96
+- **Iteration:** 97
 - **Date:** 2026-03-03
-- **Suite:** acceptance #BUG-019 (6 checks) + #IMP-018 (1 check) + #FEAT-051 (12 checks) + quality gate (2 pages)
-- **Method:** Static code analysis + production quality gate (Playwright unavailable)
-- **Result:** **19/19 ALL PASS**
-- **Bugs found:** 0
-- **Improvements found:** 3 (IMP-023 active indicator, IMP-024 has_role not evaluated, IMP-025 sidebar link verification)
-- **Note:** BUG-019 resolved. FEAT-051 fully complete. Iter 97 MUST be testing_only with regression + acceptance for FEAT-050, FEAT-051, BUG-019.
+- **Suite:** Regression baseline (35 checks) + FEAT-050 acceptance (13 checks) + FEAT-051 verify (10 checks) + BUG-019 verify (5 checks) — 4 suites total
+- **Method:** Static code analysis (Playwright unavailable)
+- **Result:** **87/87 ALL PASS** (24 acceptance + 63 regression, both testers independent)
+- **Bugs found:** 1 (BUG-020: has_role criteria silently skipped)
+- **Improvements found:** 4 (IMP-026, IMP-027, IMP-028 + doc accuracy note)
+- **Note:** FEAT-050 fully acceptance-tested for the first time. All Phase 4 features through iter 96 verified. Risk score fully resolved.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 96 (2026-03-03) — 19/19 PASS (6 BUG-019 + 1 IMP-018 + 12 FEAT-051 acceptance, static analysis + production quality gate)
+- Last run: Iteration 97 (2026-03-03) — 87/87 PASS (35 regression baseline + 13 FEAT-050 acceptance + 10 FEAT-051 verify + 5 BUG-019 verify, static analysis)
+- Previous run: Iteration 96 (2026-03-03) — 19/19 PASS (6 BUG-019 + 1 IMP-018 + 12 FEAT-051 acceptance, static analysis + production quality gate)
 - Previous run: Iteration 91 (2026-03-03) — 57/57 PASS (20 FEAT-049 acceptance + 37 regression baseline, static analysis)
 - Previous run: Iteration 87 (2026-03-02) — 33/33 PASS (5 regression + 16 FEAT-047 acceptance + 12 FEAT-048 acceptance)
 - Previous run: Iteration 83 (2026-03-02) — 23/23 PASS (static analysis + curl + API probing)

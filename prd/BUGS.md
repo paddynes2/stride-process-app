@@ -56,3 +56,10 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/page.tsx` line 25
   - **What:** page.tsx server component used `.select("*")` while API route had `.select("*, users!activity_log_user_id_fkey(email)")`. Initial load entries lacked user join → "Unknown" display.
   - **Fix applied:** Changed page.tsx `.select("*")` to `.select("*, users!activity_log_user_id_fkey(email)")`. Both page.tsx and route.ts now use identical select shape.
+
+- [ ] #BUG-020 has_role coloring criteria silently skipped during tint evaluation (P2) — Attempts: 0
+  - **Found:** Iteration 97 (regression tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` — coloring rule evaluation switch statement
+  - **What:** Rules with `criteria_type='has_role'` can be created and saved via the coloring panel, but the canvas-view.tsx tint evaluator has a comment `// Requires additional data fetch — skip visual evaluation for now` and produces no background tint on step nodes. Users get no feedback that the rule isn't working.
+  - **Related:** IMP-024 (same issue framed as improvement)
+  - **Suggested fix:** Either implement has_role evaluation by joining step_roles data in the coloring tint useMemo, or disable has_role in the coloring panel dropdown with a "coming soon" tooltip.
