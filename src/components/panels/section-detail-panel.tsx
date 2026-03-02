@@ -7,11 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+// NOTE (BUG-024): The custom DialogTitle in ui/dialog.tsx wraps a plain <h2> (not
+// DialogPrimitive.Title), so Radix cannot register it for a11y. We import
+// DialogPrimitive.Title directly here to fix the console.error in this dialog.
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
@@ -387,7 +390,7 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save as Template</DialogTitle>
+            <DialogPrimitive.Title className="text-[16px] font-semibold text-[var(--text-primary)] tracking-[-0.01em]">Save as Template</DialogPrimitive.Title>
             <DialogDescription>
               Save this section as a reusable template
             </DialogDescription>
