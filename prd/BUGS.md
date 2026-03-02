@@ -63,3 +63,10 @@
   - **What:** Rules with `criteria_type='has_role'` can be created and saved via the coloring panel, but the canvas-view.tsx tint evaluator has a comment `// Requires additional data fetch — skip visual evaluation for now` and produces no background tint on step nodes. Users get no feedback that the rule isn't working.
   - **Related:** IMP-024 (same issue framed as improvement)
   - **Fix applied:** Disabled has_role option in CRITERIA_OPTIONS with `disabled: true` and label "Has Role (coming soon)". Both select elements pass `disabled={opt.disabled}` to option. Rule list display uses CRITERIA_OPTIONS label lookup (with fallback to raw criteria_type). CRITERIA_VALUE_HINTS key retained. API routes and enum unchanged.
+
+- [ ] #BUG-021 Production workspace-shell exclusion list missing route segments (P1) — Attempts: 0
+  - **Found:** Iteration 100 (regression tester — browser)
+  - **Where:** `src/app/(app)/w/[workspaceId]/workspace-shell.tsx` — urlTabId exclusion check (~line 47)
+  - **What:** workspace-shell.tsx has an exclusion list for non-tab route segments (list, settings, teams, people, tools, dashboard, comments, compare). The segments 'runbooks', 'activity', and 'gap-analysis' are missing. When users navigate to /runbooks, /activity, or /gap-analysis, the shell treats the segment as a tabId, sets isCanvasView=true, and renders an empty React Flow canvas with TabBar instead of the intended view component.
+  - **Steps to reproduce:** Navigate to /w/[workspaceId]/runbooks — see empty canvas instead of RunbooksListView. Same for /activity and /gap-analysis.
+  - **Suggested fix:** Add 'runbooks', 'activity', 'gap-analysis' to the exclusion list in workspace-shell.tsx. Verify all route segment directories under `w/[workspaceId]/` are covered.

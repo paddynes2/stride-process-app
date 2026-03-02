@@ -27,6 +27,8 @@
 ## Environment
 
 - **Playwright MCP unavailable — not a dev server issue:** Playwright MCP has been unavailable since iteration 56. In Phase 0 (Preflight) step 3, if Playwright can't navigate, this is a TOOL LIMITATION, not a dev server outage. Do NOT write "DEV SERVER DOWN" to SIGNAL. Instead: verify the dev server is running via `curl http://localhost:3000` or `lsof -i :3000`, note "Playwright MCP unavailable" in STATUS.md warnings, and continue. The dev server is likely fine.
+- **Playwright Chrome session conflict on Windows:** Regression tester iter 100 encountered "Opening in existing browser session" error — Chrome instance already running prevents Playwright from launching. Browser install didn't help. Requires no Chrome instances open OR switching to Playwright-managed Chromium browser. Acceptance tester fell back to static analysis.
+- **workspace-shell route exclusion list:** When adding new route directories under `w/[workspaceId]/`, must also add the segment name to workspace-shell.tsx's exclusion list. Otherwise the shell treats the segment as a tabId and renders a canvas view. Affected: runbooks, activity, gap-analysis (BUG-021). Always check after adding new route dirs.
 
 ## Pipeline
 

@@ -211,5 +211,40 @@
   - **What:** 4 icon-only buttons on canvas toolbar/tab-bar lack aria-label attributes. Pre-existing issue, not introduced by iter 99.
   - **Suggested fix:** Add aria-label to: add-tab button, canvas toolbar expand/collapse buttons.
 
+- [ ] #IMP-031 Deploy route sequential INSERT — batch insert for templates — Attempts: 0
+  - **Found:** Iteration 100 (acceptance tester — static analysis)
+  - **Category:** Performance
+  - **Where:** `src/app/api/v1/templates/[id]/deploy/route.ts`
+  - **What:** Deploy route inserts steps in a sequential for-of loop — N supabase INSERT calls for N steps. For templates with many steps this creates N database roundtrips on the server. Acceptable for current template sizes (5 steps), but would degrade for larger templates.
+  - **Suggested fix:** Batch insert all steps in one call, then build the ID map from the returned rows using stored template step IDs as correlation key.
+
+- [ ] #IMP-032 StepNode/SectionNode not wrapped in React.memo — Attempts: 0
+  - **Found:** Iteration 100 (acceptance + regression tester)
+  - **Category:** Performance
+  - **Where:** `src/components/canvas/step-node.tsx`, `src/components/canvas/section-node.tsx`
+  - **What:** Custom React Flow node components are not wrapped in React.memo. React Flow's nodeTypes pattern requires stable references, but the components themselves re-render on any parent context change. React Flow documentation explicitly recommends memo on custom nodes.
+  - **Suggested fix:** Wrap each custom node export in React.memo: `export const StepNode = React.memo(function StepNode(...) { ... })`.
+
+- [ ] #IMP-033 Large component files exceeding 500 lines — Attempts: 0
+  - **Found:** Iteration 100 (regression tester)
+  - **Category:** Maintainability
+  - **Where:** Multiple files: teams-view.tsx (721), journey-canvas-view.tsx (662), compare-view.tsx (640), settings/page.tsx (581), flow-canvas.tsx (504)
+  - **What:** 5 component files exceed the 500-line maintainability threshold. Large client components are harder to tree-shake and slower to parse.
+  - **Suggested fix:** Split largest files into sub-components. Not urgent — route-level components load only on specific routes.
+
+- [ ] #IMP-034 canvas-view.tsx handler functions not memoized with useCallback — Attempts: 0
+  - **Found:** Iteration 100 (regression tester)
+  - **Category:** Performance
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` lines 44-93
+  - **What:** 10 handler functions (handleStepSelect, handleSectionSelect, handleStepUpdate, handleStepCreate, handleStepDelete, handleSectionCreate, handleSectionUpdate, handleSectionDelete, handleConnectionCreate, handleConnectionDelete) are plain inline functions not wrapped in useCallback. These are passed as props to FlowCanvas and cause re-renders on every CanvasView state change.
+  - **Suggested fix:** Wrap all 10 handlers in React.useCallback with appropriate dependency arrays. Most only depend on setState functions (stable) and state values.
+
+- [ ] #IMP-035 Sidebar missing navigation links for multiple views — Attempts: 0
+  - **Found:** Iteration 100 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/components/layout/sidebar.tsx`
+  - **What:** Sidebar only shows 6 items (Workflows, List View, Teams/People/Tools (Soon), Settings). Important views like Gap Analysis, Compare, Runbooks, Activity, and Dashboard are not linked. Users can only reach them by typing URLs directly, violating Nielsen H6 (Recognition rather than recall).
+  - **Suggested fix:** Add sidebar links for Gap Analysis, Compare, Runbooks, and Activity with appropriate grouping.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

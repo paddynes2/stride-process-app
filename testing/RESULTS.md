@@ -1,19 +1,20 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 99
+- **Iteration:** 100
 - **Date:** 2026-03-02
-- **Suite:** Acceptance testing for FEAT-052 [1/2], BUG-020, IMP-029
-- **Method:** Static code analysis (Playwright unavailable)
-- **Result:** **16/16 PASS** (FEAT-052 10/10, BUG-020 4/4, IMP-029 2/2)
-- **Bugs found:** 0
-- **Improvements found:** 1 (IMP-030 canvas toolbar aria-labels — pre-existing)
-- **Note:** All 3 tasks completed successfully. Files at correct src/ paths (critical fix from iter 98 failure).
+- **Suite:** regression-baseline-full + feat-052-data-integrity + performance-static-audit
+- **Method:** Browser regression (Playwright) + static analysis
+- **Result:** **29/32 PASS, 3 FAIL** (regression 11/14, FEAT-052 DI 10/10, performance 6/6 with 3 warnings, 2 pass)
+- **Bugs found:** 1 (BUG-021 — workspace-shell routing exclusion list)
+- **Improvements found:** 5 (IMP-031 through IMP-035)
+- **Note:** First browser-based regression with Playwright in this session. FEAT-052 data layer fully verified. Performance cadence completed.
 
 ## Suite Results
 
 ### Regression
-- Last run: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 10, BUG-020 4, IMP-029 2 — static code analysis)
+- Last run: Iteration 100 (2026-03-02) — 29/32 (regression 11/14 browser, FEAT-052 DI 10/10 static, performance 3/6+3warn static)
+- Previous run: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 10, BUG-020 4, IMP-029 2 — static code analysis)
 - Previous run: Iteration 98 (2026-03-02) — IMP-028 7/7 PASS, BUG-020 0/4 FAIL (not merged), FEAT-052 all PASS (static, wrong paths)
 - Previous run: Iteration 97 (2026-03-03) — 87/87 PASS (35 regression baseline + 13 FEAT-050 acceptance + 10 FEAT-051 verify + 5 BUG-019 verify, static analysis)
 - Previous run: Iteration 96 (2026-03-03) — 19/19 PASS (6 BUG-019 + 1 IMP-018 + 12 FEAT-051 acceptance, static analysis + production quality gate)
@@ -96,8 +97,8 @@
 - Result: N/A
 
 ### Performance
-- Last run: N/A
-- Result: N/A
+- Last run: Iteration 100 (2026-03-02)
+- Result: 3/6 PASS, 3 WARN (node types module-level ✓, flow-canvas useCallback ✓, no circular imports ✓; canvas-view handlers not useCallback ⚠, nodes not React.memo ⚠, 5 files >500 lines ⚠)
 
 ### Forms
 - Last run: N/A

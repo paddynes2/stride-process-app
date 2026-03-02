@@ -50,3 +50,41 @@
   - No duplication issues. Patterns consistent across all data layers.
   - No files >300 lines except comment-panel.tsx (415 lines)
 - Action: Pipeline G007 bug is #1 source of wasted effort — must be addressed. Test coverage needs improvement.
+
+## Retrospective — Iteration 90 (skipped)
+- Note: No retrospective triggered — iteration 90 was not caught by reviewer at the time.
+
+## Retrospective — Iteration 100 (2026-03-02)
+- Success rate (last 10 — iter 91-100): 6/10 fully completed, 3 partial, 1 blocked
+  - Completed: 91 (testing), 93, 96, 97 (testing), 99, 100 (testing)
+  - Partial: 92 (BUG-019 failed), 94 (BUG-019 lost in merge), 98 (FEAT-052 worktree paths)
+  - Blocked: 95 (planner dispatch failure)
+- Most-failed task type: **Pipeline worktree merge failures** still causing partial results (iter 92, 94, 98). Also **BUG-019 "server/API query mismatch"** — took 3 attempts across 3 iterations (92, 94, 96) before fixed correctly.
+- Hotspot files (top 3):
+  - src/types/database.ts (3 iterations: 92, 94, 99) — additive data layer, expected
+  - src/lib/api/client.ts (3 iterations: 92, 94, 99) — additive client wrappers, expected
+  - src/app/(app)/w/[workspaceId]/settings/page.tsx (3 iterations: 93, 98, 99) — accumulating complexity (581 lines)
+- Recurring pattern (3+ occurrences): **Pipeline worktree merge failures** continue (iter 92, 94, 98) — down from 5 occurrences in iter 71-80 to 3 in 91-100. Improving but not eliminated.
+- Recurring pattern: **BUG-019 multi-attempt fix** — root cause was server page.tsx using different `.select()` shape than API route. Same query mismatch documented in LEARNINGS.md. 3 attempts over 5 iterations.
+- Velocity trend: Stable. 10 iterations completed 3 features (FEAT-050, 051, 052 [1/2]), 3 bugs (BUG-018, 019, 020), 6 improvements. Testing iterations (3/10) consistently productive.
+- Self-score trends:
+  - Code quality: 4-5 on build iterations (stable, healthy)
+  - Test coverage: 2-3 on builds, 4-5 on testing_only (bifurcated — no unit tests)
+  - Confidence: 3-5 (lower on partial results, consistently high otherwise)
+  - Efficiency: 2-5 (lower on merge failures at iter 92/94/98, consistently 5 otherwise)
+- Key observations:
+  - Phase 4 nearing completion: FEAT-050, 051, 052 [1/2] done. Only FEAT-052 [2/2] UI + FEAT-053 testing gate remain.
+  - Browser-based regression (Playwright) at iter 100 found P1 routing bug (BUG-021) that static analysis missed for 30+ iterations. Demonstrates value of browser testing.
+  - Performance cadence at iter 100 identified 5 concrete optimizations (IMP-031-035).
+  - Accessibility cadence is 79 iterations overdue (last audit iter 21). Significant gap.
+  - settings/page.tsx at 581 lines — third hotspot, growing. Consider splitting after Phase 4.
+- Codebase health check:
+  - Hotspot: settings/page.tsx in 3/10 — watch for further growth
+  - Hotspot: database.ts and client.ts in 3/10 — legitimate (additive)
+  - 5 files >500 lines flagged (IMP-033)
+  - No duplication issues detected
+  - canvas-view.tsx performance issues flagged (IMP-032, IMP-034)
+- Action:
+  - BUG-021 (P1) should be prioritized alongside FEAT-052 [2/2] in next build iteration
+  - Accessibility cadence overdue — schedule audit after Phase 4 testing gate
+  - Pipeline worktree merge reliability improved but still ~30% failure rate on build iterations

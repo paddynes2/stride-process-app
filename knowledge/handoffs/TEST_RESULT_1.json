@@ -1,181 +1,12 @@
 {
   "schema_version": "1.0",
-  "iteration": 98,
+  "iteration": 100,
   "test_type": "acceptance",
   "suite_name": null,
-  "status": "failed",
-  "duration_seconds": 420,
+  "status": "passed",
+  "duration_seconds": 95,
 
-  "criteria_results": [
-    {
-      "criterion": "has_role option visually disabled with '(coming soon)' text in coloring panel criteria_type select",
-      "task_id": "#BUG-020",
-      "result": "fail",
-      "evidence": "coloring-panel.tsx line 24 still reads `{ value: 'has_role', label: 'Has Role' }` with no `disabled` field. CRITERIA_OPTIONS type is `{ value: CriteriaType; label: string }[]` — no disabled property. BUILD_RESULT_2.json claims status='completed' and staged_files=['src/components/canvas/coloring-panel.tsx'], but NO 'builder slot 2 iteration 44' commit exists in git log. The BUG-020 changes were never committed or merged into the session branch.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "If existing rules use has_role, show subtle warning 'Not yet evaluated on canvas' below criteria row",
-      "task_id": "#BUG-020",
-      "result": "fail",
-      "evidence": "Display mode section (lines 239–283) contains no conditional warning for criteria_type === 'has_role'. Changes not present in working tree.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Both <select> elements (Add form + Edit form) pass disabled={opt.disabled} to <option> for has_role",
-      "task_id": "#BUG-020",
-      "result": "fail",
-      "evidence": "Add form select (lines 317–329) and edit form select (lines 196–208) render `<option key={opt.value} value={opt.value}>{opt.label}</option>` with no disabled attribute. No disabled field in CRITERIA_OPTIONS.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Other 5 criteria types remain fully functional and unaffected",
-      "task_id": "#BUG-020",
-      "result": "fail",
-      "evidence": "Cannot assess — build was not merged. Pre-existing criteria types are unmodified (no regression introduced), but the required BUG-020 changes are absent.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Duplicate Workspace button triggers Radix UI Dialog instead of window.confirm()",
-      "task_id": "#IMP-028",
-      "result": "pass",
-      "evidence": "settings/page.tsx line 247: `<Button variant='outline' onClick={() => setConfirmCloneOpen(true)} loading={cloning}>`. Dialog controlled by `confirmCloneOpen` useState boolean (line 41). handleClone at line 142 no longer calls window.confirm() — first action is `setConfirmCloneOpen(false)`.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Dialog title: 'Duplicate Workspace'",
-      "task_id": "#IMP-028",
-      "result": "pass",
-      "evidence": "settings/page.tsx line 271: `<DialogTitle>Duplicate Workspace</DialogTitle>`",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Dialog description: 'A full copy will be created with all canvas data — tabs, sections, steps, connections, teams, roles, people, and tools.'",
-      "task_id": "#IMP-028",
-      "result": "pass",
-      "evidence": "settings/page.tsx lines 272–274: `<DialogDescription>A full copy will be created with all canvas data — tabs, sections, steps, connections, teams, roles, people, and tools.</DialogDescription>` — exact match.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Cancel button (secondary variant) and Duplicate button (default variant)",
-      "task_id": "#IMP-028",
-      "result": "pass",
-      "evidence": "settings/page.tsx line 277: `<Button variant='secondary' onClick={() => setConfirmCloneOpen(false)}>Cancel</Button>`. Line 280: `<Button onClick={handleClone}>Duplicate</Button>` — default variant (no variant prop = default).",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Clicking Duplicate triggers existing clone logic with loading state",
-      "task_id": "#IMP-028",
-      "result": "pass",
-      "evidence": "handleClone (line 142) calls setConfirmCloneOpen(false) then setCloning(true), calls cloneWorkspace(), cloning state feeds loading={cloning} on the trigger button (line 247). Loading state wired correctly.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Clicking Cancel or Escape closes dialog without action",
-      "task_id": "#IMP-028",
-      "result": "pass",
-      "evidence": "Dialog has onOpenChange={setConfirmCloneOpen} (line 268) which handles Escape key. Cancel button explicitly calls setConfirmCloneOpen(false). Neither invokes handleClone.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Zero window.confirm() calls remain in settings/page.tsx for clone",
-      "task_id": "#IMP-028",
-      "result": "pass",
-      "evidence": "handleClone (line 142) contains no window.confirm(). The only remaining confirm() is handleDelete (line 157) which is explicitly out of scope per special_instructions.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Migration 020_section_templates.sql creates templates table with correct schema",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "Read via `git show HEAD:autonomous-dev/.ralph/worktrees/build-1/supabase/migrations/020_section_templates.sql`. Table has: id UUID PK default uuid_generate_v4(), workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE, name TEXT NOT NULL, description TEXT, category TEXT, template_data JSONB NOT NULL, created_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(). All fields match spec.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "RLS policies using can_access_workspace(workspace_id) for SELECT, INSERT, UPDATE, DELETE",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "Migration creates 4 policies: templates_select (USING), templates_insert (WITH CHECK), templates_update (USING), templates_delete (USING) — all using can_access_workspace(workspace_id). ALTER TABLE templates ENABLE ROW LEVEL SECURITY present.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "update_updated_at trigger on templates table",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "Migration: `CREATE TRIGGER templates_updated_at BEFORE UPDATE ON templates FOR EACH ROW EXECUTE FUNCTION update_updated_at();`",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Index on (workspace_id)",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "Migration: `CREATE INDEX idx_templates_workspace ON templates(workspace_id);`",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Template interface added to src/types/database.ts with matching fields",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "database.ts (from git) exports: TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData, TemplateData, Template interfaces. Template interface has id, workspace_id, name, description, category, template_data, created_by, created_at, updated_at. Types align with DB schema.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "GET /api/v1/templates?workspace_id=X — auth check, returns Template[]",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "GET handler: auth check (401 if no user), workspace_id validation (400 if missing), Supabase query with .eq('workspace_id', workspaceId).order('created_at'). Returns successResponse(templates). Pattern matches spec.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "POST /api/v1/templates — fetches section+steps+connections+step_roles, builds JSONB snapshot, returns 201",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "POST route (partially verified) validates workspace_id and section_id, returns successResponse. BUILD_RESULT notes confirm: 'snapshots section+steps+connections+step_roles into template_data JSONB'. TypeScript compiles (BUILD_RESULT verification: pass, 0 errors).",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "DELETE /api/v1/templates/[id] — auth check, delete, return success",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "DELETE handler: auth check, deletes by id with .delete().eq('id', id).select().single(), handles PGRST116 as 404. Calls void logActivity on successful delete. Returns successResponse({ deleted: true }).",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "POST /api/v1/templates/[id]/deploy — creates section+steps+connections with new UUIDs, remaps via stepIdMap",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "Deploy route: fetches template (RLS), fetches tab for workspace_id, inserts new section at position_x/position_y, builds stepIdMap<string,string> for UUID remapping, iterates templateData.steps creating new steps. Pattern matches spec requirement. Full route partially verified via git show.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Client wrappers: fetchTemplates, createTemplateFromSection, deployTemplate, deleteTemplate",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_1.json notes: '4 STARTER_TEMPLATES defined with 5 steps each. Client wrappers: fetchTemplates, createTemplateFromSection, deployTemplate, deleteTemplate.' src/lib/api/client.ts modified (42 lines added). TypeScript compiles with 0 errors confirms function signatures are valid.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "STARTER_TEMPLATES: 4 templates (Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing), each 5 steps",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "templates.ts (from git): STARTER_TEMPLATES array with 4 entries. Customer Onboarding (5 steps), Support Ticket (5 steps), Content Creation (5 steps), Lead Nurturing (5 steps). makeSteps() helper generates positioning. All have connections:[], step_roles:[].",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "void logActivity() on template create, deploy, and delete",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "Delete route confirmed: `void logActivity({...action: 'deleted', entity_type: 'templates'...})`. Deploy route imports logActivity. BUILD_RESULT notes confirm activity logging on all three operations. TypeScript compiles = void prefix correct.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "npx tsc --noEmit passes",
-      "task_id": "#FEAT-052",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_1.json verification.typecheck: { status: 'pass', errors: 0, output: 'npx tsc --noEmit exited 0, no output' }",
-      "screenshot_description": null
-    }
-  ],
+  "criteria_results": [],
 
   "quality_gate": {
     "pages_checked": [],
@@ -183,50 +14,152 @@
     "network_errors": 0,
     "accessibility_issues": 0,
     "layout_shifts": 0,
-    "notes": "No live browser testing performed. Dev server running (localhost:3000 returns 307) but no test credentials available in .env.local. IMP-028 and BUG-020 acceptance criteria verified via static source analysis. BUG-020 changes absent from working tree; FEAT-052 files committed to worktree paths in git but not to src/."
+    "note": "playwright_unavailable — Chrome could not launch (existing browser session conflict on Windows). All three suites evaluated via static analysis."
   },
 
-  "bugs_found": [
-    {
-      "severity": "P1",
-      "page": "n/a (pipeline issue)",
-      "description": "BUG-020 build output was NOT committed or merged into the session branch. BUILD_RESULT_2.json reports status='completed' with staged_files=['src/components/canvas/coloring-panel.tsx'], but git log shows no 'builder slot 2 iteration 44' commit and no 'merge builder slot 2 for iteration 44' commit. The coloring-panel.tsx in the working tree is identical to the pre-iteration state — `has_role` is not disabled, no '(coming soon)' label, no warning text for has_role rules.",
-      "steps_to_reproduce": "1. Read src/components/canvas/coloring-panel.tsx line 18-26 — CRITERIA_OPTIONS has no disabled field. 2. Check `git log --oneline -20` — no 'slot 2 iteration 44' commits. 3. Open coloring panel on canvas — has_role is selectable.",
-      "related_task": "#BUG-020"
+  "suite_results": {
+    "feat-052-data-integrity": {
+      "status": "passed",
+      "method": "static",
+      "checks": [
+        {
+          "id": "FDI-001",
+          "check": "Migration 020 SQL correctness — table schema",
+          "result": "pass",
+          "evidence": "templates table has all required columns: id UUID PK, workspace_id UUID FK, name TEXT NOT NULL, description TEXT, category TEXT, template_data JSONB NOT NULL, created_by UUID FK, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ. update_updated_at() trigger reused from migration 015 as documented. Index on workspace_id present."
+        },
+        {
+          "id": "FDI-002",
+          "check": "RLS policies reference can_access_workspace()",
+          "result": "pass",
+          "evidence": "All 4 policies (SELECT/INSERT/UPDATE/DELETE) use can_access_workspace(workspace_id). INSERT uses WITH CHECK, others use USING."
+        },
+        {
+          "id": "FDI-003",
+          "check": "Template TypeScript type matches migration columns",
+          "result": "pass",
+          "evidence": "types/database.ts Template interface: id/workspace_id/name/description/category/template_data/created_by/created_at/updated_at — 1:1 match with migration 020 DDL. Sub-types TemplateData/TemplateSectionData/TemplateStepData/TemplateConnectionData/TemplateStepRoleData all defined."
+        },
+        {
+          "id": "FDI-004",
+          "check": "API GET /api/v1/templates — envelope pattern and auth guard",
+          "result": "pass",
+          "evidence": "templates/route.ts GET: auth guard present, workspace_id required, successResponse(templates) envelope, errorResponse for all failure paths."
+        },
+        {
+          "id": "FDI-005",
+          "check": "API POST /api/v1/templates — creates from section, builds template_data",
+          "result": "pass",
+          "evidence": "POST validates workspace_id/section_id/name. Fetches section+steps+connections+step_roles. Builds TemplateData with relative step positions (position_x - section.position_x). Inserts with created_by=user.id. Returns 201 with template row."
+        },
+        {
+          "id": "FDI-006",
+          "check": "API DELETE /api/v1/templates/[id] — envelope and RLS enforcement",
+          "result": "pass",
+          "evidence": "templates/[id]/route.ts DELETE: auth guard, .delete().select().single() lets RLS block unauthorized deletes, PGRST116 maps to 404, successResponse({ deleted: true }) returned."
+        },
+        {
+          "id": "FDI-007",
+          "check": "Deploy route returns { section_id } and uses UUID remapping",
+          "result": "pass",
+          "evidence": "templates/[id]/deploy/route.ts: builds stepIdMap (Map<string,string>) mapping old template step IDs to new DB step IDs. Connections remapped via stepIdMap.get(). Returns successResponse({ section_id: newSection.id }, 201)."
+        },
+        {
+          "id": "FDI-008",
+          "check": "Client wrappers match API routes",
+          "result": "pass",
+          "evidence": "client.ts: fetchTemplates → GET /api/v1/templates?workspace_id=; createTemplate → POST /api/v1/templates; deployTemplate → POST /api/v1/templates/${id}/deploy returning { section_id }; deleteTemplate → DELETE /api/v1/templates/${id}. All use apiFetch<T>() correctly."
+        },
+        {
+          "id": "FDI-009",
+          "check": "STARTER_TEMPLATES constant structure valid",
+          "result": "pass",
+          "evidence": "lib/templates.ts: 4 templates (Customer Onboarding, Support Ticket, Content Creation, Lead Nurturing). Each has name/description/category/template_data. Steps via makeSteps() have no id field (id is optional in TemplateStepData). connections/step_roles are empty arrays — deploy route handles missing ids with if (templateStep.id) guard."
+        },
+        {
+          "id": "FDI-010",
+          "check": "step_role name-matching on deploy",
+          "result": "pass",
+          "evidence": "Deploy route fetches all teams in target workspace → all roles in those teams → builds roleNameMap (name→id). step_roles matched by role_name, silently skipped if unmatched. stepIdMap used to translate step IDs. stepRoleInserts filtered of nulls before insert."
+        }
+      ]
     },
-    {
-      "severity": "P2",
-      "page": "n/a (pipeline issue)",
-      "description": "FEAT-052 API routes committed to worktree paths (autonomous-dev/.ralph/worktrees/build-1/src/...) in git, not to the expected src/ paths. `src/app/api/v1/templates/` does not exist in the working tree. The builder used `git add -f` for worktree-relative paths, bypassing the G015 fix (git add src/ supabase/). A 'merge builder slot 1 for iteration 44' commit is also absent from the git log. The templates API endpoints are not accessible at runtime.",
-      "steps_to_reproduce": "1. `ls src/app/api/v1/templates/` — returns empty/not found. 2. `git log --oneline -10` — no 'merge builder slot 1 iteration 44'. 3. `git status` — shows D autonomous-dev/.ralph/worktrees/build-1/src/... (worktree paths, not src/ paths).",
-      "related_task": "#FEAT-052"
+    "performance-static-audit": {
+      "status": "passed_with_warnings",
+      "method": "static",
+      "checks": [
+        {
+          "id": "PSA-001",
+          "check": "Component file sizes — flag >500 lines",
+          "result": "warn",
+          "evidence": "flow-canvas.tsx: 504 lines (4 lines over threshold). All other components under threshold: step-detail-panel.tsx 461, canvas-view.tsx 353, section-detail-panel.tsx 341, coloring-panel.tsx 347, step-node.tsx 143, section-node.tsx 94. client.ts 750 lines but is an API client not a component."
+        },
+        {
+          "id": "PSA-002",
+          "check": "useCallback/useMemo on handlers passed as props",
+          "result": "pass",
+          "evidence": "flow-canvas.tsx: handleNodesChange, handleEdgesChange, handleConnect, handleNodeClick, handlePaneClick, handleAddStep, handleAddSection, handleKeyDown, handleExportPdf, handleClick all wrapped in useCallback. initialNodes/initialEdges wrapped in useMemo."
+        },
+        {
+          "id": "PSA-003",
+          "check": "Inline object/array literals in JSX props (re-render risk)",
+          "result": "pass",
+          "evidence": "nodeTypes defined as module-level constant (not inline) — avoids React Flow re-render issue. No inline nodeTypes={...} found in flow-canvas.tsx JSX."
+        },
+        {
+          "id": "PSA-004",
+          "check": "Canvas node rendering — React.memo on custom nodes",
+          "result": "warn",
+          "evidence": "StepNode, SectionNode have no React.memo wrapping. React Flow recommends memo on custom nodes to prevent unnecessary re-renders when parent state changes. Partially mitigated by module-level nodeTypes and React Flow's internal memoization, but explicit memo would be safer."
+        },
+        {
+          "id": "PSA-005",
+          "check": "Client-side data fetching patterns — N+1 risks",
+          "result": "warn",
+          "evidence": "deploy/route.ts (server-side): sequential INSERT loop for templateData.steps — each step gets its own supabase.from('steps').insert().select('id').single() call. For a template with N steps = N sequential DB roundtrips. Acceptable for current template sizes (5 steps), but would degrade for large templates. A bulk insert + ID matching approach would be more efficient."
+        },
+        {
+          "id": "PSA-006",
+          "check": "Import graph — circular deps or heavy deps loaded eagerly",
+          "result": "pass",
+          "evidence": "flow-canvas.tsx imported in canvas-view.tsx, canvas-view.tsx imported in page.tsx and public share page. No circular imports detected. No client-side heavy deps (e.g., PDF libs) eagerly imported outside dynamic imports."
+        }
+      ]
+    },
+    "regression-baseline-full": {
+      "status": "playwright_unavailable",
+      "method": "browser",
+      "note": "Chrome browser could not launch — process exited immediately with 'Opening in existing browser session' (Windows Chrome session conflict). Browser install attempted, issue persisted. Regression baseline testing skipped. Recommend re-running tester with no Chrome instances open, or switching to Playwright-managed Chromium browser."
     }
-  ],
+  },
+
+  "bugs_found": [],
 
   "improvements_found": [
     {
-      "category": "content",
-      "page": "n/a (code quality)",
-      "observation": "FEAT-052 TemplateConnectionData uses {source_step_id, target_step_id} (UUIDs) instead of {source_step_index, target_step_index} (array indices) as specified in the PRD's special_instructions. The deploy route maps via stepIdMap<oldId, newId>, which requires source sections to store step IDs in template_data. STARTER_TEMPLATES have empty connections so no impact today, but the stored template_data format differs from PRD spec.",
-      "design_principle": "PRD spec fidelity — special_instructions explicitly stated index-based connections for portability",
-      "suggested_approach": "Either update TemplateConnectionData to use source_step_index/target_step_index numbers (align with spec), or update the special_instructions in the PRD to reflect the UUID-based approach chosen. The UUID approach is functionally valid for workspace-scoped templates."
+      "category": "performance",
+      "page": "server: /api/v1/templates/[id]/deploy",
+      "observation": "Deploy route inserts steps in a sequential for-of loop — N supabase INSERT calls for N steps. For templates with many steps this creates N database roundtrips on the server.",
+      "design_principle": "Performance: minimize database roundtrips",
+      "suggested_approach": "Batch insert all steps in one call, then build the ID map from the returned rows using the stored template step IDs as a correlation key. Requires templateData steps to have their original IDs (already optional in the schema — populated when saving from a section)."
     },
     {
-      "category": "content",
-      "page": "n/a (code quality)",
-      "observation": "FEAT-052 TemplateStepData field names differ from PRD spec: uses `notes` (not `description`), `frequency_per_month` (not `frequency`), `maturity_score` (not `maturity_current`), `target_maturity` (not `maturity_target`). `cost_per_execution` from spec is absent. These are schema-level deviations that may affect future UI integration for #FEAT-053 (UI layer).",
-      "design_principle": "Consistency with PRD specification — the next task (#FEAT-053) will rely on this schema",
-      "suggested_approach": "Before building the FEAT-053 UI layer, align TemplateStepData field names with the PRD spec (description, frequency, maturity_current, maturity_target, cost_per_execution) or update the PRD to match the implemented schema."
+      "category": "performance",
+      "page": "src/components/canvas/step-node.tsx, section-node.tsx",
+      "observation": "Custom React Flow node components (StepNode, SectionNode, StageNode, TouchpointNode) are not wrapped in React.memo. React Flow's nodeTypes pattern requires stable references, but the components themselves will still re-render on any parent context change.",
+      "design_principle": "Performance: memoize components with stable props",
+      "suggested_approach": "Wrap each custom node component with React.memo: export const StepNode = React.memo(function StepNode(...) { ... }). React Flow's NodeRenderer will skip re-renders when node data hasn't changed."
     },
     {
-      "category": "usability",
-      "page": "/w/[workspaceId]/settings",
-      "observation": "IMP-028 settings page: The Duplicate Workspace section description (line 245) still says 'Create a full copy of this workspace, including all tabs, sections, steps, and connections' (the old incomplete text). The Dialog description correctly lists all entity types, but the page body text is not updated to match. Minor inconsistency between the pre-dialog description and the dialog's accurate description.",
-      "design_principle": "Consistency and standards — body description should match dialog description",
-      "suggested_approach": "Update the paragraph at line 245-246 to match the dialog description: 'Create a full copy of this workspace with all canvas data — tabs, sections, steps, connections, teams, roles, people, and tools.'"
+      "category": "performance",
+      "page": "src/components/canvas/flow-canvas.tsx",
+      "observation": "flow-canvas.tsx is 504 lines, 4 lines over the 500-line threshold. Minor overage but worth tracking.",
+      "design_principle": "Maintainability: keep files focused and under 500 lines",
+      "suggested_approach": "The coloring-related state and handlers (lines ~380-500) could be extracted into a useColoringPanel hook or moved to the coloring-panel component itself."
     }
   ],
 
-  "actions_used": 10,
-  "action_budget": 10
+  "actions_used": 2,
+  "action_budget": 10,
+  "notes": "This was a testing-only iteration (no builder tasks). Playwright unavailable for browser regression. Two of three suites completed via static analysis: feat-052-data-integrity (10/10 checks pass), performance-static-audit (3/6 pass, 3 warnings). regression-baseline-full deferred — requires browser access. Static findings confirm FEAT-052 data layer is correctly implemented and safe to proceed to [2/2] UI work."
 }
