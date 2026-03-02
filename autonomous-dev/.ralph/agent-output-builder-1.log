@@ -1,0 +1,9 @@
+Done. Here's a summary of what was implemented:
+
+**BUG-019 (1-line fix in `page.tsx`):**
+- Line 25: Changed `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")` so the server-side initial load query joins the users table exactly the same way `route.ts` does. This populates `entry.users?.email` so the already-correct `activity-view.tsx` line 171 renders the email instead of `"Unknown"`.
+
+**IMP-018 (empty state guidance in `activity-view.tsx`):**
+- Added a guidance `<p>` below "No activity yet" (shown only when `activeFilter === "all"`) with the text: *"Actions like creating steps, adding comments, and completing runbooks appear here."*
+
+Both type-check (`npx tsc --noEmit`) and lint (`npm run lint`) pass with 0 errors.

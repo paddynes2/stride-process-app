@@ -1,0 +1,16 @@
+Done. Here's a summary of what was implemented for **#FEAT-050**:
+
+**Files created/modified:**
+
+1. **`supabase/migrations/018_clone_workspace.sql`** — `clone_workspace(p_source_workspace_id UUID)` SECURITY DEFINER function that:
+   - Authenticates via `auth.uid()` and verifies org membership manually (bypassed RLS needs manual check)
+   - Creates 7 `ON COMMIT DROP` temp tables for UUID remapping
+   - Clones 13 table types in FK dependency order: workspace → tabs → sections → steps → connections → teams → roles → people → tools → step_roles → stages → touchpoints → touchpoint_connections
+   - Includes `maturity_score`/`target_maturity` on steps (migration 007 fields)
+   - Returns `jsonb_build_object('workspace_id', v_new_ws_id)`
+
+2. **`src/app/api/v1/workspaces/[id]/clone/route.ts`** — POST handler that authenticates, calls the RPC, fetches the new workspace, logs activity (`action: "created"`, `details: { cloned_from: id }`), returns the workspace via `successResponse`.
+
+3. **`src/lib/api/client.ts`** — Added `cloneWorkspace(id: string): Promise<Workspace>` following existing `apiFetch<Workspace>` pattern.
+
+**Verification:** TypeCheck PASS (0 errors), Lint PASS (0 errors, 1 pre-existing warning). All 3 files staged individually.

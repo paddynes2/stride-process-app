@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "iteration": 91,
+  "date": "2026-03-03T05:00:00Z",
+  "mode": "testing_only",
+  "validation": {
+    "last_commit_hash": "68143845b18ff8a58b2303ccdecc58193b6ecccb",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json"],
+    "owner": null,
+    "note": "Testing-only iteration — no source code modifications"
+  },
+  "merge_order": [],
+  "testing_plan": {
+    "run_acceptance": true,
+    "run_regression": true,
+    "regression_reason": "Risk score 4 from iteration 90 (40 API route files touched with logActivity integration). Last 3 iterations (88-90) were build-only with no testing. SIGNAL directive: FEAT-049 acceptance + regression.",
+    "suites_to_run": [
+      {
+        "suite": "acceptance",
+        "target": "#FEAT-049",
+        "description": "Activity log — full acceptance testing",
+        "checks": [
+          "Migration 017 schema: activity_log table with correct columns (id, workspace_id, user_id, action enum, entity_type, entity_id, entity_name, details JSONB, created_at)",
+          "activity_action enum includes: created, updated, deleted, completed, assigned, commented, exported, shared",
+          "RLS policies: SELECT + INSERT only via can_access_workspace(), no UPDATE/DELETE",
+          "Index on (workspace_id, created_at DESC) for efficient pagination",
+          "ActivityLog type in database.ts matches migration schema",
+          "API route GET /api/v1/activity: workspace_id required, supports user_id/action/entity_type/from/to/limit/offset filters",
+          "API route returns paginated results with correct envelope format",
+          "logActivity() utility in lib/api/activity.ts: fire-and-forget pattern (no await, catches errors silently)",
+          "logActivity() accepts workspace_id, user_id, action, entity_type, entity_id, entity_name, optional details",
+          "Activity page UI at /w/[workspaceId]/activity: page.tsx server component + activity-view.tsx client component",
+          "Activity view: chronological feed with action type filter tabs",
+          "Activity view: entity links, relative timestamps, Load More pagination",
+          "Sidebar nav includes Activity item with correct icon and path",
+          "workspace-shell.tsx reserved paths includes 'activity'",
+          "logActivity() integrated in POST handlers (spot-check: workspaces, steps, sections, connections, comments, tasks, runbooks)",
+          "logActivity() integrated in PATCH handlers (spot-check: workspaces, steps, sections, runbooks, runbook-steps)",
+          "logActivity() integrated in DELETE handlers (spot-check: workspaces, steps, sections, connections, comments, tasks)",
+          "Special actions: comments POST uses 'commented', runbooks PATCH to completed uses 'completed', shares POST uses 'shared'",
+          "Entities without direct workspace_id (roles, people, step-roles, annotations, runbook-steps) use async IIFE for parent chain traversal",
+          "Client wrapper fetchActivityLog() in lib/api/client.ts with correct typing"
+        ]
+      },
+      {
+        "suite": "regression",
+        "target": "baseline",
+        "description": "Full regression — all phases through Phase 4 FEAT-049",
+        "checks": [
+          "/login renders (200)",
+          "/workspaces redirects unauthed (307→login)",
+          "Canvas tab loads with nodes (static analysis)",
+          "Step detail panel opens on node click",
+          "Journey canvas renders with stages/touchpoints",
+          "Gap analysis view renders",
+          "Comparison view renders",
+          "Dashboard page renders",
+          "Teams/People/Tools pages render with search/filter",
+          "Comments system: panel, badges, workspace view, category filter",
+          "Tasks system: panel, badges, section rollup",
+          "Runbooks: list view, detail view, 4-state step status, Complete/Cancel dialogs",
+          "Playbook mode: step-by-step execution, Skip button, progress bar, dot navigation",
+          "Activity page: renders with filter tabs and pagination",
+          "Type check passes (npx tsc --noEmit)",
+          "Lint passes (npm run lint)",
+          "No new TypeScript errors introduced",
+          "API auth guards return 401 for unauthenticated requests"
+        ]
+      }
+    ],
+    "cadence_trigger": "risk_score_override"
+  },
+  "status_updates": {
+    "warnings_added": [
+      "Accessibility cadence severely overdue — last audit iteration 21, now iteration 91 (70 iterations). Schedule accessibility audit for iteration 92 or 93."
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

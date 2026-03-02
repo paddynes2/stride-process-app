@@ -1,0 +1,11 @@
+Done. Here's a summary:
+
+**Task #BUG-019 + IMP-018 — completed**
+
+**Changes made:**
+
+1. `page.tsx` (line 25): `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")` — SSR query now joins the users table via the FK constraint, matching the API route exactly. Initial page load entries will show email instead of "Unknown".
+
+2. `activity-view.tsx` (lines 138–148): Added guidance paragraph after "No activity yet" — only rendered when `activeFilter === "all"`, not for filtered empty states.
+
+**Verification:** TypeScript — 0 errors. ESLint — 0 errors (1 pre-existing warning in unrelated file). Both files staged.

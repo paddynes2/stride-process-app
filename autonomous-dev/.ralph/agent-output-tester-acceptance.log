@@ -1,0 +1,23 @@
+**TEST_RESULT_1.json written.** Here's the summary:
+
+---
+
+## Iteration 92 — Acceptance Test Results: **FAILED**
+
+### #FEAT-050 — Workspace Cloning Data Layer: ✅ PASS (7/7 criteria)
+
+All acceptance criteria verified by static analysis:
+- Migration `018_clone_workspace.sql` — SECURITY DEFINER function, clones 13 table types in dependency order using temp tables for UUID mapping
+- Tables excluded (perspectives, annotations, comments, tasks, runbooks, activity_log) confirmed
+- Returns `jsonb_build_object('workspace_id', v_new_ws_id)` correctly
+- API route at correct path — calls RPC, fetches new workspace, logs activity with `cloned_from` detail
+- `cloneWorkspace()` client wrapper confirmed in `client.ts`
+- TypeScript passes
+
+### #BUG-019 — Activity Page User Display: ❌ FAIL (2/6 criteria)
+
+**Root cause:** Builder used Supabase join pattern (`entry.users?.email`) in `activity-view.tsx` but did **not** update `page.tsx` query from `select("*")` to `select("*, users(email)")`. At runtime `entry.users` is always `undefined`. Every entry displays **"Unknown"** — a regression from the original UUID prefix behavior.
+
+Additionally: the `userMap` prop approach specified in acceptance criteria was not implemented at all (no `userMap` in `ActivityViewProps`, no separate users query in `page.tsx`).
+
+**P1 Bug filed.** Iteration 92 status = FAILED. BUG-019 needs a rework.

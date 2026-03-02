@@ -1,0 +1,44 @@
+`TEST_RESULT_2.json` written. Here's the summary:
+
+---
+
+## Regression Test — Iteration 91 — FAILED
+
+**Environment note:** Local dev was running a different app ("Kernel"). All testing done against production at `stride-five-sigma.vercel.app`.
+
+### Pass/Fail breakdown (22 checks)
+
+| Result | Count |
+|--------|-------|
+| PASS | 13 |
+| FAIL | 9 |
+
+### What passed
+- Auth redirect (login → workspaces when auth'd)
+- API auth guard returns 401 with correct envelope
+- Canvas loads with nodes
+- Step detail panel opens + name edit saves
+- Section detail panel opens
+- Canvas zoom works
+- Step list view (`/list`) renders with data
+- Settings page loads
+- Teams stub renders without errors
+- 0 console errors across full session
+- TypeScript + lint clean (from BUILD_RESULT)
+
+### What failed (8 bugs filed)
+
+**P1 — Feature missing from production deployment (deployment gap, not code regression):**
+- `/activity` → renders canvas (FEAT-049 activity log not deployed)
+- `/runbooks` → renders canvas
+- `/gap-analysis` → renders canvas
+- `/compare` → renders canvas
+- Sidebar nav missing: Activity, Runbooks, Comments, Dashboard, Gap Analysis, Compare
+
+**P2 — Functionality absent in production:**
+- Settings page has no Perspectives section
+- Export (PDF/PNG) button absent from canvas UI
+- No way to create a journey canvas tab type
+
+### Root cause
+Production is running a Phase 1-2 build. Phase 3-4 features (FEAT-049 and friends) only exist on `ralph/init-stride` — not merged to `main`, not deployed. The `[tabId]` dynamic route catches all unrecognized paths and renders the canvas fallback. A production deploy of the branch is required before these checks can pass.

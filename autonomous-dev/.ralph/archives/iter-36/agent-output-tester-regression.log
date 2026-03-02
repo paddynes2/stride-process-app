@@ -1,0 +1,30 @@
+**TEST_RESULT_2.json written.** Here's a summary of the regression test results for iteration 91:
+
+## Regression Suite — PASSED ✓
+
+**23/23 checks passed.** All static analysis and browser-based regression checks passed.
+
+### Browser Checks (Playwright)
+- `/login` renders correctly on production — page title confirmed, 0 console errors
+- `/workspaces` redirects unauthenticated users to `/login` ✓
+
+### Static Analysis Checks (22 checks)
+All core architectural components verified intact after the logActivity integration across 40 API routes:
+- Canvas views, journey canvas, step/section selection → detail panels ✓
+- All named sub-views (list, gap-analysis, compare, dashboard) ✓
+- Teams/People/Tools with search+filter ✓
+- Comments with category filter + entity nav links ✓
+- Tasks with TaskCountsContext rollup in section-detail-panel ✓
+- Runbooks 4-state + dialogs + progress bar + section button ✓
+- Playbook overlay z-50, Mark Complete, Skip, dots, progress bar, read-only Playbook button ✓
+- Sidebar includes Activity nav item ✓
+- workspace-shell reserved paths includes `activity` ✓
+- API auth guards (401 + 405) ✓
+- **0 TypeScript errors** (`npx tsc --noEmit` clean) ✓
+- **0 ESLint errors** (1 pre-existing warning, non-blocking) ✓
+
+### Improvements Found (no bugs)
+3 UX observations logged (no bugs):
+1. Activity author shows truncated UUID instead of display name
+2. Playbook dot navigation has no step-name tooltips
+3. Activity entry sentence grammar is awkward (`created steps "Name"`)

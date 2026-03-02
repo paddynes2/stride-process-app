@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -673,4 +673,40 @@ export async function fetchActivityLog(workspaceId: string, filters?: {
   if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
   if (filters?.offset !== undefined) params.set("offset", String(filters.offset));
   return apiFetch<ActivityLog[]>(`/api/v1/activity?${params}`);
+}
+
+// ---------------------------------------------------------------------------
+// Coloring Rules
+// ---------------------------------------------------------------------------
+
+export async function fetchColoringRules(workspaceId: string): Promise<ColoringRule[]> {
+  return apiFetch<ColoringRule[]>(`/api/v1/coloring-rules?workspace_id=${workspaceId}`);
+}
+
+export async function createColoringRule(data: {
+  workspace_id: string;
+  name: string;
+  color: string;
+  criteria_type: CriteriaType;
+  criteria_value: string;
+  is_active?: boolean;
+  position?: number;
+}): Promise<ColoringRule> {
+  return apiFetch<ColoringRule>("/api/v1/coloring-rules", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateColoringRule(id: string, data: Partial<Pick<ColoringRule, "name" | "color" | "criteria_type" | "criteria_value" | "is_active" | "position">>): Promise<ColoringRule> {
+  return apiFetch<ColoringRule>(`/api/v1/coloring-rules/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteColoringRule(id: string): Promise<void> {
+  await apiFetch(`/api/v1/coloring-rules/${id}`, { method: "DELETE" });
 }

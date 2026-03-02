@@ -1,0 +1,27 @@
+## Planner Output — Iteration 93
+
+**Mode:** `multi_task` (2 independent tasks)
+
+**Validation:** Codebase compiles clean (0 tsc errors). Last commit `e7500c7` is valid.
+
+### Slot 1: #FEAT-050 [2/2] — Workspace Cloning UI
+- **Complexity:** S
+- **Files:** `settings/page.tsx`, `client.ts`
+- Add `cloneWorkspace()` client wrapper (missing from iter 92 cherry-pick recovery)
+- "Duplicate Workspace" button in settings between Perspectives and Danger Zone
+- Loading spinner, confirm dialog, redirect to cloned workspace, toast messages
+- Follows `handleDelete` pattern already in the settings page
+
+### Slot 2: #BUG-018 — Void keyword on logActivity() calls
+- **Complexity:** M (18 route files, mechanical)
+- Add `void` prefix to ~36 bare `logActivity()` calls across API routes
+- Do NOT touch `await logActivity()` calls (those are intentional)
+- Zero behavioral change, prevents future `@typescript-eslint/no-floating-promises` warnings
+
+**Merge order:** BUG-018 first (no overlap with FEAT-050 files)
+
+**Key finding:** `cloneWorkspace` client wrapper is **missing** from `client.ts` despite STATUS.md claiming it was added in iter 92. The cherry-pick recovery was incomplete. Slot 1 builder must add it.
+
+**Testing:** No testing this iteration. Last regression was iter 91 (57/57 PASS, 2 iters ago). FEAT-050 acceptance deferred to next testing-only iteration.
+
+`knowledge/handoffs/EXECUTION_PLAN.json` written. STATUS.md warning added.

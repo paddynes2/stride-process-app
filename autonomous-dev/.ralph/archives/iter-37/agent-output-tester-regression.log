@@ -1,0 +1,44 @@
+`TEST_RESULT_2.json` written. Here's the summary:
+
+---
+
+## Regression Test — Iteration 91 Summary
+
+**Status:** `playwright_unavailable` — Chrome opened in existing session and exited. Full static analysis used as rigor substitute.
+
+---
+
+### Static Analysis Results
+
+**TypeScript:** `npx tsc --noEmit` → 0 errors  
+**Lint:** `npm run lint` → 0 errors, 1 pre-existing warning (known)
+
+**FEAT-049 (Activity Log) — 20 checks:** All 20 pass
+- Migration 017 schema, RLS policies, enum, index — all verified against SQL
+- API route `/api/v1/activity`: all filters, auth guard, pagination — verified
+- `logActivity()` utility: fire-and-forget pattern, all 39 API route integrations confirmed
+- Activity page UI: server/client split, filter tabs, entity links, Load More — verified
+- Sidebar Activity nav item, workspace-shell reserved paths — verified
+- `fetchActivityLog()` client wrapper — verified
+
+**Regression Baseline — 17 checks:** All 17 pass
+- All page files exist (canvas, journey, gap-analysis, compare, dashboard, teams, people, tools, runbooks, activity, settings)
+- Runbook 4-state step status (pending/in_progress/completed/skipped) + Complete/Cancel dialogs — confirmed
+- Playbook mode: skip button, progress bar, dot navigation — confirmed
+- API auth guards return 401 — confirmed across workspaces/steps/activity routes
+
+---
+
+### Bugs Found (2)
+
+| Severity | Location | Issue |
+|----------|----------|-------|
+| P2 | Multiple API routes | `logActivity()` called without `void` keyword in several routes (steps, connections, workspaces). Inconsistent vs `void logActivity()` used in others. Latent floating-promise issue when no-floating-promises lint rule is enabled. |
+| P2 | Activity view | Author displayed as `user_id.slice(0,8)` — UUID fragment not user name. Activity log rows don't join the `users` table for display names. |
+
+### Improvements Found (5)
+- Entity type labels should be human-readable (not raw DB table names)
+- Load More needs skeleton placeholders during fetch
+- Filter tab row needs right-side fade gradient to indicate scrollability
+- Author identifier style could use a person icon prefix
+- Consider `actor_type: 'user' | 'system'` for future audit traceability

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "iteration": 92,
+  "slot": 2,
+  "task_id": "#BUG-019",
+  "status": "completed",
+  "duration_seconds": 120,
+
+  "files_changed": [
+    {
+      "path": "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+      "action": "modified",
+      "lines_added": 10,
+      "lines_removed": 2
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 2
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known, documented in LEARNINGS.md)" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
+    "src/app/(app)/w/[workspaceId]/activity/page.tsx"
+  ],
+  "ownership_violations": [],
+  "notes": "Users table has 'name' column (not 'full_name'). page.tsx maps name→full_name in userMap to match acceptance criteria. RLS policy 'users_select_own' (id = auth.uid()) limits results to current user's row for other-user entries; UUID prefix fallback handles those cases gracefully. Two-phase query: entries fetched first in Promise.all, then users fetched for unique user_ids.",
+
+  "failure_details": null
+}

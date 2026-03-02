@@ -321,3 +321,22 @@ export interface ActivityLog {
   created_at: string;
   users?: { email: string } | null;
 }
+
+// =============================================================================
+// Coloring Rules — workspace-scoped conditional step coloring
+// =============================================================================
+
+export type CriteriaType = "status" | "executor" | "step_type" | "has_role" | "maturity_below" | "maturity_above";
+
+export interface ColoringRule {
+  id: string;
+  workspace_id: string;
+  name: string;
+  color: string;
+  criteria_type: CriteriaType;
+  criteria_value: string;
+  is_active: boolean;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}

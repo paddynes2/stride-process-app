@@ -1,0 +1,17 @@
+Build complete. Here's the summary:
+
+## Done — #IMP-017 + #IMP-019
+
+**3 files changed, typecheck ✓, lint ✓ (0 errors)**
+
+### IMP-017: User email in activity feed
+- `src/app/api/v1/activity/route.ts`: `.select("*")` → `.select("*, users!activity_log_user_id_fkey(email)")` — joins the users table via explicit FK name
+- `src/types/database.ts`: Added `users?: { email: string } | null` to `ActivityLog` interface
+- `activity-view.tsx`: `entry.user_id.slice(0, 8)` → `entry.users?.email ?? "Unknown"`
+
+### IMP-019: Proper action sentences + badge removal
+- `activity-view.tsx`: Added `ENTITY_TYPE_SINGULAR` constant map (19 entity types: `steps→step`, `people→person`, etc.)
+- Action sentence now renders as `"Created step «Name»"` instead of `"created steps «Name»"`
+- Removed the redundant `entity_type` badge span (`text-[10px] text-quaternary`) entirely
+
+**Staged:** `src/app/api/v1/activity/route.ts`, `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`, `src/types/database.ts` — specific files only, no `git add -A`.

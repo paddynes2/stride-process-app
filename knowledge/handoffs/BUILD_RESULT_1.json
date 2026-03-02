@@ -2,25 +2,19 @@
   "schema_version": "1.0",
   "iteration": 94,
   "slot": 1,
-  "task_id": "#FEAT-050",
+  "task_id": "#BUG-019",
   "status": "completed",
-  "duration_seconds": 180,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "supabase/migrations/018_clone_workspace.sql",
-      "action": "created",
-      "lines_added": 182,
-      "lines_removed": 0
+      "path": "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+      "action": "modified",
+      "lines_added": 1,
+      "lines_removed": 1
     },
     {
-      "path": "src/app/api/v1/workspaces/[id]/clone/route.ts",
-      "action": "created",
-      "lines_added": 54,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/lib/api/client.ts",
+      "path": "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
       "action": "modified",
       "lines_added": 5,
       "lines_removed": 0
@@ -29,19 +23,18 @@
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused) — known acceptable per LEARNINGS.md" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge import, not touched)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "supabase/migrations/018_clone_workspace.sql",
-    "src/app/api/v1/workspaces/[id]/clone/route.ts",
-    "src/lib/api/client.ts"
+    "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+    "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Migration 018 creates clone_workspace(p_source_workspace_id UUID) SECURITY DEFINER function. Verifies org membership manually (since SECURITY DEFINER bypasses RLS). Clones 13 table types in FK dependency order using ON COMMIT DROP temp tables for UUID remapping. Includes maturity_score and target_maturity on steps (migration 007 fields). API route POST /api/v1/workspaces/[id]/clone calls RPC, fetches cloned workspace via SELECT (RLS allows since same org), logs activity with action=created and details.cloned_from. cloneWorkspace(id) added to client.ts following existing apiFetch<Workspace> pattern. Files staged individually with git add on specific paths — no git add -A.",
+  "notes": "BUG-019: Changed .select('*') to .select('*, users!activity_log_user_id_fkey(email)') in page.tsx — now matches route.ts select shape so initial load entries include user email (fixes 'Unknown' display). IMP-018: Added guidance paragraph 'Actions like creating steps, adding comments, and completing runbooks appear here.' below 'No activity yet' in the all-filter empty state in activity-view.tsx.",
 
   "failure_details": null
 }

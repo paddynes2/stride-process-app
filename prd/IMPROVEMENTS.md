@@ -51,13 +51,11 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`, `journey-canvas-view.tsx`
   - **Fix applied:** Replaced `{activePerspective && selected && <AnnotationPanel />}` with ternary showing empty state message ("Select a perspective to add annotations") when no perspective active. Applied to both canvas-view.tsx and journey-canvas-view.tsx for step/section and stage/touchpoint selection paths.
 
-- [ ] #IMP-007 Journey canvas keyboard shortcuts undocumented in UI — Attempts: 0
+- [x] #IMP-007 Journey canvas keyboard shortcuts undocumented in UI — Attempts: 1 — DONE iteration 94, 2026-03-03
   - **Found:** Iteration 73 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx`
-  - **What:** Keyboard shortcuts 's' (new stage) and 'n' (new touchpoint) are registered globally but not shown in the UI. Users who discover them get unexpected behavior; users who don't miss efficiency.
-  - **Why it matters:** Nielsen H7 — Flexibility and efficiency of use. Shortcuts need to be discoverable.
-  - **Suggested fix:** Add keyboard shortcut legend to journey toolbar or tooltip on buttons.
+  - **Fix applied:** Added `<kbd>` shortcut hint elements inside Touchpoint button (showing 'N') and Stage button (showing 'S') in journey canvas toolbar. Styled: text-[10px] font-mono px-1 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-tertiary)] border border-[var(--border-subtle)].
 
 - [x] #IMP-008 flow-canvas handleKeyDown useCallback has incomplete dependency array — Attempts: 1 — DONE iteration 78, 2026-03-01
   - **Found:** Iteration 75 (regression tester)
@@ -126,7 +124,7 @@
   - **What:** Filter tabs filter client-side on already-fetched entries. When Load More is used and then a filter applied, the filter only applies to loaded entries — DB may have matching entries not yet fetched.
   - **Suggested fix:** When a filter tab is activated, reset entries and re-fetch from API with the action= filter param. Ensures pagination aligns with selected filter.
 
-- [ ] #IMP-018 Activity empty state guidance text — Attempts: 0
+- [ ] #IMP-018 Activity empty state guidance text — Attempts: 1
   - **Found:** Iteration 91 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`

@@ -1,0 +1,124 @@
+{
+  "schema_version": "1.0",
+  "iteration": 94,
+  "date": "2026-03-03T15:00:00Z",
+  "mode": "multi_task",
+  "validation": {
+    "last_commit_hash": "3447891aae35b9a3a95a2f354b246dd63781457d",
+    "last_commit_valid": true,
+    "compilation_status": "passing",
+    "revert_needed": false,
+    "revert_reason": null
+  },
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#BUG-019",
+      "description": "Fix BUG-019 regression (activity page.tsx missing user join) + IMP-018 (activity empty state guidance text)",
+      "source": "prd/BUGS.md, prd/IMPROVEMENTS.md",
+      "type": "fix",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 2,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "page.tsx line 25: .select('*') changed to .select('*, users!activity_log_user_id_fkey(email)')",
+        "Initial SSR-rendered activity entries show user email instead of 'Unknown'",
+        "Load More entries continue to show user email (API route join already works)",
+        "Empty state shows guidance text when activeFilter === 'all': 'Actions like creating steps, adding comments, and completing runbooks appear here.'",
+        "Guidance text NOT shown when a specific action filter is active (filtered empty state only shows 'No {action} activity')",
+        "TypeScript compiles without errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx"
+      ],
+      "files_read_only": [
+        "src/app/api/v1/activity/route.ts",
+        "src/types/database.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/api/v1/activity/route.ts (correct join: .select('*, users!activity_log_user_id_fkey(email)'))",
+          "src/app/(app)/w/[workspaceId]/settings/page.tsx lines 326-327 (empty state guidance text pattern)"
+        ],
+        "patterns_to_follow": [
+          "Match API route's select query exactly: .select('*, users!activity_log_user_id_fkey(email)')",
+          "Empty state guidance: text-[12px] text-[var(--text-tertiary)] below existing message"
+        ],
+        "learnings_relevant": [
+          "Supabase FK join: table!fk_constraint_name(columns). The constraint is activity_log_user_id_fkey.",
+          "ActivityLog type already has users?: { email: string } | null — no type changes needed."
+        ],
+        "affected_urls": [
+          "/w/{workspaceId}/activity"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Two changes:\n\n1. **BUG-019 fix (page.tsx line 25):** Change `.select(\"*\")` to `.select(\"*, users!activity_log_user_id_fkey(email)\")`. This one-line change makes the server-side query match the API route query, so initial SSR entries include user email data.\n\n2. **IMP-018 (activity-view.tsx lines 138-145):** In the empty state section, add guidance text after the existing 'No activity yet' paragraph. The guidance should only appear for the 'all' filter (not filtered empty states). Replace the empty state paragraph block:\n\nCurrent:\n```jsx\n<p className=\"text-[13px] text-[var(--text-secondary)]\">\n  {activeFilter === \"all\"\n    ? \"No activity yet\"\n    : `No ${ACTION_LABELS[activeFilter].toLowerCase()} activity`}\n</p>\n```\n\nNew:\n```jsx\n<p className=\"text-[13px] text-[var(--text-secondary)]\">\n  {activeFilter === \"all\"\n    ? \"No activity yet\"\n    : `No ${ACTION_LABELS[activeFilter].toLowerCase()} activity`}\n</p>\n{activeFilter === \"all\" && (\n  <p className=\"text-[12px] text-[var(--text-tertiary)] mt-1\">\n    Actions like creating steps, adding comments, and completing runbooks appear here.\n  </p>\n)}\n```"
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-007",
+      "description": "Journey canvas keyboard shortcuts legend — show shortcut hints on toolbar buttons for 's' (stage) and 'n' (touchpoint)",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 2a: Journey Canvas",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Journey canvas 'Add Stage' toolbar button shows keyboard shortcut hint 'S' (visible as small text or badge)",
+        "Journey canvas 'Add Touchpoint' toolbar button shows keyboard shortcut hint 'N'",
+        "Hints are subtle: text-[10px] text-[var(--text-quaternary)] or similar low-emphasis styling",
+        "Hints render consistently with existing toolbar button sizing",
+        "TypeScript compiles without errors"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [
+          "src/components/canvas/flow-canvas.tsx (process canvas toolbar buttons for reference)"
+        ],
+        "patterns_to_follow": [
+          "Use Radix Tooltip (already in deps) wrapping toolbar buttons to show shortcut hint on hover, OR add inline <kbd> styled element next to button text",
+          "Follow existing button styling in journey-canvas-view.tsx toolbar"
+        ],
+        "learnings_relevant": [
+          "Keyboard shortcuts 's' and 'n' are registered in journey-canvas-view.tsx handleKeyDown"
+        ],
+        "affected_urls": [
+          "/w/{workspaceId}/{tabId} (journey canvas tabs)"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Find the toolbar buttons for 'Add Stage' and 'Add Touchpoint' (or equivalent) in journey-canvas-view.tsx. Add a keyboard shortcut indicator. Simplest approach: use Radix Tooltip (already installed) to wrap each toolbar button, showing 'Keyboard shortcut: S' and 'Keyboard shortcut: N' on hover. Alternatively, add a small <kbd> element with the key letter next to the button text. The <kbd> should be styled subtly: text-[10px] font-mono px-1 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-tertiary)] border border-[var(--border-subtle)]."
+    }
+  ],
+  "shared_files": {
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts"],
+    "owner": null,
+    "note": "No shared file modifications needed"
+  },
+  "merge_order": ["#BUG-019", "#IMP-007"],
+  "testing_plan": {
+    "run_acceptance": false,
+    "run_regression": false,
+    "regression_reason": "BUG-019 is a one-line query fix. IMP-007 is a cosmetic UI addition. Risk score 0. Schedule testing-only iteration 95 for: FEAT-050 full acceptance + regression + accessibility cadence (severely overdue since iter 21).",
+    "suites_to_run": [],
+    "cadence_trigger": null
+  },
+  "status_updates": {
+    "warnings_added": [
+      "BUG-019 P1 regression fix — second attempt, one-line change in page.tsx",
+      "Accessibility cadence severely overdue (72 iterations) — MUST schedule for iter 95",
+      "FEAT-050 acceptance testing needed — schedule for iter 95"
+    ],
+    "diagnoses_written": false,
+    "signal_override": null
+  }
+}

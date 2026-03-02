@@ -1,0 +1,18 @@
+---
+
+ITERATION 93 COMPLETE.
+
+**Tasks:**
+- #FEAT-050 [2/2] Duplicate Workspace UI — **completed** (settings page button with confirm/loading/navigate)
+- #BUG-018 void logActivity() cleanup — **completed** (25 calls across 18 API route files)
+- #BUG-019 fix (page.tsx user join) — **NOT DONE** (slot 2 diverged from plan — built BUG-018 instead)
+
+**Corrections applied to iteration 92:**
+- BUG-019 status reverted from "completed" to **FAILED** (4/6 acceptance criteria FAIL)
+- page.tsx still uses `select("*")` — initial page load shows "Unknown" for all users
+- PROGRESS.md, METRICS.jsonl, BUGS.md, IMPLEMENTATION-PLAN.md all corrected
+- New LEARNINGS entry: server/API query mismatch pattern
+
+**Result:** completed (iter 93 tasks), partial (BUG-019 still open from iter 92)
+
+**Next:** #BUG-019 fix (attempt 2 — change page.tsx line 25 from `select("*")` to `select("*, users!activity_log_user_id_fkey(email)")`), then #FEAT-051 conditional step coloring

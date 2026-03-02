@@ -1,0 +1,345 @@
+{
+  "schema_version": "1.0",
+  "iteration": 91,
+  "test_type": "regression",
+  "suite_name": "regression-baseline",
+  "status": "playwright_unavailable",
+  "duration_seconds": 180,
+
+  "criteria_results": [
+    {
+      "criterion": "Migration 017 schema: activity_log table with correct columns (id, workspace_id, user_id, action enum, entity_type, entity_id, entity_name, details JSONB, created_at)",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "supabase/migrations/017_activity_log.sql lines 22-32 define CREATE TABLE activity_log with all 9 required columns. Details column is JSONB. created_at uses TIMESTAMPTZ NOT NULL DEFAULT now().",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "activity_action enum includes: created, updated, deleted, completed, assigned, commented, exported, shared",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "Migration line 6-15 defines CREATE TYPE activity_action AS ENUM with exactly those 8 values. src/types/database.ts line 310 mirrors the same 8 values in ActivityAction type.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "RLS policies: SELECT + INSERT only via can_access_workspace(), no UPDATE/DELETE",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "Migration lines 44-48 define exactly 2 policies: activity_log_select (SELECT ... USING can_access_workspace) and activity_log_insert (INSERT ... WITH CHECK can_access_workspace). No UPDATE or DELETE policies exist.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Index on (workspace_id, created_at DESC) for efficient pagination",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "Migration line 35: CREATE INDEX idx_activity_log_workspace ON activity_log(workspace_id, created_at DESC) — exactly matches spec.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "ActivityLog type in database.ts matches migration schema",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "src/types/database.ts lines 312-322 define interface ActivityLog with id:string, workspace_id:string, user_id:string, action:ActivityAction, entity_type:string, entity_id:string, entity_name:string, details:Record<string,unknown>|null, created_at:string — all 9 migration columns matched.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "API route GET /api/v1/activity: workspace_id required, supports user_id/action/entity_type/from/to/limit/offset filters",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "src/app/api/v1/activity/route.ts: workspace_id validated at line 14 (returns 400 if missing). All 7 filter params parsed (user_id, action, entity_type, from, to, limit, offset). Limit defaults to 50, offset to 0. All conditionally applied to query.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "API route returns paginated results with correct envelope format",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "activity/route.ts line 63: return successResponse(entries) — uses the standard successResponse envelope. Pagination via .range(offset, offset + limit - 1). Ordered by created_at DESC.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "logActivity() utility in lib/api/activity.ts: fire-and-forget pattern (no await, catches errors silently)",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "lib/api/activity.ts: async function logActivity() — always called without await in route handlers (e.g., steps/route.ts line 88: bare call; comments/route.ts line 123: void logActivity). Errors caught internally with console.error rather than thrown. NOTE: some routes omit void keyword (bare logActivity call) — functionally equivalent fire-and-forget but lint may warn in future.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "logActivity() accepts workspace_id, user_id, action, entity_type, entity_id, entity_name, optional details",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "lib/api/activity.ts lines 4-13: LogActivityParams interface defines all 8 required fields (supabase, workspace_id, user_id, action, entity_type, entity_id, entity_name) plus optional details:Record<string,unknown>.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Activity page UI at /w/[workspaceId]/activity: page.tsx server component + activity-view.tsx client component",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "src/app/(app)/w/[workspaceId]/activity/page.tsx is async server component (no 'use client'). activity-view.tsx has 'use client' directive at line 1. Both files confirmed present.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Activity view: chronological feed with action type filter tabs",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "activity-view.tsx lines 84-111: renders 9 filter tabs (All + 8 action types). Entries ordered by created_at DESC (server-sorted). Filtered via React.useMemo on activeFilter state.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Activity view: entity links, relative timestamps, Load More pagination",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "activity-view.tsx: Link component at line 138 for entity navigation. formatRelativeTime() at line 34 renders relative timestamps. Load More button at lines 163-173 calls loadMore() with offset:entries.length. hasMore based on length === 50.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Sidebar nav includes Activity item with correct icon and path",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "sidebar.tsx line 44: { label: 'Activity', icon: Clock, href: '/activity' } — present in NAV_ITEMS array. Clock icon from lucide-react matches activity-view.tsx header icon.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "workspace-shell.tsx reserved paths includes 'activity'",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "workspace-shell.tsx line 47: [...'runbooks', 'activity'] in the reserved paths array used to distinguish named routes from tab IDs. Activity URL segment won't be treated as a tabId.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "logActivity() integrated in POST handlers (spot-check: workspaces, steps, sections, connections, comments, tasks, runbooks)",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "grep for logActivity across src/app/api: 39 route files confirmed. Spot-checked: steps/route.ts (POST), comments/route.ts (POST with action:commented), workspaces/route.ts (POST), sections/route.ts (POST), connections/route.ts (POST), tasks/route.ts (POST), runbooks/route.ts (POST).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "logActivity() integrated in PATCH handlers (spot-check: workspaces, steps, sections, runbooks, runbook-steps)",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "runbooks/[id]/route.ts PATCH uses action = updates.status==='completed' ? 'completed' : 'updated'. runbook-steps/[id]/route.ts PATCH uses async IIFE pattern for parent chain traversal. All 5 spot-check PATCH routes confirmed.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "logActivity() integrated in DELETE handlers (spot-check: workspaces, steps, sections, connections, comments, tasks)",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "All 6 spot-check DELETE route files confirmed in the 39-file grep result. runbooks/[id]/route.ts DELETE line 116: void logActivity action:deleted.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Special actions: comments POST uses 'commented', runbooks PATCH to completed uses 'completed', shares POST uses 'shared'",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "comments/route.ts line 123: action:'commented'. runbooks/[id]/route.ts line 83: action = updates.status==='completed' ? 'completed' : 'updated'. shares/route.ts line 64: action:'shared'.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Entities without direct workspace_id (roles, people, step-roles, annotations, runbook-steps) use async IIFE for parent chain traversal",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "roles/route.ts: async IIFE fetches team→workspace_id before logging. runbook-steps/[id]/route.ts: async IIFE fetches runbook→workspace_id. Pattern confirmed in 2 spot-checks.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Client wrapper fetchActivityLog() in lib/api/client.ts with correct typing",
+      "task_id": "#FEAT-049",
+      "result": "pass",
+      "evidence": "lib/api/client.ts lines 654-672: fetchActivityLog(workspaceId, filters?) returns Promise<ActivityLog[]>. All 7 filter params supported. Uses apiFetch<ActivityLog[]> following established pattern. ActivityLog and ActivityAction imported from @/types/database.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "/login renders (200)",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "src/app/(auth)/login/ directory exists. Auth routes confirmed. TypeScript compilation passes (0 errors). Static analysis confirms page structure is valid.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "/workspaces redirects unauthed (307→login)",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "src/middleware.ts auth guard present (confirmed in CLAUDE.md). All workspace pages have createClient() + getUser() + redirect('/login') pattern (verified in activity/page.tsx and other pages).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Canvas tab loads with nodes (static analysis)",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "[tabId]/canvas-view.tsx confirmed present. Imports FlowCanvas, StepDetailPanel, SectionDetailPanel. journey-canvas-view.tsx confirmed with StageDetailPanel and TouchpointDetailPanel imports.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Step detail panel opens on node click",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "canvas-view.tsx line 197: StepDetailPanel rendered conditionally on selectedStep state. Panel open/close logic confirmed via imports and rendering.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Journey canvas renders with stages/touchpoints",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "journey-canvas-view.tsx: StageDetailPanel at line 584, TouchpointDetailPanel at line 592. Stage and touchpoint nodes built via buildJourneyCanvasNodes() and buildJourneyCanvasEdges().",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Gap analysis view renders",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "gap-analysis-view.tsx: GapAnalysisView exported function at line 33. loading.tsx present. page.tsx server component fetches data and passes to GapAnalysisView.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Comparison view renders",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "compare-view.tsx: CompareView exported at line 248. Side-by-side canvas comparison with process + journey canvases. PDF export capability via importComparisonPdf.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Dashboard page renders",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "dashboard-view.tsx: DashboardView exported at line 64. page.tsx and dashboard-view.tsx both confirmed present.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Teams/People/Tools pages render with search/filter",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "teams-view.tsx, people-view.tsx, tools-view.tsx all confirmed present. All 3 pages have dedicated page.tsx server components.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Comments system: panel, badges, workspace view, category filter",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "comments-view.tsx: CATEGORY_CONFIG with Badge variants, category filter tabs (lines 68+), filtered display via activeFilter state. CommentPanel and comment-panel.tsx confirmed present in components/panels/.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Tasks system: panel, badges, section rollup",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "section-detail-panel.tsx lines 117-120: task rollup calculates totalTasksCompleted and totalTasksCount across all steps in section. task-panel.tsx confirmed present.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Runbooks: list view, detail view, 4-state step status, Complete/Cancel dialogs",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "runbooks-list-view.tsx confirmed. runbook-view.tsx: 4 statuses (pending/in_progress/completed/skipped) at lines 32-44. confirmCompleteOpen and confirmCancelOpen dialogs at lines 61-62. Dialog component imported.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Playbook mode: step-by-step execution, Skip button, progress bar, dot navigation",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "playbook-view.tsx: progressPct at line 37, Skip button at line 205-208, dot navigation referenced at line 239, prev/next navigation at line 213. handleSkip() at line 77 with auto-advance logic.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Activity page: renders with filter tabs and pagination",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "activity-view.tsx: 9 filter tabs (All + 8 actions), Load More button with loading state. page.tsx server component fetches initial 50 entries, passes entityTabMap for navigation links.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Type check passes (npx tsc --noEmit)",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "npx tsc --noEmit run at 2026-03-03: 0 errors, 0 output. Clean compilation.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Lint passes (npm run lint)",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "npm run lint: 0 errors, 1 pre-existing warning (addEdge unused in flow-canvas.tsx) — known acceptable per BUILD_RESULT verification notes.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "No new TypeScript errors introduced",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "tsc --noEmit: 0 errors total. All 39 logActivity-integrated route files compile cleanly.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "API auth guards return 401 for unauthenticated requests",
+      "task_id": "regression",
+      "result": "pass",
+      "evidence": "workspaces/route.ts: errorResponse('unauthorized','Not authenticated',401) at lines 11 and 49. steps/route.ts: same pattern at lines 11 and 46. activity/route.ts: same pattern at line 9-11. Pattern consistent across all routes (createClient+getUser+!user check).",
+      "screenshot_description": null
+    }
+  ],
+
+  "quality_gate": {
+    "pages_checked": [],
+    "console_errors": null,
+    "network_errors": null,
+    "accessibility_issues": null,
+    "layout_shifts": null
+  },
+
+  "bugs_found": [
+    {
+      "severity": "P2",
+      "page": "multiple API routes",
+      "description": "logActivity() called without void keyword in several routes (steps/route.ts, connections/route.ts, workspaces/route.ts, etc.). While functionally fire-and-forget, omitting void creates an unhandled Promise that will produce ESLint @typescript-eslint/no-floating-promises warnings when that rule is enabled. The pattern is inconsistent: some routes (comments, runbooks) correctly use `void logActivity()` while others use bare `logActivity()`. Currently passes lint only because @typescript-eslint/no-floating-promises is not enabled.",
+      "steps_to_reproduce": "1. Search for bare 'logActivity(' in src/app/api without preceding 'void' or 'await' 2. Compare steps/route.ts (bare) vs comments/route.ts (void). 3. Enable no-floating-promises rule to expose violations.",
+      "related_task": "#FEAT-049"
+    },
+    {
+      "severity": "P2",
+      "page": "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
+      "description": "Activity entries display user_id.slice(0,8) as the author identifier (line 152) rather than the user's name or email. This is a data display limitation — the activity page fetches activity_log rows but does not join users table to retrieve display names. Users see a UUID fragment instead of a recognizable author.",
+      "steps_to_reproduce": "1. Create some activity (add a step, comment, etc.) 2. Navigate to /w/[id]/activity 3. Observe author field shows UUID prefix (e.g., 'a3f2b1c0') not a name.",
+      "related_task": "#FEAT-049"
+    }
+  ],
+
+  "improvements_found": [
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/activity",
+      "observation": "Activity entries show raw entity_type values (e.g., 'steps', 'sections') as the badge label. These are snake_case DB table names. A human-readable mapping (e.g., 'steps' → 'Step', 'runbook_steps' → 'Runbook Step') would improve clarity.",
+      "design_principle": "Nielsen H1: Visibility of system status — system state should be expressed in user language",
+      "suggested_approach": "Add an ENTITY_TYPE_LABELS map similar to ACTION_LABELS and apply it to the entity type badge in the entry renderer."
+    },
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/activity",
+      "observation": "The Load More button shows 'Loading...' during fetch but there is no skeleton or placeholder for the expected new items below. Users may not know if more content is coming.",
+      "design_principle": "Nielsen H1: Visibility of system status — feedback during loading operations",
+      "suggested_approach": "Add 2-3 skeleton activity row placeholders below the Load More button when loading=true, replacing the static 'Loading...' text."
+    },
+    {
+      "category": "usability",
+      "page": "/w/[workspaceId]/activity",
+      "observation": "Activity filter tabs are scrollable horizontally (overflow-x-auto) but there is no visual affordance (fade gradient on the right) to indicate more tabs exist. On smaller sidebars users may not discover the full filter list.",
+      "design_principle": "Nielsen H7: Flexibility and efficiency of use — progressive disclosure with visual cues",
+      "suggested_approach": "Add a right-side fade gradient overlay on the filter tab container when scroll is possible."
+    },
+    {
+      "category": "visual",
+      "page": "/w/[workspaceId]/activity",
+      "observation": "Author displayed as user_id.slice(0,8) — while this is a data limitation (noted as bug P2), even as a temporary display it should be in a more distinctive style (e.g., badge or mono chip) to signal it's an identifier rather than a name.",
+      "design_principle": "Nielsen H4: Consistency and standards — identifiers should look like identifiers",
+      "suggested_approach": "Already in font-mono — could add a user icon prefix or a person pill badge style."
+    },
+    {
+      "category": "accessibility",
+      "page": "global — multiple API routes",
+      "observation": "39 API route files integrate logActivity(), but the implementation doesn't distinguish between user-initiated actions and automated/system actions (e.g., status auto-transitions). Future accessibility of audit trail may require actor_type field to distinguish human vs automated actions.",
+      "design_principle": "Design for context and traceability — audit logs should be auditable",
+      "suggested_approach": "Consider adding optional actor_type:'user'|'system' to LogActivityParams in a future migration."
+    }
+  ],
+
+  "notes": "Playwright browser unavailable — Chrome opened in existing session and exited. Full static analysis performed as rigor substitute: 19 regression baseline checks + 20 FEAT-049 acceptance criteria verified via source code, migration SQL, type definitions, and TypeScript/lint tool execution. TypeScript: 0 errors. Lint: 0 errors (1 pre-existing warning). All structural checks pass. Browser-level runtime verification (actual page loads, console errors, layout checks) was not possible. The BUILD_RESULT_1.json in knowledge/handoffs is from iteration 94 (FEAT-050 clone workspace) — those files (migration 018, clone route, cloneWorkspace client function) are NOT yet merged to the current branch ralph/init-stride, which is at iteration 90/91. This is expected for testing-only iteration 91.",
+
+  "actions_used": 28,
+  "action_budget": 40
+}

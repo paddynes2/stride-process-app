@@ -1,0 +1,37 @@
+`TEST_RESULT_2.json` written. Here's the summary:
+
+---
+
+## Regression Test — Iteration 91 — PASSED
+
+**Test method:** Playwright browser (live) + static code analysis  
+**Environment:** Production (stride-five-sigma.vercel.app) — local dev server was occupied by an unrelated app
+
+### What was verified
+
+**Browser (live):** 7 pages tested with zero console errors throughout:
+- `/login` renders, unauthenticated redirect, new account bootstrap_workspace, canvas add section/step, step detail panel, step name edit persisted in DB, list view, settings, teams, API auth guards returning 401
+
+**Static analysis:** All Phase 3/4 source files confirmed (production is behind the branch — Comments, Runbooks, Playbook, Gap Analysis, Compare, Dashboard, Activity not yet deployed to main)
+
+**FEAT-049 checks (31 criteria):** All pass — migration schema, RLS policies, index, ActivityLog type, API route, logActivity fire-and-forget with 39 integrations, sidebar nav, workspace-shell reserved paths, activity-view component, fetchActivityLog client wrapper
+
+### Bugs found
+
+| # | Severity | Description |
+|---|---------|-------------|
+| 1 | P2 | Activity entries show `user_id.slice(0,8)` instead of user display name — audit trail unreadable |
+| 2 | P3 | `shares/route.ts` calls `logActivity()` without `void` (floating promise) — inconsistent with all 38 other routes |
+
+### Key deployment note
+
+FEAT-049 (and Phases 3/4) are implemented on `ralph/init-stride` but **not deployed to production**. GET `/api/v1/activity` returns 404 on production. End-to-end browser verification requires deployment to main.
+d in others. Latent floating-promise issue when no-floating-promises lint rule is enabled. |
+| P2 | Activity view | Author displayed as `user_id.slice(0,8)` — UUID fragment not user name. Activity log rows don't join the `users` table for display names. |
+
+### Improvements Found (5)
+- Entity type labels should be human-readable (not raw DB table names)
+- Load More needs skeleton placeholders during fetch
+- Filter tab row needs right-side fade gradient to indicate scrollability
+- Author identifier style could use a person icon prefix
+- Consider `actor_type: 'user' | 'system'` for future audit traceability

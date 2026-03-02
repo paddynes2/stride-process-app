@@ -1,0 +1,37 @@
+`TEST_RESULT_1.json` written. Here's the summary:
+
+---
+
+## Test Result — Iteration 91 / #FEAT-049 Activity Log
+
+**Status:** `playwright_unavailable` — Chrome failed to launch (existing session conflict). All 20 acceptance criteria verified via **static analysis** of source files.
+
+### Acceptance Criteria: 20/20 Pass
+
+| # | Criterion | Result |
+|---|-----------|--------|
+| 1 | Migration 017 schema | ✅ Pass |
+| 2 | activity_action enum (8 values) | ✅ Pass |
+| 3 | RLS: SELECT + INSERT only | ✅ Pass |
+| 4 | Index on (workspace_id, created_at DESC) | ✅ Pass |
+| 5 | ActivityLog type in database.ts | ✅ Pass |
+| 6 | GET /api/v1/activity with all filters | ✅ Pass |
+| 7 | Paginated response, correct envelope | ✅ Pass |
+| 8 | logActivity() fire-and-forget, silent catch | ✅ Pass (note: `void` keyword missing in steps/* routes — stylistically inconsistent but semantically correct) |
+| 9 | logActivity() param signature | ✅ Pass |
+| 10 | page.tsx + activity-view.tsx structure | ✅ Pass |
+| 11 | Chronological feed + filter tabs | ✅ Pass |
+| 12 | Entity links, relative timestamps, Load More | ✅ Pass |
+| 13 | Sidebar Activity nav item | ✅ Pass |
+| 14 | workspace-shell.tsx reserved paths | ✅ Pass |
+| 15–17 | logActivity in POST/PATCH/DELETE handlers | ✅ Pass (spot-checks: steps, comments, runbooks) |
+| 18 | Special actions: commented/completed/shared | ✅ Pass |
+| 19 | Async IIFE for parent chain traversal (roles) | ✅ Pass |
+| 20 | fetchActivityLog() client wrapper | ✅ Pass |
+
+### Regression: Pass on static checks, browser renders unverifiable
+
+### 3 Improvements Found
+1. **User identity**: Activity shows UUID prefix instead of name/email
+2. **Filter + pagination mismatch**: Client-side filtering after Load More can show incomplete results — should re-fetch with `action=` param on filter change
+3. **Empty state guidance**: No contextual hint on how to generate activity

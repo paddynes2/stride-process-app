@@ -348,7 +348,7 @@
 ### #FEAT-051 Conditional step coloring
 **Phase:** 4
 **Priority:** P2 (nice to have)
-**Attempts:** 0
+**Attempts:** 1
 **Status:** pending
 **Acceptance criteria:**
 - [ ] New `coloring_rules` table: id, workspace_id, name, color (hex), criteria_type (enum: status/executor/step_type/has_role/maturity_below/maturity_above), criteria_value TEXT NOT NULL (interpreted per criteria_type), is_active (boolean), position (integer), created_at, updated_at

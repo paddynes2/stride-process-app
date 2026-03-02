@@ -1191,3 +1191,37 @@ Slot 2 (18 files):
 - Efficiency: 4 — Both builders succeeded. Slot 2 diverged from plan (#IMP-018 assigned, #BUG-018 built).
 - Observations: 0
 **Notes:** FEAT-050 fully complete (both sub-tasks done). BUG-018 resolved — 25 bare logActivity() calls now have void prefix across 18 API route files. Slot 2 task divergence: planner assigned IMP-018 (activity empty state guidance text) but builder chose BUG-018 instead. IMP-018 remains pending. FEAT-050 acceptance testing recommended for next iteration.
+
+## Iteration 94 — 2026-03-03 17:00
+**Tasks:**
+- #BUG-019 Fix activity page 'Unknown' user display — slot 1 — FAILED (merge failure — builder completed but worktree code lost)
+- #IMP-018 Activity empty state guidance text — slot 1 — FAILED (bundled with BUG-019, lost in same merge failure)
+- #FEAT-051 [1/2] Coloring rules data layer — slot 2 — FAILED (builder produced no output)
+- #IMP-007 Journey canvas kbd shortcut hints — partial run carry-over — completed (already committed at 46963c4)
+**Source:** prd/BUGS.md, prd/IMPROVEMENTS.md, prd/FEATURES.md
+**Mode:** multi_task
+**Result:** partial
+**Changes:**
+Slot 1 (merge failure — code NOT in branch):
+- src/app/(app)/w/[workspaceId]/activity/page.tsx — builder claimed: .select("*") → .select("*, users!...") (NOT merged)
+- src/app/(app)/w/[workspaceId]/activity/activity-view.tsx — builder claimed: empty state guidance text (NOT merged)
+Slot 2 (no output):
+- No changes
+IMP-007 (partial run carry-over, already committed):
+- src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx — +2 lines: <kbd> hints in toolbar buttons
+**Verification:**
+- Type check: pass (POST_MERGE_CHECK: PASS)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (no new UI to test — planned changes lost)
+**Bugs found:** None (new)
+**Improvements found:** None (new)
+**Self-score:**
+- Code quality: 3 — IMP-007 change is clean, but planned tasks never made it to branch
+- Test coverage: 1 — nothing to test (code lost in merge)
+- Confidence: 2 — BUG-019 P1 regression still active after 2 failed attempts
+- Efficiency: 1 — both builder slots wasted (merge failure + no output). 7th+ pipeline merge failure.
+- Observations: 0
+**Notes:** Pipeline reliability remains the #1 source of wasted effort. BUG-019 is a trivial ONE LINE fix that has now failed twice (attempt 1: wrong file, attempt 2: merge failure). FEAT-051 builder slot 2 produced no commits on ralph-build-40-slot-2 branch. BUILD_RESULT_2.json was stale from partial run (IMP-007). Next iteration must retry both tasks. Testing-only iteration deferred until FEAT-051 is actually built.

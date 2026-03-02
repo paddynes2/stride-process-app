@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "iteration": 94,
+  "slot": 1,
+  "task_id": "#FEAT-050",
+  "status": "completed",
+  "duration_seconds": 180,
+
+  "files_changed": [
+    {
+      "path": "supabase/migrations/018_clone_workspace.sql",
+      "action": "created",
+      "lines_added": 182,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/workspaces/[id]/clone/route.ts",
+      "action": "created",
+      "lines_added": 54,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/lib/api/client.ts",
+      "action": "modified",
+      "lines_added": 5,
+      "lines_removed": 0
+    }
+  ],
+
+  "verification": {
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused) — known acceptable per LEARNINGS.md" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
+  },
+
+  "dependencies_added": [],
+  "staged_files": [
+    "supabase/migrations/018_clone_workspace.sql",
+    "src/app/api/v1/workspaces/[id]/clone/route.ts",
+    "src/lib/api/client.ts"
+  ],
+  "ownership_violations": [],
+  "notes": "Migration 018 creates clone_workspace(p_source_workspace_id UUID) SECURITY DEFINER function. Verifies org membership manually (since SECURITY DEFINER bypasses RLS). Clones 13 table types in FK dependency order using ON COMMIT DROP temp tables for UUID remapping. Includes maturity_score and target_maturity on steps (migration 007 fields). API route POST /api/v1/workspaces/[id]/clone calls RPC, fetches cloned workspace via SELECT (RLS allows since same org), logs activity with action=created and details.cloned_from. cloneWorkspace(id) added to client.ts following existing apiFetch<Workspace> pattern. Files staged individually with git add on specific paths — no git add -A.",
+
+  "failure_details": null
+}

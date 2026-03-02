@@ -51,7 +51,7 @@
   - **What:** Some routes use `void logActivity()` (comments, runbooks) while others use bare `logActivity()` without `void` prefix. Both are functionally fire-and-forget since logActivity() handles its own errors, but bare calls create floating promises that will trigger `@typescript-eslint/no-floating-promises` warnings when that lint rule is enabled.
   - **Fix applied:** Added `void` prefix to all 25 bare `logActivity()` calls across 18 API route files (connections, sections, shares, stages, steps, tabs, touchpoints, touchpoint-connections, workspaces). Non-owned files (annotations, roles, people, step-roles, runbook-steps) left untouched per ownership rules.
 
-- [ ] #BUG-019 Activity page displays "Unknown" for all user entries (P1 regression) — Attempts: 1 (FAILED)
+- [ ] #BUG-019 Activity page displays "Unknown" for all user entries (P1 regression) — Attempts: 2 (FAILED — attempt 1 wrong file, attempt 2 merge failure)
   - **Found:** Iteration 91 (acceptance + regression tester)
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/page.tsx` line 25, `activity-view.tsx` line 171
   - **What:** Builder updated API route (`activity/route.ts`) to join users table: `.select("*, users!activity_log_user_id_fkey(email)")`, BUT forgot to update `page.tsx` server component which still uses `.select("*")`. Initial page load entries have no `users` data → `entry.users?.email` is `undefined` → all entries show "Unknown". This is WORSE than the original UUID prefix. Load More entries work (they use the API route which has the join).
