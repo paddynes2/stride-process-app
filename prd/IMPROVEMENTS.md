@@ -101,13 +101,11 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
   - **Fix applied:** Added segmented progress bar below step count text. Teal segment (`--brand`) for completed, blue/60 (`--accent-blue/60`) for in_progress. Proportional widths. Empty state shows gray background bar only. Follows h-1.5 rounded-full overflow-hidden flex pattern from runbook-view.tsx.
 
-- [ ] #IMP-014 Progress bar should count skipped steps as "resolved" — Attempts: 0
+- [x] #IMP-014 Progress bar should count skipped steps as "resolved" — Attempts: 1 — DONE iteration 89, 2026-03-03
   - **Found:** Iteration 87 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
-  - **What:** Progress bar uses completedCount/total, so skipped steps count against progress (e.g., 0/5 even if 2 are intentionally skipped). Users who skip irrelevant steps feel the bar misrepresents actual completion.
-  - **Why it matters:** Nielsen H1 — Visibility of system status. Progress should match user's mental model of "done."
-  - **Suggested fix:** Count (completed + skipped) as "resolved" for progress, or add a secondary skipped segment (similar to IMP-013 in list view).
+  - **Fix applied:** Added `resolvedCount = completedCount + skippedCount` in runbook-view.tsx, runbooks-list-view.tsx, and playbook-view.tsx. Progress bar uses resolvedCount/total. Text shows "N of M resolved". List view has white/20 skipped segment between teal (completed) and blue/60 (in_progress).
 
 - [x] #IMP-015 Playbook mode Skip action button — Attempts: 1 — DONE iteration 88, 2026-03-03
   - **Found:** Iteration 87 (acceptance tester)

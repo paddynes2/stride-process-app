@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-88, 2026-03-03 -->
+<!-- Updated: iter-89, 2026-03-03 -->
 
 ## Project
 
@@ -48,6 +48,7 @@ npx supabase db push     # Push migrations
 | `/w/.../runbooks` | `src/app/(app)/w/[workspaceId]/runbooks/page.tsx` | Runbook list (name, status, progress, section, date, filter tabs) |
 | `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with 4-state status, progress bar+text, notes, Complete/Cancel via Radix Dialog, read-only mode, metadata footer, Playbook button) |
 | `/w/.../runbooks/[id]/playbook` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/page.tsx` | Playbook mode (distraction-free step-by-step execution, fixed overlay z-50, Mark Complete & Next, Skip, dot navigation, progress bar, mobile-responsive) |
+| `/w/.../activity` | `src/app/(app)/w/[workspaceId]/activity/page.tsx` | Activity log (chronological feed, action type filter tabs, entity links, relative timestamps, Load More pagination) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 
@@ -169,7 +170,7 @@ Types: step, section, touchpoint, stage.
 `CommentCountsContext` (from `canvas.ts`) provides Map<entityId, count> to node components. `TaskCountsContext` provides Map<stepId, { completed, total }>. Canvas views fetch all workspace comments/tasks once, build count maps, and wrap React Flow in both providers. Node components consume via `useContext()`. Comment badge: bottom-right. Task badge: bottom-left (step nodes only). Section detail panel shows task rollup (per-step progress + summary). This avoids prop-drilling through FlowCanvas (D-004).
 
 ### Reserved Paths in Workspace Shell
-`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks"]`
+`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity"]`
 
 ### Component Conventions
 - Dark theme only. All colors via CSS custom properties in globals.css

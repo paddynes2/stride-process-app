@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 88
-- **Date:** 2026-03-03 01:00
+- **Iteration:** 89
+- **Date:** 2026-03-03 03:00
 - **Phase:** Phase 4: The Living Playbook
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-049 [1/3] Activity log data layer, #BUG-017 playbook optimistic rollback fix, #IMP-015 playbook skip button
+- **Last task(s):** #FEAT-049 [2/3] Activity log page UI, #IMP-014 Progress bar counts skipped steps
 - **Result:** completed
-- **Next task:** #FEAT-049 [2/3] Activity log page UI (activity feed view with filters, entity links, timestamps)
+- **Next task:** #FEAT-049 [3/3] Integrate logActivity() into existing POST/PATCH/DELETE routes
 - **Blockers:** None
 
 ## Context
 
-Iteration 88 completed two parallel slots. Slot 1 built the activity log data layer: migration 017 (activity_action enum + activity_log table, append-only with SELECT+INSERT RLS), types in database.ts, GET /api/v1/activity route with full filter support, fetchActivityLog() client wrapper, and fire-and-forget logActivity() server utility. Slot 2 fixed BUG-017 (optimistic rollback now restores currentIndex on API failure in handleMarkComplete) and added IMP-015 (Skip button in playbook mode with identical optimistic+rollback pattern). All Phase 4 P0 features remain acceptance-tested. FEAT-049 is the first P1 feature — [2/3] activity page UI and [3/3] logActivity() integration into existing routes remain.
+Iteration 89 completed two parallel slots. Slot 1 built the activity log page UI at /w/[workspaceId]/activity — server page.tsx fetches initial 50 entries + builds entityTabMap, client ActivityView has filter tabs (All + 8 action types), action sentence entries with entity links, relative timestamps, and Load More pagination. Sidebar updated with Clock icon + Activity nav item. workspace-shell.tsx reserved paths updated. Slot 2 implemented IMP-014 — progress bar now counts (completed + skipped) as "resolved" in runbook-view.tsx, runbooks-list-view.tsx (with white/20 skipped segment), and playbook-view.tsx. FEAT-049 has one remaining sub-task: [3/3] integrate logActivity() calls into existing API routes.
 
 ## Dev Server
 

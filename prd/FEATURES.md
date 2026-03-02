@@ -320,10 +320,10 @@
 ### #FEAT-049 Activity log
 **Phase:** 4
 **Priority:** P1 (important)
-**Attempts:** 1
+**Attempts:** 2
 **Status:** in_progress
   - [x] [1/3] Data layer (migration 017, types, API route, client wrapper, logActivity utility) — DONE iteration 88, 2026-03-03
-  - [ ] [2/3] Activity page UI at `/w/[workspaceId]/activity`
+  - [x] [2/3] Activity page UI at `/w/[workspaceId]/activity` — DONE iteration 89, 2026-03-03
   - [ ] [3/3] Integrate logActivity() into existing POST/PATCH/DELETE routes
 **Acceptance criteria:**
 - [ ] New `activity_log` table: id, workspace_id, user_id (FK), action (enum: created/updated/deleted/completed/assigned/commented/exported/shared), entity_type, entity_id, entity_name (snapshot), details (JSONB nullable), created_at

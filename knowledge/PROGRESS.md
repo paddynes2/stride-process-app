@@ -998,3 +998,35 @@
 - Efficiency: 5 — Both slots succeeded on first attempt, no merge issues
 - Observations: 0
 **Notes:** First iteration to build FEAT-049 activity log (P1 feature). Data layer complete — [2/3] activity page UI and [3/3] logActivity() integration into existing API routes remain. BUG-017 fixed (prevIndex saved/restored on rollback). IMP-015 Skip button follows identical optimistic pattern. Both builders merged cleanly — no worktree merge failures this iteration.
+
+## Iteration 89 — 2026-03-03 03:00
+**Tasks:**
+- #FEAT-049 [2/3] Activity log page UI — slot 1 — completed
+- #IMP-014 Progress bar counts skipped steps as resolved — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Created: src/app/(app)/w/[workspaceId]/activity/page.tsx (49 lines — server page, Supabase fetch, entityTabMap)
+- Created: src/app/(app)/w/[workspaceId]/activity/activity-view.tsx (177 lines — filter tabs, entry list, Load More)
+- Modified: src/app/(app)/w/[workspaceId]/workspace-shell.tsx (+1/-1 — 'activity' in reserved paths)
+- Modified: src/components/layout/sidebar.tsx (+3/-1 — Clock icon, Activity nav item, Workflows exclude)
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx (+3/-5 — resolvedCount = completed + skipped)
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx (+4/-2 — skipped segment, resolved stat)
+- Modified: src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx (+3/-2 — resolvedCount progress)
+**Verification:**
+- Type check: pass (both builders + POST_MERGE_CHECK all pass)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx, 0 errors)
+- Build: pass (slot 1 verified Next.js build)
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true for both slots)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Activity page follows comments page pattern exactly. IMP-014 changes are minimal and correct across all 3 files.
+- Test coverage: 2 — typecheck + lint + build only, no runtime testing
+- Confidence: 5 — Both builders typecheck+lint+build clean, POST_MERGE_CHECK pass. Code follows established patterns.
+- Efficiency: 5 — Both slots succeeded on first attempt, no merge issues. 5th consecutive clean merge (iters 86-89).
+- Observations: 0
+**Notes:** FEAT-049 [2/3] complete. One remaining sub-task: [3/3] integrate logActivity() into existing API routes. IMP-014 resolved across all 3 runbook views. Activity page follows comments page pattern (server fetch + entityTabMap + client view with filters).

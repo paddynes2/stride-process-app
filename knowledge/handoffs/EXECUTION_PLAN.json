@@ -1,90 +1,133 @@
 {
   "schema_version": "1.0",
-  "iteration": 87,
-  "date": "2026-03-02T23:15:00Z",
-  "mode": "testing_only",
+  "iteration": 89,
+  "date": "2026-03-03T02:00:00Z",
+  "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "88aad0eed8bc39a4087b688534d3bb4578663820",
+    "last_commit_hash": "d7611da3ca75750a0934d91c4f2d8a4bea0e4111",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
     "revert_reason": null
   },
-  "tasks": [],
+  "tasks": [
+    {
+      "slot": 1,
+      "id": "#FEAT-049",
+      "description": "[2/3] Activity log page UI — chronological feed at /w/[workspaceId]/activity with action type filter tabs, entity links, relative timestamps, pagination via load-more",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "New route /w/[workspaceId]/activity renders activity feed",
+        "Server page.tsx fetches initial activity log entries (limit 50) and passes to client ActivityView component",
+        "Each entry shows: action verb sentence (e.g. 'created step \"Onboarding\"'), entity type badge, relative timestamp",
+        "Entity name is a clickable link to the entity's tab (build entityTabMap from steps/sections/stages/touchpoints like comments page.tsx)",
+        "Filter tabs at top: All + one per ActivityAction value (Created, Updated, Deleted, Completed, Assigned, Commented, Exported, Shared)",
+        "Empty state when no entries match filter",
+        "'Load More' button at bottom fetches next page (offset-based pagination via fetchActivityLog)",
+        "Sidebar nav: 'Activity' item added with Clock icon, between Runbooks and Teams",
+        "workspace-shell.tsx: 'activity' added to reserved paths array"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/activity/page.tsx",
+        "src/app/(app)/w/[workspaceId]/activity/activity-view.tsx",
+        "src/components/layout/sidebar.tsx",
+        "src/app/(app)/w/[workspaceId]/workspace-shell.tsx"
+      ],
+      "files_read_only": [
+        "src/types/database.ts",
+        "src/lib/api/client.ts",
+        "src/app/api/v1/activity/route.ts",
+        "src/app/(app)/w/[workspaceId]/comments/page.tsx",
+        "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/comments/page.tsx",
+          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx",
+          "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx"
+        ],
+        "patterns_to_follow": [
+          "Server page.tsx fetches data via Supabase, builds entityTabMap, passes to client view component (see comments/page.tsx)",
+          "Client view component uses filter tabs pattern (see comments-view.tsx: activeFilter useState, cn() conditional styling)",
+          "formatRelativeTime() helper for timestamps (see comments-view.tsx line 29-35)",
+          "Entity type badge using <span> with bg-[var(--bg-surface)] styling (see comments-view.tsx line 131)",
+          "Empty state: centered icon + message (see comments-view.tsx line 100-107)",
+          "Sidebar nav items: { label, icon, href } objects in NAV_ITEMS array (see sidebar.tsx line 31-42)",
+          "Reserved paths: array of strings at workspace-shell.tsx line 47"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — fetchActivityLog returns ActivityLog[] directly",
+          "WCAG AA: never use text-white/15 for functional content, minimum text-white/55",
+          "React 19 useRef requires initial value"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/activity"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Follow comments page pattern exactly: server page.tsx fetches initial data via Supabase + builds entityTabMap from steps/sections/stages/touchpoints for entity_id→tab_id linking. Client ActivityView uses fetchActivityLog() for 'Load More' pagination. Use ActivityAction type for filter tabs — map each action to a user-friendly label. Action sentence format: '{action} {entity_type} \"{entity_name}\"'. Icon: Clock from lucide-react for sidebar. User ID shown as truncated UUID (author_id.slice(0,8)) same as comments-view.tsx."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-014",
+      "description": "Progress bar counts skipped steps as 'resolved' — (completed + skipped) / total for progress computation",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 4: The Living Playbook",
+      "complexity": "S",
+      "attempts": 0,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "runbook-view.tsx progress bar uses (completed + skipped) as 'resolved' count instead of completed only",
+        "Progress text shows 'N of M resolved' or equivalent that reflects skipped steps counting toward progress",
+        "runbooks-list-view.tsx segmented progress bar also counts skipped steps — add skipped segment (or merge with completed segment)",
+        "Playbook mode progress (playbook-view.tsx) also counts skipped steps toward progress if applicable"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx",
+        "src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx",
+        "src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": [
+          "Segmented progress bar pattern in runbooks-list-view.tsx (IMP-013): h-1.5 rounded-full overflow-hidden flex, teal for completed, blue/60 for in_progress",
+          "Add a third segment color for skipped (e.g. amber/40 or white/20) or merge skipped into completed segment"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/runbooks",
+          "/w/[workspaceId]/runbooks/[runbookId]",
+          "/w/[workspaceId]/runbooks/[runbookId]/playbook"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Three files to update: runbook-view.tsx (main progress bar + text), runbooks-list-view.tsx (list card progress bar), playbook-view.tsx (playbook progress). In each, find where completedCount is calculated and change to resolvedCount = completed + skipped. Update display text. For segmented bar in list view, consider adding a 'skipped' segment in a distinct color (amber or white/20) between completed (teal) and in_progress (blue)."
+    }
+  ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "next.config.ts", "tailwind.config.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
     "owner": null,
-    "note": "Testing-only iteration — no builders, no source changes."
+    "note": "types/database.ts and client.ts are read-only this iteration — slot 1 reads ActivityLog type and fetchActivityLog, no modifications needed"
   },
-  "merge_order": [],
+  "merge_order": ["#FEAT-049", "#IMP-014"],
   "testing_plan": {
-    "run_acceptance": true,
-    "run_regression": true,
-    "regression_reason": "FEAT-047 acceptance overdue 5+ iterations (dispatch failures iters 72, 79, 83, 84, 85). FEAT-048 new UI from iter 86 — never acceptance tested. All Phase 4 P0 features complete — natural testing inflection point.",
-    "suites_to_run": [
-      {
-        "suite": "regression",
-        "scope": "full",
-        "method": "static_analysis + tsc + eslint + curl + API probing",
-        "expected_checks": 23,
-        "notes": "Baseline regression from iter 83 (23 checks). Verify nothing regressed from FEAT-048/IMP-012/IMP-013 additions."
-      },
-      {
-        "suite": "acceptance",
-        "feature_id": "#FEAT-047",
-        "feature_name": "Runbook instances",
-        "scope": "full feature",
-        "method": "static_analysis + API probing + code review",
-        "checks": [
-          "Runbooks API route exists: GET /api/v1/runbooks returns 401 for unauthed",
-          "Runbook-steps API route exists: GET /api/v1/runbook-steps returns 401 for unauthed",
-          "Runbooks POST route creates runbook from section (static analysis of route.ts POST handler)",
-          "Runbook GET by id returns runbook with steps (static analysis)",
-          "Runbook PATCH updates status (static analysis of [id]/route.ts PATCH handler)",
-          "RunbookStep PATCH updates step status (static analysis of runbook-steps/[id]/route.ts PATCH)",
-          "Runbook list page renders with filter tabs (static analysis of runbooks-list-view.tsx)",
-          "Runbook view page renders checklist with progress bar (static analysis of runbook-view.tsx)",
-          "4-state step status transitions: pending → in_progress → completed, pending → skipped (static analysis)",
-          "Complete/Cancel buttons use Radix Dialog confirmation (static analysis — IMP-012 verify)",
-          "Read-only mode for completed/cancelled runbooks (static analysis of runbook-view.tsx)",
-          "Section detail panel has 'Run as Checklist' button (static analysis of section-detail-panel.tsx)",
-          "Sidebar navigation includes runbooks link (static analysis of sidebar.tsx)",
-          "Runbook types defined: Runbook, RunbookStep, RunbookStatus, RunbookStepStatus (static analysis of database.ts)",
-          "Migration 016 creates runbooks + runbook_steps tables with RLS (file exists + structure check)",
-          "workspace-shell.tsx reserved paths includes 'runbooks' (static analysis)"
-        ],
-        "notes": "5+ consecutive dispatch failures. This acceptance test covers the full FEAT-047 feature (iters 80-82) plus IMP-012 (iter 86)."
-      },
-      {
-        "suite": "acceptance",
-        "feature_id": "#FEAT-048",
-        "feature_name": "Playbook mode",
-        "scope": "full feature",
-        "method": "static_analysis + code review",
-        "checks": [
-          "Playbook page.tsx exists at correct route path (file existence check)",
-          "Playbook server page fetches runbook + steps via Supabase (static analysis of playbook/page.tsx)",
-          "PlaybookView renders fixed overlay (z-50) covering workspace shell (static analysis of playbook-view.tsx)",
-          "Mark Complete & Next button advances to next pending/in_progress step (static analysis)",
-          "Optimistic update with rollback on API error (static analysis of handleMarkComplete)",
-          "Dot navigation allows jumping to any step (static analysis)",
-          "Progress bar shows completion (static analysis)",
-          "Step N of M text displayed (static analysis)",
-          "Completed steps show green checkmark (static analysis)",
-          "Exit/back navigation returns to runbook view (static analysis)",
-          "Mobile-responsive layout (max-w-xl or similar constraint, static analysis)",
-          "Runbook view has 'Playbook' button linking to playbook route (static analysis of runbook-view.tsx)"
-        ],
-        "notes": "New in iter 86 (attempt 3 after 2 pipeline merge failures). First acceptance test."
-      }
-    ],
+    "run_acceptance": false,
+    "run_regression": false,
+    "regression_reason": null,
+    "suites_to_run": [],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "Migrations 014-016 still need `npx supabase db push` to deploy to remote DB",
-      "Production (origin/main) is behind ralph/init-stride"
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }
