@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { FlowCanvas } from "@/components/canvas/flow-canvas";
 import { StepDetailPanel } from "@/components/panels/step-detail-panel";
 import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
@@ -11,10 +12,22 @@ import { TaskPanel } from "@/components/panels/task-panel";
 import { ColoringPanel } from "@/components/canvas/coloring-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules } from "@/lib/api/client";
+import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep } from "@/lib/api/client";
 import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
-import type { Section, Step, Connection, ColoringRule } from "@/types/database";
-import { Paintbrush } from "lucide-react";
+import type { Section, Step, Connection, ColoringRule, Template } from "@/types/database";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { STARTER_TEMPLATES } from "@/lib/templates";
+import { Paintbrush, LayoutTemplate, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { toastError } from "@/lib/api/toast-helpers";
 import { cn } from "@/lib/utils";
 
 interface CanvasViewProps {
@@ -159,6 +172,65 @@ export function CanvasView({
     return () => { cancelled = true; };
   }, [workspaceId]);
 
+  // Template browser state
+  const router = useRouter();
+  const [showTemplateDialog, setShowTemplateDialog] = React.useState(false);
+  const [dbTemplates, setDbTemplates] = React.useState<Template[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = React.useState(false);
+  const [templateError, setTemplateError] = React.useState<string | null>(null);
+  const [deployingKey, setDeployingKey] = React.useState<string | null>(null);
+  const [deletingId, setDeletingId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!showTemplateDialog) return;
+    let cancelled = false;
+    setLoadingTemplates(true);
+    setTemplateError(null);
+    fetchTemplates(workspaceId)
+      .then((templates) => { if (!cancelled) setDbTemplates(templates); })
+      .catch((err) => { if (!cancelled) setTemplateError(err instanceof Error ? err.message : "Failed to load templates"); })
+      .finally(() => { if (!cancelled) setLoadingTemplates(false); });
+    return () => { cancelled = true; };
+  }, [showTemplateDialog, workspaceId]);
+
+  const handleDeployTemplate = async (key: string, templateId: string | null, starterIndex: number | null) => {
+    setDeployingKey(key);
+    const maxY = sections.length > 0 ? Math.max(...sections.map((s) => s.position_y)) : -200;
+    const deployX = 100;
+    const deployY = sections.length > 0 ? maxY + 300 : 100;
+    try {
+      if (templateId !== null) {
+        await deployTemplate(templateId, { tab_id: tabId, position_x: deployX, position_y: deployY });
+      } else if (starterIndex !== null) {
+        const starter = STARTER_TEMPLATES[starterIndex];
+        const newSection = await createSection({ workspace_id: workspaceId, tab_id: tabId, name: starter.template_data.section.name, position_x: deployX, position_y: deployY });
+        await Promise.all(starter.template_data.steps.map((step) =>
+          createStep({ workspace_id: workspaceId, tab_id: tabId, section_id: newSection.id, name: step.name, position_x: deployX + step.position_x, position_y: deployY + step.position_y })
+        ));
+      }
+      toast.success("Template deployed");
+      setShowTemplateDialog(false);
+      router.refresh();
+    } catch (err) {
+      toastError("Failed to deploy template", { error: err });
+    } finally {
+      setDeployingKey(null);
+    }
+  };
+
+  const handleDeleteTemplate = async (templateId: string) => {
+    setDeletingId(templateId);
+    try {
+      await deleteTemplate(templateId);
+      setDbTemplates((prev) => prev.filter((t) => t.id !== templateId));
+      toast.success("Template deleted");
+    } catch (err) {
+      toastError("Failed to delete template", { error: err });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   // Fetch workspace coloring rules for step background tint
   const [coloringRules, setColoringRules] = React.useState<ColoringRule[]>([]);
   const [showColoringPanel, setShowColoringPanel] = React.useState(false);
@@ -245,22 +317,36 @@ export function CanvasView({
             onExportPng={handleExportPng}
           />
 
-          {/* Coloring rules button + panel — top-right overlay, away from react-flow toolbar */}
+          {/* Coloring rules + Templates buttons — top-right overlay */}
           <div className="absolute top-2.5 right-2.5 z-10 flex flex-col items-end gap-1">
-            <button
-              onClick={() => setShowColoringPanel((p) => !p)}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium",
-                "bg-[var(--bg-surface)] shadow-[var(--shadow-sm)] transition-colors",
-                showColoringPanel
-                  ? "border-[var(--accent-blue)] text-[var(--accent-blue)]"
-                  : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
-              )}
-              aria-label="Toggle coloring rules"
-            >
-              <Paintbrush className="h-3.5 w-3.5" />
-              Color
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setShowTemplateDialog(true)}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium",
+                  "bg-[var(--bg-surface)] shadow-[var(--shadow-sm)] transition-colors",
+                  "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+                )}
+                aria-label="Browse templates"
+              >
+                <LayoutTemplate className="h-3.5 w-3.5" />
+                Templates
+              </button>
+              <button
+                onClick={() => setShowColoringPanel((p) => !p)}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium",
+                  "bg-[var(--bg-surface)] shadow-[var(--shadow-sm)] transition-colors",
+                  showColoringPanel
+                    ? "border-[var(--accent-blue)] text-[var(--accent-blue)]"
+                    : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+                )}
+                aria-label="Toggle coloring rules"
+              >
+                <Paintbrush className="h-3.5 w-3.5" />
+                Color
+              </button>
+            </div>
             {showColoringPanel && (
               <ColoringPanel
                 workspaceId={workspaceId}
@@ -269,6 +355,72 @@ export function CanvasView({
               />
             )}
           </div>
+
+          {/* Template browser dialog */}
+          <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Templates</DialogTitle>
+                <DialogDescription>Deploy a template to add a new section to the canvas</DialogDescription>
+              </DialogHeader>
+              {loadingTemplates ? (
+                <div className="grid grid-cols-2 gap-3 py-2">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div key={i} className="h-24 bg-[var(--bg-surface-secondary)] rounded-[var(--radius-md)] animate-pulse" />
+                  ))}
+                </div>
+              ) : templateError ? (
+                <p className="text-[13px] text-red-400 py-6 text-center">{templateError}</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto py-1">
+                  {dbTemplates.length === 0 && STARTER_TEMPLATES.length === 0 && (
+                    <p className="col-span-2 text-[13px] text-[var(--text-tertiary)] py-6 text-center">
+                      No templates yet. Save a section as a template to get started.
+                    </p>
+                  )}
+                  {dbTemplates.map((t) => (
+                    <div key={`db-${t.id}`} className="bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] p-3 flex flex-col gap-2">
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-semibold text-[var(--text-primary)] truncate">{t.name}</p>
+                          {t.description && <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 line-clamp-2">{t.description}</p>}
+                        </div>
+                        <button onClick={() => handleDeleteTemplate(t.id)} disabled={deletingId === t.id} aria-label="Delete template" className="p-0.5 text-[var(--text-tertiary)] hover:text-red-400 flex-shrink-0 transition-colors">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 mt-auto">
+                        <div className="flex items-center gap-1.5">
+                          {t.category && <Badge variant="secondary">{t.category}</Badge>}
+                          <span className="text-[10px] text-[var(--text-tertiary)]">{t.template_data.steps.length} step{t.template_data.steps.length !== 1 ? "s" : ""}</span>
+                        </div>
+                        <Button size="sm" onClick={() => handleDeployTemplate(`db-${t.id}`, t.id, null)} disabled={deployingKey === `db-${t.id}`}>
+                          {deployingKey === `db-${t.id}` ? "Deploying…" : "Deploy"}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {STARTER_TEMPLATES.map((t, i) => (
+                    <div key={`starter-${i}`} className="bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] p-3 flex flex-col gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-[var(--text-primary)] truncate">{t.name}</p>
+                        {t.description && <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 line-clamp-2">{t.description}</p>}
+                      </div>
+                      <div className="flex items-center justify-between gap-2 mt-auto">
+                        <div className="flex items-center gap-1.5">
+                          {t.category && <Badge variant="secondary">{t.category}</Badge>}
+                          <span className="text-[10px] text-[var(--text-tertiary)]">{t.template_data.steps.length} step{t.template_data.steps.length !== 1 ? "s" : ""}</span>
+                        </div>
+                        <Button size="sm" onClick={() => handleDeployTemplate(`starter-${i}`, null, i)} disabled={deployingKey === `starter-${i}`}>
+                          {deployingKey === `starter-${i}` ? "Deploying…" : "Deploy"}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Detail Panel / Summary Panel */}

@@ -1,12 +1,20 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, ListTodo, Play } from "lucide-react";
+import { X, Trash2, ListTodo, Play, BookTemplate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import dynamic from "next/dynamic";
 
 const RichTextEditor = dynamic(
@@ -19,7 +27,7 @@ const RichTextEditor = dynamic(
   }
 );
 import { useRouter } from "next/navigation";
-import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch, createRunbook } from "@/lib/api/client";
+import { updateSection, deleteSection as apiDeleteSection, fetchStepRolesBatch, createRunbook, createTemplate } from "@/lib/api/client";
 import type { StepRoleWithDetails } from "@/lib/api/client";
 import type { Section, Step } from "@/types/database";
 import { TaskCountsContext } from "@/types/canvas";
@@ -40,6 +48,11 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
   const nameTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   const [stepRolesMap, setStepRolesMap] = React.useState<Record<string, StepRoleWithDetails[]>>({});
   const [creating, setCreating] = React.useState(false);
+  const [showSaveDialog, setShowSaveDialog] = React.useState(false);
+  const [saveTemplateName, setSaveTemplateName] = React.useState("");
+  const [saveTemplateDesc, setSaveTemplateDesc] = React.useState("");
+  const [saveTemplateCat, setSaveTemplateCat] = React.useState("");
+  const [savingTemplate, setSavingTemplate] = React.useState(false);
 
   React.useEffect(() => {
     setName(section.name);
@@ -109,6 +122,36 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
       toastError("Failed to create runbook", { error: err });
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleOpenSaveDialog = () => {
+    setSaveTemplateName(section.name);
+    setSaveTemplateDesc("");
+    setSaveTemplateCat("");
+    setShowSaveDialog(true);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!saveTemplateName.trim()) {
+      toastError("Template name is required");
+      return;
+    }
+    setSavingTemplate(true);
+    try {
+      await createTemplate({
+        workspace_id: section.workspace_id,
+        section_id: section.id,
+        name: saveTemplateName.trim(),
+        description: saveTemplateDesc.trim() || undefined,
+        category: saveTemplateCat.trim() || undefined,
+      });
+      toast.success("Template saved");
+      setShowSaveDialog(false);
+    } catch (err) {
+      toastError("Failed to save template", { error: err });
+    } finally {
+      setSavingTemplate(false);
     }
   };
 
@@ -327,6 +370,10 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
       </div>
 
       <div className="px-4 py-3 border-t border-[var(--border-subtle)] space-y-2">
+        <Button variant="secondary" size="sm" onClick={handleOpenSaveDialog} className="w-full">
+          <BookTemplate className="h-3.5 w-3.5" />
+          Save as Template
+        </Button>
         <Button variant="default" size="sm" onClick={handleRunAsChecklist} disabled={creating} className="w-full">
           <Play className="h-3.5 w-3.5" />
           {creating ? "Creating..." : "Run as Checklist"}
@@ -336,6 +383,57 @@ export function SectionDetailPanel({ section, steps, onUpdate, onDelete, onClose
           Delete Section
         </Button>
       </div>
+
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save as Template</DialogTitle>
+            <DialogDescription>
+              Save this section as a reusable template
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+                Name
+              </label>
+              <Input
+                value={saveTemplateName}
+                onChange={(e) => setSaveTemplateName(e.target.value)}
+                placeholder="Template name"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+                Description
+              </label>
+              <Input
+                value={saveTemplateDesc}
+                onChange={(e) => setSaveTemplateDesc(e.target.value)}
+                placeholder="Brief description (optional)"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+                Category
+              </label>
+              <Input
+                value={saveTemplateCat}
+                onChange={(e) => setSaveTemplateCat(e.target.value)}
+                placeholder="e.g. Sales, Support, Marketing (optional)"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" size="sm" onClick={() => setShowSaveDialog(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleSaveTemplate} disabled={savingTemplate}>
+              {savingTemplate ? "Saving..." : "Save Template"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
