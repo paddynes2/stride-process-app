@@ -15,13 +15,13 @@ interface ColoringPanelProps {
   onRulesChange: (rules: ColoringRule[]) => void;
 }
 
-const CRITERIA_OPTIONS: { value: CriteriaType; label: string }[] = [
+const CRITERIA_OPTIONS: { value: CriteriaType; label: string; disabled?: boolean }[] = [
   { value: "status", label: "Status" },
   { value: "executor", label: "Executor" },
   { value: "step_type", label: "Step Type" },
   { value: "maturity_below", label: "Maturity Below" },
   { value: "maturity_above", label: "Maturity Above" },
-  { value: "has_role", label: "Has Role" },
+  { value: "has_role", label: "Has Role (coming soon)", disabled: true },
 ];
 
 const CRITERIA_VALUE_HINTS: Record<CriteriaType, string> = {
@@ -201,7 +201,7 @@ export function ColoringPanel({ workspaceId, rules, onRulesChange }: ColoringPan
                   className="w-full bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] px-2 py-1 text-[12px] text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)]"
                 >
                   {CRITERIA_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
+                    <option key={opt.value} value={opt.value} disabled={opt.disabled}>
                       {opt.label}
                     </option>
                   ))}
@@ -246,7 +246,7 @@ export function ColoringPanel({ workspaceId, rules, onRulesChange }: ColoringPan
                 <div className="flex-1 min-w-0">
                   <p className="text-[12px] font-medium text-[var(--text-primary)] truncate">{rule.name}</p>
                   <p className="text-[10px] text-[var(--text-tertiary)] truncate">
-                    {rule.criteria_type}: {rule.criteria_value}
+                    {CRITERIA_OPTIONS.find((o) => o.value === rule.criteria_type)?.label ?? rule.criteria_type}: {rule.criteria_value}
                   </p>
                 </div>
                 {/* Active toggle */}
@@ -322,7 +322,7 @@ export function ColoringPanel({ workspaceId, rules, onRulesChange }: ColoringPan
           className="w-full bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] px-2 py-1 text-[12px] text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)]"
         >
           {CRITERIA_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
+            <option key={opt.value} value={opt.value} disabled={opt.disabled}>
               {opt.label}
             </option>
           ))}
