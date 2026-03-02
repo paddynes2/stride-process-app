@@ -2,9 +2,17 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, ClipboardList } from "lucide-react";
+import { ArrowLeft, ClipboardList, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { updateRunbook, updateRunbookStep } from "@/lib/api/client";
 import { toastError } from "@/lib/api/toast-helpers";
 import { cn } from "@/lib/utils";
@@ -50,6 +58,8 @@ interface RunbookViewProps {
 export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId, userId }: RunbookViewProps) {
   const [runbook, setRunbook] = React.useState(initialRunbook);
   const [steps, setSteps] = React.useState(initialSteps);
+  const [confirmCompleteOpen, setConfirmCompleteOpen] = React.useState(false);
+  const [confirmCancelOpen, setConfirmCancelOpen] = React.useState(false);
   const noteSaveTimers = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const isReadOnly = runbook.status === "completed" || runbook.status === "cancelled";
@@ -88,8 +98,8 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
     }, 600);
   };
 
-  const handleCompleteRunbook = async () => {
-    if (!window.confirm("Mark this runbook as complete?")) return;
+  const executeCompleteRunbook = async () => {
+    setConfirmCompleteOpen(false);
     const prev = { ...runbook };
     const now = new Date().toISOString();
     setRunbook((r) => ({ ...r, status: "completed" as RunbookStatus, completed_at: now }));
@@ -102,8 +112,8 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
     }
   };
 
-  const handleCancelRunbook = async () => {
-    if (!window.confirm("Cancel this runbook?")) return;
+  const executeCancelRunbook = async () => {
+    setConfirmCancelOpen(false);
     const prev = { ...runbook };
     setRunbook((r) => ({ ...r, status: "cancelled" as RunbookStatus }));
     try {
@@ -137,10 +147,16 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
           <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
           {!isReadOnly && (
             <div className="flex items-center gap-1.5">
-              <Button variant="destructive" size="sm" onClick={handleCancelRunbook}>
+              <Button variant="secondary" size="sm" asChild>
+                <Link href="./playbook">
+                  <Play className="h-3.5 w-3.5" aria-label="Playbook Mode" />
+                  Playbook
+                </Link>
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => setConfirmCancelOpen(true)}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleCompleteRunbook}>
+              <Button size="sm" onClick={() => setConfirmCompleteOpen(true)}>
                 Complete
               </Button>
             </div>
@@ -262,6 +278,48 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
           <span>Created {createdByLabel}</span>
         </div>
       </div>
+
+      {/* Complete confirmation dialog */}
+      <Dialog open={confirmCompleteOpen} onOpenChange={setConfirmCompleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Complete runbook?</DialogTitle>
+            <DialogDescription>
+              Marking this runbook as complete will lock all steps. You will no longer be able to
+              update step statuses or add notes.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setConfirmCompleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={executeCompleteRunbook}>
+              Mark Complete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel confirmation dialog */}
+      <Dialog open={confirmCancelOpen} onOpenChange={setConfirmCancelOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel runbook?</DialogTitle>
+            <DialogDescription>
+              Cancelling this runbook will stop execution and lock all steps. This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setConfirmCancelOpen(false)}>
+              Go Back
+            </Button>
+            <Button variant="destructive" onClick={executeCancelRunbook}>
+              Cancel Runbook
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
