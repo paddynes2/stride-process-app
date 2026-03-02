@@ -19,6 +19,7 @@ import {
   MessageSquare,
   ClipboardList,
   Clock,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,12 +36,13 @@ const NAV_ITEMS = [
   { label: "Workflows", icon: GitBranch, href: "", active: (p: string, wsId: string) => {
     // Active when on /w/{wsId} or /w/{wsId}/{tabId} — excludes all named sub-routes
     const base = `/w/${wsId}`;
-    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list") && !p.includes("/gap-analysis") && !p.includes("/compare") && !p.includes("/dashboard") && !p.includes("/comments") && !p.includes("/runbooks") && !p.includes("/activity") && !p.includes("/perspectives"));
+    return p === base || (p.startsWith(base) && !p.includes("/teams") && !p.includes("/people") && !p.includes("/tools") && !p.includes("/settings") && !p.includes("/list") && !p.includes("/gap-analysis") && !p.includes("/compare") && !p.includes("/dashboard") && !p.includes("/comments") && !p.includes("/runbooks") && !p.includes("/activity") && !p.includes("/perspectives") && !p.includes("/prioritization"));
   }},
   { label: "List View", icon: List, href: "/list" },
   { label: "Gap Analysis", icon: TrendingDown, href: "/gap-analysis" },
   { label: "Compare", icon: Split, href: "/compare" },
   { label: "Perspectives", icon: Eye, href: "/perspectives/compare" },
+  { label: "Prioritization", icon: Target, href: "/prioritization" },
   { label: "Comments", icon: MessageSquare, href: "/comments" },
   { label: "Runbooks", icon: ClipboardList, href: "/runbooks" },
   { label: "Activity", icon: Clock, href: "/activity" },
