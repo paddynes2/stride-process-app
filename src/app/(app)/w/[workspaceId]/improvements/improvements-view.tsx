@@ -206,6 +206,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
                       {/* Delete button */}
                       <button
                         onClick={() => handleDelete(idea)}
+                        aria-label="Delete improvement idea"
                         className="text-[var(--text-tertiary)] hover:text-[#EF4444] transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
