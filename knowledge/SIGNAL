@@ -1,1 +1,1 @@
-CONTINUE: #BUG-019 fix (page.tsx activity query missing user join — P1 regression, attempt 2), then #FEAT-051 conditional step coloring
+CONTINUE: #BUG-019 attempt 3 (page.tsx line 25: .select("*") → .select("*, users!activity_log_user_id_fkey(email)") — ONE LINE FIX), then #FEAT-051 [2/2] coloring rules UI (toolbar panel + step node background tint)
