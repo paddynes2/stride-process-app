@@ -1122,14 +1122,14 @@ Slot 2 (22 files modified):
 - Observations: 8 (2 bugs + 6 improvements)
 **Notes:** Iteration 91 validated FEAT-049 after 40 API route files were modified in iter 90. Both acceptance and regression passed all criteria via static analysis (Playwright unavailable — Chrome launch conflict). Acceptance verified: migration schema, RLS, API route, logActivity utility, activity page UI components, sidebar nav, special actions, parent-chain traversal. Regression covered all features through Phase 4. 2 P2 bugs and 6 improvements logged for future iterations. BUILD_RESULT_1.json contained stale iter 94 FEAT-050 data from a builder worktree — not relevant to this testing-only iteration. Risk score 4 from iter 90 is now cleared. Next: FEAT-050 Workspace cloning.
 
-## Iteration 92 — 2026-03-03 10:00
+## Iteration 92 — 2026-03-03 10:00 (corrected with acceptance test results)
 **Tasks:**
-- #FEAT-050 [1/2] Workspace cloning data layer — slot 1 — completed
-- #BUG-019 Activity user email display — slot 2 — completed
+- #FEAT-050 [1/2] Workspace cloning data layer — slot 1 — completed (7/7 acceptance PASS)
+- #BUG-019 Activity user email display — slot 2 — FAILED (4/6 criteria FAIL — regression)
 - #IMP-019 Entity type human-readable labels — slot 2 — completed
 **Source:** prd/FEATURES.md, prd/BUGS.md, prd/IMPROVEMENTS.md
 **Mode:** multi_task
-**Result:** completed
+**Result:** partial
 **Changes:**
 - supabase/migrations/018_clone_workspace.sql (created — 249 lines, SECURITY DEFINER clone function)
 - src/app/api/v1/workspaces/[id]/clone/route.ts (created — 55 lines, POST handler)
@@ -1139,17 +1139,55 @@ Slot 2 (22 files modified):
 - src/types/database.ts (modified — users join type on ActivityLog)
 **Verification:**
 - Type check: pass (0 errors)
-- Lint: pass (0 errors, 3 pre-existing warnings from flow-canvas copies in worktrees)
+- Lint: pass (0 errors, 1 pre-existing warning in flow-canvas.tsx)
 - Build: N/A
 - Unit tests: N/A (no test suite)
 - Browser test: skipped (Playwright unavailable)
-- Canary test: skipped (no UI changes requiring canary)
+- Canary test: skipped (UI changes are view-only, no new user journeys)
+- **Acceptance test: FAILED** — FEAT-050 7/7 pass, BUG-019 4/6 FAIL
+**Bugs found:** 1 — P1 regression: BUG-019 fix incomplete. Builder updated API route.ts with user join but NOT page.tsx server component. Initial page load shows "Unknown" for all entries (entry.users is always undefined). Worse than original UUID prefix behavior. userMap approach from acceptance criteria also not implemented.
+**Improvements found:** None (tester claimed Activity not in sidebar nav, but it IS there per FEAT-049 acceptance iter 91 — false positive)
+**Self-score:**
+- Code quality: 4 — FEAT-050 migration well-structured. Clone route follows patterns. BUG-019 implementation incomplete (API route updated, page.tsx not).
+- Test coverage: 3 — Typecheck/lint pass. Acceptance testing caught BUG-019 regression via static analysis. No runtime tests.
+- Confidence: 3 — FEAT-050 data layer sound but untested live. BUG-019 is actively regressed (shows "Unknown").
+- Efficiency: 2 — Code built 3 times by pipeline but never merged. Reviewer recovered from unreachable commits.
+- Observations: 1 (BUG-019 regression from incomplete implementation)
+**Notes:** Pipeline merge step failed 3 consecutive times. Builder commits recovered from unreachable git objects. BUG-019 correction: previous reviewer marked as "completed" without test results; acceptance tester confirmed 4/6 criteria FAIL. The builder's BUILD_RESULT notes described a "two-phase userMap approach" that was NOT actually implemented. page.tsx still uses select("*") — must be updated to select("*, users!activity_log_user_id_fkey(email)") to match the API route.
+
+## Iteration 93 — 2026-03-03 14:00
+**Tasks:**
+- #FEAT-050 [2/2] Duplicate Workspace button in settings — slot 1 — completed
+- #BUG-018 void logActivity() cleanup — slot 2 — completed
+**Source:** prd/FEATURES.md, prd/BUGS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+Slot 1 (1 file):
+- src/app/(app)/w/[workspaceId]/settings/page.tsx — added cloneWorkspace import, cloning state, handleClone handler (confirm → API → toast → navigate), "Duplicate Workspace" section above Danger Zone with Copy icon and loading button
+Slot 2 (18 files):
+- src/app/api/v1/connections/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/sections/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/shares/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/stages/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/steps/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/tabs/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/touchpoints/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/touchpoint-connections/route.ts, [id]/route.ts — void prefix on logActivity
+- src/app/api/v1/workspaces/route.ts, [id]/route.ts — void prefix on logActivity
+**Verification:**
+- Type check: pass (both builders + POST_MERGE_CHECK all pass, 0 errors)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx, 0 errors)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (Playwright unavailable)
+- Canary test: skipped (Playwright unavailable — has_ui_changes=true)
 **Bugs found:** None
 **Improvements found:** None
 **Self-score:**
-- Code quality: 4 — Migration is well-structured with FK-ordered cloning, temp tables for UUID mapping. Clone route follows existing API patterns. Review-level fix: added void to logActivity call.
-- Test coverage: 2 — Typecheck and lint only, no runtime verification
-- Confidence: 4 — Migration logic is sound (FK order, NULL handling), but untested against live Supabase. Activity join depends on FK constraint existing in deployed DB.
-- Efficiency: 2 — Code was built 3 times by pipeline (iterations 92-94) but never merged. Reviewer recovered from unreachable commits.
+- Code quality: 5 — FEAT-050 UI follows handleDelete pattern exactly. BUG-018 mechanical but clean.
+- Test coverage: 2 — typecheck + lint only. FEAT-050 acceptance testing needed.
+- Confidence: 5 — FEAT-050 [2/2] straightforward UI wiring to existing API. BUG-018 purely additive void prefix.
+- Efficiency: 4 — Both builders succeeded. Slot 2 diverged from plan (#IMP-018 assigned, #BUG-018 built).
 - Observations: 0
-**Notes:** Pipeline merge step failed 3 consecutive times for this iteration's work (internal iters 38, 39, 40). Builder commits were unreachable (03896ad for slot 1, 77eaa98 for slot 2). Reviewer recovered files via `git checkout <sha> -- <files>`. This is the 9th+ pipeline merge failure occurrence (previously iters 73, 74, 77, 78, 84, 85). Pipeline worktree cleanup continues to destroy builder work before merge.
+**Notes:** FEAT-050 fully complete (both sub-tasks done). BUG-018 resolved — 25 bare logActivity() calls now have void prefix across 18 API route files. Slot 2 task divergence: planner assigned IMP-018 (activity empty state guidance text) but builder chose BUG-018 instead. IMP-018 remains pending. FEAT-050 acceptance testing recommended for next iteration.

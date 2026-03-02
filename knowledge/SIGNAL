@@ -1,1 +1,1 @@
-CONTINUE: #FEAT-050 [2/2] Workspace cloning UI (Duplicate Workspace button in settings, loading spinner, redirect to cloned workspace on success)
+CONTINUE: #BUG-019 fix (page.tsx activity query missing user join — P1 regression, attempt 2), then #FEAT-051 conditional step coloring

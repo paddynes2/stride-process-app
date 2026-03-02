@@ -6,9 +6,9 @@
 - **Suite:** acceptance #FEAT-049 (20 checks) + regression baseline (37 checks)
 - **Method:** Static analysis + TypeScript + ESLint + code review (Playwright unavailable — Chrome launch conflict)
 - **Result:** **57/57 ALL PASS**
-- **Bugs found:** 2 (BUG-018 P2 void keyword, BUG-019 P2 user display)
+- **Bugs found:** 2 (BUG-018 P2 void keyword — resolved iter 93, BUG-019 P2 user display — still open)
 - **Improvements found:** 6 (IMP-017 through IMP-022 — activity page usability)
-- **Note:** FEAT-049 fully acceptance-tested. Full regression clean. Risk score 4 from iter 90 cleared.
+- **Note:** FEAT-049 fully acceptance-tested. Full regression clean. FEAT-050 acceptance testing pending (UI changes in iters 92-93).
 
 ## Suite Results
 
