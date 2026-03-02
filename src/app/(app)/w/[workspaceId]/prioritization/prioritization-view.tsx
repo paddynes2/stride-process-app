@@ -166,7 +166,7 @@ export function PrioritizationView({
             <span>No items with both effort and impact scores. Open a step or touchpoint and assign scores in the detail panel.</span>
             {tabs.length > 0 && (
               <Link
-                href={`/w/${workspaceId}/${tabs[0].id}`}
+                href={`/w/${workspaceId}/${(tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id}`}
                 className="text-[var(--accent-blue)] hover:underline"
               >
                 Go to Canvas
