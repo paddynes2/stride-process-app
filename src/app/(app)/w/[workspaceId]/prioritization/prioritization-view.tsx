@@ -42,6 +42,11 @@ interface PrioritizationViewProps {
   tabs: Pick<Tab, "id" | "name" | "canvas_type">[];
 }
 
+// Scores top-to-bottom (high impact = top)
+const Y_AXIS_SCORES = [5, 4, 3, 2, 1] as const;
+// Scores left-to-right (low effort = left)
+const X_AXIS_SCORES = [1, 2, 3, 4, 5] as const;
+
 export function PrioritizationView({
   workspaceId,
   steps,
@@ -161,9 +166,9 @@ export function PrioritizationView({
           </div>
         ) : (
           <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden">
-            {/* Axis label row */}
+            {/* Main chart row: Y-axis title + Y-axis labels + chart area */}
             <div className="flex">
-              {/* Y-axis label */}
+              {/* Y-axis title */}
               <div className="flex items-center justify-center w-6 shrink-0">
                 <span
                   className="text-[9px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide select-none whitespace-nowrap"
@@ -171,6 +176,19 @@ export function PrioritizationView({
                 >
                   ↑ Impact
                 </span>
+              </div>
+
+              {/* Y-axis numeric labels (5 at top → 1 at bottom) */}
+              <div className="relative w-4 shrink-0" style={{ height: "480px" }}>
+                {Y_AXIS_SCORES.map((score, i) => (
+                  <span
+                    key={score}
+                    className="absolute right-0.5 text-[9px] text-[var(--text-tertiary)] select-none leading-none"
+                    style={{ top: `${i * 25}%`, transform: "translateY(-50%)" }}
+                  >
+                    {score}
+                  </span>
+                ))}
               </div>
 
               {/* Chart area */}
@@ -181,9 +199,29 @@ export function PrioritizationView({
                 <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-[#3B82F6]/5 pointer-events-none" />
                 <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-[#EF4444]/5 pointer-events-none" />
 
-                {/* Divider lines */}
+                {/* Quadrant divider lines (at 50%) */}
                 <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[var(--border-subtle)] pointer-events-none" />
                 <div className="absolute top-1/2 left-0 right-0 h-px bg-[var(--border-subtle)] pointer-events-none" />
+
+                {/* Subtle grid lines at 25% and 75% — vertical (scores 2 and 4) */}
+                <div
+                  className="absolute top-0 bottom-0 pointer-events-none"
+                  style={{ left: "25%", width: 0, borderLeft: "1px dashed var(--border-subtle)", opacity: 0.35 }}
+                />
+                <div
+                  className="absolute top-0 bottom-0 pointer-events-none"
+                  style={{ left: "75%", width: 0, borderLeft: "1px dashed var(--border-subtle)", opacity: 0.35 }}
+                />
+
+                {/* Subtle grid lines at 25% and 75% — horizontal (scores 4 and 2) */}
+                <div
+                  className="absolute left-0 right-0 pointer-events-none"
+                  style={{ top: "25%", height: 0, borderTop: "1px dashed var(--border-subtle)", opacity: 0.35 }}
+                />
+                <div
+                  className="absolute left-0 right-0 pointer-events-none"
+                  style={{ top: "75%", height: 0, borderTop: "1px dashed var(--border-subtle)", opacity: 0.35 }}
+                />
 
                 {/* Quadrant labels */}
                 <div className="absolute top-3 left-3 text-[10px] font-medium text-[var(--text-tertiary)]/50 pointer-events-none select-none">
@@ -244,9 +282,27 @@ export function PrioritizationView({
               </div>
             </div>
 
-            {/* X-axis label */}
+            {/* X-axis numeric labels (1 at left → 5 at right) */}
             <div className="flex">
               <div className="w-6 shrink-0" />
+              <div className="w-4 shrink-0" />
+              <div className="flex-1 relative" style={{ height: "14px" }}>
+                {X_AXIS_SCORES.map((score, i) => (
+                  <span
+                    key={score}
+                    className="absolute text-[9px] text-[var(--text-tertiary)] select-none leading-none"
+                    style={{ left: `${i * 25}%`, top: 0, transform: "translateX(-50%)" }}
+                  >
+                    {score}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* X-axis title */}
+            <div className="flex">
+              <div className="w-6 shrink-0" />
+              <div className="w-4 shrink-0" />
               <div className="flex-1 text-center py-1.5">
                 <span className="text-[9px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide select-none">
                   Effort →
