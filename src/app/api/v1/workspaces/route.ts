@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  logActivity({
+  void logActivity({
     supabase,
     workspace_id: workspace.id,
     user_id: user.id,
