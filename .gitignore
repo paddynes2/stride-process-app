@@ -46,6 +46,9 @@ next-env.d.ts
 # claude code
 .claude/
 
+# ralph pipeline runtime files
+autonomous-dev/.ralph/
+
 # playwright MCP artifacts
 .playwright-mcp/
 
