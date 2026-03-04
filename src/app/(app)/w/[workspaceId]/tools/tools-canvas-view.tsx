@@ -15,7 +15,7 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Plus, Square, BarChart3 } from "lucide-react";
+import { Plus, Square, BarChart3, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToolNode } from "@/components/canvas/tool-node";
 import { ToolSectionNode } from "@/components/canvas/tool-section-node";
@@ -430,13 +430,23 @@ export function ToolsCanvasView({
       <h1 className="sr-only">Tools</h1>
       {/* Main content: canvas or analysis view */}
       {showAnalysis ? (
-        <ToolAnalysisView
-          workspaceId={workspaceId}
-          tools={tools}
-          steps={steps}
-          stepTools={stepTools}
-          onSelectTool={handleSelectToolFromAnalysis}
-        />
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] shrink-0">
+            <Button variant="secondary" size="sm" onClick={() => setShowAnalysis(false)}>
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Canvas
+            </Button>
+          </div>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ToolAnalysisView
+              workspaceId={workspaceId}
+              tools={tools}
+              steps={steps}
+              stepTools={stepTools}
+              onSelectTool={handleSelectToolFromAnalysis}
+            />
+          </div>
+        </div>
       ) : (
         <div className="flex-1 relative">
           <ReactFlow
