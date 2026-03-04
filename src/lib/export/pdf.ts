@@ -17,6 +17,11 @@ interface StepRoleForExport {
   role: { hourly_rate: number | null };
 }
 
+interface StepToolForExport {
+  step_id: string;
+  tool: { cost_per_month: number | null };
+}
+
 interface ExportPdfOptions {
   workspaceName: string;
   sections: Section[];
@@ -24,6 +29,7 @@ interface ExportPdfOptions {
   connections: Connection[];
   canvasElement: HTMLElement | null;
   stepRoles?: StepRoleForExport[];
+  stepTools?: StepToolForExport[];
 }
 
 export interface PdfSectionEntry {
@@ -39,6 +45,7 @@ export async function createWorkspacePdf(
     connections,
     canvasElement,
     stepRoles = [],
+    stepTools = [],
   }: ExportPdfOptions,
   skipFooter = false,
 ): Promise<{ pdf: jsPDF; sections: PdfSectionEntry[] }> {
@@ -57,6 +64,7 @@ export async function createWorkspacePdf(
   // Pre-compute shared lookups
   const sectionMap = new Map(sections.map((s) => [s.id, s.name]));
   const stepRolesMap = buildStepRolesMap(stepRoles);
+  const stepToolsMap = buildStepToolsMap(stepTools);
   const sectionEntries: PdfSectionEntry[] = [];
 
   // --- Title Page ---
@@ -453,7 +461,7 @@ export async function createWorkspacePdf(
   }, 0);
 
   const totalMonthlyCost = steps.reduce((total, s) => {
-    return total + computeStepMonthlyCost(s, stepRolesMap);
+    return total + computeStepMonthlyCost(s, stepRolesMap, stepToolsMap);
   }, 0);
 
   if (totalMonthlyHours > 0 || totalMonthlyCost > 0) {
@@ -504,7 +512,7 @@ export async function createWorkspacePdf(
         }
         return sum;
       }, 0);
-      const cost = sectionSteps.reduce((sum, s) => sum + computeStepMonthlyCost(s, stepRolesMap), 0);
+      const cost = sectionSteps.reduce((sum, s) => sum + computeStepMonthlyCost(s, stepRolesMap, stepToolsMap), 0);
       return { name: section.name, stepCount: sectionSteps.length, hours: hrs, cost };
     }).filter((s) => s.hours > 0 || s.cost > 0);
 
@@ -590,9 +598,9 @@ export async function createWorkspacePdf(
         name: s.name,
         section: s.section_id ? sectionMap.get(s.section_id) ?? "" : "",
         hours: s.time_minutes && s.frequency_per_month ? (s.time_minutes * s.frequency_per_month) / 60 : 0,
-        cost: computeStepMonthlyCost(s, stepRolesMap),
+        cost: computeStepMonthlyCost(s, stepRolesMap, stepToolsMap),
       }))
-      .filter((s) => s.hours > 0)
+      .filter((s) => s.hours > 0 || s.cost > 0)
       .sort((a, b) => {
         if (a.cost !== b.cost) return b.cost - a.cost;
         return b.hours - a.hours;
@@ -701,14 +709,33 @@ function buildStepRolesMap(stepRoles: StepRoleForExport[]): Map<string, StepRole
   return map;
 }
 
-function computeStepMonthlyCost(step: Step, rolesMap: Map<string, StepRoleForExport[]>): number {
-  if (!step.time_minutes || !step.frequency_per_month) return 0;
+function buildStepToolsMap(stepTools: StepToolForExport[]): Map<string, StepToolForExport[]> {
+  const map = new Map<string, StepToolForExport[]>();
+  for (const st of stepTools) {
+    const existing = map.get(st.step_id);
+    if (existing) {
+      existing.push(st);
+    } else {
+      map.set(st.step_id, [st]);
+    }
+  }
+  return map;
+}
+
+function computeStepMonthlyCost(
+  step: Step,
+  rolesMap: Map<string, StepRoleForExport[]>,
+  toolsMap: Map<string, StepToolForExport[]>,
+): number {
+  const tools = toolsMap.get(step.id) ?? [];
+  const toolCost = tools.reduce((sum, st) => sum + (st.tool.cost_per_month ?? 0), 0);
+  if (!step.time_minutes || !step.frequency_per_month) return toolCost;
   const monthlyHours = (step.time_minutes * step.frequency_per_month) / 60;
   const roles = rolesMap.get(step.id) ?? [];
   const rolesWithRate = roles.filter((sr) => sr.role.hourly_rate != null);
-  if (rolesWithRate.length === 0) return 0;
+  if (rolesWithRate.length === 0) return toolCost;
   const avgRate = rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length;
-  return monthlyHours * avgRate;
+  return monthlyHours * avgRate + toolCost;
 }
 
 function getGapColor(gap: number): string {
