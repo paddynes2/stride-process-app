@@ -486,5 +486,37 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show brief inline confirmation — change button text to "Added" with checkmark for 2 seconds (same Copy button pattern in gap-analysis-view).
 
+- [ ] #IMP-069 StageNode and TouchpointNode not wrapped in React.memo() — Attempts: 0
+  - **Found:** Iteration 112 (acceptance tester)
+  - **Category:** Performance
+  - **Where:** `src/components/canvas/stage-node.tsx`, `src/components/canvas/touchpoint-node.tsx`
+  - **What:** StageNode and TouchpointNode are exported as plain function components without React.memo(). StepNode and SectionNode already use React.memo() (IMP-032, iter 101). In a canvas with many journey elements, re-renders of the parent cause unnecessary re-renders of all stage/touchpoint nodes.
+  - **Design principle:** Performance — minimize unnecessary renders (React Flow docs recommend memo on custom nodes)
+  - **Suggested fix:** Wrap exports in React.memo() matching step-node.tsx:145 and section-node.tsx:96 patterns.
+
+- [ ] #IMP-070 AI Suggestions panel duplicates fetch logic instead of using apiFetch client — Attempts: 0
+  - **Found:** Iteration 112 (acceptance tester)
+  - **Category:** Code consistency
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` (lines 68-85)
+  - **What:** The fetchSuggestionsAPI function fetches inline via `fetch('/api/v1/ai/suggest-improvements', ...)` rather than using the shared API client pattern. This duplicates fetch logic and bypasses the standard apiFetch envelope pattern used by the rest of the app (generateProcessAnalysis, generateGapNarrative).
+  - **Design principle:** Code consistency — all API calls should use apiFetch via lib/api/client.ts
+  - **Suggested fix:** Extract a fetchAISuggestions() function in lib/api/client.ts and use it from improvements-view.tsx.
+
+- [ ] #IMP-071 Sidebar improvements badge shows nothing on API 500 instead of fallback 0 — Attempts: 0
+  - **Found:** Iteration 112 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/components/layout/sidebar.tsx` (lines 131-135)
+  - **What:** When /api/v1/improvement-ideas returns 500 (BUG-028), the sidebar badge count stays null and renders nothing. Users see a blank badge area instead of "0".
+  - **Design principle:** Nielsen H9: Help users recognize, diagnose, recover from errors
+  - **Suggested fix:** Default badge count to 0 on fetch error rather than null, so the nav item renders consistently.
+
+- [ ] #IMP-072 Compare view empty state lacks CTA to create journey tab — Attempts: 0
+  - **Found:** Iteration 112 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx`
+  - **What:** The compare view empty state says "create a journey canvas tab" but has no direct CTA button or link. Users must remember to add a tab via the tab bar.
+  - **Design principle:** Nielsen H6: Recognition over recall — users should not have to remember where to take action
+  - **Suggested fix:** Add a small "Add Journey Tab" button in the empty state that triggers the tab creation flow directly.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

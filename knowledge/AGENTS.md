@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-109, 2026-03-03 — Phase 3a, FEAT-036 [1/2] backend complete -->
+<!-- Updated: iter-112, 2026-03-04 — Phase 3a COMPLETE -->
 
 ## Project
 
@@ -155,6 +155,7 @@ npx supabase db push     # Push migrations
 | 019 | Coloring rules (criteria_type enum + coloring_rules table + RLS + index + update_updated_at trigger) |
 | 020 | Section templates (templates table with JSONB template_data + RLS via can_access_workspace + index + update_updated_at trigger) |
 | 021 | Prioritization scores (effort_score + impact_score INT CHECK 1-5 nullable on steps + touchpoints) |
+| 022 | Improvement ideas (improvement_status + improvement_priority enums + improvement_ideas table + RLS via can_access_workspace + index) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->
@@ -191,7 +192,7 @@ Types: step, section, touchpoint, stage.
 `ColoringTintContext` (from `canvas.ts`) provides Map<stepId, hexColor> to step nodes. Canvas-view evaluates workspace coloring rules against each step in position order (last match wins). Step nodes apply matching rule's color as background tint at 15% opacity (hex alpha `26`). HeatMapMode takes precedence over coloring rules. Coloring panel (`coloring-panel.tsx`, 347 lines) accessible via paintbrush button at top-right of canvas (absolute overlay, z-10). Panel supports full CRUD for rules. API routes validate color with `HEX_COLOR_REGEX` and criteria_type against `VALID_CRITERIA_TYPES`. has_role criteria type is in the enum but not visually evaluated (requires step-role data fetch). Process canvas only — does not apply to journey canvas.
 
 ### Reserved Paths in Workspace Shell
-`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity", "perspectives"]`
+`workspace-shell.tsx` line 47: array of path segments that are NOT tab IDs. When adding a new workspace sub-route, add its path segment here: `["teams", "people", "tools", "settings", "list", "gap-analysis", "compare", "comments", "dashboard", "runbooks", "activity", "perspectives", "prioritization", "improvements", "ai-analysis"]`
 
 ### Component Conventions
 - Dark theme only. All colors via CSS custom properties in globals.css

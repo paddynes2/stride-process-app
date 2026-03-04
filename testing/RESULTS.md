@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 111
+- **Iteration:** 112
 - **Date:** 2026-03-04
-- **Suite:** acceptance (FEAT-037 + FEAT-038 + IMP-065)
-- **Method:** Static code analysis (Playwright unavailable)
-- **Result:** **16/16 PASS** — All acceptance criteria verified
-- **Bugs found:** 1 (P2: BUG-027 — Generate Summary button hidden when no gap data)
-- **Improvements found:** 3 (IMP-066 gap analysis countdown, IMP-067 AI Suggestions no-steps guard, IMP-068 Add as Improvement feedback)
+- **Suite:** Phase 3a testing gate (acceptance + regression + accessibility)
+- **Method:** Static code analysis (acceptance) + Playwright browser (regression)
+- **Result:** **Acceptance 14/14 PASS + Regression 27/28 PASS (1 skip) + Accessibility 0 violations**
+- **Bugs found:** 2 (BUG-028 improvement-ideas 500, BUG-029 coloring-rules 500)
+- **Improvements found:** 4 (IMP-069 React.memo on journey nodes, IMP-070 AI fetch consistency, IMP-071 sidebar badge fallback, IMP-072 compare CTA)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 111 (2026-03-04) — 16/16 PASS (FEAT-037 7/7, FEAT-038 5/5, IMP-065 4/4 — static code analysis, Playwright unavailable)
+- Last run: Iteration 112 (2026-03-04) — 14/14 PASS (Phase 3a gate: FEAT-033 through FEAT-038 acceptance, regression checks, accessibility audit — static code analysis)
+- Previous: Iteration 111 (2026-03-04) — 16/16 PASS (FEAT-037 7/7, FEAT-038 5/5, IMP-065 4/4 — static code analysis, Playwright unavailable)
 - Previous: Iteration 109 (2026-03-03) — 24/24 PASS (FEAT-036 [1/2] 14/14, IMP-057 7/7, IMP-062 3/3 — static code analysis, Playwright unavailable)
 - Previous: Iteration 107 (2026-03-03) — 19/19 PASS (FEAT-035 11/11, BUG-025 5/5, IMP-052 4/4 — static code analysis, Playwright unavailable)
 - Previous: Iteration 106 (2026-03-02) — 19/20 PASS (FEAT-034 [2/2] 11/11, IMP-050 4/4, IMP-051 4/5 — static analysis + production comparison; 1 fail pre-existing)
@@ -24,7 +25,8 @@
 - Previous: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 DI 10, BUG-020 4, IMP-029 2 — static)
 
 ### Regression
-- Last run: Iteration 109 (2026-03-03) — 19/19 PASS, 2 skip (regression-baseline hybrid: browser on production + static analysis for iter-109 changes, 7 pages checked, 0 console errors, 8 regression checks PASS)
+- Last run: Iteration 112 (2026-03-04) — 27/28 PASS, 1 skip (full regression: Playwright browser on localhost, 13 pages checked, 2 console errors, 4 network errors, 0 accessibility violations; skip: journey canvas — no journey tab)
+- Previous: Iteration 109 (2026-03-03) — 19/19 PASS, 2 skip (regression-baseline hybrid: browser on production + static analysis for iter-109 changes, 7 pages checked, 0 console errors, 8 regression checks PASS)
 - Previous: Iteration 107 (2026-03-03) — 20/20 PASS (baseline 15 + BUG-025 2 + FEAT-035 2 + IMP-052 1 — Playwright browser, 7 pages checked, 0 console errors)
 - Previous: Iteration 105 (2026-03-02) — 12/12 PASS (regression-baseline static, feat-034-data-integrity static — Playwright unavailable)
 - Previous run: Iteration 103 (2026-03-02) — 10/10 PASS (Phase 4 full gate — all phases regression + all Phase 4 feature verification, 30+ files analyzed)
@@ -67,9 +69,8 @@
 - Method: Deep code review (3 parallel agents)
 
 ### Accessibility
-- Last run: N/A (BUG-002 through BUG-009 fixed in iteration 21, not re-audited with RALPH)
-- Result: N/A
-- **OVERDUE:** 83 iterations since last audit. Schedule immediately.
+- Last run: Iteration 112 (2026-03-04) — 0 violations (static audit via __auditAccessibility() on canvas + activity pages; static code review of Phase 3a components)
+- Previous: BUG-002 through BUG-009 fixed in iteration 21 (not re-audited with RALPH until now)
 
 ### Performance
 - Last run: Iteration 100 (2026-03-02)

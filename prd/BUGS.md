@@ -109,3 +109,19 @@
   - **What:** The entire AI narrative section (including "Generate Summary" button) is hidden when hasGapData is false. A new or empty workspace gives no indication that the AI narrative feature exists. The spec says the button should be "above the table" without specifying a conditional.
   - **Steps to reproduce:** Create a new workspace → Navigate to Gap Analysis → Observe: no "Generate Summary" button visible.
   - **Suggested fix:** Show the button in a muted/disabled state with hint text like "Score steps to enable AI narrative" when no gap data exists.
+
+- [ ] #BUG-028 /api/v1/improvement-ideas returns HTTP 500 for authenticated users (P2) — Attempts: 0
+  - **Found:** Iteration 112 (regression tester — browser)
+  - **Where:** `src/app/api/v1/improvement-ideas/route.ts`, sidebar.tsx badge fetch
+  - **What:** GET /api/v1/improvement-ideas?workspace_id=... returns HTTP 500 for authenticated users. Sidebar useEffect fetches this endpoint to render the Improvements badge count — 500 response causes badge to show blank. Double-fires (2x) due to React 18 StrictMode dev double-invoke.
+  - **Steps to reproduce:** 1. Log in. 2. Navigate to any workspace page. 3. Open DevTools Network tab. 4. Observe /api/v1/improvement-ideas returns 500.
+  - **Related:** FEAT-035 (improvement ideas feature)
+  - **Suggested fix:** Debug API route — likely RLS policy issue or migration 022 not applied to local dev DB.
+
+- [ ] #BUG-029 /api/v1/coloring-rules returns HTTP 500 for authenticated users (P2) — Attempts: 0
+  - **Found:** Iteration 112 (regression tester — browser)
+  - **Where:** `src/app/api/v1/coloring-rules/route.ts`, flow-canvas.tsx mount fetch
+  - **What:** GET /api/v1/coloring-rules?workspace_id=... returns HTTP 500 for authenticated users. flow-canvas.tsx calls fetchColoringRules on mount — 500 means coloring rules panel loads empty and any saved rules are invisible. Double-fires (2x) in dev StrictMode.
+  - **Steps to reproduce:** 1. Log in. 2. Navigate to a canvas tab. 3. Open DevTools Network. 4. Observe /api/v1/coloring-rules returns 500.
+  - **Related:** FEAT-051 (conditional coloring feature)
+  - **Suggested fix:** Debug API route — likely RLS policy issue or migration 019 not applied to local dev DB.
