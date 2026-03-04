@@ -1,33 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 122,
+  "iteration": 124,
   "slot": 1,
-  "task_id": "#BUG-033",
+  "task_id": "#FEAT-043 [1/4]",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 180,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx",
-      "action": "modified",
-      "lines_added": 4,
-      "lines_removed": 2
+      "path": "src/types/export.ts",
+      "action": "created",
+      "lines_added": 6,
+      "lines_removed": 0
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning (unused 'addEdge' in flow-canvas.tsx, unrelated to this change)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge import) — not introduced by this task" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [
-    "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx"
-  ],
+  "staged_files": ["src/types/export.ts"],
   "ownership_violations": [],
-  "notes": "Added useWorkspace import and destructured refreshTabs. Called await refreshTabs() in both handleCreateJourneyTab and handleCreateProcessTab after createTab() succeeds and before router.push(). Added refreshTabs to both useCallback dependency arrays.",
+  "notes": "The ExportPdfDialog component was already implemented by a previous builder iteration at src/components/panels/export-pdf-dialog.tsx (outside this task's owned paths of src/components/export/** and src/types/export.ts). It is fully wired into flow-canvas.tsx: Export PDF button opens the dialog, which calls onExportPdf(canvasElement, config) with the selected ExportConfig. The use-canvas-export.ts hook already handles config-aware PDF generation. All 7 of 8 acceptance criteria are met by the pre-existing code. This task created src/types/export.ts as the canonical re-export for ExportConfig (satisfying criterion 8). One minor discrepancy: existing dialog uses preset names Quick Summary / Full Report / Custom while spec called for Full Audit / Executive Summary / Gap Report. Fixing requires modifying src/components/panels/export-pdf-dialog.tsx which is outside owned paths.",
 
   "failure_details": null
 }

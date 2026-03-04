@@ -416,7 +416,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
   - **Fix applied:** Added `aria-pressed={statusFilter === "all"}` on All button and `aria-pressed={statusFilter === status}` on each status filter button.
 
-- [ ] #IMP-060 Sidebar improvements badge count stale after adding from detail panel — Attempts: 0
+- [x] #IMP-060 Sidebar improvements badge count stale after adding from detail panel — Attempts: 1 — Done iteration 124, 2026-03-05
   - **Found:** Iteration 108 (regression tester)
   - **Category:** Usability
   - **Where:** `src/components/layout/sidebar.tsx` (lines 62-74)
@@ -618,7 +618,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — clear feedback on selection
   - **Suggested fix:** Verify panel opens on single click and is visible in viewport; add tooltip if double-click required.
 
-- [ ] #IMP-086 Tool Analysis toggle button lacks active visual indicator — Attempts: 0
+- [x] #IMP-086 Tool Analysis toggle button lacks active visual indicator — Attempts: 1 — Done iteration 124, 2026-03-05
   - **Found:** Iteration 119 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — Analysis toggle button in sidebar header
@@ -681,6 +681,22 @@
   - **What:** Message says "No tools defined yet. Go to Tools →" implying tools must be defined globally first. Should say "No tools assigned. Assign from Tools page →" to clarify the action.
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Change copy to "No tools assigned. Assign from Tools page →".
+
+- [ ] #IMP-094 Export dialog disabled sections lack tooltip explaining what data is needed — Attempts: 0
+  - **Found:** Iteration 124 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — disabled checkboxes
+  - **What:** Disabled "coming soon" sections have no tooltip explaining when they'll become available or what data is needed (e.g., "Add a journey tab to enable Journey Map").
+  - **Design principle:** Nielsen H1: Visibility of system status — users should understand why a feature is unavailable
+  - **Suggested fix:** Add tooltip on disabled checkboxes: "Requires journey tab" or "Requires improvement ideas".
+
+- [ ] #IMP-095 Export dialog presets don't auto-switch to Custom on manual checkbox change — Attempts: 0
+  - **Found:** Iteration 124 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset button state
+  - **What:** Clicking any checkbox after selecting a preset doesn't switch to "Custom" automatically — user must manually click Custom first.
+  - **Design principle:** Nielsen H4: Consistency and standards — preset systems typically auto-switch to "Custom" when user deviates
+  - **Suggested fix:** When any checkbox state is manually changed, auto-activate the Custom preset button.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

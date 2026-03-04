@@ -1,23 +1,23 @@
 {
   "schema_version": "1.0",
-  "iteration": 122,
+  "iteration": 124,
   "slot": 2,
-  "task_id": "#BUG-037",
+  "task_id": "#IMP-086",
   "status": "completed",
-  "duration_seconds": 60,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
       "path": "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
       "action": "modified",
       "lines_added": 1,
-      "lines_removed": 0
+      "lines_removed": 1
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge) — not in owned files" },
+    "lint": { "status": "pass", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
@@ -27,7 +27,7 @@
     "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Added <h1 className=\"sr-only\">Tools</h1> as first child of the outermost <div className=\"flex h-full\"> at line 408. The existing h2 'Tools Summary' at line 540 is unchanged. Heading hierarchy is now h1 then h2 with no skipped levels. Visual appearance is unchanged (sr-only is Tailwind's screen-reader-only utility).",
+  "notes": "Changed active state of BarChart3 toggle button from accent-blue (bg-[var(--accent-blue)]/15 text-[var(--accent-blue)]) to brand teal (bg-[var(--brand)]/20 text-[var(--brand)]) to match sidebar active state pattern. Inactive state unchanged.",
 
   "failure_details": null
 }

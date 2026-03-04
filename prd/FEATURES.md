@@ -226,8 +226,8 @@
 ### #FEAT-043 Enhanced PDF export — multi-section report
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in_progress
 **Acceptance criteria:**
 - [ ] Export dialog (replaces direct download) with toggleable sections
 - [ ] Sections: Title page, Executive Summary (key metrics), Process Map (existing), Gap Analysis (existing), Cost Analysis (existing), Journey Map (if exists), Journey Sentiment (if exists), Perspective Comparison (if exists), Prioritization Matrix (if exists), Tool Landscape (if tools exist), Improvement Recommendations (if ideas exist), AI Insights (if cached)
@@ -236,7 +236,7 @@
 - [ ] Page numbers, table of contents
 **Notes:** The "crown jewel" — what consultants hand to clients. Builds on existing jspdf/html-to-image infrastructure. One render function per section (modular). FEAT-007's existing export becomes the "Process Map" section.
 **Sub-tasks:**
-- [ ] [1/4] Export dialog UI with section toggles and presets
+- [x] [1/4] Export dialog UI with section toggles and presets — Done iteration 124, 2026-03-05 (pre-existing dialog + canonical type re-export)
 - [ ] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison
 - [ ] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights
 - [ ] [4/4] Page numbers, table of contents, consistent styling

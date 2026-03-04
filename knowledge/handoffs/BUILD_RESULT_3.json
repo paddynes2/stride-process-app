@@ -1,31 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 122,
+  "iteration": 124,
   "slot": 3,
-  "task_id": "#BUG-036",
+  "task_id": "#IMP-060",
   "status": "completed",
-  "duration_seconds": 120,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/components/layout/header.tsx",
+      "path": "src/components/layout/sidebar.tsx",
       "action": "modified",
-      "lines_added": 2,
-      "lines_removed": 0
+      "lines_added": 14,
+      "lines_removed": 7
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused var), no errors" },
+    "lint": { "status": "pass", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/layout/header.tsx"],
+  "staged_files": ["src/components/layout/sidebar.tsx"],
   "ownership_violations": [],
-  "notes": "Added suppressHydrationWarning to both DropdownMenuTrigger child elements in header.tsx: (1) the user avatar Button on line 55, and (2) the perspective switcher button on line 106. Radix increments internal IDs during render; client-only Radix components on gap-analysis/tools pages shift that counter, causing a mismatch on the header DropdownMenuTrigger aria-controls/id attributes. suppressHydrationWarning silences the mismatch without affecting functionality.",
+  "notes": "Extracted fetch logic into fetchCount(), added visibilitychange listener that calls fetchCount() when tab becomes visible. Cleanup removes listener and sets cancelled=true. No polling — event-driven only. Error path sets null (hides badge) instead of 0 to avoid showing stale count.",
 
   "failure_details": null
 }

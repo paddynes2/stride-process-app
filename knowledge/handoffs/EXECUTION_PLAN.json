@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 122,
-  "date": "2026-03-05T03:00:00Z",
+  "iteration": 124,
+  "date": "2026-03-05T05:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "8af230ca055463ad19b63a60186e4fdf255fa79c",
+    "last_commit_hash": "10f343a",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,130 +13,151 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#BUG-033",
-      "description": "Journey tab not in tab bar after creation from Compare view CTA — call refreshTabs() after createTab() to update workspace context before navigation",
-      "source": "prd/BUGS.md",
-      "type": "fix",
-      "phase": "Phase 3b — Tools Canvas + Enhanced Export",
-      "complexity": "S",
+      "id": "#FEAT-043 [1/4]",
+      "description": "Export dialog UI with section toggles and presets. Create a new ExportDialog component that replaces the direct PDF download with a dialog offering toggleable report sections and 3 presets (Full Audit, Executive Summary, Gap Report). The dialog should list all available sections with checkboxes: Title Page, Executive Summary, Process Map, Gap Analysis, Cost Analysis, Journey Map, Journey Sentiment, Perspective Comparison, Prioritization Matrix, Tool Landscape, Improvement Recommendations, AI Insights. Each section shows enabled/disabled based on data availability. Presets auto-toggle relevant sections. Export button at bottom triggers PDF generation with selected sections. For this sub-task, build the dialog UI and state management only — actual PDF section renderers come in [2/4] and [3/4].",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "M",
       "attempts": 1,
       "risk_score": 1,
       "acceptance_criteria": [
-        "After clicking 'Create Journey Tab' in Compare view, the new tab appears in the tab bar",
-        "After clicking 'Create Process Tab' in Compare view, the new tab appears in the tab bar",
-        "Navigation to the new tab's canvas view works correctly after creation",
-        "No regression in existing tab bar behavior for already-existing tabs"
+        "New ExportDialog component exists (e.g., src/components/panels/export-dialog.tsx or src/components/export/export-dialog.tsx)",
+        "Dialog triggered from canvas-view.tsx export button (replaces or wraps existing direct PDF call)",
+        "12 section toggles rendered with checkboxes and labels",
+        "3 preset buttons (Full Audit, Executive Summary, Gap Report) that set toggle state",
+        "Sections that lack data show as disabled with muted text (e.g., Journey Map disabled if no journey tabs)",
+        "Export button at bottom calls a handler with the selected section config",
+        "Dialog uses Radix Dialog (existing ui/dialog.tsx) following codebase patterns",
+        "TypeScript types for ExportConfig (section booleans) defined in types/ or co-located"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx"
+        "src/components/export/**",
+        "src/types/export.ts"
       ],
       "files_read_only": [
-        "src/lib/context/workspace-context.tsx"
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+        "src/hooks/use-canvas-export.ts",
+        "src/lib/export/pdf.ts",
+        "src/components/ui/dialog.tsx"
       ],
       "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "useWorkspace() hook provides refreshTabs() — call it after createTab() succeeds, before router.push()",
-          "Other views that create entities and need context refresh use this same pattern"
+        "similar_files": [
+          "src/components/panels/coloring-panel.tsx",
+          "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
         ],
-        "learnings_relevant": [],
-        "affected_urls": ["/w/{workspaceId}/compare"]
+        "patterns_to_follow": [
+          "Radix Dialog pattern from canvas-view.tsx Templates dialog",
+          "Checkbox state management — simple boolean record/object",
+          "Dark theme tokens from globals.css",
+          "CVA for variants if needed"
+        ],
+        "learnings_relevant": [
+          "Custom Radix DialogTitle wrapper breaks a11y check (BUG-023) — use DialogPrimitive.Title",
+          "apiFetch unwraps envelope — returns T directly"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/[tabId]"
+        ]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Import useWorkspace from @/lib/context/workspace-context. In both handleCreateJourneyTab and handleCreateProcessTab, add `await refreshTabs()` after the createTab() call and before router.push(). The refreshTabs() function fetches updated tabs from the API and sets them in context, so the tab bar (which reads from context) will show the new tab immediately."
+      "special_instructions": "This is [1/4] — build the DIALOG UI and export config types only. Do NOT implement actual PDF section renderers yet. The Export button handler should accept an ExportConfig object and for now just call the existing handleExportPdf as a passthrough. Wire into canvas-view.tsx by modifying the existing PDF export button to open this dialog instead of calling handleExportPdf directly. Also wire into journey-canvas-view.tsx if it has its own export button. Existing export functionality must still work (dialog → Export → same PDF as before)."
     },
     {
       "slot": 2,
-      "id": "#BUG-037",
-      "description": "Tools page heading hierarchy violation — h2 'Tools Summary' without h1. Change to h1 or add visually-hidden h1.",
-      "source": "prd/BUGS.md",
-      "type": "fix",
-      "phase": "Phase 3b — Tools Canvas + Enhanced Export",
+      "id": "#IMP-086",
+      "description": "Add active visual indicator to Tool Analysis toggle button. When analysis mode is active, the BarChart3 toggle button should have a more prominent active state — use brand color (--brand / teal) background similar to sidebar active states, not just accent-blue text.",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Tools page has an h1 element as the first heading in the DOM",
-        "Heading hierarchy is logical (h1 before h2, no skipped levels)",
-        "Visual appearance is unchanged (use sr-only if adding a hidden h1)"
+        "Toggle button has clear visual distinction between canvas mode and analysis mode",
+        "Active (analysis) state uses brand color or prominent background/outline",
+        "Inactive state is visually subdued (current default styling)",
+        "No layout shift on toggle"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
       ],
-      "files_read_only": [],
+      "files_read_only": [
+        "src/components/layout/sidebar.tsx"
+      ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
+          "src/components/layout/sidebar.tsx"
         ],
         "patterns_to_follow": [
-          "Other workspace views use a visually hidden h1 or the header component provides it. Check how other view pages handle heading hierarchy.",
-          "The summary sidebar h2 at line 540 should stay h2 — add a sr-only h1 'Tools' before the ReactFlow canvas area"
+          "Sidebar active state uses --brand (#14B8A6) background",
+          "Dark theme tokens"
         ],
         "learnings_relevant": [],
-        "affected_urls": ["/w/{workspaceId}/tools"]
+        "affected_urls": [
+          "/w/[workspaceId]/tools"
+        ]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Add a visually-hidden h1 element (className='sr-only') with text 'Tools' as the first child of the outermost container div. Keep the existing h2 'Tools Summary' as-is. The sr-only class is built into Tailwind."
+      "special_instructions": "Small change — toggle button styling only. Look at existing showAnalysis state boolean and apply conditional className."
     },
     {
       "slot": 3,
-      "id": "#BUG-036",
-      "description": "Radix hydration mismatch on gap-analysis and tools pages — DropdownMenuTrigger ID offset between server/client",
-      "source": "prd/BUGS.md",
-      "type": "fix",
-      "phase": "Phase 3b — Tools Canvas + Enhanced Export",
+      "id": "#IMP-060",
+      "description": "Fix stale sidebar improvements badge count after adding improvement from detail panel. Badge count loads once on mount and never refreshes. Add a refetch mechanism — simplest approach: refetch on window focus (visibilitychange event) or use a lightweight custom event emitted by createImprovementIdea.",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "S",
       "attempts": 1,
-      "risk_score": 1,
+      "risk_score": 0,
       "acceptance_criteria": [
-        "No hydration mismatch console warnings on cold-navigate to /gap-analysis",
-        "No hydration mismatch console warnings on cold-navigate to /tools",
-        "User menu dropdown still functions correctly",
-        "No regressions on other pages that use DropdownMenu"
+        "After adding an improvement from a detail panel, sidebar badge count updates without page reload",
+        "Implementation uses either visibility change listener, polling interval, or custom event pattern",
+        "No performance regression (avoid polling faster than every 30s if using interval)",
+        "Count still correct on initial load"
       ],
       "files_owned": [
-        "src/components/layout/header.tsx"
+        "src/components/layout/sidebar.tsx"
       ],
       "files_read_only": [
-        "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
-        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
+        "src/lib/api/client.ts"
       ],
       "context": {
-        "similar_files": [],
+        "similar_files": [
+          "src/components/layout/sidebar.tsx"
+        ],
         "patterns_to_follow": [
-          "Radix generates incremental IDs during render. Server/client mismatch means different numbers of Radix components render. The gap-analysis and tools pages likely have client-only Radix components (e.g., Select, DropdownMenu in view components) that don't render on server.",
-          "Fix: add suppressHydrationWarning={true} to the DropdownMenuTrigger button in header.tsx, OR investigate why SSR component count differs"
+          "Existing sidebar fetch pattern for badge count (lines 62-74)",
+          "Fire-and-forget pattern from activity logging"
         ],
-        "learnings_relevant": [
-          "BUG-030 hydration fix pattern — similar date formatting hydration issue was resolved by consistent formatting"
-        ],
-        "affected_urls": ["/w/{workspaceId}/gap-analysis", "/w/{workspaceId}/tools"]
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/*"
+        ]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The root cause is that gap-analysis and tools pages render client-only Radix components that shift Radix's internal ID counter. The cleanest fix is to add `suppressHydrationWarning` to the DropdownMenuTrigger's `<button>` element in header.tsx. This is a known pattern for Radix ID mismatches in Next.js SSR. Alternative: if header.tsx DropdownMenu can be made client-only (dynamic import with ssr:false), that would also fix it. Prefer the simpler suppressHydrationWarning approach."
+      "special_instructions": "Simplest reliable approach: add a visibilitychange event listener that refetches the count when the tab becomes visible. This handles the case where user adds improvement in a panel (which might navigate/focus away) and comes back. Alternatively, a setInterval of 30-60s. Do NOT add a context provider for this — keep it simple."
     }
   ],
   "shared_files": {
     "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
     "owner": null,
-    "note": ""
+    "note": "Slot 1 may create new types in src/types/export.ts — not a shared file."
   },
-  "merge_order": ["#BUG-033", "#BUG-037", "#BUG-036"],
+  "merge_order": ["#IMP-086", "#IMP-060", "#FEAT-043 [1/4]"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Regression ran 2 iterations ago (iter 120). Not due.",
-    "suites_to_run": ["acceptance-bug-033", "acceptance-bug-037", "acceptance-bug-036"],
+    "regression_reason": null,
+    "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "BUG-035 (P1) still blocked — Supabase CLI unauthenticated. Manual npx supabase login required.",
-      "BUG-032 same root cause as BUG-035 — blocked until migration 024 pushed."
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

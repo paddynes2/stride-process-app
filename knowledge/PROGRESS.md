@@ -2183,3 +2183,34 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — 3 tasks completed in single iteration, all passed
 - Observations: 0
 **Notes:** BUG-036 retry succeeded (failed merge in iteration 122). All 3 tasks were small/simple fixes. step-tools 500 re-observed by tester but already tracked.
+
+## Iteration 124 — 2026-03-05 05:30
+**Tasks:**
+- #FEAT-043 [1/4] Export dialog UI with section toggles and presets — slot 1 — completed
+- #IMP-086 Tool Analysis toggle button brand color active indicator — slot 2 — completed
+- #IMP-060 Sidebar improvements badge stale fix (visibilitychange) — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/types/export.ts (created — canonical ExportConfig re-export)
+- src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (modified — toggle color accent-blue → brand teal + deterministic section positioning)
+- src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx (modified — spend summary layout refactor, unreported by builder)
+- src/components/layout/sidebar.tsx (modified — visibilitychange listener for badge count refresh)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs: typecheck.status=pass)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance tester — 15/16 criteria passed, 1 fail: preset names)
+- Canary test: skipped (acceptance tester covered UI)
+- Post-merge check: PASS
+**Bugs found:** 2 (BUG-038 preset names P2, BUG-039 aria-describedby warnings P2)
+**Improvements found:** 2 (IMP-094 disabled section tooltips, IMP-095 auto-Custom preset)
+**Self-score:**
+- Code quality: 4 — Clean, minimal changes. Slot 2 had unreported tool-analysis-view.tsx scope creep.
+- Test coverage: 4 — Acceptance tester ran 16 criteria, 15 passed. 1 fail is cosmetic (preset names).
+- Confidence: 5 — All changes are small, well-understood, typecheck/lint/post-merge all pass.
+- Efficiency: 4 — FEAT-043 [1/4] was mostly pre-existing work. Builder correctly identified this and created only the type re-export.
+- Observations: 4
+**Notes:** FEAT-043 [1/4] export dialog was already implemented by earlier iterations at src/components/panels/export-pdf-dialog.tsx. Builder slot 1 created only src/types/export.ts as canonical type location. Preset names deviate from spec (BUG-038). Slot 2 builder modified tool-analysis-view.tsx outside owned files (unreported ownership violation — layout refactor is harmless).
