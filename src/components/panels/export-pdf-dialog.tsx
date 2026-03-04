@@ -29,27 +29,12 @@ export interface ExportConfig {
   aiInsights: boolean;
 }
 
-const FULL_REPORT_CONFIG: ExportConfig = {
-  canvasSnapshot: true,
-  dataTable: true,
-  gapAnalysis: true,
-  costAnalysis: true,
-  executiveSummary: false,
-  journeyMap: false,
-  journeySentiment: false,
-  perspectiveComparison: false,
-  prioritizationMatrix: false,
-  toolLandscape: false,
-  improvements: false,
-  aiInsights: false,
-};
-
-const QUICK_SUMMARY_CONFIG: ExportConfig = {
+const EXECUTIVE_SUMMARY_CONFIG: ExportConfig = {
   canvasSnapshot: true,
   dataTable: false,
   gapAnalysis: true,
   costAnalysis: false,
-  executiveSummary: false,
+  executiveSummary: true,
   journeyMap: false,
   journeySentiment: false,
   perspectiveComparison: false,
@@ -59,7 +44,7 @@ const QUICK_SUMMARY_CONFIG: ExportConfig = {
   aiInsights: false,
 };
 
-const CUSTOM_CONFIG: ExportConfig = {
+const FULL_AUDIT_CONFIG: ExportConfig = {
   canvasSnapshot: true,
   dataTable: true,
   gapAnalysis: true,
@@ -72,6 +57,21 @@ const CUSTOM_CONFIG: ExportConfig = {
   toolLandscape: true,
   improvements: true,
   aiInsights: true,
+};
+
+const GAP_REPORT_CONFIG: ExportConfig = {
+  canvasSnapshot: true,
+  dataTable: false,
+  gapAnalysis: true,
+  costAnalysis: false,
+  executiveSummary: false,
+  journeyMap: false,
+  journeySentiment: false,
+  perspectiveComparison: true,
+  prioritizationMatrix: false,
+  toolLandscape: false,
+  improvements: true,
+  aiInsights: false,
 };
 
 interface SectionDef {
@@ -115,7 +115,7 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
   },
 ];
 
-type Preset = "quick" | "full" | "custom";
+type Preset = "executive" | "full" | "gap" | "custom";
 
 interface ExportPdfDialogProps {
   open: boolean;
@@ -130,17 +130,17 @@ export function ExportPdfDialog({
   onExport,
   exporting = false,
 }: ExportPdfDialogProps) {
-  const [config, setConfig] = React.useState<ExportConfig>(FULL_REPORT_CONFIG);
+  const [config, setConfig] = React.useState<ExportConfig>(FULL_AUDIT_CONFIG);
   const [activePreset, setActivePreset] = React.useState<Preset>("full");
 
   const handlePreset = (preset: Preset) => {
     setActivePreset(preset);
     if (preset === "full") {
-      setConfig(FULL_REPORT_CONFIG);
-    } else if (preset === "quick") {
-      setConfig(QUICK_SUMMARY_CONFIG);
-    } else {
-      setConfig(CUSTOM_CONFIG);
+      setConfig(FULL_AUDIT_CONFIG);
+    } else if (preset === "executive") {
+      setConfig(EXECUTIVE_SUMMARY_CONFIG);
+    } else if (preset === "gap") {
+      setConfig(GAP_REPORT_CONFIG);
     }
   };
 
@@ -156,7 +156,7 @@ export function ExportPdfDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!exporting) onOpenChange(o); }}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" aria-describedby={undefined}>
         <DialogHeader>
           <DialogPrimitive.Title className="text-[16px] font-semibold text-[var(--text-primary)] tracking-[-0.01em]">
             Export PDF
@@ -172,22 +172,24 @@ export function ExportPdfDialog({
             Preset
           </p>
           <div className="flex gap-2">
-            {(["quick", "full", "custom"] as Preset[]).map((preset) => (
+            {(
+              [
+                { id: "executive", label: "Executive Summary" },
+                { id: "full", label: "Full Audit" },
+                { id: "gap", label: "Gap Report" },
+              ] as { id: Preset; label: string }[]
+            ).map(({ id, label }) => (
               <button
-                key={preset}
-                onClick={() => handlePreset(preset)}
+                key={id}
+                onClick={() => handlePreset(id)}
                 className={cn(
                   "px-3 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium transition-colors",
-                  activePreset === preset
+                  activePreset === id
                     ? "bg-[var(--accent-blue)] border-[var(--accent-blue)] text-white"
                     : "bg-transparent border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
                 )}
               >
-                {preset === "quick"
-                  ? "Quick Summary"
-                  : preset === "full"
-                  ? "Full Report"
-                  : "Custom"}
+                {label}
               </button>
             ))}
           </div>
