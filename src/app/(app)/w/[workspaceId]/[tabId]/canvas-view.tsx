@@ -460,20 +460,25 @@ export function CanvasView({
                 <LayoutTemplate className="h-3.5 w-3.5" />
                 Templates
               </button>
-              <button
-                onClick={() => setShowColoringPanel((p) => !p)}
-                className={cn(
-                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium",
-                  "bg-[var(--bg-surface)] shadow-[var(--shadow-sm)] transition-colors",
-                  showColoringPanel
-                    ? "border-[var(--accent-blue)] text-[var(--accent-blue)]"
-                    : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+              <div className="relative">
+                <button
+                  onClick={() => setShowColoringPanel((p) => !p)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium",
+                    "bg-[var(--bg-surface)] shadow-[var(--shadow-sm)] transition-colors",
+                    showColoringPanel
+                      ? "border-[var(--accent-blue)] text-[var(--accent-blue)]"
+                      : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+                  )}
+                  aria-label="Toggle coloring rules"
+                >
+                  <Paintbrush className="h-3.5 w-3.5" />
+                  Color
+                </button>
+                {coloringRules.some((r) => r.is_active) && (
+                  <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-[#14B8A6] pointer-events-none" />
                 )}
-                aria-label="Toggle coloring rules"
-              >
-                <Paintbrush className="h-3.5 w-3.5" />
-                Color
-              </button>
+              </div>
             </div>
             {showColoringPanel && (
               <ColoringPanel
