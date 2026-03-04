@@ -12,7 +12,7 @@ export default async function ToolsPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: tools }, { data: toolSections }] = await Promise.all([
+  const [{ data: tools }, { data: toolSections }, { data: steps }] = await Promise.all([
     supabase
       .from("tools")
       .select("*")
@@ -23,13 +23,29 @@ export default async function ToolsPage({
       .select("*")
       .eq("workspace_id", workspaceId)
       .order("created_at"),
+    supabase
+      .from("steps")
+      .select("id, name, section_id, tab_id, frequency_per_month")
+      .eq("workspace_id", workspaceId),
   ]);
+
+  const toolIds = (tools ?? []).map((t) => t.id);
+  let stepTools: { id: string; step_id: string; tool_id: string }[] = [];
+  if (toolIds.length > 0) {
+    const { data } = await supabase
+      .from("step_tools")
+      .select("id, step_id, tool_id")
+      .in("tool_id", toolIds);
+    stepTools = data ?? [];
+  }
 
   return (
     <ToolsCanvasView
       workspaceId={workspaceId}
       initialTools={tools ?? []}
       initialToolSections={toolSections ?? []}
+      initialSteps={steps ?? []}
+      initialStepTools={stepTools}
     />
   );
 }

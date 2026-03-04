@@ -15,7 +15,7 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Plus, Square } from "lucide-react";
+import { Plus, Square, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToolNode } from "@/components/canvas/tool-node";
 import { ToolSectionNode } from "@/components/canvas/tool-section-node";
@@ -29,6 +29,8 @@ import type { Tool, ToolSection } from "@/types/database";
 import type { ToolNodeData, ToolSectionNodeData } from "@/types/canvas";
 import { ToolDetailPanel } from "@/components/panels/tool-detail-panel";
 import { ToolSectionDetailPanel } from "@/components/panels/tool-section-detail-panel";
+import { ToolAnalysisView } from "./tool-analysis-view";
+import type { AnalysisStep, StepToolData } from "./tool-analysis-view";
 
 const nodeTypes = {
   tool: ToolNode,
@@ -109,16 +111,22 @@ interface ToolsCanvasViewProps {
   workspaceId: string;
   initialTools: Tool[];
   initialToolSections: ToolSection[];
+  initialSteps: AnalysisStep[];
+  initialStepTools: StepToolData[];
 }
 
 export function ToolsCanvasView({
   workspaceId,
   initialTools,
   initialToolSections,
+  initialSteps,
+  initialStepTools,
 }: ToolsCanvasViewProps) {
   const [tools, setTools] = React.useState<Tool[]>(initialTools);
   const [toolSections, setToolSections] =
     React.useState<ToolSection[]>(initialToolSections);
+  const [steps] = React.useState<AnalysisStep[]>(initialSteps);
+  const [stepTools] = React.useState<StepToolData[]>(initialStepTools);
 
   // toolId → sectionId | null (derived from spatial containment, kept in sync on drag)
   const [toolSectionMap, setToolSectionMap] = React.useState<
@@ -131,6 +139,7 @@ export function ToolsCanvasView({
   const [selectedSectionId, setSelectedSectionId] = React.useState<
     string | null
   >(null);
+  const [showAnalysis, setShowAnalysis] = React.useState(false);
 
   // Stable resize callback passed through node data
   const handleSectionResizeEnd = React.useCallback(
@@ -295,6 +304,22 @@ export function ToolsCanvasView({
     setSelectedSectionId(null);
   }, []);
 
+  const handleToggleAnalysis = React.useCallback(() => {
+    setShowAnalysis((prev) => {
+      if (!prev) {
+        setSelectedToolId(null);
+        setSelectedSectionId(null);
+      }
+      return !prev;
+    });
+  }, []);
+
+  const handleSelectToolFromAnalysis = React.useCallback((toolId: string) => {
+    setSelectedToolId(toolId);
+    setSelectedSectionId(null);
+    setShowAnalysis(false);
+  }, []);
+
   const handleAddTool = React.useCallback(async () => {
     try {
       const tool = await createTool({
@@ -380,91 +405,101 @@ export function ToolsCanvasView({
 
   return (
     <div className="flex h-full">
-      {/* Canvas */}
-      <div className="flex-1 relative">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={handleNodesChange}
-          onEdgesChange={onEdgesChange}
-          onNodeClick={handleNodeClick}
-          onPaneClick={handlePaneClick}
-          nodeTypes={nodeTypes}
-          fitView
-          fitViewOptions={{ padding: 0.2 }}
-          deleteKeyCode={null}
-          className="bg-[var(--bg-app)]"
-        >
-          <Background
-            variant={BackgroundVariant.Dots}
-            gap={20}
-            size={1}
-            color="rgba(255,255,255,0.04)"
-          />
-          <Controls
-            showInteractive={false}
-            className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)] !rounded-[var(--radius-md)]"
-          />
-          <MiniMap
-            nodeColor={(node) => {
-              if (node.type === "tool-section")
-                return "rgba(255,255,255,0.06)";
-              return "var(--brand)";
-            }}
-            maskColor="rgba(10,10,11,0.75)"
-            className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)]"
-          />
+      {/* Main content: canvas or analysis view */}
+      {showAnalysis ? (
+        <ToolAnalysisView
+          workspaceId={workspaceId}
+          tools={tools}
+          steps={steps}
+          stepTools={stepTools}
+          onSelectTool={handleSelectToolFromAnalysis}
+        />
+      ) : (
+        <div className="flex-1 relative">
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={handleNodesChange}
+            onEdgesChange={onEdgesChange}
+            onNodeClick={handleNodeClick}
+            onPaneClick={handlePaneClick}
+            nodeTypes={nodeTypes}
+            fitView
+            fitViewOptions={{ padding: 0.2 }}
+            deleteKeyCode={null}
+            className="bg-[var(--bg-app)]"
+          >
+            <Background
+              variant={BackgroundVariant.Dots}
+              gap={20}
+              size={1}
+              color="rgba(255,255,255,0.04)"
+            />
+            <Controls
+              showInteractive={false}
+              className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)] !rounded-[var(--radius-md)]"
+            />
+            <MiniMap
+              nodeColor={(node) => {
+                if (node.type === "tool-section")
+                  return "rgba(255,255,255,0.06)";
+                return "var(--brand)";
+              }}
+              maskColor="rgba(10,10,11,0.75)"
+              className="!bg-[var(--bg-surface)] !border-[var(--border-subtle)]"
+            />
 
-          {/* Toolbar */}
-          <Panel position="top-left" className="flex gap-1.5">
-            <Button variant="secondary" size="sm" onClick={handleAddTool}>
-              <Plus className="h-3.5 w-3.5" />
-              Add Tool
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleAddToolSection}
-            >
-              <Square className="h-3.5 w-3.5" />
-              Add Tool Section
-            </Button>
-          </Panel>
-        </ReactFlow>
+            {/* Toolbar */}
+            <Panel position="top-left" className="flex gap-1.5">
+              <Button variant="secondary" size="sm" onClick={handleAddTool}>
+                <Plus className="h-3.5 w-3.5" />
+                Add Tool
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleAddToolSection}
+              >
+                <Square className="h-3.5 w-3.5" />
+                Add Tool Section
+              </Button>
+            </Panel>
+          </ReactFlow>
 
-        {/* Empty state overlay */}
-        {tools.length === 0 && toolSections.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-            <div className="pointer-events-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center max-w-sm">
-              <Square className="h-8 w-8 text-[var(--text-quaternary)] mx-auto mb-3" />
-              <p className="text-[14px] text-[var(--text-secondary)] mb-1">
-                No tools yet
-              </p>
-              <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
-                Add tools to map your tech stack, or create groups to organize
-                them
-              </p>
-              <div className="flex items-center justify-center gap-2">
-                <Button size="sm" onClick={handleAddTool}>
-                  <Plus className="h-3.5 w-3.5" />
-                  Add Tool
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleAddToolSection}
-                >
-                  <Square className="h-3.5 w-3.5" />
-                  Add Tool Section
-                </Button>
+          {/* Empty state overlay */}
+          {tools.length === 0 && toolSections.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <div className="pointer-events-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center max-w-sm">
+                <Square className="h-8 w-8 text-[var(--text-quaternary)] mx-auto mb-3" />
+                <p className="text-[14px] text-[var(--text-secondary)] mb-1">
+                  No tools yet
+                </p>
+                <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+                  Add tools to map your tech stack, or create groups to organize
+                  them
+                </p>
+                <div className="flex items-center justify-center gap-2">
+                  <Button size="sm" onClick={handleAddTool}>
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Tool
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleAddToolSection}
+                  >
+                    <Square className="h-3.5 w-3.5" />
+                    Add Tool Section
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Tool detail panel — shown when a tool node is selected */}
-      {selectedTool && (
+      {selectedTool && !showAnalysis && (
         <div
           className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex-shrink-0 flex flex-col"
           style={{ width: "var(--panel-width)" }}
@@ -479,7 +514,7 @@ export function ToolsCanvasView({
       )}
 
       {/* Tool section detail panel — shown when a section node is selected */}
-      {selectedSection && (
+      {selectedSection && !showAnalysis && (
         <div
           className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex-shrink-0 flex flex-col"
           style={{ width: "var(--panel-width)" }}
@@ -494,16 +529,31 @@ export function ToolsCanvasView({
         </div>
       )}
 
-      {/* Summary sidebar — shown when nothing selected */}
-      {nothingSelected && (
+      {/* Summary sidebar — shown when nothing selected or in analysis mode */}
+      {(nothingSelected || showAnalysis) && (
         <div
           className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex-shrink-0 overflow-y-auto"
           style={{ width: "var(--panel-width)" }}
         >
           <div className="p-4">
-            <h2 className="text-[13px] font-semibold text-[var(--text-primary)] mb-4">
-              Tools Summary
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[13px] font-semibold text-[var(--text-primary)]">
+                Tools Summary
+              </h2>
+              <button
+                onClick={handleToggleAnalysis}
+                aria-label={showAnalysis ? "Back to canvas" : "Tool Analysis"}
+                title={showAnalysis ? "Back to canvas" : "Tool Analysis"}
+                className={
+                  showAnalysis
+                    ? "flex items-center gap-1.5 px-2 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--accent-blue)]/15 text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/25 transition-colors"
+                    : "flex items-center gap-1.5 px-2 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--bg-surface-active)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                }
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+                {showAnalysis ? "Canvas" : "Analysis"}
+              </button>
+            </div>
 
             {/* Cost summary */}
             <div className="space-y-3 mb-6">
