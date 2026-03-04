@@ -28,6 +28,7 @@ import { SectionNode } from "@/components/canvas/section-node";
 import { StageNode } from "@/components/canvas/stage-node";
 import { TouchpointNode } from "@/components/canvas/touchpoint-node";
 import { Button } from "@/components/ui/button";
+import { useWorkspace } from "@/lib/context/workspace-context";
 import { createTab } from "@/lib/api/client";
 import { toastError } from "@/lib/api/toast-helpers";
 import type {
@@ -265,6 +266,7 @@ export function CompareView({
   const hasNeither = processTab === null && journeyTab === null;
 
   const router = useRouter();
+  const { refreshTabs } = useWorkspace();
   const [creating, setCreating] = React.useState(false);
   const [creatingProcess, setCreatingProcess] = React.useState(false);
 
@@ -272,23 +274,25 @@ export function CompareView({
     setCreating(true);
     try {
       const newTab = await createTab({ workspace_id: workspaceId, name: "Journey", canvas_type: "journey" });
+      await refreshTabs();
       router.push(`/w/${workspaceId}/${newTab.id}`);
     } catch (err) {
       toastError("Failed to create journey tab", { error: err });
       setCreating(false);
     }
-  }, [workspaceId, router]);
+  }, [workspaceId, router, refreshTabs]);
 
   const handleCreateProcessTab = React.useCallback(async () => {
     setCreatingProcess(true);
     try {
       const newTab = await createTab({ workspace_id: workspaceId, name: "Process", canvas_type: "process" });
+      await refreshTabs();
       router.push(`/w/${workspaceId}/${newTab.id}`);
     } catch (err) {
       toastError("Failed to create process tab", { error: err });
       setCreatingProcess(false);
     }
-  }, [workspaceId, router]);
+  }, [workspaceId, router, refreshTabs]);
 
   const processCanvasRef = React.useRef<HTMLDivElement>(null);
   const journeyCanvasRef = React.useRef<HTMLDivElement>(null);
