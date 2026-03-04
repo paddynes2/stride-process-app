@@ -45,6 +45,7 @@ interface ToolDetailPanelProps {
 
 export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetailPanelProps) {
   const [name, setName] = React.useState(tool.name);
+  const [status, setStatus] = React.useState(tool.status);
   const [category, setCategory] = React.useState(tool.category ?? "");
   const [vendor, setVendor] = React.useState(tool.vendor ?? "");
   const [url, setUrl] = React.useState(tool.url ?? "");
@@ -63,11 +64,12 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
 
   React.useEffect(() => {
     setName(tool.name);
+    setStatus(tool.status);
     setCategory(tool.category ?? "");
     setVendor(tool.vendor ?? "");
     setUrl(tool.url ?? "");
     setCostPerMonth(tool.cost_per_month != null ? String(tool.cost_per_month) : "");
-  }, [tool.id, tool.name, tool.category, tool.vendor, tool.url, tool.cost_per_month]);
+  }, [tool.id, tool.name, tool.status, tool.category, tool.vendor, tool.url, tool.cost_per_month]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -86,6 +88,18 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
       onUpdate(updated);
     } catch (err) {
       toastError(`Failed to update ${field}`, { error: err, retry: () => handleFieldUpdate(field, value) });
+    }
+  };
+
+  const handleStatusChange = async (newStatus: ToolStatus) => {
+    const previous = status;
+    setStatus(newStatus);
+    try {
+      const updated = await updateTool(tool.id, { status: newStatus });
+      onUpdate(updated);
+    } catch (err) {
+      setStatus(previous);
+      toastError("Failed to update status", { error: err });
     }
   };
 
@@ -168,8 +182,8 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
             Status
           </label>
           <select
-            value={tool.status}
-            onChange={(e) => handleFieldUpdate("status", e.target.value as ToolStatus)}
+            value={status}
+            onChange={(e) => handleStatusChange(e.target.value as ToolStatus)}
             aria-label="Tool status"
             className="w-full h-8 px-3 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-secondary)] focus:outline-none focus:border-[var(--signal)]"
           >
