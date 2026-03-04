@@ -486,6 +486,14 @@ export function ToolsCanvasView({
                 <Square className="h-3.5 w-3.5" />
                 Add Tool Section
               </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleToggleAnalysis}
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+                {showAnalysis ? "Canvas" : "Analysis"}
+              </Button>
             </Panel>
           </ReactFlow>
 
