@@ -1,31 +1,40 @@
 {
   "schema_version": "1.0",
-  "iteration": 72,
+  "iteration": 129,
   "slot": 1,
-  "task_id": "#BUG-040",
+  "task_id": "#BUG-042",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 420,
 
   "files_changed": [
     {
-      "path": "src/components/panels/export-pdf-dialog.tsx",
+      "path": "src/lib/export/pdf.ts",
       "action": "modified",
-      "lines_added": 4,
+      "lines_added": 28,
+      "lines_removed": 7
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+      "action": "modified",
+      "lines_added": 13,
       "lines_removed": 4
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated unused var, not owned by this task)" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused), no errors" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/panels/export-pdf-dialog.tsx"],
+  "staged_files": [
+    "src/lib/export/pdf.ts",
+    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+  ],
   "ownership_violations": [],
-  "notes": "BUG-040: Set available:true for executiveSummary, journeyMap, journeySentiment, perspectiveComparison in SECTION_GROUPS. improvements and aiInsights remain available:false (render functions not yet built). IMP-096: EXECUTIVE_SUMMARY_CONFIG was already correct (canvasSnapshot+gapAnalysis+executiveSummary=true, dataTable+costAnalysis=false — no change needed). IMP-095: handleToggle already called setActivePreset('custom') on every checkbox change — no code change needed, preset buttons deselect automatically when activePreset becomes 'custom'.",
+  "notes": "Added StepToolForExport interface and optional stepTools field to ExportPdfOptions. Added buildStepToolsMap() helper. Updated computeStepMonthlyCost() to accept toolsMap and sum tool cost_per_month in addition to labor cost (handles steps with tool cost but no labor time/frequency). Fixed step costs table filter from .filter(s => s.hours > 0) to .filter(s => s.hours > 0 || s.cost > 0) so tool-only steps appear. In canvas-view.tsx: added fetchStepToolsByStep import, parallel-fetched step tools for all steps when costAnalysis enabled (Promise.allSettled to handle BUG-035 gracefully), passed exportStepTools to createWorkspacePdf. exportStepTools cleared when costAnalysis disabled.",
 
   "failure_details": null
 }

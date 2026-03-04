@@ -1,7 +1,7 @@
 # Stride — CLAUDE.md
 
 ## What This Is
-Process mapping & continuous improvement SaaS (Puzzle.io clone). Currently in **Phase 4 — The Living Playbook** (iteration 97). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, and applies conditional step coloring.
+Process mapping & continuous improvement SaaS (Puzzle.io clone). Currently completing **Phase 3b — Tools Canvas + Enhanced Export** (iteration 127). All core features through Phase 4 are built. Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, applies conditional step coloring, manages tools with cost analysis, and exports enhanced multi-section PDF reports.
 
 ## Tech Stack
 - Next.js 16.1.6 + React 19.2 + TypeScript 5 + Tailwind CSS 4
@@ -55,7 +55,7 @@ src/
       workspace-shell.tsx  — client layout (sidebar, header, tab bar)
     layout.tsx             — server layout (fetch user, org, workspaces)
     layout-client.tsx      — client context provider wrapper
-  app/api/v1/              — REST routes (25 resource groups)
+  app/api/v1/              — REST routes (29 resource groups)
     auth/me/               — GET current user
     workspaces/            — GET list, POST create, GET/PATCH/DELETE by id
     tabs/                  — POST create, PATCH/DELETE by id
@@ -63,8 +63,10 @@ src/
     steps/                 — POST create, PATCH/DELETE by id
     connections/           — POST create, DELETE by id
     activity/              — GET activity log (workspace-scoped)
+    ai/                    — POST AI analysis (requires OPENROUTER_API_KEY)
     annotations/           — POST create, PATCH/DELETE by id
     comments/              — POST create, PATCH/DELETE by id
+    improvement-ideas/     — POST create, PATCH/DELETE by id
     people/                — POST create, GET/PATCH/DELETE by id
     perspectives/          — POST create, PATCH/DELETE by id
     roles/                 — POST create, GET/PATCH/DELETE by id
@@ -73,9 +75,11 @@ src/
     shares/                — POST create, GET/DELETE by id
     stages/                — POST create, PATCH/DELETE by id
     step-roles/            — POST create, DELETE by id
+    step-tools/            — POST create, DELETE by id
     tasks/                 — POST create, PATCH/DELETE by id
     teams/                 — POST create, GET/PATCH/DELETE by id
     tools/                 — POST create, GET/PATCH/DELETE by id
+    tool-sections/         — POST create, PATCH/DELETE by id
     touchpoints/           — POST create, PATCH/DELETE by id
     touchpoint-connections/ — POST create, DELETE by id
     coloring-rules/        — POST create, PATCH/DELETE by id
@@ -86,19 +90,20 @@ src/
   components/
     ui/                    — button, input, badge, dialog, dropdown-menu, separator, skeleton, tabs, textarea, offline-banner
     canvas/                — flow-canvas, step-node, section-node, stage-node, touchpoint-node
-    panels/                — step-detail-panel, section-detail-panel, stage-detail-panel, touchpoint-detail-panel, annotation-panel, comment-panel, task-panel, workspace-summary-panel, rich-text-editor, video-embed
+    panels/                — step-detail-panel, section-detail-panel, stage-detail-panel, touchpoint-detail-panel, tool-detail-panel, tool-section-detail-panel, annotation-panel, comment-panel, task-panel, export-pdf-dialog, workspace-summary-panel, rich-text-editor, video-embed
     layout/                — sidebar, header, tab-bar
   lib/
     supabase/              — client.ts, server.ts, middleware.ts (3-client pattern)
     api/                   — client.ts (apiFetch wrappers), response.ts (envelope helpers)
     context/               — workspace-context.tsx (user + workspace + tabs)
-    export/                — PDF/PNG export utilities
+    export/                — pdf.ts, enhanced-pdf-sections.ts, journey-pdf.ts, comparison-pdf.ts, png.ts
     maturity.ts            — maturity scoring constants + helpers
     pain.ts                — pain score constants + helpers
     utils.ts               — cn() (clsx + tailwind-merge)
   types/
     database.ts            — entity types (Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, Team, Role, Person, Tool, Comment, Task, Runbook, Activity, etc.)
     canvas.ts              — React Flow custom node data types
+    export.ts              — PDF export types (ExportConfig, section toggles)
     index.ts               — re-exports
   middleware.ts            — auth guard (redirects unauthenticated to /login)
 ```
@@ -122,7 +127,7 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - Step status badges: draft (gray), in_progress (blue), testing (yellow), live (green), archived (dim)
 
 ## Database
-19 migration files in `supabase/migrations/`:
+24 migration files in `supabase/migrations/`:
 - 001: extensions (uuid-ossp, pg_trgm)
 - 002: enums (step_status, executor_type, workspace_role)
 - 003: core tables (users, organizations, organization_members, workspaces)
@@ -142,6 +147,11 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - 017: activity log (audit trail)
 - 018: clone_workspace (SECURITY DEFINER deep copy function)
 - 019: coloring_rules (conditional step coloring)
+- 020: section_templates (reusable section+steps snapshots)
+- 021: prioritization_scores (effort_score & impact_score on steps/touchpoints)
+- 022: improvement_ideas (status & priority tracking)
+- 023: tool_sections (tool grouping with position/status)
+- 024: step_tools (many-to-many step↔tool junction table)
 
 ## Gotchas & Learnings
 - **NEXT_PUBLIC_ static replacement:** Never use dynamic property access for these vars. Browser has no `process.env`.

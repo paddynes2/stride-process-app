@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 128
+- **Iteration:** 129
 - **Date:** 2026-03-05
-- **Suite:** Acceptance + Regression (Phase 3b testing gate)
-- **Method:** Playwright browser (acceptance) + static analysis + tsc + lint (regression)
-- **Result:** **Acceptance 8/8 PASS, Regression 7/8 PASS (1 FAIL: cost chain PDF)**
-- **Bugs found:** 1 — BUG-042 (PDF cost summary excludes tool costs)
-- **Improvements found:** 5 (IMP-100 through IMP-104)
+- **Suite:** Acceptance (BUG-042, IMP-100, IMP-094)
+- **Method:** Playwright browser (acceptance) + BUILD_RESULT verification
+- **Result:** **Acceptance 9/11 PASS (2 FAIL: IMP-094 tooltips unreachable — available always true)**
+- **Bugs found:** 1 — BUG-043 (IMP-094 tooltip infrastructure unreachable)
+- **Improvements found:** 1 — IMP-105 (dynamic section availability)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 128 (2026-03-05) — 8/8 PASS (FEAT-044 Phase 3b testing gate: FEAT-040 tools canvas, FEAT-041 tool detail, FEAT-042 tool analysis, FEAT-043 enhanced PDF export, cost chain, tsc, lint, full regression sidebar check — Playwright browser on localhost:3000; 0 console errors, 0 network errors)
+- Last run: Iteration 129 (2026-03-05) — 9/11 PASS (BUG-042 5/5, IMP-100 3/3, IMP-094 1/3 — Playwright browser; 2 fail: available:true hardcoded makes tooltips unreachable; 0 console errors, 0 network errors)
+- Previous: Iteration 128 (2026-03-05) — 8/8 PASS (FEAT-044 Phase 3b testing gate: FEAT-040 tools canvas, FEAT-041 tool detail, FEAT-042 tool analysis, FEAT-043 enhanced PDF export, cost chain, tsc, lint, full regression sidebar check — Playwright browser on localhost:3000; 0 console errors, 0 network errors)
 - Previous: Iteration 126 (2026-03-05) — 15/15 PASS (BUG-040 5/5, FEAT-043 [3/4] 7/7, IMP-045 3/3 — Playwright browser + static code check)
 - Previous: Iteration 125 (2026-03-05) — 13/14 PASS (FEAT-043 [2/4] 6/7, BUG-038+039 5/5, IMP-023 2/2, TypeScript 1/1 — Playwright browser; 1 fail: sections available:false BUG-040)
 - Previous: Iteration 124 (2026-03-05) — 15/16 PASS (FEAT-043 [1/4] 7/8, IMP-086 4/4, IMP-060 4/4 — Playwright browser; 1 fail: preset names BUG-038)

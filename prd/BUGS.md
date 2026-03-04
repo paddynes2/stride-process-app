@@ -192,9 +192,17 @@
 - [x] #BUG-041 Export dialog SECTION_GROUPS still marks 4 new sections as available: false (P1) — DONE iteration 127, 2026-03-05
   - **Note:** Duplicate of BUG-040. Resolved in same iteration.
 
-- [ ] #BUG-042 PDF Cost Summary excludes tool costs from section/workspace totals (P2) — Attempts: 0
+- [x] #BUG-042 PDF Cost Summary excludes tool costs from section/workspace totals (P2) — Attempts: 1 — DONE iteration 129, 2026-03-05
   - **Found:** Iteration 128 (regression tester)
   - **Where:** `src/lib/export/pdf.ts` — `computeStepMonthlyCost()` (lines 704-712)
   - **What:** `computeStepMonthlyCost()` calculates labor cost only (time_minutes × frequency_per_month × avgHourlyRate). The `ExportPdfOptions` interface has no `stepTools` field. The Cost Summary PDF page shows section costs that are labor-only — tool monthly costs are excluded from section totals and workspace total cost. The UI step detail panel correctly shows combined labor+tool cost; only the PDF is affected.
   - **Steps to reproduce:** 1. Assign a cost_per_month to a tool (e.g. $500/mo). 2. Assign that tool to a step. 3. Export PDF with Cost Analysis enabled. 4. Open PDF Cost Summary page. 5. Observe: step/section/workspace total cost does not include the tool $500/mo.
   - **Suggested fix:** Add `stepTools` field to `ExportPdfOptions`. Pass step-tool associations to `computeStepMonthlyCost()`. Sum tool costs into step total cost before section rollup.
+  - **Fix applied:** Added `StepToolForExport` interface, `buildStepToolsMap()` helper, updated `computeStepMonthlyCost()` to accept toolsMap and sum tool costs. canvas-view.tsx fetches step tools via `Promise.allSettled` batch. Filter changed from `hours > 0` to `hours > 0 || cost > 0`.
+
+- [ ] #BUG-043 IMP-094 tooltip infrastructure unreachable — all SECTION_GROUPS available:true hardcoded (P2) — Attempts: 0
+  - **Found:** Iteration 129 (acceptance tester)
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — SECTION_GROUPS constant
+  - **What:** IMP-094 added `disabledTooltip` strings and `title={!available ? disabledTooltip : undefined}` to labels. However, all SECTION_GROUPS entries have `available: true` as a static constant. No section is ever disabled, so no tooltip ever appears at runtime. The disabled styling (opacity-50, cursor-not-allowed, checkbox disabled) is also never triggered.
+  - **Steps to reproduce:** 1. Open any workspace. 2. Click Export PDF. 3. Inspect labels in DevTools — none have a title attribute.
+  - **Suggested fix:** Compute `available` dynamically from workspace data (see IMP-105). Accept props like `hasJourneyTab`, `hasImprovements`, etc. from canvas-view.tsx.

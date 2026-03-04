@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 126,
-  "date": "2026-03-05T07:00:00Z",
+  "iteration": 129,
+  "date": "2026-03-05T12:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "f9035f870dc3cb11283fb3e5202c6b7b58f150e5",
+    "last_commit_hash": "cfd71f3d0801a48bf0d9bbe55e62b4b8a7c7eeaf",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,77 +13,54 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#BUG-040",
-      "description": "Enable 4 new export sections (flip available:false → true for executiveSummary, journeyMap, journeySentiment, perspectiveComparison). Also fix IMP-096 (Executive Summary preset config — should only enable canvasSnapshot + gapAnalysis + executiveSummary, not dataTable + costAnalysis) and IMP-095 (auto-switch to Custom preset when user manually toggles a checkbox after selecting a preset).",
+      "id": "#BUG-042",
+      "description": "Fix PDF Cost Summary to include tool costs in step/section/workspace totals. Add stepTools field to ExportPdfOptions, pass step-tool associations from canvas-view.tsx, and sum tool cost_per_month into computeStepMonthlyCost().",
       "source": "prd/BUGS.md",
       "type": "fix",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 1,
-      "acceptance_criteria": [
-        "executiveSummary, journeyMap, journeySentiment, perspectiveComparison all have available: true in SECTION_GROUPS",
-        "All 4 sections appear enabled (no 'coming soon' badge) in the Export PDF dialog",
-        "Selecting 'Executive Summary' preset only enables canvasSnapshot, gapAnalysis, and executiveSummary — NOT dataTable or costAnalysis",
-        "Toggling any checkbox while a preset is active auto-switches the active preset indicator to show no preset is active (or 'Custom' if a custom state exists)",
-        "TypeScript compiles cleanly"
-      ],
-      "files_owned": ["src/components/panels/export-pdf-dialog.tsx"],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": ["SECTION_GROUPS array has { key, label, available } objects", "Preset configs are typed ExportConfig objects at module scope"],
-        "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/[tabId] (Export PDF dialog)"]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Lines 101, 102, 103, 109, 110, 111, 112, 113: change available: false to available: true for executiveSummary, journeyMap, journeySentiment, perspectiveComparison. Lines 102-103 (improvements, aiInsights) should stay available: false — those render functions don't exist yet (being built in slot 2). For IMP-096: update EXECUTIVE_SUMMARY_CONFIG to only set canvasSnapshot, gapAnalysis, executiveSummary to true, everything else false. For IMP-095: in handleToggle or wherever checkbox change is handled, clear the active preset state so no preset button appears selected."
-    },
-    {
-      "slot": 2,
-      "id": "#FEAT-043 [3/4]",
-      "description": "Build 4 new PDF render functions: renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights. Wire them into handleEnhancedExportPdf in canvas-view.tsx. These sections use existing data types (Step with effort_score/impact_score, Tool with status/monthly_cost, ImprovementIdea with status/priority, AIAnalysisResult from workspace settings).",
-      "source": "prd/FEATURES.md",
-      "type": "build",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "M",
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "renderPrioritizationMatrix function exists and renders steps with effort_score/impact_score in a table or quadrant summary",
-        "renderToolLandscape function exists and renders tools grouped by status with cost summary",
-        "renderImprovements function exists and renders improvement ideas grouped by status/priority",
-        "renderAIInsights function exists and renders AI analysis results (bottlenecks, redundancies, automation, general)",
-        "All 4 functions are wired into handleEnhancedExportPdf in canvas-view.tsx with lazy data fetching",
-        "Export config keys prioritizationMatrix, toolLandscape, improvements, aiInsights control inclusion",
-        "TypeScript compiles cleanly"
+        "ExportPdfOptions interface has an optional stepTools field typed as an array of { step_id: string; tool: { cost_per_month: number | null } }",
+        "computeStepMonthlyCost() sums tool cost_per_month values for the step in addition to labor cost",
+        "canvas-view.tsx handleEnhancedExportPdf fetches stepTools (via fetchStepToolsByStep or batch) and passes them to createWorkspacePdf when config.costAnalysis is enabled",
+        "PDF Cost Summary section totals now include tool costs (step total = labor + tool monthly cost)",
+        "Section rollup totals include tool costs",
+        "Workspace total cost includes tool costs",
+        "Steps with zero labor cost but non-zero tool cost still appear in cost table",
+        "TypeScript compiles with zero errors (npx tsc --noEmit)"
       ],
-      "files_owned": ["src/lib/export/enhanced-pdf-sections.ts", "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"],
+      "files_owned": [
+        "src/lib/export/pdf.ts",
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+      ],
       "files_read_only": [
         "src/types/database.ts",
         "src/lib/api/client.ts",
-        "src/components/panels/export-pdf-dialog.tsx"
+        "src/components/panels/step-detail-panel.tsx"
       ],
       "context": {
-        "similar_files": ["src/lib/export/enhanced-pdf-sections.ts (existing 4 render functions to match style)"],
+        "similar_files": ["src/components/panels/step-detail-panel.tsx lines 500-520 — UI combined cost calculation pattern"],
         "patterns_to_follow": [
-          "Each render function: adds new page, renders section header, renders content tables/cards, returns void",
-          "Data interfaces defined at top of enhanced-pdf-sections.ts",
-          "canvas-view.tsx handleEnhancedExportPdf: lazy-imports enhanced-pdf-sections, fetches data conditionally based on config, calls render functions in sequence",
-          "Fetch data from API client functions (fetchImprovementIdeas, fetchTools, etc.) — check client.ts for existing wrappers"
+          "step-detail-panel.tsx: stepTools.reduce((sum, st) => sum + (st.tool.cost_per_month ?? 0), 0) — same pattern for tool cost aggregation",
+          "fetchStepToolsByStep(stepId) in client.ts returns StepToolWithTool[] with tool.cost_per_month",
+          "ExportPdfOptions already has optional stepRoles — follow same pattern for stepTools"
         ],
-        "learnings_relevant": ["apiFetch unwraps envelope — returns T directly"],
-        "affected_urls": ["/w/[workspaceId]/[tabId] (Export PDF with new sections)"]
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — fetchStepToolsByStep returns StepToolWithTool[] directly",
+          "BUG-035: step-tools API returns 500 when migration 024 not pushed — but code should still compile and work structurally"
+        ],
+        "affected_urls": []
       },
       "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "Follow the exact style of the existing 4 render functions in enhanced-pdf-sections.ts. Use the same PDF layout patterns (margins, fonts, colors, table rendering). For AI insights, the data is stored in workspace.settings.last_analysis (JSONB). For prioritization, use steps with effort_score/impact_score. For tools, use Tool[] with status/monthly_cost. For improvements, use ImprovementIdea[]. All data should be fetched lazily in canvas-view.tsx only when the corresponding config flag is true. After building render functions, flip the remaining 4 sections to available: true in export-pdf-dialog.tsx — BUT WAIT: export-pdf-dialog.tsx is owned by slot 1. Instead, add these sections to available:true ONLY in enhanced-pdf-sections.ts exports and canvas-view.tsx wiring. Slot 1 is NOT flipping these 4 to true (they stay false until render functions exist). Once this slot builds the render functions, the sections need to be enabled. RESOLUTION: This slot should ALSO modify export-pdf-dialog.tsx to flip improvements, aiInsights, prioritizationMatrix, toolLandscape to available: true. OWNERSHIP CONFLICT — moving export-pdf-dialog.tsx to shared_files with slot 1 as owner. Slot 2 must NOT modify export-pdf-dialog.tsx. Instead, leave those 4 as available: false for now — they'll be enabled in the next iteration once render functions are verified."
+      "special_instructions": "The step-tools API may return 500 if migration 024 isn't pushed (BUG-035). The fix is still correct structurally — it handles empty/failed fetch gracefully. Use the existing StepToolWithTool type from database.ts. For batch fetching all step tools, consider fetching once for all steps in the workspace (similar to how stepRoles are fetched) rather than N+1 per-step fetches. Check if a workspace-level step-tools endpoint exists; if not, fetch per-step or add a simple loop. The cost filter condition in the Cost Summary (totalMonthlyHours > 0 || totalMonthlyCost > 0) should naturally include tool-only costs now."
     },
     {
-      "slot": 3,
-      "id": "#IMP-045",
-      "description": "Add aria-label to color picker input in coloring panel for WCAG 1.3.1 compliance.",
+      "slot": 2,
+      "id": "#IMP-100",
+      "description": "Add empty state guidance to tools canvas when no tools exist. Show centered prompt like 'Add your first tool to start tracking your tech stack' with a pointer to the toolbar Add button.",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
@@ -91,33 +68,68 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "input[type='color'] in coloring-panel.tsx has aria-label='Rule color picker' or similar descriptive label",
-        "Associated hex text input has aria-label describing its purpose",
-        "TypeScript compiles cleanly"
+        "When tools array is empty, a centered empty state message is visible on the tools canvas",
+        "Message text guides user to add their first tool",
+        "Message disappears when tools are added",
+        "Styling follows dark theme conventions (text-white/55 or text-white/30 for secondary text)",
+        "TypeScript compiles with zero errors"
       ],
-      "files_owned": ["src/components/canvas/coloring-panel.tsx"],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
+      ],
       "files_read_only": [],
       "context": {
-        "similar_files": ["src/app/(app)/w/[workspaceId]/settings/page.tsx (IMP-002 color picker a11y pattern)"],
-        "patterns_to_follow": ["Use aria-label on native input elements per WCAG 1.3.1"],
+        "similar_files": ["src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — existing empty state patterns"],
+        "patterns_to_follow": ["Dark theme empty state: centered div with text-white/55 heading, text-white/30 body"],
         "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/[tabId] (coloring panel overlay)"]
+        "affected_urls": ["/w/[workspaceId]/tools"]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Simple a11y fix. Find the <input type='color'> element(s) in coloring-panel.tsx and add aria-label. Also check if the associated hex text input needs an aria-label."
+      "special_instructions": "Simple overlay or conditional render. Check how the existing canvas-view.tsx handles empty state for reference."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-094",
+      "description": "Add tooltips to disabled export dialog sections explaining what data is needed to enable them (e.g., 'Requires journey tab', 'Requires improvement ideas').",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Disabled checkboxes in export dialog show a tooltip on hover explaining the prerequisite",
+        "Tooltip text is contextual per section (e.g., 'Add a journey tab to enable' for journey sections)",
+        "Tooltips only appear on disabled sections, not enabled ones",
+        "Uses Radix Tooltip or native title attribute (match existing pattern)",
+        "TypeScript compiles with zero errors"
+      ],
+      "files_owned": [
+        "src/components/panels/export-pdf-dialog.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": ["Radix Tooltip already imported in other components — check if available in export-pdf-dialog.tsx"],
+        "learnings_relevant": [],
+        "affected_urls": []
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "SECTION_GROUPS has an 'available' field per section and a 'disabledReason' or similar could be added. Simplest approach: add a 'disabledTooltip' string to each section group item, then render as title attribute on the label when disabled. Radix Tooltip is fine too if already used in the file."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts"],
-    "owner": "#BUG-040",
-    "note": "export-pdf-dialog.tsx is owned by slot 1 (#BUG-040). Slot 2 may READ it but must NOT modify it. The 4 new sections (improvements, aiInsights, prioritizationMatrix, toolLandscape) will remain available: false until next iteration when render functions are verified."
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "owner": null,
+    "note": "No shared file modifications needed. database.ts types and client.ts functions are read-only references."
   },
-  "merge_order": ["#BUG-040", "#FEAT-043 [3/4]", "#IMP-045"],
+  "merge_order": ["#BUG-042", "#IMP-100", "#IMP-094"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": null,
+    "regression_reason": "Last regression was iteration 128 (1 iteration ago). BUG-042 fix is contained to PDF export logic. No regression needed this iteration.",
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },

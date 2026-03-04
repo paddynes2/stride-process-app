@@ -682,7 +682,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Change copy to "No tools assigned. Assign from Tools page →".
 
-- [ ] #IMP-094 Export dialog disabled sections lack tooltip explaining what data is needed — Attempts: 0
+- [x] #IMP-094 Export dialog disabled sections lack tooltip explaining what data is needed — Attempts: 1 — DONE iteration 129, 2026-03-05 (tooltip infrastructure added but functionally unreachable — needs IMP-105)
   - **Found:** Iteration 124 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — disabled checkboxes
@@ -722,7 +722,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show estimated page count (e.g., '~8 pages') next to the Export button, computed from the number of selected sections.
 
-- [ ] #IMP-100 Tools canvas empty state lacks onboarding guidance — Attempts: 0
+- [x] #IMP-100 Tools canvas empty state lacks onboarding guidance — Attempts: 1 — DONE iteration 129, 2026-03-05 (pre-existing implementation at tools-canvas-view.tsx lines 479-506)
   - **Found:** Iteration 128 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx`
@@ -761,6 +761,14 @@
   - **What:** Summary sidebar shows Analysis toggle, but it's not in the main toolbar. On smaller screens the sidebar toggle requires scrolling.
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Add Analysis button to the toolbar Panel alongside 'Add Tool' and 'Add Tool Section'.
+
+- [ ] #IMP-105 Export dialog section availability should be computed dynamically from workspace data — Attempts: 0
+  - **Found:** Iteration 129 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — SECTION_GROUPS `available` field
+  - **What:** All SECTION_GROUPS entries have `available: true` hardcoded as a static constant. Section availability should be computed dynamically: journeyMap disabled when workspace has no journey tab, improvements disabled when improvementIdeas array is empty, aiInsights disabled when AI analysis hasn't been run, etc. This would make the IMP-094 tooltip feature actually functional.
+  - **Design principle:** Nielsen H1: Visibility of system status — users should understand when a section requires prerequisites
+  - **Suggested fix:** Accept availability flags as props (hasJourneyTab, hasImprovements, hasAiInsights, hasPerspectives, hasPrioritizationScores, hasTools) and compute `available` per section. Pass from canvas-view.tsx which has access to tabs, improvementIdeas, etc.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

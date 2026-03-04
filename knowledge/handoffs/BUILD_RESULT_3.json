@@ -1,31 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 72,
+  "iteration": 129,
   "slot": 3,
-  "task_id": "#IMP-045",
+  "task_id": "#IMP-094",
   "status": "completed",
-  "duration_seconds": 60,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/components/canvas/coloring-panel.tsx",
+      "path": "src/components/panels/export-pdf-dialog.tsx",
       "action": "modified",
-      "lines_added": 4,
-      "lines_removed": 0
+      "lines_added": 12,
+      "lines_removed": 15
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "skipped", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/canvas/coloring-panel.tsx"],
+  "staged_files": ["src/components/panels/export-pdf-dialog.tsx"],
   "ownership_violations": [],
-  "notes": "Added aria-label='Rule color picker' to both input[type='color'] elements (add form and edit form) and aria-label='Rule color hex value' to both associated hex text inputs. Four aria-label attributes added total for WCAG 1.3.1 compliance.",
+  "notes": "Added disabledTooltip?: string to SectionDef interface. Added contextual tooltip strings to all non-trivial sections (journey sections: 'Add a journey tab to enable'; improvements: 'Requires improvement ideas'; aiInsights: 'Requires AI analysis to be run'; etc.). Rendered as native title attribute on <label> only when !available. Removed the 'coming soon' span — tooltip on hover replaces it.",
 
   "failure_details": null
 }

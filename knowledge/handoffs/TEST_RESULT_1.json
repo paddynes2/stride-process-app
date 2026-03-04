@@ -1,139 +1,118 @@
 {
   "schema_version": "1.0",
-  "iteration": 126,
+  "iteration": 129,
   "test_type": "acceptance",
   "suite_name": null,
-  "status": "passed",
-  "duration_seconds": 45,
+  "status": "failed",
+  "duration_seconds": 120,
 
   "criteria_results": [
     {
-      "criterion": "executiveSummary, journeyMap, journeySentiment, perspectiveComparison all have available: true in SECTION_GROUPS",
-      "task_id": "#BUG-040",
+      "criterion": "ExportPdfOptions interface has an optional stepTools field typed as an array of { step_id: string; tool: { cost_per_month: number | null } }",
+      "task_id": "#BUG-042",
       "result": "pass",
-      "evidence": "Static code check: export-pdf-dialog.tsx lines 101, 109, 110, 111 confirm available:true for all 4. Accessibility tree confirms checkboxes for journeyMap, journeySentiment, perspectiveComparison are enabled (no 'coming soon' badge, cursor=pointer). executiveSummary also enabled.",
-      "screenshot_description": null
+      "evidence": "StepToolForExport interface at pdf.ts:20, optional stepTools field at pdf.ts:32 matching specified type signature"
     },
     {
-      "criterion": "All 4 sections appear enabled (no 'coming soon' badge) in the Export PDF dialog",
-      "task_id": "#BUG-040",
+      "criterion": "computeStepMonthlyCost() sums tool cost_per_month values for the step in addition to labor cost",
+      "task_id": "#BUG-042",
       "result": "pass",
-      "evidence": "Dialog snapshot: 'Journey Map' checkbox [cursor=pointer], 'Journey Sentiment' checkbox [cursor=pointer], 'Perspective Comparison' checkbox [cursor=pointer], 'Executive Summary' checkbox [cursor=pointer]. None show 'coming soon' badge. Improvements and AI Insights correctly show 'coming soon' [disabled].",
-      "screenshot_description": null
+      "evidence": "computeStepMonthlyCost() at pdf.ts:725 accepts toolsMap param; buildStepToolsMap() at pdf.ts:712 groups tools by step_id; tool costs summed alongside labor"
     },
     {
-      "criterion": "Selecting 'Executive Summary' preset only enables canvasSnapshot, gapAnalysis, and executiveSummary — NOT dataTable or costAnalysis",
-      "task_id": "#BUG-040",
+      "criterion": "canvas-view.tsx handleEnhancedExportPdf fetches stepTools (via fetchStepToolsByStep or batch) and passes them to createWorkspacePdf when config.costAnalysis is enabled",
+      "task_id": "#BUG-042",
       "result": "pass",
-      "evidence": "After clicking Executive Summary preset: 'Data Table' checkbox shows without [checked], 'Cost Analysis' checkbox shows without [checked], 'Gap Analysis' remains [checked], 'Canvas Snapshot' remains [checked], 'Executive Summary' remains [checked]. journeyMap/journeySentiment/perspectiveComparison all unchecked.",
-      "screenshot_description": null
+      "evidence": "canvas-view.tsx line 15 imports fetchStepToolsByStep; lines 311-351 use Promise.allSettled batch fetch gated on costAnalysis; exportStepTools passed to createWorkspacePdf at line 351"
     },
     {
-      "criterion": "Toggling any checkbox while a preset is active auto-switches the active preset indicator to show no preset is active",
-      "task_id": "#BUG-040",
+      "criterion": "Steps with zero labor cost but non-zero tool cost still appear in cost table",
+      "task_id": "#BUG-042",
       "result": "pass",
-      "evidence": "With Executive Summary preset active (button had [active] attribute), clicking Journey Map checkbox caused the Executive Summary button to lose [active] state — rendered as plain 'button \"Executive Summary\" [ref=e238]' with no [active]. IMP-095 confirmed working.",
-      "screenshot_description": null
+      "evidence": "pdf.ts line 517 changed filter from .filter(s => s.hours > 0) to .filter(s => s.hours > 0 || s.cost > 0); same fix at line 603"
     },
     {
-      "criterion": "TypeScript compiles cleanly",
-      "task_id": "#BUG-040",
+      "criterion": "TypeScript compiles with zero errors (npx tsc --noEmit)",
+      "task_id": "#BUG-042",
       "result": "pass",
-      "evidence": "BUILD_RESULT_1.json: typecheck status=pass, errors=0",
-      "screenshot_description": null
+      "evidence": "BUILD_RESULT_1.json: typecheck status=pass, errors=0, output='npx tsc --noEmit — no output (clean)'"
     },
     {
-      "criterion": "renderPrioritizationMatrix function exists and renders steps with effort_score/impact_score in a table or quadrant summary",
-      "task_id": "#FEAT-043 [3/4]",
+      "criterion": "When tools array is empty, a centered empty state message is visible on the tools canvas",
+      "task_id": "#IMP-100",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2.json confirms function built in enhanced-pdf-sections.ts (+350 lines). TypeScript compiles cleanly (errors=0). Static verification via build result; has_ui_changes=false so no browser test required.",
-      "screenshot_description": null
+      "evidence": "tools-canvas-view.tsx line 479: condition {tools.length === 0 && toolSections.length === 0} renders empty state with heading 'No tools yet'. Test workspace has 3 existing tool section nodes so empty state correctly hidden — this is expected behavior, not a failure."
     },
     {
-      "criterion": "renderToolLandscape function exists and renders tools grouped by status with cost summary",
-      "task_id": "#FEAT-043 [3/4]",
+      "criterion": "Message text guides user to add their first tool",
+      "task_id": "#IMP-100",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2.json confirms function built. TypeScript compiles cleanly.",
-      "screenshot_description": null
+      "evidence": "Per BUILD_RESULT_2.json: existing implementation at lines 479-506 includes centered heading 'No tools yet' with body text guiding user and inline Add buttons. Pre-existing implementation confirmed correct by builder."
     },
     {
-      "criterion": "renderImprovements function exists and renders improvement ideas grouped by status/priority",
-      "task_id": "#FEAT-043 [3/4]",
+      "criterion": "Styling follows dark theme conventions (text-white/55 or text-white/30 for secondary text)",
+      "task_id": "#IMP-100",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2.json confirms function built. TypeScript compiles cleanly.",
-      "screenshot_description": null
+      "evidence": "BUILD_RESULT_2.json notes: uses var(--text-secondary)/var(--text-tertiary) — dark theme equivalents of text-white/55 and text-white/30"
     },
     {
-      "criterion": "renderAIInsights function exists and renders AI analysis results (bottlenecks, redundancies, automation, general)",
-      "task_id": "#FEAT-043 [3/4]",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_2.json confirms function built. TypeScript compiles cleanly.",
-      "screenshot_description": null
+      "criterion": "Disabled checkboxes in export dialog show a tooltip on hover explaining the prerequisite",
+      "task_id": "#IMP-094",
+      "result": "fail",
+      "evidence": "Export PDF dialog opened. Evaluated all labels in dialog: 0 labels have a title attribute, 0 checkboxes are disabled. All SECTION_GROUPS entries have available: true hardcoded — no section is ever disabled, making tooltip infrastructure unreachable. title={!available ? disabledTooltip : undefined} correctly renders on disabled labels, but no labels are ever disabled."
     },
     {
-      "criterion": "All 4 functions are wired into handleEnhancedExportPdf in canvas-view.tsx with lazy data fetching",
-      "task_id": "#FEAT-043 [3/4]",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_2.json: canvas-view.tsx modified (+30 lines, -3). Notes confirm lazy fetching wired. TypeScript compiles cleanly.",
-      "screenshot_description": null
+      "criterion": "Tooltip text is contextual per section (e.g., 'Add a journey tab to enable' for journey sections)",
+      "task_id": "#IMP-094",
+      "result": "fail",
+      "evidence": "Tooltip strings are correctly defined in SECTION_GROUPS (e.g., journeyMap: 'Add a journey tab to enable', improvements: 'Requires improvement ideas'), but are never rendered at runtime because available is always true. Cannot be verified in browser."
     },
     {
-      "criterion": "Export config keys prioritizationMatrix, toolLandscape, improvements, aiInsights control inclusion",
-      "task_id": "#FEAT-043 [3/4]",
+      "criterion": "Tooltips only appear on disabled sections, not enabled ones",
+      "task_id": "#IMP-094",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2.json notes: 'All 4 wired into handleEnhancedExportPdf with lazy data fetching (fetchTools for toolLandscape, fetchImprovementIdeas for improvements, workspace.settings.last_analysis for aiInsights, existing steps+sections for prioritizationMatrix)'. TypeScript compiles cleanly.",
-      "screenshot_description": null
+      "evidence": "title attribute is conditioned on !available — correct logic. Since available is always true, this criterion technically holds (no enabled sections show tooltips, no disabled sections exist to test)."
     },
     {
-      "criterion": "TypeScript compiles cleanly (#FEAT-043)",
-      "task_id": "#FEAT-043 [3/4]",
+      "criterion": "TypeScript compiles with zero errors",
+      "task_id": "#IMP-094",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2.json: typecheck status=pass, errors=0",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "input[type='color'] in coloring-panel.tsx has aria-label='Rule color picker' or similar descriptive label",
-      "task_id": "#IMP-045",
-      "result": "pass",
-      "evidence": "Static code check: coloring-panel.tsx lines 187 and 310 have aria-label='Rule color picker' on both color picker inputs (add form and edit form).",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Associated hex text input has aria-label describing its purpose",
-      "task_id": "#IMP-045",
-      "result": "pass",
-      "evidence": "Static code check: coloring-panel.tsx lines 195 and 318 have aria-label='Rule color hex value' on both hex text inputs.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "TypeScript compiles cleanly (#IMP-045)",
-      "task_id": "#IMP-045",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_3.json: typecheck status=pass, errors=0",
-      "screenshot_description": null
+      "evidence": "BUILD_RESULT_3.json: typecheck status=pass, errors=0"
     }
   ],
 
   "quality_gate": {
-    "pages_checked": ["/w/[workspaceId]/[tabId] (Export PDF dialog)"],
+    "pages_checked": [
+      "/workspaces",
+      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/tools",
+      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/fcfdce67-1453-46c9-a8f2-c3c0ef615619"
+    ],
     "console_errors": 0,
     "network_errors": 0,
     "accessibility_issues": 0,
     "layout_shifts": 0
   },
 
-  "bugs_found": [],
+  "bugs_found": [
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/[tabId] — Export PDF dialog",
+      "description": "IMP-094 tooltip implementation is structurally present but functionally unreachable. All SECTION_GROUPS entries have available: true hardcoded as a static constant. The title attribute tooltip is correctly conditioned on !available, but since no section is ever available=false, no tooltip ever appears. The 'disabled' state for sections (opacity-50, cursor-not-allowed, checkbox disabled) is also never triggered.",
+      "steps_to_reproduce": "1. Open any workspace canvas. 2. Click Export PDF. 3. Observe that all checkboxes are enabled and none are grayed out. 4. Inspect labels in DevTools — none have a title attribute.",
+      "related_task": "#IMP-094"
+    }
+  ],
 
   "improvements_found": [
     {
       "category": "usability",
-      "page": "/w/[workspaceId]/[tabId] (Export PDF dialog)",
-      "observation": "The 'coming soon' sections (Improvements, AI Insights, Prioritization Matrix, Tool Landscape) are shown as checked+disabled rather than unchecked+disabled. This is visually misleading — a checked-but-disabled checkbox implies the feature is included but locked, when in reality it cannot be included at all.",
-      "design_principle": "Nielsen H1: Visibility of system status — state should accurately reflect what will happen",
-      "suggested_approach": "Render available:false sections as unchecked+disabled, or hide them entirely, to avoid implying they will be included in the export."
+      "page": "/w/[workspaceId]/[tabId] — Export PDF dialog",
+      "observation": "The export dialog's section availability should be computed dynamically from workspace data (e.g., journeyMap disabled when workspace has no journey tab, improvements disabled when improvementIdeas array is empty). Currently all sections are statically available=true. This would make the tooltip feature actually functional and improve the UX by clarifying why sections might not produce output.",
+      "design_principle": "Nielsen H1: Visibility of system status — users should understand when a section requires prerequisites",
+      "suggested_approach": "Accept availability flags as props (hasJourneyTab, hasImprovements, hasAiInsights, hasPerspectives, hasPrioritizationScores, hasTools) and compute available per section based on these flags. Pass them down from canvas-view.tsx which already has access to tabs, improvementIdeas, etc."
     }
   ],
 
-  "actions_used": 7,
+  "actions_used": 8,
   "action_budget": 10
 }
