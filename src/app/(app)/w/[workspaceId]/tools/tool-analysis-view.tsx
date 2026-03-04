@@ -152,17 +152,15 @@ export function ToolAnalysisView({
                 ${spendByStatus.considering.toLocaleString()}/mo
               </p>
             </div>
-          </div>
-          {spendByStatus.cancelled > 0 && (
-            <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between">
-              <span className="text-[12px] text-[var(--text-secondary)]">
-                Cancelled tools spend
-              </span>
-              <span className="text-[12px] text-[var(--text-tertiary)]">
+            <div>
+              <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
+                Cancelled
+              </p>
+              <p className="text-[16px] font-semibold text-[var(--text-tertiary)]">
                 ${spendByStatus.cancelled.toLocaleString()}/mo
-              </span>
+              </p>
             </div>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
