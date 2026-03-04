@@ -10,21 +10,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { updateImprovementIdea, deleteImprovementIdea, createImprovementIdea } from "@/lib/api/client";
+import { updateImprovementIdea, deleteImprovementIdea, createImprovementIdea, fetchAISuggestions, type AISuggestion, type AISuggestionCategory } from "@/lib/api/client";
 import { toastError } from "@/lib/api/toast-helpers";
 import type { ImprovementIdea, ImprovementStatus, ImprovementPriority, Tab } from "@/types/database";
-
-// ─── Local AI Suggestion types (duplicate acceptable — reviewer will consolidate) ─
-
-type AISuggestionCategory = "process" | "technology" | "people" | "governance";
-
-interface AISuggestion {
-  title: string;
-  description: string;
-  affected_step_ids: string[];
-  estimated_impact: string;
-  category: AISuggestionCategory;
-}
 
 type SuggestionsState =
   | { type: "idle" }
@@ -63,28 +51,6 @@ const ALL_PRIORITIES: ImprovementPriority[] = ["low", "medium", "high", "critica
 
 const RATE_LIMIT_RE = /Please wait (\d+) seconds/;
 
-// ─── Inline API fetch (client.ts is owned by slot 1 — use inline fetch here) ─
-
-async function fetchSuggestionsAPI(workspaceId: string): Promise<AISuggestion[]> {
-  const res = await fetch("/api/v1/ai/suggest-improvements", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ workspace_id: workspaceId }),
-  });
-  const contentType = res.headers.get("content-type") ?? "";
-  if (!contentType.includes("application/json")) {
-    throw new Error(`Request failed: ${res.status} ${res.statusText}`);
-  }
-  const json = await res.json() as {
-    data: AISuggestion[] | null;
-    error: { code: string; message: string } | null;
-  };
-  if (json.error) {
-    throw new Error(json.error.message);
-  }
-  return json.data ?? [];
-}
-
 function classifySuggestionsError(err: unknown): SuggestionsState {
   const msg = err instanceof Error ? err.message : String(err);
   if (msg.includes("OPENROUTER_API_KEY") || msg.includes("OpenRouter API key")) {
@@ -108,11 +74,12 @@ interface ImprovementsViewProps {
   workspaceId: string;
   entityTabMap: Record<string, string>;
   tabs?: Pick<Tab, "id" | "canvas_type">[];
+  hasSteps?: boolean;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entityTabMap, tabs = [] }: ImprovementsViewProps) {
+export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entityTabMap, tabs = [], hasSteps = true }: ImprovementsViewProps) {
   const [ideas, setIdeas] = React.useState<ImprovementIdea[]>(initialIdeas);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("all");
   const [priorityFilter, setPriorityFilter] = React.useState<PriorityFilter>("all");
@@ -151,7 +118,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
     setSuggestionsState({ type: "loading" });
     setIsPanelOpen(true);
     try {
-      const suggestions = await fetchSuggestionsAPI(workspaceId);
+      const suggestions = await fetchAISuggestions(workspaceId);
       setSuggestionsState({ type: "loaded", suggestions });
     } catch (err) {
       setSuggestionsState(classifySuggestionsError(err));
@@ -200,10 +167,11 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
           </div>
           <button
             onClick={handleGenerateSuggestions}
-            disabled={isLoading || suggestionsState.type === "rate_limited"}
+            disabled={isLoading || suggestionsState.type === "rate_limited" || !hasSteps}
+            title={!hasSteps ? "Add steps to the canvas before generating suggestions" : undefined}
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors",
-              isLoading || suggestionsState.type === "rate_limited"
+              isLoading || suggestionsState.type === "rate_limited" || !hasSteps
                 ? "bg-[var(--bg-surface-active)] text-[var(--text-tertiary)] cursor-not-allowed"
                 : "bg-[var(--accent-blue)] text-white hover:opacity-90"
             )}
