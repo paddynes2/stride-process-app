@@ -454,7 +454,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Fix applied:** Added formatCountdown() helper, countdown state, useEffect with setInterval (1s), auto-transitions to idle when countdown reaches 0. Display format: "Try again in M:SS". Regenerate button disabled during rate_limited state. Previously numbered IMP-063 (duplicate — renumbered to IMP-065).
 
-- [ ] #IMP-064 AI analysis not-configured message targets developers only, not SaaS users — Attempts: 0
+- [x] #IMP-064 AI analysis not-configured message targets developers only, not SaaS users — Attempts: 1 — DONE iteration 114, 2026-03-04
   - **Found:** Iteration 110 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx`
@@ -470,7 +470,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — consistent patterns across features
   - **Suggested fix:** Apply the same IMP-065 countdown timer pattern to the gap-narrative rate_limited state.
 
-- [ ] #IMP-067 AI Suggestions button enabled with no steps in workspace — Attempts: 0
+- [x] #IMP-067 AI Suggestions button enabled with no steps in workspace — Attempts: 1 — DONE iteration 114, 2026-03-04
   - **Found:** Iteration 111 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
@@ -494,7 +494,7 @@
   - **Design principle:** Performance — minimize unnecessary renders (React Flow docs recommend memo on custom nodes)
   - **Suggested fix:** Wrap exports in React.memo() matching step-node.tsx:145 and section-node.tsx:96 patterns.
 
-- [ ] #IMP-070 AI Suggestions panel duplicates fetch logic instead of using apiFetch client — Attempts: 0
+- [x] #IMP-070 AI Suggestions panel duplicates fetch logic instead of using apiFetch client — Attempts: 1 — DONE iteration 114, 2026-03-04
   - **Found:** Iteration 112 (acceptance tester)
   - **Category:** Code consistency
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` (lines 68-85)
@@ -518,7 +518,7 @@
   - **Design principle:** Nielsen H6: Recognition over recall — users should not have to remember where to take action
   - **Suggested fix:** Add a small "Add Journey Tab" button in the empty state that triggers the tab creation flow directly.
 
-- [ ] #IMP-073 Regenerate button hidden during rate_limited state instead of shown as disabled — Attempts: 0
+- [x] #IMP-073 Regenerate button hidden during rate_limited state instead of shown as disabled — Attempts: 1 — DONE iteration 114, 2026-03-04
   - **Found:** Iteration 113 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
@@ -526,13 +526,29 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Render Regenerate button outside the narrativeText conditional, add disabled={narrativeState.type === 'loading' || narrativeState.type === 'rate_limited'} with tooltip when rate_limited.
 
-- [ ] #IMP-074 AI Suggestions panel shows no error state on endpoint failure — Attempts: 0
+- [x] #IMP-074 AI Suggestions panel shows no error state on endpoint failure — Attempts: 1 — DONE iteration 114, 2026-03-04 (already resolved by existing code — no changes needed)
   - **Found:** Iteration 113 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
   - **What:** The AI Suggestions button triggers a panel that depends on a broken endpoint (BUG-028). When the endpoint fails, the user gets no visible feedback — the panel may open to an empty or broken state with no error messaging.
   - **Design principle:** Nielsen H9: Help users recognize, diagnose, and recover from errors
   - **Suggested fix:** Show an inline error state in the AI Suggestions panel when the endpoint returns a non-ok response, rather than silently failing.
+
+- [ ] #IMP-075 Gap analysis not_configured message still says "redeploy" — Attempts: 0
+  - **Found:** Iteration 114 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx` (line 325)
+  - **What:** The not_configured state in gap-analysis-view.tsx still instructs users to "redeploy" — same issue as IMP-064 but in a different file. Was deferred because slot 1 (IMP-073) owned this file and focused on Regenerate button visibility.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Apply same text update as IMP-064 (ai-analysis-view.tsx). Replace "redeploy" with SaaS-appropriate language.
+
+- [ ] #IMP-076 AI Suggestions button lacks "last generated" visual indicator — Attempts: 0
+  - **Found:** Iteration 114 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
+  - **What:** AI Suggestions button has no visual indicator showing whether suggestions have been generated previously. A user returning to the page sees the same button with no memory of prior state.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Show a small badge or "Last generated N min ago" label near the button when cached suggestions exist.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

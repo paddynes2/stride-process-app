@@ -1867,3 +1867,34 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 slots completed, zero re-attempts, no reviewer fixes needed
 - Observations: 2 (IMP-073, IMP-074)
 **Notes:** Cleanup iteration between Phase 3a and Phase 3b. All S-complexity tasks. BUG-027 was the last actionable P2 bug. IMP-066 bundled with BUG-027 (same file). 4 improvements cleared in one iteration.
+
+## Iteration 114 — 2026-03-04 18:30
+**Tasks:**
+- #IMP-073 Regenerate button visible (disabled) during loading/rate_limited in gap analysis — slot 1 — completed
+- #IMP-067+#IMP-070+#IMP-074 AI Suggestions: disable when no steps, move to apiFetch client, error state — slot 2 — completed
+- #IMP-064 AI analysis not_configured message SaaS-appropriate — slot 3 — completed
+**Source:** prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx (modified — +14/-2 lines, disabled Regenerate buttons in loading + rate_limited blocks)
+- src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx (modified — +7/-35 lines, removed inline types + fetch, added hasSteps disable)
+- src/app/(app)/w/[workspaceId]/improvements/page.tsx (modified — +1/-0 lines, pass hasSteps prop)
+- src/lib/api/client.ts (modified — +22/-0 lines, AISuggestion types + fetchAISuggestions function)
+- src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx (modified — +4/-3 lines, not_configured message text)
+**Verification:**
+- Type check: pass (0 errors, all 3 slots + post-merge)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: pass (slot 2 ran full build)
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance tester — 18/18 criteria pass)
+- Canary test: skipped (acceptance covered all 3 affected pages)
+**Bugs found:** 2 (BUG-030 pre-existing hydration mismatch on AI analysis date, #IMP-075 gap-analysis not_configured still says "redeploy")
+**Improvements found:** 1 (AI Suggestions button lacks "last generated" indicator)
+**Self-score:**
+- Code quality: 5 — All changes follow established patterns exactly, types properly centralized, clean disabled states
+- Test coverage: 4 — Acceptance 18/18 pass, all 3 pages verified, 1 pre-existing console error
+- Confidence: 5 — All tasks completed cleanly, all additive/minimal changes, zero merge failures
+- Efficiency: 5 — All 3 slots completed, zero re-attempts, no reviewer fixes needed
+- Observations: 3 (BUG-030, IMP-075, AI Suggestions "last generated" indicator)
+**Notes:** Final AI improvement cleanup iteration. IMP-074 was already resolved by existing error state code — no changes needed. gap-analysis "redeploy" text deferred as IMP-075 (owned by slot 1 which was on IMP-073). Phase 3a improvements fully cleared.

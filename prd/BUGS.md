@@ -124,3 +124,10 @@
   - **Steps to reproduce:** 1. Log in. 2. Navigate to a canvas tab. 3. Open DevTools Network. 4. Observe /api/v1/coloring-rules returns 500.
   - **Related:** FEAT-051 (conditional coloring feature)
   - **Suggested fix:** Debug API route — likely RLS policy issue or migration 019 not applied to local dev DB.
+
+- [ ] #BUG-030 Pre-existing hydration mismatch on AI analysis date format (P3) — Attempts: 0
+  - **Found:** Iteration 114 (acceptance tester — browser console)
+  - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx` — "Last run" timestamp
+  - **What:** Server renders date as '2026/03/04' but client locale formats it as '3/4/2026'. React detects the mismatch and regenerates the subtree on the client. Appears as a console error on every page load with existing analysis results.
+  - **Steps to reproduce:** 1. Navigate to /ai-analysis with existing analysis results. 2. Open browser console. 3. Observe hydration mismatch warning on date display.
+  - **Suggested fix:** Use a consistent date format (e.g., `toISOString().slice(0, 10)` or `Intl.DateTimeFormat` with explicit locale) that produces the same output on server and client.

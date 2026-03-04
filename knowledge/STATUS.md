@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 113
-- **Date:** 2026-03-04 17:30
-- **Phase:** Post Phase 3a — Bug fixes + improvements before Phase 3b
+- **Iteration:** 114
+- **Date:** 2026-03-04 18:30
+- **Phase:** Phase 3a complete — all AI improvements cleared. Ready for Phase 3b or next priority.
 - **Branch:** ralph/init-stride
-- **Last task(s):** #BUG-027 + #IMP-066 (slot 1), #IMP-069 (slot 2), #IMP-071 + #IMP-068 (slot 3)
+- **Last task(s):** #IMP-073 (gap analysis Regenerate visibility), #IMP-067+#IMP-070+#IMP-074 (AI Suggestions button/client/error), #IMP-064 (AI not_configured message)
 - **Result:** completed
-- **Next task:** Continue clearing P2 improvements or start Phase 3b (FEAT-040+)
+- **Next task:** Start Phase 3b (#FEAT-040 Tools Canvas) or clear remaining medium-priority improvements (#IMP-004, #IMP-072, etc.)
 - **Blockers:** Migrations 014-022 not pushed — requires human action (`npx supabase db push`). OPENROUTER_API_KEY not configured — AI features return 503 until key is added to .env.local and Vercel.
 
 ## Context
 
-Iteration 113 completed all 3 slots cleanly. BUG-027 fixed (gap analysis Generate Summary button now always visible, disabled when no gap data). IMP-066 done (live countdown timer for rate-limited state). IMP-069 done (StageNode/TouchpointNode wrapped in React.memo). IMP-071 done (sidebar badge shows 0 on error). IMP-068 done (Add as Improvement shows "Added ✓" for 2s). Files touched: gap-analysis-view.tsx, stage-node.tsx, touchpoint-node.tsx, sidebar.tsx, improvements-view.tsx. 2 new improvements found by acceptance tester (IMP-073 Regenerate button visibility during rate_limited, IMP-074 AI Suggestions error state).
+Iteration 114 cleared the last 5 AI-related improvements across 3 builder slots. Slot 1 added disabled Regenerate buttons to gap-analysis loading/rate_limited states (gap-analysis-view.tsx). Slot 2 moved AISuggestion types and fetch logic from improvements-view.tsx to client.ts, added hasSteps prop with page.tsx wiring, and confirmed IMP-074 was already handled by existing error state code. Slot 3 updated the not_configured message in ai-analysis-view.tsx to be SaaS-appropriate (removed "redeploy" language). All acceptance criteria passed (18/18). gap-analysis-view.tsx still has "redeploy" text in its not_configured block — logged as follow-up (#IMP-075).
 
 ## Dev Server
 
@@ -29,3 +29,5 @@ Iteration 113 completed all 3 slots cleanly. BUG-027 fixed (gap analysis Generat
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - canvas-view.tsx now ~530 lines — approaching complexity threshold (IMP-033 tracks large files)
+- Pre-existing hydration mismatch: date format in AI analysis header (server vs client locale)
+- gap-analysis-view.tsx not_configured block still says "redeploy" (follow-up #IMP-075)
