@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb } from "lucide-react";
+import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,9 +43,13 @@ import {
   createStepRole,
   deleteStepRole,
   createImprovementIdea,
+  fetchStepToolsByStep,
+  createStepTool,
+  deleteStepTool,
+  fetchTools,
 } from "@/lib/api/client";
-import type { TeamWithRoles, StepRoleWithDetails } from "@/lib/api/client";
-import type { Step, StepStatus, ExecutorType, ImprovementPriority } from "@/types/database";
+import type { TeamWithRoles, StepRoleWithDetails, StepToolWithTool } from "@/lib/api/client";
+import type { Step, StepStatus, ExecutorType, ImprovementPriority, Tool } from "@/types/database";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
 import { MATURITY_LEVELS } from "@/lib/maturity";
@@ -92,6 +96,8 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
   const nameTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   const [stepRoles, setStepRoles] = React.useState<StepRoleWithDetails[]>([]);
   const [teams, setTeams] = React.useState<TeamWithRoles[]>([]);
+  const [stepTools, setStepTools] = React.useState<StepToolWithTool[]>([]);
+  const [allTools, setAllTools] = React.useState<Tool[]>([]);
   const [showImprovDialog, setShowImprovDialog] = React.useState(false);
   const [improvTitle, setImprovTitle] = React.useState("");
   const [improvDesc, setImprovDesc] = React.useState("");
@@ -120,7 +126,26 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
     return () => { cancelled = true; };
   }, [workspaceId]);
 
+  // Fetch assigned tools when step changes
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchStepToolsByStep(step.id)
+      .then((tools) => { if (!cancelled) setStepTools(tools); })
+      .catch(() => { /* silently fail — tools section just stays empty */ });
+    return () => { cancelled = true; };
+  }, [step.id]);
+
+  // Fetch all workspace tools for the dropdown
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchTools(workspaceId)
+      .then((t) => { if (!cancelled) setAllTools(t); })
+      .catch(() => { /* silently fail — dropdown stays empty */ });
+    return () => { cancelled = true; };
+  }, [workspaceId]);
+
   const assignedRoleIds = new Set(stepRoles.map((sr) => sr.role_id));
+  const assignedToolIds = new Set(stepTools.map((st) => st.tool.id));
 
   const handleAssignRole = async (roleId: string) => {
     try {
@@ -137,6 +162,24 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
       setStepRoles((prev) => prev.filter((sr) => sr.id !== stepRoleId));
     } catch (err) {
       toastError("Failed to remove role", { error: err });
+    }
+  };
+
+  const handleAssignTool = async (toolId: string) => {
+    try {
+      const created = await createStepTool({ step_id: step.id, tool_id: toolId });
+      setStepTools((prev) => [...prev, created]);
+    } catch (err) {
+      toastError("Failed to assign tool", { error: err, retry: () => handleAssignTool(toolId) });
+    }
+  };
+
+  const handleRemoveTool = async (stepToolId: string) => {
+    try {
+      await deleteStepTool(stepToolId);
+      setStepTools((prev) => prev.filter((st) => st.id !== stepToolId));
+    } catch (err) {
+      toastError("Failed to remove tool", { error: err });
     }
   };
 
@@ -349,6 +392,71 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
           </DropdownMenu>
         </div>
 
+        {/* Assigned Tools */}
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+            <Wrench className="h-3 w-3" />
+            Assigned Tools
+          </label>
+          {stepTools.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {stepTools.map((st) => (
+                <Badge key={st.id} variant="outline" className="gap-1 max-w-none">
+                  <span className="truncate">{st.tool.name}</span>
+                  {st.tool.cost_per_month != null && (
+                    <>
+                      <span className="text-[var(--text-quaternary)]">·</span>
+                      <span className="text-[var(--text-quaternary)] truncate">${st.tool.cost_per_month}/mo</span>
+                    </>
+                  )}
+                  <button
+                    onClick={() => handleRemoveTool(st.id)}
+                    className="ml-0.5 hover:text-[var(--error)] transition-colors"
+                    aria-label={`Remove ${st.tool.name} tool`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
+              >
+                <Plus className="h-3 w-3" />
+                Assign Tool
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
+              {allTools.length === 0 && (
+                <DropdownMenuLabel>No tools — create tools first</DropdownMenuLabel>
+              )}
+              {allTools.map((tool) => {
+                const isAssigned = assignedToolIds.has(tool.id);
+                return (
+                  <DropdownMenuItem
+                    key={tool.id}
+                    disabled={isAssigned}
+                    onSelect={() => { if (!isAssigned) handleAssignTool(tool.id); }}
+                  >
+                    <span className="flex-1 truncate">{tool.name}</span>
+                    {tool.cost_per_month != null && (
+                      <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
+                        ${tool.cost_per_month}/mo
+                      </span>
+                    )}
+                    {isAssigned && (
+                      <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
+                    )}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
         <Separator />
 
         {/* Time & Frequency */}
@@ -381,27 +489,47 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
           </div>
         </div>
 
-        {step.time_minutes && step.frequency_per_month ? (() => {
-          const monthlyHours = (step.time_minutes * step.frequency_per_month) / 60;
+        {(() => {
+          const hasTimeFreq = !!(step.time_minutes && step.frequency_per_month);
+          const toolMonthlyCost = stepTools.reduce((sum, st) => sum + (st.tool.cost_per_month ?? 0), 0);
+          const hasToolCost = toolMonthlyCost > 0;
+
+          if (!hasTimeFreq && !hasToolCost) return null;
+
+          const monthlyHours = hasTimeFreq ? (step.time_minutes! * step.frequency_per_month!) / 60 : 0;
           const rolesWithRate = stepRoles.filter((sr) => sr.role.hourly_rate != null);
           const avgRate = rolesWithRate.length > 0
             ? rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length
             : null;
-          const monthlyCost = avgRate != null ? monthlyHours * avgRate : null;
+          const laborCost = (hasTimeFreq && avgRate != null) ? monthlyHours * avgRate : null;
+          const totalCost = (laborCost ?? 0) + toolMonthlyCost;
+
           return (
             <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2 space-y-1">
-              <div>
-                Monthly time: <strong className="text-[var(--text-secondary)]">{monthlyHours.toFixed(1)}h</strong> / month
-              </div>
-              {monthlyCost != null && (
+              {hasTimeFreq && (
                 <div>
-                  Monthly cost: <strong className="text-[var(--text-secondary)]">${monthlyCost.toFixed(2)}</strong> / month
+                  Monthly time: <strong className="text-[var(--text-secondary)]">{monthlyHours.toFixed(1)}h</strong> / month
+                </div>
+              )}
+              {laborCost != null && (
+                <div>
+                  Labor cost: <strong className="text-[var(--text-secondary)]">${laborCost.toFixed(2)}</strong> / month
                   <span className="text-[var(--text-quaternary)] ml-1">(avg ${avgRate!.toFixed(2)}/hr)</span>
+                </div>
+              )}
+              {hasToolCost && (
+                <div>
+                  Tool cost: <strong className="text-[var(--text-secondary)]">${toolMonthlyCost.toFixed(2)}</strong> / month
+                </div>
+              )}
+              {(laborCost != null || hasToolCost) && (
+                <div className="border-t border-[var(--border-subtle)] pt-1 mt-1">
+                  Total: <strong className="text-[var(--text-secondary)]">${totalCost.toFixed(2)}</strong> / month
                 </div>
               )}
             </div>
           );
-        })() : null}
+        })()}
 
         <Separator />
 
