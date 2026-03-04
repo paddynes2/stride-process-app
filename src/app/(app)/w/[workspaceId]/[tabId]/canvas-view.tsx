@@ -12,7 +12,9 @@ import { TaskPanel } from "@/components/panels/task-panel";
 import { ColoringPanel } from "@/components/canvas/coloring-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep } from "@/lib/api/client";
+import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch } from "@/lib/api/client";
+import type { ExportConfig } from "@/components/panels/export-pdf-dialog";
+import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
 import type { Section, Step, Connection, ColoringRule, Template } from "@/types/database";
 import { Button } from "@/components/ui/button";
@@ -110,7 +112,7 @@ export function CanvasView({
   };
 
   const { workspace, activePerspective } = useWorkspace();
-  const { handleExportPdf, handleExportPng } = useCanvasExport({
+  const { handleExportPng } = useCanvasExport({
     workspaceName: workspace.name,
     sections,
     steps,
@@ -290,6 +292,128 @@ export function CanvasView({
     return map;
   }, [coloringRules, steps]);
 
+  // Enhanced PDF export handler — orchestrates base + new sections
+  const handleEnhancedExportPdf = React.useCallback(
+    async (canvasElement: HTMLElement, config: ExportConfig) => {
+      try {
+        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison }] = await Promise.all([
+          import("@/lib/export/pdf"),
+          import("@/lib/export/enhanced-pdf-sections"),
+        ]);
+
+        // Fetch step roles if needed for cost or executive summary sections
+        const stepIds = steps.map((s) => s.id);
+        const needsRoles = config.costAnalysis || config.executiveSummary;
+        const stepRoles =
+          needsRoles && stepIds.length > 0 ? await fetchStepRolesBatch(stepIds) : [];
+
+        // Mask step data for disabled base sections (matches use-canvas-export.ts logic)
+        let exportSteps = steps;
+        let exportStepRoles = stepRoles;
+        if (!config.dataTable && !config.gapAnalysis && !config.costAnalysis) {
+          exportSteps = [];
+        } else {
+          if (!config.gapAnalysis) {
+            exportSteps = exportSteps.map((s) => ({
+              ...s,
+              maturity_score: null,
+              target_maturity: null,
+            }));
+          }
+          if (!config.costAnalysis) {
+            exportStepRoles = [];
+            exportSteps = exportSteps.map((s) => ({
+              ...s,
+              time_minutes: null,
+              frequency_per_month: null,
+            }));
+          }
+        }
+
+        // Build base PDF without footer (skipFooter=true)
+        const pdf = await createWorkspacePdf(
+          {
+            workspaceName: workspace.name,
+            sections,
+            steps: exportSteps,
+            connections,
+            canvasElement: config.canvasSnapshot ? canvasElement : null,
+            stepRoles: exportStepRoles,
+          },
+          true,
+        );
+
+        // Executive Summary
+        if (config.executiveSummary) {
+          renderExecutiveSummary(pdf, { sections, steps, stepRoles });
+        }
+
+        // Journey Map and/or Journey Sentiment — fetch data once for both
+        if (config.journeyMap || config.journeySentiment) {
+          const supabase = createSupabaseClient();
+          const [touchpoints, stagesResult] = await Promise.all([
+            fetchTouchpoints(workspaceId),
+            supabase
+              .from("stages")
+              .select("*")
+              .eq("workspace_id", workspaceId)
+              .order("created_at", { ascending: true }),
+          ]);
+          const stages = stagesResult.data ?? [];
+
+          if (config.journeyMap) {
+            await renderJourneyMap(pdf, { stages, touchpoints, canvasElement: null });
+          }
+          if (config.journeySentiment) {
+            renderJourneySentiment(pdf, { stages, touchpoints });
+          }
+        }
+
+        // Perspective Comparison
+        if (config.perspectiveComparison) {
+          const perspectives = await fetchPerspectives(workspaceId);
+          const allAnnotations =
+            perspectives.length > 0
+              ? (await Promise.all(perspectives.map((p) => fetchAnnotations(p.id)))).flat()
+              : [];
+          renderPerspectiveComparison(pdf, {
+            perspectives,
+            annotations: allAnnotations,
+            steps,
+            sections,
+          });
+        }
+
+        // Add footer to all pages (base + enhanced)
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const totalPages = pdf.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.setFontSize(7);
+          pdf.setTextColor(255, 255, 255, 50);
+          pdf.text(
+            `${workspace.name} \u2014 Page ${i} of ${totalPages}`,
+            pageWidth / 2,
+            pageHeight - 5,
+            { align: "center" },
+          );
+          pdf.setTextColor(20, 184, 166, 80);
+          pdf.text("Stride", pageWidth - 15, pageHeight - 5, { align: "right" });
+        }
+
+        const safeFilename = workspace.name
+          .replace(/[^a-zA-Z0-9-_ ]/g, "")
+          .replace(/\s+/g, "-");
+        pdf.save(`${safeFilename}-process-report.pdf`);
+        toast.success("PDF exported successfully");
+      } catch (err) {
+        toastError("Failed to export PDF", { error: err });
+      }
+    },
+    [workspace.name, sections, steps, connections, workspaceId],
+  );
+
   return (
     <ColoringTintContext.Provider value={coloringTints}>
     <TaskCountsContext.Provider value={taskCounts}>
@@ -317,7 +441,7 @@ export function CanvasView({
             onSectionDelete={handleSectionDelete}
             onConnectionCreate={handleConnectionCreate}
             onConnectionDelete={handleConnectionDelete}
-            onExportPdf={handleExportPdf}
+            onExportPdf={handleEnhancedExportPdf}
             onExportPng={handleExportPng}
           />
 

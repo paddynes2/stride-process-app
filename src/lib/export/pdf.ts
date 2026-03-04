@@ -22,18 +22,21 @@ interface ExportPdfOptions {
   sections: Section[];
   steps: Step[];
   connections: Connection[];
-  canvasElement: HTMLElement;
+  canvasElement: HTMLElement | null;
   stepRoles?: StepRoleForExport[];
 }
 
-export async function exportWorkspacePdf({
-  workspaceName,
-  sections,
-  steps,
-  connections,
-  canvasElement,
-  stepRoles = [],
-}: ExportPdfOptions): Promise<void> {
+export async function createWorkspacePdf(
+  {
+    workspaceName,
+    sections,
+    steps,
+    connections,
+    canvasElement,
+    stepRoles = [],
+  }: ExportPdfOptions,
+  skipFooter = false,
+): Promise<jsPDF> {
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "mm",
@@ -105,67 +108,69 @@ export async function exportWorkspacePdf({
   });
 
   // --- Canvas Snapshot Page ---
-  pdf.addPage("a4", "landscape");
-  y = margin;
+  if (canvasElement !== null) {
+    pdf.addPage("a4", "landscape");
+    y = margin;
 
-  pdf.setFillColor(10, 10, 11);
-  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+    pdf.setFillColor(10, 10, 11);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(14);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text("Process Map", margin, y);
-  y += 8;
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("Process Map", margin, y);
+    y += 8;
 
-  try {
-    const dataUrl = await toPng(canvasElement, {
-      backgroundColor: "#0a0a0b",
-      pixelRatio: 2,
-      filter: (node) => {
-        // Exclude React Flow controls, minimap, and toolbar panels from snapshot
-        if (node instanceof HTMLElement) {
-          const classList = node.classList;
-          if (
-            classList?.contains("react-flow__controls") ||
-            classList?.contains("react-flow__minimap") ||
-            classList?.contains("react-flow__panel")
-          ) {
-            return false;
+    try {
+      const dataUrl = await toPng(canvasElement, {
+        backgroundColor: "#0a0a0b",
+        pixelRatio: 2,
+        filter: (node) => {
+          // Exclude React Flow controls, minimap, and toolbar panels from snapshot
+          if (node instanceof HTMLElement) {
+            const classList = node.classList;
+            if (
+              classList?.contains("react-flow__controls") ||
+              classList?.contains("react-flow__minimap") ||
+              classList?.contains("react-flow__panel")
+            ) {
+              return false;
+            }
           }
-        }
-        return true;
-      },
-    });
+          return true;
+        },
+      });
 
-    const canvasAvailHeight = pageHeight - y - margin;
-    const canvasAvailWidth = contentWidth;
+      const canvasAvailHeight = pageHeight - y - margin;
+      const canvasAvailWidth = contentWidth;
 
-    // Get image dimensions to maintain aspect ratio
-    const img = new Image();
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = reject;
-      img.src = dataUrl;
-    });
+      // Get image dimensions to maintain aspect ratio
+      const img = new Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = dataUrl;
+      });
 
-    const imgAspect = img.width / img.height;
-    const boxAspect = canvasAvailWidth / canvasAvailHeight;
+      const imgAspect = img.width / img.height;
+      const boxAspect = canvasAvailWidth / canvasAvailHeight;
 
-    let imgW: number;
-    let imgH: number;
-    if (imgAspect > boxAspect) {
-      imgW = canvasAvailWidth;
-      imgH = canvasAvailWidth / imgAspect;
-    } else {
-      imgH = canvasAvailHeight;
-      imgW = canvasAvailHeight * imgAspect;
+      let imgW: number;
+      let imgH: number;
+      if (imgAspect > boxAspect) {
+        imgW = canvasAvailWidth;
+        imgH = canvasAvailWidth / imgAspect;
+      } else {
+        imgH = canvasAvailHeight;
+        imgW = canvasAvailHeight * imgAspect;
+      }
+
+      pdf.addImage(dataUrl, "PNG", margin, y, imgW, imgH);
+    } catch {
+      pdf.setFontSize(10);
+      pdf.setTextColor(255, 255, 255, 140);
+      pdf.text("Canvas snapshot unavailable", margin, y + 10);
     }
-
-    pdf.addImage(dataUrl, "PNG", margin, y, imgW, imgH);
-  } catch {
-    pdf.setFontSize(10);
-    pdf.setTextColor(255, 255, 255, 140);
-    pdf.text("Canvas snapshot unavailable", margin, y + 10);
   }
 
   // --- Step List Page ---
@@ -647,23 +652,29 @@ export async function exportWorkspacePdf({
   }
 
   // --- Footer on all pages ---
-  const totalPages = pdf.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    pdf.setPage(i);
-    pdf.setFontSize(7);
-    pdf.setTextColor(255, 255, 255, 50);
-    pdf.text(
-      `${workspaceName} \u2014 Page ${i} of ${totalPages}`,
-      pageWidth / 2,
-      pageHeight - 5,
-      { align: "center" }
-    );
-    pdf.setTextColor(20, 184, 166, 80);
-    pdf.text("Stride", pageWidth - margin, pageHeight - 5, { align: "right" });
+  if (!skipFooter) {
+    const totalPages = pdf.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(7);
+      pdf.setTextColor(255, 255, 255, 50);
+      pdf.text(
+        `${workspaceName} \u2014 Page ${i} of ${totalPages}`,
+        pageWidth / 2,
+        pageHeight - 5,
+        { align: "center" }
+      );
+      pdf.setTextColor(20, 184, 166, 80);
+      pdf.text("Stride", pageWidth - margin, pageHeight - 5, { align: "right" });
+    }
   }
 
-  // Download
-  const safeFilename = workspaceName.replace(/[^a-zA-Z0-9-_ ]/g, "").replace(/\s+/g, "-");
+  return pdf;
+}
+
+export async function exportWorkspacePdf(opts: ExportPdfOptions): Promise<void> {
+  const pdf = await createWorkspacePdf(opts);
+  const safeFilename = opts.workspaceName.replace(/[^a-zA-Z0-9-_ ]/g, "").replace(/\s+/g, "-");
   pdf.save(`${safeFilename}-process-report.pdf`);
 }
 
