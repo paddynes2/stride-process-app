@@ -20,7 +20,7 @@ const SENTIMENT_LABELS: Record<string, string> = {
   negative: "Negative",
 };
 
-export function TouchpointNode({ data, selected }: NodeProps) {
+function TouchpointNodeComponent({ data, selected }: NodeProps) {
   const nodeData = data as unknown as TouchpointNodeData;
   const { touchpoint, heatMapMode, annotationColor } = nodeData;
   const sentimentColor = touchpoint.sentiment
@@ -148,3 +148,5 @@ export function TouchpointNode({ data, selected }: NodeProps) {
     </div>
   );
 }
+
+export const TouchpointNode = React.memo(TouchpointNodeComponent);
