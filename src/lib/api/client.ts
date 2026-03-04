@@ -803,3 +803,11 @@ export async function analyzeProcess(workspaceId: string): Promise<AIAnalysisRes
     body: JSON.stringify({ workspace_id: workspaceId }),
   });
 }
+
+export async function generateGapNarrative(workspaceId: string): Promise<string> {
+  return apiFetch<string>("/api/v1/ai/gap-narrative", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ workspace_id: workspaceId }),
+  });
+}
