@@ -1,17 +1,17 @@
-**TEST_RESULT_1.json written. Summary:**
+Testing complete. Here's the summary:
 
-**Status: PASSED** — All 18 acceptance criteria pass across 3 tasks.
+**BUG-034 (step nodes clickable): PASS**
+- Clicking step inside section correctly opens Step Details panel
+- Clicking section background still opens Section Details panel
+- The pointer-events fix works as designed
 
-**Testing approach:**
-- Static analysis (source code) provided primary evidence for all 3 tasks — implementations clearly match the specs
-- Browser testing confirmed: 0 console errors, 0 network errors on both the canvas and tools pages
-- TypeScript clean on all 3 slots per BUILD_RESULT files
+**BUG-031 (Spend Summary Cancelled row): PASS**
+- Tool Analysis view shows all 3 rows: Active $0/mo, Considering $0/mo, Cancelled $0/mo
+- Cancelled row always visible even with 0 cancelled tools
 
-**Criteria results:**
-- `#FEAT-041 [3/3]` (8 criteria): All pass — Assigned Tools section, dropdown exclusion, badges with X, createStepTool/deleteStepTool wiring, cost_per_month display, tool cost computation, labor+tool separation, TS clean
-- `#IMP-081` (5 criteria): All pass — local status state, useEffect reset on tool.id change, optimistic update, revert on error, TS clean  
-- `#IMP-083` (5 criteria): All pass — toolCount prop, display text, computed in canvas-view, updates on change, TS clean
+**BUG-035 (migration push): BLOCKED / FAIL**
+- Builder reported Supabase CLI unauthenticated — migration not pushed
+- Confirmed by 500 errors on step-tools API every time a step is clicked
+- Manual fix required: `npx supabase login` → `supabase link` → `supabase db push`
 
-**2 improvements logged** (not bugs):
-1. Empty-state in tool dropdown could link to the Tools page
-2. Panel open interaction on section node click should be confirmed visually (accessibility tree didn't capture it, but `bodyHasPanel: true` confirms it's in the DOM)
+**1 bug carried forward (P2):** step-tools 500 on every step click until migration is pushed manually.

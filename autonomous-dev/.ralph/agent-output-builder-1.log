@@ -1,21 +1,12 @@
-Done. Here's a summary of what was implemented:
+Done. Summary:
 
-**Task: #FEAT-041 [3/3] — Assigned Tools section + cost integration**
+**#BUG-034 — Section overlay intercepting step node clicks**
 
-Changes to `src/components/panels/step-detail-panel.tsx`:
+Fix: Added `pointerEvents: "none"` to `section-node.tsx`'s main content div (merged into both heatmap and default style branches). Added `pointerEvents: "auto"` to three interactive children:
+- Perspective annotation dot
+- Section label flex row (name + maturity badge)  
+- Comment count badge
 
-1. **Imports**: Added `Wrench` (lucide-react), `fetchStepToolsByStep`, `createStepTool`, `deleteStepTool`, `fetchTools` (client), `StepToolWithTool` (client type), `Tool` (database type)
+This lets click events on step nodes pass through the section's content div to React Flow's step node wrappers. Clicks on empty section background pass through the content div to the React Flow node wrapper (which still fires `onNodeClick` for section selection).
 
-2. **State**: Added `stepTools: StepToolWithTool[]` and `allTools: Tool[]`
-
-3. **Effects**: Two new useEffects — fetch assigned tools on `step.id` change; fetch all workspace tools on `workspaceId` change
-
-4. **Derived**: `assignedToolIds = new Set(stepTools.map(st => st.tool.id))`
-
-5. **Handlers**: `handleAssignTool` (createStepTool → update state) and `handleRemoveTool` (deleteStepTool → filter state), exact role assignment pattern
-
-6. **"Assigned Tools" UI section**: Inserted between Assigned Roles and the separator. Dropdown lists all workspace tools (excluded assigned), badges show name + `cost_per_month`, X removes
-
-7. **Cost section**: Refactored IIFE to show labor cost and tool cost as separate lines, total row when either exists. Block now renders even without time/frequency if tools have costs
-
-**Verification**: TypeScript clean (`npx tsc --noEmit` — no output), lint passes (0 errors, 1 pre-existing warning)
+**Verification:** TypeScript clean (no output), ESLint 0 errors (1 pre-existing warning in unowned file).

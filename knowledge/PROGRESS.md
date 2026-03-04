@@ -2096,3 +2096,34 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — single tester completed within action budget (36/40)
 - Observations: 8 (4 bugs + 4 improvements)
 **Notes:** Testing-only iteration triggered by regression cadence (8 iterations since iter 112). Most significant finding is P1 BUG-034 (step nodes unclickable) — blocks primary step-editing workflow. P1 BUG-035 (step-tools 500) confirms migration 024 not pushed. Both P1 bugs should be prioritized before FEAT-043. Retrospective performed (120 = 10th iteration milestone).
+
+## Iteration 121 — 2026-03-05 02:30
+**Tasks:**
+- #BUG-034 Step nodes unclickable — section overlay intercepts pointer events — slot 1 — completed
+- #BUG-031 Spend Summary missing Cancelled status breakdown row — slot 2 — completed
+- #BUG-035 Push migration 024 (step_tools) to remote Supabase DB — slot 3 — failed
+**Source:** prd/BUGS.md
+**Mode:** multi_task
+**Result:** partial
+**Changes:**
+- src/components/canvas/section-node.tsx (modified — pointerEvents: none on container, auto on interactive children)
+- src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx (modified — Cancelled row unconditional)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs: typecheck.status=pass)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance tester — 9/12 criteria pass, 2 skip, 1 fail for BUG-035)
+- Canary test: skipped (acceptance tester verified step click + tool analysis in browser)
+- Post-merge check: PASS
+**Bugs found:** 1 (existing BUG-035 confirmed — step-tools API 500 due to unpushed migration)
+**Improvements found:** 2
+- IMP-092: Spend Summary lacks visual hierarchy separating totals from status breakdown
+- IMP-093: Step Details "No tools defined yet" copy misleading — should say "No tools assigned"
+**Self-score:**
+- Code quality: 5 — Both fixes are minimal, targeted, follow existing patterns. No debug artifacts.
+- Test coverage: 4 — 9/12 acceptance criteria pass. 2 skipped (no test data), 1 fail (BUG-035 blocked).
+- Confidence: 4 — BUG-034 and BUG-031 verified in browser. BUG-035 requires manual intervention.
+- Efficiency: 4 — 2/3 tasks completed. Slot 3 failure was environmental (no CLI auth), not code issue.
+- Observations: 3 (1 bug confirmed + 2 improvements)
+**Notes:** BUG-035 blocked on Supabase CLI authentication — not a code issue. Migration file exists and is correct. Needs manual `npx supabase login` before retry. BUG-034 P1 fix restores primary step-editing workflow. BUG-031 P2 fix ensures Cancelled row always visible in Spend Summary.

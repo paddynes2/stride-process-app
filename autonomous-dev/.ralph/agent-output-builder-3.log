@@ -1,6 +1,17 @@
-Task complete. The implementation was already present in the worktree baseline:
+BUILD_RESULT_3.json written. Summary:
 
-- **`tool-section-detail-panel.tsx`**: `toolCount?: number` prop already defined (line 34, default 0), displayed as `"{toolCount} tool(s) in this section"` below the name field (line 101).
-- **`tools-canvas-view.tsx`**: `selectedSectionToolCount` already computed via `toolSectionMap` (lines 377-379) and passed as `toolCount={selectedSectionToolCount}` to `ToolSectionDetailPanel` (line 489).
+**Task #BUG-035 — Status: `failed`**
 
-All 5 acceptance criteria satisfied. TypeScript clean (zero errors). No files needed staging.
+- **Blocker:** Supabase CLI is not authenticated on this machine. No access token exists in any standard location (`~/.config/supabase/access-token`, `AppData\Roaming\supabase\`, `SUPABASE_ACCESS_TOKEN` env var).
+- `npx supabase link` → `Unauthorized`  
+- `npx supabase db push` → `Cannot find project ref`
+- **Migration file is correct** — `supabase/migrations/024_step_tools.sql` uses `gen_random_uuid()`, has proper RLS policies, mirrors the step_roles pattern. No code changes needed.
+- **TypeScript:** passes clean (0 errors)
+- **Table status confirmed:** `GET /rest/v1/step_tools` returns 404 — table does not yet exist in remote schema.
+
+**Manual fix required (3 steps in any terminal):**
+```bash
+npx supabase login
+npx supabase link --project-ref tkcyxtxkmveipnwgrddd
+npx supabase db push
+```

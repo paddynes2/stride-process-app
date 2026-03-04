@@ -1,16 +1,40 @@
-**TEST_RESULT_2.json written.** Summary:
+`TEST_RESULT_2.json` written. Here's the summary:
 
-**Status: `playwright_unavailable`** — Chrome session conflict prevented browser launch. Full static analysis performed across all 5 changed files.
+---
 
-**Regression suite (19/19 checks): All pass via static analysis**
+## Regression Test Results — Iteration 120
 
-Key findings:
-- Changes are isolated to 3 feature areas (tools canvas, improvements view, compare view)
-- The 10 core regression paths (process canvas, journey canvas, list, gap analysis, settings, teams, export) are **untouched** by this iteration
-- Compare view `hasBoth` rendering path is unchanged — only the empty state (`!hasBoth`) received the new CTA button
-- All API wrappers confirmed to exist, type signatures verified, TipTap dynamic import pattern correct, BUG-023 DialogPrimitive.Title pattern applied correctly
+**Status: FAILED** (2 P1 bugs, 2 P2 bugs)
 
-**3 improvements logged** (no bugs found):
-1. Tool status dropdown lacks optimistic update (unlike other fields)
-2. Compare empty-state with no tabs shows "Create Journey Tab" only, but copy mentions both canvases
-3. Tool section detail panel could show a tool count
+### Regression Suite: 17/19 checks passed
+
+| Check | Result |
+|-------|--------|
+| Auth / workspaces list | ✅ |
+| Canvas loads with nodes | ✅ |
+| **Click step node → step detail panel** | ❌ P1 |
+| Section detail panel opens | ✅ |
+| Canvas zoom/pan | ✅ |
+| Journey canvas renders | ✅ |
+| List view, Gap analysis, Compare | ✅ |
+| Settings, Teams | ✅ |
+| PDF export, PNG export | ✅ |
+| **Console clean** | ❌ (2 net errors + 2 hydration errors) |
+
+### Bugs Found
+
+| # | Severity | Description |
+|---|----------|-------------|
+| 1 | **P1** | Step nodes unclickable — section node intercepts all pointer events; step detail panel never opens via mouse click |
+| 2 | **P1** | `GET /api/v1/step-tools` → HTTP 500 on every step panel open (fires twice) |
+| 3 | P2 | React hydration mismatch on `/gap-analysis` and `/tools` — Radix `DropdownMenuTrigger` ID differs server vs client |
+| 4 | P2 | `/tools` page heading hierarchy violation — first heading is `h2` with no `h1` |
+
+### Performance Audit (4 pages)
+
+| Page | Transfer | CLS | Result |
+|------|----------|-----|--------|
+| /workspaces | 792KB | 0 | ✅ |
+| /w/.../canvas | **1208KB** | 0 | ⚠️ over 1MB |
+| /gap-analysis | 997KB | 0 | ✅ |
+| /tools | **1150KB** | 0 | ⚠️ over 1MB |

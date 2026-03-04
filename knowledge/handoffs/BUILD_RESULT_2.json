@@ -1,31 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 119,
+  "iteration": 120,
   "slot": 2,
-  "task_id": "#IMP-084",
+  "task_id": "#BUG-031",
   "status": "completed",
-  "duration_seconds": 120,
+  "duration_seconds": 60,
 
   "files_changed": [
     {
-      "path": "src/components/panels/step-detail-panel.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx",
       "action": "modified",
-      "lines_added": 62,
-      "lines_removed": 53
+      "lines_added": 7,
+      "lines_removed": 10
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning (unrelated addEdge unused var in flow-canvas.tsx)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/panels/step-detail-panel.tsx"],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx"
+  ],
   "ownership_violations": [],
-  "notes": "Added 'import Link from next/link'. When allTools.length === 0, Assigned Tools section now shows 'No tools defined yet.' with a Next.js Link to /w/{workspaceId}/tools styled with text-[var(--accent-blue)] hover:underline. When allTools.length > 0, existing dropdown behavior is unchanged. Removed the now-unreachable 'No tools — create tools first' DropdownMenuLabel (dropdown only renders when allTools.length > 0).",
+  "notes": "Removed conditional wrapper around Cancelled row. Moved Cancelled into the grid as a 5th column div, matching Active and Considering styling. Shows $0/mo when no cancelled tools exist.",
 
   "failure_details": null
 }

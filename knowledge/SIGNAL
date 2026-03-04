@@ -1,1 +1,1 @@
-CONTINUE: Fix P1 #BUG-034 (step nodes unclickable — section overlay intercepts pointer events) and P1 #BUG-035 (step-tools API 500 — push migration 024), then #FEAT-043 Enhanced PDF export
+CONTINUE: Retry #BUG-035 (push migration 024 after manual npx supabase login), then #BUG-033 (journey tab not in tab bar), then remaining P2 bugs

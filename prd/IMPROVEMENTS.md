@@ -666,5 +666,21 @@
   - **Design principle:** Regression testing coverage — critical paths need representative test data
   - **Suggested fix:** Seed the test workspace with at least one stage and one touchpoint for regression runs.
 
+- [ ] #IMP-092 Spend Summary lacks visual hierarchy separating totals from status breakdown — Attempts: 0
+  - **Found:** Iteration 121 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Spend Summary card
+  - **What:** No visual separation between totals (Monthly/Annual) and status breakdown (Active/Considering/Cancelled). Adding a 'By Status' sub-label would improve scannability.
+  - **Design principle:** Nielsen H6: Recognition over recall — grouping related values reduces cognitive load
+  - **Suggested fix:** Add a small 'By Status' label above the Active/Considering/Cancelled rows.
+
+- [ ] #IMP-093 Step Details "No tools defined yet" copy misleading — Attempts: 0
+  - **Found:** Iteration 121 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** Step detail panel — tools section empty state
+  - **What:** Message says "No tools defined yet. Go to Tools →" implying tools must be defined globally first. Should say "No tools assigned. Assign from Tools page →" to clarify the action.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Change copy to "No tools assigned. Assign from Tools page →".
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

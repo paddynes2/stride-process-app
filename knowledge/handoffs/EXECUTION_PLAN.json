@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 119,
-  "date": "2026-03-04T23:55:00Z",
+  "iteration": 121,
+  "date": "2026-03-05T02:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "7913009",
+    "last_commit_hash": "56c82043c027ebc2ece32e244ede59cce1a8948b",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,154 +13,113 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-042",
-      "description": "Tool overlap and gap analysis — client-side computation: overlapping tools, unused tools, coverage gaps, total tool spend summary. Add 'Tool Analysis' section/toggle to tools page with 4 analysis cards.",
-      "source": "prd/FEATURES.md",
-      "type": "build",
+      "id": "#BUG-034",
+      "description": "Fix step nodes unclickable — section overlay intercepts pointer events. Set pointer-events: none on section node container div so step node clicks pass through to React Flow's onNodeClick. Re-enable pointer-events: auto on section's interactive child elements (name label, badges, annotation dots).",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "M",
+      "complexity": "S",
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "'Tool Analysis' section on tools page accessible via button or tab toggle",
-        "'Overlapping Tools' card: lists steps served by 2+ tools with combined monthly cost for those tools",
-        "'Unused Tools' card: lists tools with zero step_tools assignments",
-        "'Coverage Gaps' card: lists steps with no tool assigned, sorted by frequency_per_month descending",
-        "Total tool spend summary: monthly total, annual total, breakdown by status (active/considering/cancelled)",
-        "Click step name → navigate to step's canvas tab (requires section_id → tab lookup)",
-        "Click tool name → select that tool on the tools canvas (or scroll to it)",
-        "All data computed client-side from tools + steps + step_tools arrays — no new API endpoints needed"
+        "Clicking a step node inside a section opens Step Details panel (not Section Details)",
+        "Clicking on the section background (empty area) still opens Section Details panel",
+        "Section name label, annotation dots, and comment/task badges remain clickable",
+        "Step nodes outside sections remain clickable",
+        "TypeScript compiles clean"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx",
-        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
-        "src/app/(app)/w/[workspaceId]/tools/page.tsx"
+        "src/components/canvas/section-node.tsx"
       ],
       "files_read_only": [
-        "src/lib/api/client.ts",
-        "src/types/database.ts",
-        "src/types/canvas.ts",
-        "src/components/panels/tool-detail-panel.tsx",
-        "src/app/api/v1/step-tools/route.ts"
+        "src/components/canvas/step-node.tsx",
+        "src/components/canvas/flow-canvas.tsx"
       ],
       "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
-          "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx",
-          "src/app/(app)/w/[workspaceId]/dashboard/dashboard-view.tsx"
-        ],
-        "patterns_to_follow": [
-          "page.tsx server component fetches data via Supabase, passes to client view component",
-          "Analysis cards use bg-surface-secondary rounded-md p-4 with white/90 headers and white/55 body text",
-          "Step/tool navigation: useRouter().push(`/w/${workspaceId}/${tabId}`) for steps, tool selection via local state for tools",
-          "Existing tools page.tsx fetches tools + toolSections — add steps + step_tools queries in parallel Promise.all",
-          "step_tools has no workspace_id column — fetch via .in('tool_id', toolIds) where toolIds come from already-fetched tools",
-          "Steps need: id, name, section_id, frequency_per_month — section_id used to find tab via sections table"
-        ],
-        "learnings_relevant": [
-          "apiFetch unwraps envelope — returns T directly",
-          "Server/API query mismatch — update both page.tsx and any API routes if adding joins",
-          "Canvas null guards — (arr ?? []).filter(Boolean) before .map()"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/tools"
-        ]
+        "similar_files": ["src/components/canvas/stage-node.tsx"],
+        "patterns_to_follow": ["React Flow parent-child node click delegation"],
+        "learnings_relevant": [],
+        "affected_urls": ["/w/{workspaceId}/{tabId}"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Data fetching approach: page.tsx should add two more queries to the existing Promise.all — (1) steps with select('id, name, section_id, frequency_per_month') filtered by workspace_id, (2) step_tools via .in('tool_id', toolIds) after tools are fetched (may need sequential instead of parallel for this one, or use a Supabase inner join: step_tools.select('id, step_id, tool_id, steps!inner(workspace_id)').eq('steps.workspace_id', workspaceId)). Pass steps and stepTools as new props to ToolsCanvasView. Create tool-analysis-view.tsx as a separate component rendered conditionally via a toggle button (e.g. BarChart3 icon). For step navigation, also fetch sections (id, tab_id) to map section_id → tab_id. Total spend summary should match the existing sidebar summary pattern in tools-canvas-view.tsx."
+      "special_instructions": "The section node outer div currently receives all clicks because it spans the full section area. In React Flow, when a parent node and child node overlap, the click goes to the node whose DOM element is topmost. Add pointer-events: none to the section container's main content area, then pointer-events: auto on interactive elements (section name text, badges). The section's background click should still work via React Flow's built-in node click detection on the node wrapper. Test by verifying handleNodeClick receives step-* node IDs when clicking steps inside sections."
     },
     {
       "slot": 2,
-      "id": "#IMP-084",
-      "description": "Add 'Go to Tools' link in step-detail-panel Assigned Tools section when workspace has no tools",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
+      "id": "#BUG-031",
+      "description": "Fix Spend Summary missing Cancelled status breakdown row. Remove the conditional wrapper around the Cancelled row in tool-analysis-view.tsx so it always displays (matching Active and Considering rows).",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "When no tools exist in workspace, Assigned Tools section shows 'No tools yet' with link to /w/{workspaceId}/tools",
-        "Link uses router.push or Next.js Link component",
-        "When tools exist but none assigned to step, shows existing empty dropdown behavior (no change)"
+        "Spend Summary card shows all 3 status rows: Active, Considering, Cancelled — always visible",
+        "Cancelled row shows $0/mo when no cancelled tools exist",
+        "Cancelled row shows correct total when cancelled tools exist",
+        "TypeScript compiles clean"
       ],
       "files_owned": [
-        "src/components/panels/step-detail-panel.tsx"
+        "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx"
       ],
-      "files_read_only": [
-        "src/lib/api/client.ts",
-        "src/types/database.ts"
-      ],
+      "files_read_only": [],
       "context": {
-        "similar_files": [
-          "src/components/panels/tool-detail-panel.tsx"
-        ],
-        "patterns_to_follow": [
-          "Existing 'Go to Canvas' link pattern in improvements-view.tsx",
-          "text-accent-blue hover:underline for internal navigation links"
-        ],
+        "similar_files": [],
+        "patterns_to_follow": ["Active and Considering rows render unconditionally — match that pattern"],
         "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] (step detail panel)"
-        ]
+        "affected_urls": ["/w/{workspaceId}/tools"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "step-detail-panel.tsx already fetches tools for the dropdown (fetchTools). When the tools list is empty (length 0), show a text like 'No tools defined yet.' with a link 'Go to Tools →' that navigates to /w/{workspaceId}/tools. Use useWorkspace() or useParams() for workspaceId."
+      "special_instructions": "Line ~156: remove the `{spendByStatus.cancelled > 0 && (...)}` conditional wrapper. Keep the inner div content. Also remove the conditional border-t/mt-3/pt-3 styling — the Cancelled row should match Active and Considering row styling for consistency."
     },
     {
       "slot": 3,
-      "id": "#IMP-082",
-      "description": "Compare view CTA should create both process and journey tabs, not just journey",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
+      "id": "#BUG-035",
+      "description": "Push migration 024 (step_tools) to remote Supabase DB. Migration file exists at supabase/migrations/024_step_tools.sql but was never pushed. Run npx supabase db push. Also resolves BUG-032 (same root cause).",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "S",
       "attempts": 1,
-      "risk_score": 0,
+      "risk_score": 1,
       "acceptance_criteria": [
-        "Compare view 'Go to Canvas' CTA creates the correct tab type based on context or offers both options",
-        "If comparison is between perspectives on process entities, creates process tab",
-        "If comparison is between perspectives on journey entities, creates journey tab",
-        "Navigation goes to the newly created tab"
+        "npx supabase db push succeeds without errors",
+        "GET /api/v1/step-tools?step_id={id} returns 200 (empty array) instead of 500",
+        "step_tools table exists in remote Supabase schema",
+        "TypeScript compiles clean (no code changes expected)"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx"
+        "supabase/migrations/024_step_tools.sql"
       ],
       "files_read_only": [
-        "src/lib/api/client.ts",
-        "src/types/database.ts"
+        "src/app/api/v1/step-tools/route.ts",
+        "src/app/api/v1/step-tools/[id]/route.ts"
       ],
       "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
-        ],
-        "patterns_to_follow": [
-          "createTab() accepts canvas_type: 'process' | 'journey'",
-          "Existing CTA button style: bg-accent-blue text-white rounded-md px-4 py-2"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/compare"
-        ]
+        "similar_files": ["supabase/migrations/009_step_roles.sql"],
+        "patterns_to_follow": ["Previous migration push pattern from BUG-022/028/029"],
+        "learnings_relevant": ["S001: uuid_generate_v4() fails — use gen_random_uuid(). Already correct in 024."],
+        "affected_urls": ["/w/{workspaceId}/{tabId} (step detail panel)"]
       },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Read the current CTA implementation in compare-view.tsx (added in IMP-072, iteration 117). It likely calls createTab with canvas_type 'journey' only. Fix: if workspace already has tabs, navigate to an existing one. If creating new, check whether the comparison data contains process entities (steps/sections) or journey entities (touchpoints/stages) and create the appropriate tab type. If both, default to process tab or show two buttons."
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "This is a DB migration push, not a code change. Run: npx supabase db push. The migration file already uses gen_random_uuid() (not uuid_generate_v4()), so no code fix needed. If push fails, check if Supabase CLI is linked (npx supabase link --project-ref tkcyxtxkmveipnwgrddd). After push, verify by curling the step-tools API endpoint. This also resolves BUG-032 (same root cause — step_tools table missing)."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
     "owner": null,
-    "note": "No shared file modifications needed. All 3 tasks touch non-overlapping files."
+    "note": "No shared file modifications needed for these bug fixes"
   },
-  "merge_order": ["#FEAT-042", "#IMP-084", "#IMP-082"],
+  "merge_order": ["#BUG-034", "#BUG-031", "#BUG-035"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Last regression iteration 112 (7 iters ago, threshold 8). Will be due next iteration (120).",
-    "suites_to_run": ["acceptance"],
+    "regression_reason": null,
+    "suites_to_run": ["acceptance-bug-034", "acceptance-bug-031", "acceptance-bug-035"],
     "cadence_trigger": null
   },
   "status_updates": {

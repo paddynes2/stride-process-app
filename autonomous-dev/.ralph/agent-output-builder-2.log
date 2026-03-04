@@ -1,13 +1,1 @@
-Done. Here's a summary of what was implemented for `#IMP-081`:
-
-**Changes to `src/components/panels/tool-detail-panel.tsx`:**
-
-1. **Added local state:** `const [status, setStatus] = React.useState(tool.status)` alongside other field states at line ~48.
-
-2. **Updated useEffect:** Added `tool.status` to the dependency array and `setStatus(tool.status)` in the effect body — so status resets when the selected tool changes (matching the pattern for name/category/vendor/url/costPerMonth).
-
-3. **Added `handleStatusChange`:** Captures the previous status, updates optimistically via `setStatus(newStatus)`, calls `updateTool` directly with try/catch. On error, reverts to the previous status and calls `toastError`. On success, calls `onUpdate(updated)` to sync parent state.
-
-4. **Wired the select:** Changed `value={tool.status}` → `value={status}` and `onChange` → `handleStatusChange`.
-
-All acceptance criteria met: TypeScript clean (0 errors), lint clean (0 errors, 1 pre-existing unrelated warning).
+Done. The fix removes the `{spendByStatus.cancelled > 0 && (...)}` conditional and adds Cancelled as a standard grid item matching Active/Considering styling. TypeScript and lint both pass clean.

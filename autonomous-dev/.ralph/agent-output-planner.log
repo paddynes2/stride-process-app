@@ -1,15 +1,15 @@
-EXECUTION_PLAN.json written. Here's the summary:
+Execution plan produced. Summary:
 
-**Iteration 118 — 3 parallel tasks:**
+**Iteration 121 — 3 parallel bug fixes:**
 
-| Slot | Task | Type | Complexity | Files Owned |
-|------|------|------|------------|-------------|
-| 1 | **FEAT-041 [3/3]** Step detail panel "Tools" section + cost integration | build | M | step-detail-panel.tsx |
-| 2 | **IMP-081** Tool status dropdown optimistic update | improve | S | tool-detail-panel.tsx |
-| 3 | **IMP-083** Tool section panel tool count display | improve | S | tool-section-detail-panel.tsx, tools-canvas-view.tsx |
+| Slot | Task | Severity | Complexity | Files |
+|------|------|----------|------------|-------|
+| 1 | **#BUG-034** Step nodes unclickable (section overlay intercepts clicks) | P1 | S | `section-node.tsx` |
+| 2 | **#BUG-031** Cancelled row hidden in tool analysis | P2 | S | `tool-analysis-view.tsx` |
+| 3 | **#BUG-035** step-tools API 500 (push migration 024) | P1 | S | `024_step_tools.sql` (DB push) |
 
-**Key finding:** FEAT-041 [2/3] (step_tools junction data layer) was already completed in iteration 117 alongside [1/3]. Migration 024, types, API routes, client wrappers, and "Step Usage" section all exist. STATUS.md updated with this warning.
+**Validation:** Last commit valid, TypeScript passing, no revert needed.
 
-**Validation:** tsc clean, last commit valid, no revert needed. Risk score 2 — normal task selection.
+**Risk score:** 0 (last iteration was testing-only). No cadence triggers.
 
-**Testing:** Acceptance only. Regression not due (last at iter 112, within 8-iter cadence).
+Output written to `knowledge/handoffs/EXECUTION_PLAN.json`.

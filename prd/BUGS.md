@@ -126,12 +126,10 @@
   - **Steps to reproduce:** 1. Navigate to /ai-analysis with existing analysis results. 2. Open browser console. 3. Observe hydration mismatch warning on date display.
   - **Suggested fix:** Use a consistent date format (e.g., `toISOString().slice(0, 10)` or `Intl.DateTimeFormat` with explicit locale) that produces the same output on server and client.
 
-- [ ] #BUG-031 Spend Summary missing Cancelled status breakdown row (P2) — Attempts: 0
+- [x] #BUG-031 Spend Summary missing Cancelled status breakdown row (P2) — Attempts: 1 — DONE iteration 121, 2026-03-05
   - **Found:** Iteration 119 (acceptance tester)
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Spend Summary card
-  - **What:** Spend Summary shows Active and Considering status rows but the Cancelled row is conditionally rendered only when `spendByStatus.cancelled > 0`. Acceptance criterion #FEAT-042 requires all three status breakdowns (active/considering/cancelled) to always be visible.
-  - **Steps to reproduce:** 1. Navigate to /w/{workspaceId}/tools. 2. Click 'Analysis' toggle. 3. Observe Spend Summary — only Active and Considering visible, no Cancelled row.
-  - **Suggested fix:** Remove the `{spendByStatus.cancelled > 0 && (...)}` conditional wrapper around the Cancelled row. Show it unconditionally like Active and Considering.
+  - **Fix applied:** Removed `{spendByStatus.cancelled > 0 && (...)}` conditional wrapper. Cancelled row now renders unconditionally as a grid column matching Active and Considering styling.
 
 - [ ] #BUG-032 step-tools API returns HTTP 500 when step detail panel opens (P2) — Attempts: 0
   - **Found:** Iteration 119 (acceptance tester)
@@ -147,14 +145,12 @@
   - **Steps to reproduce:** 1. Navigate to /w/{workspaceId}/compare with only a process tab. 2. Click 'Create Journey Tab'. 3. Observe tab bar — new journey tab not shown.
   - **Suggested fix:** After createTab(), call the workspace context refresh/invalidation method to re-fetch tabs list, or use router.refresh().
 
-- [ ] #BUG-034 Step nodes unclickable — section overlay intercepts pointer events (P1) — Attempts: 0
+- [x] #BUG-034 Step nodes unclickable — section overlay intercepts pointer events (P1) — Attempts: 1 — DONE iteration 121, 2026-03-05
   - **Found:** Iteration 120 (regression tester — Playwright browser)
-  - **Where:** `src/components/canvas/section-node.tsx` pointer event overlay + `src/components/canvas/step-node.tsx`
-  - **What:** Clicking on a step node (mouse click) opens the Section Details panel instead of Step Details panel. The section node's pointer-event overlay intercepts all click events from child step nodes. Step Details only opens via JavaScript's dispatchEvent(). This blocks the primary step-editing workflow.
-  - **Steps to reproduce:** 1. Navigate to workspace workflow canvas. 2. Ensure a section with at least one step node is visible. 3. Click directly on the step node card. 4. Observe: Section Details panel opens instead of Step Details panel.
-  - **Suggested fix:** Set `pointer-events: none` on the section node's overlay div, or use `stopPropagation()` on step node click handler, or adjust z-index layering so step nodes are above section overlays.
+  - **Where:** `src/components/canvas/section-node.tsx`
+  - **Fix applied:** Added `pointerEvents: "none"` to section container div style (both heatMap and default branches). Added `pointerEvents: "auto"` on interactive children: annotation indicator dot, section label row (name + maturity badge), comment count badge. Step node clicks now pass through to React Flow's onNodeClick.
 
-- [ ] #BUG-035 step-tools API returns HTTP 500 — migration 024 likely not pushed (P1) — Attempts: 0
+- [ ] #BUG-035 step-tools API returns HTTP 500 — migration 024 likely not pushed (P1) — Attempts: 1
   - **Found:** Iteration 120 (regression tester — Playwright browser)
   - **Where:** `src/app/api/v1/step-tools` route
   - **What:** GET /api/v1/step-tools?step_id=... returns HTTP 500 Internal Server Error. Called twice every time Step Details panel opens. Prevents tool assignments from loading. Likely the step_tools table (migration 024) was never created or pushed to the DB.
