@@ -285,7 +285,7 @@ export function ToolAnalysisView({
               </p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full" aria-label="Tool cost breakdown">
                   <thead>
                     <tr className="border-b border-[var(--border-subtle)]">
                       <th className="pb-2 text-left text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)] pr-4">
