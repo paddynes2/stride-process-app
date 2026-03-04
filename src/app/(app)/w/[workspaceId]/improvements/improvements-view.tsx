@@ -96,10 +96,13 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
   }, [ideas, statusFilter, priorityFilter]);
 
   const handleStatusChange = async (idea: ImprovementIdea, newStatus: ImprovementStatus) => {
+    const prevIdeas = [...ideas];
+    setIdeas((prev) => prev.map((i) => (i.id === idea.id ? { ...i, status: newStatus } : i)));
     try {
       const updated = await updateImprovementIdea(idea.id, { status: newStatus });
       setIdeas((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
     } catch (err) {
+      setIdeas(prevIdeas);
       toastError("Failed to update status", { error: err });
     }
   };
