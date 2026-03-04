@@ -169,6 +169,13 @@ export interface StepRole {
   created_at: string;
 }
 
+export interface StepTool {
+  id: string;
+  step_id: string;
+  tool_id: string;
+  created_at: string;
+}
+
 export interface PublicShare {
   id: string;
   workspace_id: string;

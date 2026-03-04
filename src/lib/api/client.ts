@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, ToolSection, ToolStatus, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template, ImprovementIdea, ImprovementStatus, ImprovementPriority, AIAnalysisResult } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, ToolSection, ToolStatus, StepRole, StepTool, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template, ImprovementIdea, ImprovementStatus, ImprovementPriority, AIAnalysisResult } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -344,6 +344,38 @@ export async function createStepRole(data: { step_id: string; role_id: string })
 
 export async function deleteStepRole(id: string): Promise<void> {
   await apiFetch(`/api/v1/step-roles/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Step-Tools (junction: step ↔ tool assignment)
+// ---------------------------------------------------------------------------
+
+export type StepToolWithStep = StepTool & {
+  step: Pick<Step, "id" | "name" | "section_id">;
+};
+
+export type StepToolWithTool = StepTool & {
+  tool: Pick<Tool, "id" | "name" | "cost_per_month">;
+};
+
+export async function fetchStepToolsByTool(toolId: string): Promise<StepToolWithStep[]> {
+  return apiFetch<StepToolWithStep[]>(`/api/v1/step-tools?tool_id=${toolId}`);
+}
+
+export async function fetchStepToolsByStep(stepId: string): Promise<StepToolWithTool[]> {
+  return apiFetch<StepToolWithTool[]>(`/api/v1/step-tools?step_id=${stepId}`);
+}
+
+export async function createStepTool(data: { step_id: string; tool_id: string }): Promise<StepToolWithTool> {
+  return apiFetch<StepToolWithTool>("/api/v1/step-tools", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStepTool(id: string): Promise<void> {
+  await apiFetch(`/api/v1/step-tools/${id}`, { method: "DELETE" });
 }
 
 // ---------------------------------------------------------------------------
