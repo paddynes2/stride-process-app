@@ -23,6 +23,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 
 const RichTextEditor = dynamic(
@@ -398,63 +399,71 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
             <Wrench className="h-3 w-3" />
             Assigned Tools
           </label>
-          {stepTools.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {stepTools.map((st) => (
-                <Badge key={st.id} variant="outline" className="gap-1 max-w-none">
-                  <span className="truncate">{st.tool.name}</span>
-                  {st.tool.cost_per_month != null && (
-                    <>
-                      <span className="text-[var(--text-quaternary)]">·</span>
-                      <span className="text-[var(--text-quaternary)] truncate">${st.tool.cost_per_month}/mo</span>
-                    </>
-                  )}
-                  <button
-                    onClick={() => handleRemoveTool(st.id)}
-                    className="ml-0.5 hover:text-[var(--error)] transition-colors"
-                    aria-label={`Remove ${st.tool.name} tool`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
-              >
-                <Plus className="h-3 w-3" />
-                Assign Tool
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
-              {allTools.length === 0 && (
-                <DropdownMenuLabel>No tools — create tools first</DropdownMenuLabel>
+          {allTools.length === 0 ? (
+            <p className="text-[12px] text-[var(--text-tertiary)]">
+              No tools defined yet.{" "}
+              <Link href={`/w/${workspaceId}/tools`} className="text-[var(--accent-blue)] hover:underline">
+                Go to Tools →
+              </Link>
+            </p>
+          ) : (
+            <>
+              {stepTools.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {stepTools.map((st) => (
+                    <Badge key={st.id} variant="outline" className="gap-1 max-w-none">
+                      <span className="truncate">{st.tool.name}</span>
+                      {st.tool.cost_per_month != null && (
+                        <>
+                          <span className="text-[var(--text-quaternary)]">·</span>
+                          <span className="text-[var(--text-quaternary)] truncate">${st.tool.cost_per_month}/mo</span>
+                        </>
+                      )}
+                      <button
+                        onClick={() => handleRemoveTool(st.id)}
+                        className="ml-0.5 hover:text-[var(--error)] transition-colors"
+                        aria-label={`Remove ${st.tool.name} tool`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
               )}
-              {allTools.map((tool) => {
-                const isAssigned = assignedToolIds.has(tool.id);
-                return (
-                  <DropdownMenuItem
-                    key={tool.id}
-                    disabled={isAssigned}
-                    onSelect={() => { if (!isAssigned) handleAssignTool(tool.id); }}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
                   >
-                    <span className="flex-1 truncate">{tool.name}</span>
-                    {tool.cost_per_month != null && (
-                      <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
-                        ${tool.cost_per_month}/mo
-                      </span>
-                    )}
-                    {isAssigned && (
-                      <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
-                    )}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                    <Plus className="h-3 w-3" />
+                    Assign Tool
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
+                  {allTools.map((tool) => {
+                    const isAssigned = assignedToolIds.has(tool.id);
+                    return (
+                      <DropdownMenuItem
+                        key={tool.id}
+                        disabled={isAssigned}
+                        onSelect={() => { if (!isAssigned) handleAssignTool(tool.id); }}
+                      >
+                        <span className="flex-1 truncate">{tool.name}</span>
+                        {tool.cost_per_month != null && (
+                          <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
+                            ${tool.cost_per_month}/mo
+                          </span>
+                        )}
+                        {isAssigned && (
+                          <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
+                        )}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
         </div>
 
         <Separator />
