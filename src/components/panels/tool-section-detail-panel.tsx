@@ -31,12 +31,13 @@ const RichTextEditor = dynamic(
 
 interface ToolSectionDetailPanelProps {
   toolSection: ToolSection;
+  toolCount?: number;
   onUpdate: (toolSection: ToolSection) => void;
   onDelete: (id: string) => void;
   onClose: () => void;
 }
 
-export function ToolSectionDetailPanel({ toolSection, onUpdate, onDelete, onClose }: ToolSectionDetailPanelProps) {
+export function ToolSectionDetailPanel({ toolSection, toolCount = 0, onUpdate, onDelete, onClose }: ToolSectionDetailPanelProps) {
   const [name, setName] = React.useState(toolSection.name);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
@@ -96,6 +97,9 @@ export function ToolSectionDetailPanel({ toolSection, onUpdate, onDelete, onClos
             Name
           </label>
           <Input value={name} onChange={(e) => handleNameChange(e.target.value)} placeholder="Section name" />
+          <p className="mt-1.5 text-[12px] text-[var(--text-secondary)]">
+            {toolCount} {toolCount === 1 ? "tool" : "tools"} in this section
+          </p>
         </div>
 
         <Separator />

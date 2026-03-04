@@ -374,6 +374,9 @@ export function ToolsCanvasView({
   const nothingSelected = selectedToolId === null && selectedSectionId === null;
   const selectedTool = selectedToolId ? (tools.find((t) => t.id === selectedToolId) ?? null) : null;
   const selectedSection = selectedSectionId ? (toolSections.find((ts) => ts.id === selectedSectionId) ?? null) : null;
+  const selectedSectionToolCount = selectedSectionId
+    ? Object.values(toolSectionMap).filter((sId) => sId === selectedSectionId).length
+    : 0;
 
   return (
     <div className="flex h-full">
@@ -483,6 +486,7 @@ export function ToolsCanvasView({
         >
           <ToolSectionDetailPanel
             toolSection={selectedSection}
+            toolCount={selectedSectionToolCount}
             onUpdate={handleToolSectionUpdate}
             onDelete={handleToolSectionDelete}
             onClose={handlePaneClick}
