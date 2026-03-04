@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { ToolsView } from "./tools-view";
+import { ToolsCanvasView } from "./tools-canvas-view";
 
 export default async function ToolsPage({
   params,
@@ -12,16 +12,24 @@ export default async function ToolsPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: tools } = await supabase
-    .from("tools")
-    .select("*")
-    .eq("workspace_id", workspaceId)
-    .order("created_at");
+  const [{ data: tools }, { data: toolSections }] = await Promise.all([
+    supabase
+      .from("tools")
+      .select("*")
+      .eq("workspace_id", workspaceId)
+      .order("created_at"),
+    supabase
+      .from("tool_sections")
+      .select("*")
+      .eq("workspace_id", workspaceId)
+      .order("created_at"),
+  ]);
 
   return (
-    <ToolsView
+    <ToolsCanvasView
       workspaceId={workspaceId}
       initialTools={tools ?? []}
+      initialToolSections={toolSections ?? []}
     />
   );
 }
