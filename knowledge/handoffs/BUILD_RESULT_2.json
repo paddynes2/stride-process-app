@@ -1,31 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 133,
+  "iteration": 136,
   "slot": 2,
-  "task_id": "#IMP-106",
+  "task_id": "#IMP-102",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 180,
 
   "files_changed": [
     {
-      "path": "src/components/panels/export-pdf-dialog.tsx",
+      "path": "src/components/panels/tool-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 17,
-      "lines_removed": 0
+      "lines_added": 28,
+      "lines_removed": 5
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "skipped", "errors": 0, "output": "" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated), 0 errors" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/panels/export-pdf-dialog.tsx"],
+  "staged_files": ["src/components/panels/tool-detail-panel.tsx"],
   "ownership_violations": [],
-  "notes": "Added maskedCount computation using presetConfig (maps activePreset to its constant config, null for 'custom'). Counts keys where preset=true but availability=false. Shows muted info note (text-xs text-white/55) below preset buttons when activePreset !== 'custom' && maskedCount > 0. Pluralizes 'section/sections' correctly.",
+  "notes": "Used useWorkspace() context to get workspace.id — avoids adding prop to tools-canvas-view.tsx (outside ownership). Fetches all steps via /api/v1/steps?workspace_id= on workspace mount to build stepId→tabId map. Step names in Step Usage section now render as clickable buttons matching tool-analysis-view.tsx pattern (text-[var(--accent-blue)] hover:underline cursor-pointer). Falls back to plain text span if tab_id not yet loaded.",
 
   "failure_details": null
 }

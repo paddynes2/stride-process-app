@@ -1,19 +1,17 @@
 ## Handoff
 
-- **Iteration:** 135
-- **Date:** 2026-03-06 00:15
-- **Phase:** Phase 3b — Tools Canvas + Enhanced Export
+- **Iteration:** 136
+- **Date:** 2026-03-06 02:00
+- **Phase:** Post-Phase 3b — Improvements
 - **Branch:** ralph/init-stride
-- **Last task(s):** #BUG-052 (export PDF dialog close aria-label), #BUG-053 (gap analysis table aria-label), #BUG-054 (tool cost breakdown table aria-label)
+- **Last task(s):** #IMP-034 (useCallback memoization), #IMP-102 (tool detail panel clickable steps), #IMP-114 (AI Regenerate disabled tooltip)
 - **Result:** completed
-- **Next task:** #FEAT-044 (Phase 3b testing gate) — all Phase 3b features + bugs now resolved
+- **Next task:** Continue improvements — #IMP-005 (orphaned annotations), #IMP-010 (collapsible panels), #IMP-088 (if exists), or other medium/high priority improvements
 - **Blockers:** BUG-035 + BUG-032 blocked on Supabase CLI authentication — `npx supabase login` required before migration 024 can be pushed.
 
 ## Context
 
-Iteration 135 fixed 3 P2 accessibility bugs found in iter 134 testing. BUG-052: added aria-label='Close' to shared DialogContent close button in `ui/dialog.tsx` (reviewer fix — builder had inlined the entire DialogContent, reviewer de-duplicated back to shared component). BUG-053: added aria-label='Gap analysis ranking' to `gap-analysis-view.tsx` table. BUG-054: added aria-label='Tool cost breakdown' to `tool-analysis-view.tsx` table. IMP-115 (perspectives comparison table aria-label) was bundled with BUG-052 in slot 1.
-
-Files touched: `src/components/ui/dialog.tsx`, `src/components/panels/export-pdf-dialog.tsx`, `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`, `src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx`, `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx`.
+Iteration 136 completed 3 independent improvements across non-overlapping files. IMP-034 wrapped all 10 handler functions in canvas-view.tsx with React.useCallback (correct dependency arrays). IMP-102 made Step Usage list items in tool-detail-panel.tsx clickable — navigates to the canvas tab containing the step, using useRouter + a workspace-scoped step→tabId map. IMP-114 added a native title tooltip to the disabled AI Regenerate button. All 3 builders passed typecheck and lint. Post-merge tsc passed. Acceptance testing passed 9/9 criteria.
 
 ## Dev Server
 
@@ -25,7 +23,8 @@ Files touched: `src/components/ui/dialog.tsx`, `src/components/panels/export-pdf
 
 - **P1 BUG-035:** step-tools API returns 500 (migration 024 not pushed — Supabase CLI unauthenticated).
 - **CRITICAL:** OPENROUTER_API_KEY not set — AI analysis route returns 503.
-- Production (origin/main) is behind ralph/init-stride by 90+ commits
+- Production (origin/main) is behind ralph/init-stride by 109+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - step-detail-panel.tsx ~770 lines — exceeding complexity threshold
+- IMP-102 uses raw `fetch()` instead of `apiFetch()` — minor pattern inconsistency (no `fetchSteps` function exists in client.ts)

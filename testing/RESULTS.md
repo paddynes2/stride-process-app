@@ -12,7 +12,8 @@
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 129 (2026-03-05) — 9/11 PASS (BUG-042 5/5, IMP-100 3/3, IMP-094 1/3 — Playwright browser; 2 fail: available:true hardcoded makes tooltips unreachable; 0 console errors, 0 network errors)
+- Last run: Iteration 136 (2026-03-06) — 9/9 PASS (IMP-034 3/3, IMP-102 3/3, IMP-114 3/3 — Playwright browser + static code analysis; 1 console error, 0 network errors)
+- Previous: Iteration 129 (2026-03-05) — 9/11 PASS (BUG-042 5/5, IMP-100 3/3, IMP-094 1/3 — Playwright browser; 2 fail: available:true hardcoded makes tooltips unreachable; 0 console errors, 0 network errors)
 - Previous: Iteration 128 (2026-03-05) — 8/8 PASS (FEAT-044 Phase 3b testing gate: FEAT-040 tools canvas, FEAT-041 tool detail, FEAT-042 tool analysis, FEAT-043 enhanced PDF export, cost chain, tsc, lint, full regression sidebar check — Playwright browser on localhost:3000; 0 console errors, 0 network errors)
 - Previous: Iteration 126 (2026-03-05) — 15/15 PASS (BUG-040 5/5, FEAT-043 [3/4] 7/7, IMP-045 3/3 — Playwright browser + static code check)
 - Previous: Iteration 125 (2026-03-05) — 13/14 PASS (FEAT-043 [2/4] 6/7, BUG-038+039 5/5, IMP-023 2/2, TypeScript 1/1 — Playwright browser; 1 fail: sections available:false BUG-040)

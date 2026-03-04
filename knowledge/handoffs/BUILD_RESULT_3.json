@@ -1,33 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 133,
+  "iteration": 136,
   "slot": 3,
-  "task_id": "#IMP-104",
+  "task_id": "#IMP-114",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 45,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx",
       "action": "modified",
-      "lines_added": 8,
+      "lines_added": 1,
       "lines_removed": 0
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused 'addEdge') — not introduced by this change" },
+    "lint": { "status": "skipped", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
+    "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Added Analysis toggle button to the ReactFlow Panel toolbar alongside Add Tool and Add Tool Section buttons. Reused existing handleToggleAnalysis callback and BarChart3 icon (both already imported). Button text uses {showAnalysis ? 'Canvas' : 'Analysis'} — in practice the toolbar Panel is only rendered when showAnalysis=false so the button always shows 'Analysis', but the conditional text is correct for completeness. Existing sidebar analysis toggle is unchanged and continues to work.",
+  "notes": "Added title attribute to the Regenerate button: title={!hasSteps ? 'Add steps to the canvas before running AI analysis' : undefined}. Native browser tooltip via title attribute. Button remains disabled with cursor-not-allowed styling when !hasSteps.",
 
   "failure_details": null
 }

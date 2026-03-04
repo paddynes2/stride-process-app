@@ -2572,3 +2572,32 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed cleanly, reviewer fix improved code quality
 - Observations: 1 (builder inlined shared component due to ownership constraints — reviewer fixed)
 **Notes:** IMP-115 (perspectives comparison table aria-label) was bundled with BUG-052 by slot 1 builder.
+
+## Iteration 136 — 2026-03-06 02:00
+**Tasks:**
+- #IMP-034 Wrap 10 canvas-view.tsx handler functions in React.useCallback — slot 1 — completed
+- #IMP-102 Make Step Usage list items in tool-detail-panel.tsx clickable — slot 2 — completed
+- #IMP-114 Add explanatory tooltip to disabled AI Regenerate button — slot 3 — completed
+**Source:** prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (10 handlers wrapped in useCallback)
+- src/components/panels/tool-detail-panel.tsx (clickable step links with router navigation)
+- src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx (title tooltip on Regenerate button)
+**Verification:**
+- Type check: pass (all 3 builders, post-merge tsc)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A
+- Browser test: pass (acceptance tester verified 9/9 criteria)
+- Canary test: skipped (IMP-102/IMP-114 have UI changes but tool-detail-panel and AI analysis are secondary views)
+**Bugs found:** None
+**Improvements found:** 1 — #IMP-117 (tool detail Step Usage empty state hint)
+**Self-score:**
+- Code quality: 4 — Clean memoization, correct dep arrays; minor: IMP-102 uses raw fetch instead of apiFetch
+- Test coverage: 4 — Acceptance tester verified all criteria; no interactive browser exercise of IMP-102 clickable links (no linked steps in test workspace)
+- Confidence: 5 — All changes are additive/non-breaking, all typechecks pass
+- Efficiency: 5 — All 3 builders succeeded cleanly, no wasted actions
+- Observations: 1 (IMP-117 empty state discoverability)
+**Notes:** Source changes already committed via ralph merge commits. Reviewer tagged and updated docs only.

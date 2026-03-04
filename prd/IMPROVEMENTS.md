@@ -230,7 +230,7 @@
   - **What:** 5 component files exceed the 500-line maintainability threshold. Large client components are harder to tree-shake and slower to parse.
   - **Suggested fix:** Split largest files into sub-components. Not urgent — route-level components load only on specific routes.
 
-- [ ] #IMP-034 canvas-view.tsx handler functions not memoized with useCallback — Attempts: 0
+- [x] #IMP-034 canvas-view.tsx handler functions not memoized with useCallback — Attempts: 1 — Done: iter 136 (2026-03-06)
   - **Found:** Iteration 100 (regression tester)
   - **Category:** Performance
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` lines 44-93
@@ -738,7 +738,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — user should know where the uncovered step lives
   - **Suggested fix:** Add section/tab context to Coverage Gaps table rows, or make the step button navigate directly to the step on the canvas.
 
-- [ ] #IMP-102 Tool detail panel Step Usage list items not clickable — Attempts: 0
+- [x] #IMP-102 Tool detail panel Step Usage list items not clickable — Attempts: 1 — Done: iter 136 (2026-03-06)
   - **Found:** Iteration 128 (regression tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/tool-detail-panel.tsx` — Step Usage list
@@ -834,7 +834,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall — show preset contents on hover
   - **Suggested fix:** Add a tooltip or description below each preset button listing the sections it includes.
 
-- [ ] #IMP-114 AI Regenerate button disabled state needs explanatory tooltip — Attempts: 0
+- [x] #IMP-114 AI Regenerate button disabled state needs explanatory tooltip — Attempts: 1 — Done: iter 136 (2026-03-06)
   - **Found:** Iteration 134 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/` — Regenerate button
@@ -857,6 +857,14 @@
   - **What:** The maskedCount unavailability hint only appears when using a named preset. In custom mode, disabled sections have individual tooltips but there's no top-level guidance about why certain sections remain disabled.
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Verify individual disabled tooltips are visible on hover/focus in browser. If so, no change needed.
+
+- [ ] #IMP-117 Tool detail panel Step Usage empty state hint — Attempts: 0
+  - **Found:** Iteration 136 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/tool-detail-panel.tsx` — Step Usage section
+  - **What:** The Step Usage clickable links (#IMP-102) only become discoverable after steps are linked to a tool. Empty Tools canvas is the default state, so most users won't see Step Usage until they actively link steps.
+  - **Design principle:** Nielsen H6: Recognition over recall
+  - **Suggested fix:** Add empty-state hint in Step Usage section when a tool has no linked steps (e.g., 'No steps linked yet. Open a step on the canvas and assign this tool.').
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

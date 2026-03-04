@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 133,
-  "date": "2026-03-05T21:00:00Z",
+  "iteration": 136,
+  "date": "2026-03-06T01:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "c94dba0e269184fce2164d0420f4c58fafb9605f",
+    "last_commit_hash": "c12022783a476849f5b010cca106bd3d106ee021",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,61 +13,40 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#BUG-048",
-      "description": "Dynamic page titles — add generateMetadata to workspace layout (template pattern) and all page.tsx files so each page has a unique <title> satisfying WCAG 2.4.2. Pattern: '[Page Name] — [Workspace Name] — Stride'. Auth pages get static titles. /workspaces gets 'Workspaces — Stride'. Settings page (client component) uses layout default.",
-      "source": "prd/BUGS.md",
-      "type": "fix",
+      "id": "#IMP-034",
+      "description": "Wrap 10 canvas-view.tsx handler functions in React.useCallback to prevent unnecessary FlowCanvas re-renders",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "M",
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "Root layout.tsx title becomes template: { template: '%s — Stride', default: 'Stride — Process Mapping & Continuous Improvement' }",
-        "[workspaceId]/layout.tsx exports generateMetadata with title: { template: '%s — {workspaceName} — Stride', default: '{workspaceName} — Stride' }",
-        "All 14 server-component page.tsx files under [workspaceId]/ export generateMetadata or static metadata with page-specific title (e.g. 'Settings', 'Dashboard', 'Activity')",
-        "Canvas [tabId]/page.tsx uses tab name as title (dynamic via generateMetadata)",
-        "/workspaces page.tsx exports metadata with title 'Workspaces'",
-        "/login and /signup pages export metadata with title 'Log In' and 'Sign Up'",
-        "TypeScript compilation passes with zero new errors",
-        "No duplicate title across any two different pages"
+        "All 10 handler functions (handleStepSelect, handleSectionSelect, handleStepUpdate, handleStepCreate, handleStepDelete, handleSectionCreate, handleSectionUpdate, handleSectionDelete, handleConnectionCreate, handleConnectionDelete) wrapped in React.useCallback",
+        "Dependency arrays correct — setState functions are stable, state values that are read inside closures are deps",
+        "TypeScript compiles cleanly (npx tsc --noEmit)",
+        "No behavioral regression — handlers still update state correctly"
       ],
       "files_owned": [
-        "src/app/layout.tsx",
-        "src/app/(app)/w/[workspaceId]/layout.tsx",
-        "src/app/(app)/w/[workspaceId]/*/page.tsx",
-        "src/app/(app)/workspaces/page.tsx",
-        "src/app/(auth)/login/page.tsx",
-        "src/app/(auth)/signup/page.tsx"
+        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
       ],
       "files_read_only": [
-        "src/lib/supabase/server.ts"
+        "src/components/canvas/flow-canvas.tsx"
       ],
       "context": {
-        "similar_files": ["src/app/public/[shareId]/page.tsx"],
-        "patterns_to_follow": [
-          "public/[shareId]/page.tsx uses generateMetadata with Supabase query to get workspace name",
-          "Next.js title.template in layout — child page title strings get interpolated into template",
-          "Root layout already has static metadata export at line 21"
-        ],
-        "learnings_relevant": [
-          "NEXT_PUBLIC_ static replacement — not relevant here but be careful with env vars",
-          "Settings page.tsx is 'use client' — cannot export metadata/generateMetadata. Layout default will apply."
-        ],
-        "affected_urls": [
-          "/workspaces",
-          "/login",
-          "/signup",
-          "/w/[workspaceId]/*"
-        ]
+        "similar_files": ["src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"],
+        "patterns_to_follow": ["React 19 useRef requires initial value", "Never sort prop arrays directly"],
+        "learnings_relevant": ["IMP-032 already added React.memo to StepNode/SectionNode in iter 101"],
+        "affected_urls": ["/w/[workspaceId]/[tabId]"]
       },
       "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "The [workspaceId]/layout.tsx already fetches workspace. Add generateMetadata that does the same query (Next.js deduplicates). Use title.template: '%s — {workspaceName} — Stride'. For settings/page.tsx which is 'use client', do NOT add metadata — the layout default '{workspaceName} — Stride' is acceptable. For [tabId]/page.tsx, use the tab name from the existing query. Also resolves IMP-108."
+      "special_instructions": "Lines 67-100 approximately. Most handlers only use setState (stable reference) so deps arrays will be minimal. handleStepDelete also filters connections and checks selectedStepId — include selectedStepId as dep. handleSectionDelete checks selectedSectionId — include it. Be careful with handleConnectionCreate and handleConnectionDelete which may reference state."
     },
     {
       "slot": 2,
-      "id": "#IMP-106",
-      "description": "Show info note in export PDF dialog when a preset is applied but some sections are masked by availability. E.g. 'N sections unavailable — add data to unlock them'.",
+      "id": "#IMP-102",
+      "description": "Make Step Usage list items in tool-detail-panel.tsx clickable — navigate to step on canvas",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
@@ -75,83 +54,73 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "When a preset is applied and availability masks >= 1 section, a muted info note appears below the preset buttons",
-        "Note shows count of masked sections (e.g. '3 sections unavailable — add data to unlock them')",
-        "Note disappears when no preset is active or all preset sections are available",
-        "Styling matches existing muted text pattern (text-white/55, text-xs)",
-        "TypeScript compilation passes"
+        "Step names in Step Usage section of tool-detail-panel.tsx are clickable",
+        "Clicking a step name navigates to the canvas tab containing that step",
+        "Cursor changes to pointer on hover, text styled as link (blue/underline or matching tool-analysis-view.tsx pattern)",
+        "TypeScript compiles cleanly"
       ],
       "files_owned": [
-        "src/components/panels/export-pdf-dialog.tsx"
+        "src/components/panels/tool-detail-panel.tsx"
       ],
-      "files_read_only": [],
+      "files_read_only": [
+        "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx"
+      ],
       "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "maskWithAvailability at line 77 already computes masked config",
-          "activePreset state tracks current preset",
-          "availability prop is Record<keyof ExportConfig, boolean>"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/[tabId]"]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Compute masked count by comparing preset config keys (where preset[k]=true) against availability[k]. Show note only when activePreset !== 'custom' and maskedCount > 0."
-    },
-    {
-      "slot": 3,
-      "id": "#IMP-104",
-      "description": "Add Analysis toggle button to the tools canvas toolbar alongside 'Add Tool' and 'Add Tool Section' buttons, so users can toggle analysis view from the toolbar without needing the sidebar.",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "An 'Analysis' button appears in the tools canvas toolbar (alongside Add Tool, Add Tool Section)",
-        "Clicking toggles showAnalysis state (same as existing sidebar toggle)",
-        "Button text switches between 'Analysis' and 'Canvas' based on showAnalysis state",
-        "Existing sidebar analysis toggle continues to work",
-        "TypeScript compilation passes"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
-      ],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "handleToggleAnalysis callback at line 311 already exists",
-          "Toolbar area with Add Tool / Add Tool Section buttons — find in JSX",
-          "Existing sidebar analysis toggle at line 567 uses same handler"
-        ],
+        "similar_files": ["src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx"],
+        "patterns_to_follow": ["tool-analysis-view.tsx already has clickable step links with router.push — match that pattern"],
         "learnings_relevant": [],
         "affected_urls": ["/w/[workspaceId]/tools"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Reuse the existing handleToggleAnalysis callback. Match button styling to other toolbar buttons. Use BarChart3 or similar icon from lucide-react."
+      "special_instructions": "Check tool-analysis-view.tsx for the existing step link pattern (router.push to canvas tab). The tool-detail-panel needs access to workspaceId and the step's tab_id. The step data returned from step-tools API may include tab_id via section join or the step may have section_id which links to a tab. Check the Step type and step-tools API response shape. If tab_id is not available, may need to fetch sections to determine tab_id, or use a simpler approach if steps already carry section_id + sections are available in context."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-114",
+      "description": "Add explanatory tooltip to disabled AI Regenerate button when no steps exist",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3a: Analysis Intelligence",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "When hasSteps is false, Regenerate button shows tooltip: 'Add steps to the canvas before running AI analysis'",
+        "Tooltip uses title attribute or Radix Tooltip (match existing pattern in the file)",
+        "Button remains disabled with cursor-not-allowed styling",
+        "TypeScript compiles cleanly"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": ["src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"],
+        "patterns_to_follow": ["gap-analysis-view.tsx has similar disabled button with hint text pattern (BUG-027 fix)"],
+        "learnings_relevant": [],
+        "affected_urls": ["/w/[workspaceId]/ai-analysis"]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Simple change. Use title attribute on the button wrapper or a hint text below — match the pattern used in gap-analysis-view.tsx for the disabled Generate Summary button."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
     "owner": null,
-    "note": "No shared files need modification."
+    "note": "No shared file modifications needed for any task"
   },
-  "merge_order": ["#BUG-048", "#IMP-106", "#IMP-104"],
+  "merge_order": ["#IMP-034", "#IMP-102", "#IMP-114"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": null,
+    "regression_reason": "Last regression was iter 134 (2 iterations ago). Risk score 2. Not due per 8-iteration cadence.",
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "IMP-107, IMP-109, IMP-110 were resolved by BUG-045/046/047 in iter 132 — should be marked done by reviewer"
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }
