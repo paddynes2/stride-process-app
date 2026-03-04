@@ -156,7 +156,7 @@
   - **What:** No distinction between user-initiated and automated/system actions. Future audit trail may need actor_type.
   - **Suggested fix:** Add optional actor_type:'user'|'system' to LogActivityParams in a future migration.
 
-- [ ] #IMP-023 Coloring rules active indicator on paintbrush button — Attempts: 0
+- [x] #IMP-023 Coloring rules active indicator on paintbrush button — DONE iteration 125, 2026-03-05 — Attempts: 1
   - **Found:** Iteration 96 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`
@@ -697,6 +697,14 @@
   - **What:** Clicking any checkbox after selecting a preset doesn't switch to "Custom" automatically — user must manually click Custom first.
   - **Design principle:** Nielsen H4: Consistency and standards — preset systems typically auto-switch to "Custom" when user deviates
   - **Suggested fix:** When any checkbox state is manually changed, auto-activate the Custom preset button.
+
+- [ ] #IMP-096 Executive Summary preset config includes Data Table + Cost Analysis — should only enable canvasSnapshot + gapAnalysis + executiveSummary — Attempts: 0
+  - **Found:** Iteration 125 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — EXECUTIVE_SUMMARY_CONFIG
+  - **What:** Executive Summary preset currently enables all 4 available sections (Canvas Snapshot, Data Table, Gap Analysis, Cost Analysis). Per spec, it should only enable canvasSnapshot + gapAnalysis + executiveSummary. Data Table and Cost Analysis add noise to a summary-oriented export.
+  - **Design principle:** Nielsen H8: Aesthetic and minimalist design — presets should surface only what is relevant to the named use case
+  - **Suggested fix:** Set `dataTable: false` and `costAnalysis: false` in EXECUTIVE_SUMMARY_CONFIG.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

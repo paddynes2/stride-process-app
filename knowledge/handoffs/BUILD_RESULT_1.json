@@ -1,31 +1,47 @@
 {
   "schema_version": "1.0",
-  "iteration": 124,
+  "iteration": 125,
   "slot": 1,
-  "task_id": "#FEAT-043 [1/4]",
+  "task_id": "#FEAT-043 [2/4]",
   "status": "completed",
-  "duration_seconds": 180,
+  "duration_seconds": 900,
 
   "files_changed": [
     {
-      "path": "src/types/export.ts",
+      "path": "src/lib/export/pdf.ts",
+      "action": "modified",
+      "lines_added": 28,
+      "lines_removed": 10
+    },
+    {
+      "path": "src/lib/export/enhanced-pdf-sections.ts",
       "action": "created",
-      "lines_added": 6,
+      "lines_added": 385,
       "lines_removed": 0
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+      "action": "modified",
+      "lines_added": 128,
+      "lines_removed": 4
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge import) — not introduced by this task" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not owned by this task)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/types/export.ts"],
+  "staged_files": [
+    "src/lib/export/pdf.ts",
+    "src/lib/export/enhanced-pdf-sections.ts",
+    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+  ],
   "ownership_violations": [],
-  "notes": "The ExportPdfDialog component was already implemented by a previous builder iteration at src/components/panels/export-pdf-dialog.tsx (outside this task's owned paths of src/components/export/** and src/types/export.ts). It is fully wired into flow-canvas.tsx: Export PDF button opens the dialog, which calls onExportPdf(canvasElement, config) with the selected ExportConfig. The use-canvas-export.ts hook already handles config-aware PDF generation. All 7 of 8 acceptance criteria are met by the pre-existing code. This task created src/types/export.ts as the canonical re-export for ExportConfig (satisfying criterion 8). One minor discrepancy: existing dialog uses preset names Quick Summary / Full Report / Custom while spec called for Full Audit / Executive Summary / Gap Report. Fixing requires modifying src/components/panels/export-pdf-dialog.tsx which is outside owned paths.",
+  "notes": "Created enhanced-pdf-sections.ts with 4 exported render functions: renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison. Refactored pdf.ts to export createWorkspacePdf (returns jsPDF, skipFooter param, canvasElement accepts null to skip snapshot page) alongside the existing exportWorkspacePdf wrapper. canvas-view.tsx now uses handleEnhancedExportPdf callback that orchestrates all sections based on ExportConfig, fetches journey/perspective data lazily, and manages footer pagination across all pages. Stages fetched directly via Supabase browser client since no GET REST endpoint exists for /api/v1/stages. The 4 new export dialog sections (executiveSummary, journeyMap, journeySentiment, perspectiveComparison) remain available: false in export-pdf-dialog.tsx — that file is read-only for this slot; Slot 3 (BUG-038) will enable them.",
 
   "failure_details": null
 }

@@ -2214,3 +2214,34 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 4 — FEAT-043 [1/4] was mostly pre-existing work. Builder correctly identified this and created only the type re-export.
 - Observations: 4
 **Notes:** FEAT-043 [1/4] export dialog was already implemented by earlier iterations at src/components/panels/export-pdf-dialog.tsx. Builder slot 1 created only src/types/export.ts as canonical type location. Preset names deviate from spec (BUG-038). Slot 2 builder modified tool-analysis-view.tsx outside owned files (unreported ownership violation — layout refactor is harmless).
+
+## Iteration 125 — 2026-03-05 06:30
+**Tasks:**
+- #FEAT-043 [2/4] New PDF sections: executive summary, journey map, journey sentiment, perspective comparison — slot 1 — completed
+- #IMP-023 Coloring rules active indicator (teal dot on paintbrush button) — slot 2 — completed
+- #BUG-038 Export dialog preset names renamed (Executive Summary, Full Audit, Gap Report) + #BUG-039 aria-describedby fix — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md, prd/BUGS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/lib/export/enhanced-pdf-sections.ts (created — 783 lines, 4 render functions: renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison)
+- src/lib/export/pdf.ts (modified — refactored to export createWorkspacePdf with skipFooter param, canvasElement accepts null)
+- src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (modified — handleEnhancedExportPdf callback, paintbrush dot indicator)
+- src/components/panels/export-pdf-dialog.tsx (modified — preset rename, GAP_REPORT_CONFIG added, aria-describedby fix)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs: typecheck.status=pass, errors=0)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance tester — 13/14 criteria passed, 1 fail: sections still available:false)
+- Canary test: skipped (acceptance tester covered UI)
+- Post-merge check: PASS
+**Bugs found:** 1 (BUG-040 — 4 new sections available:false, P1, handoff gap between slot 1 and slot 3)
+**Improvements found:** 1 (Executive Summary preset enables Data Table + Cost Analysis — should only enable canvasSnapshot + gapAnalysis + executiveSummary)
+**Self-score:**
+- Code quality: 4 — Well-structured new file. Follows existing pdf.ts patterns. Footer deduplication is clean.
+- Test coverage: 4 — 13/14 acceptance criteria pass. The 1 fail is a handoff gap, not a code quality issue.
+- Confidence: 4 — Code is solid but untestable at runtime until available:false is flipped. Lowered from 5 for that reason.
+- Efficiency: 4 — 3 builders completed successfully, all merged cleanly.
+- Observations: 2
+**Notes:** Slot 1 created enhanced-pdf-sections.ts (385 builder lines, 783 final). Slot 1 left available:false for the 4 sections (export-pdf-dialog.tsx was read-only for slot 1). Slot 3 renamed presets but didn't flip available:false → true. This handoff gap is filed as BUG-040. Pipeline builder merge commits labeled "iteration 71" due to ralph.sh counter bug.

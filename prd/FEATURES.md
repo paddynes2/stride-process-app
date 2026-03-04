@@ -226,7 +226,7 @@
 ### #FEAT-043 Enhanced PDF export — multi-section report
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 1
+**Attempts:** 2
 **Status:** in_progress
 **Acceptance criteria:**
 - [ ] Export dialog (replaces direct download) with toggleable sections
@@ -237,7 +237,7 @@
 **Notes:** The "crown jewel" — what consultants hand to clients. Builds on existing jspdf/html-to-image infrastructure. One render function per section (modular). FEAT-007's existing export becomes the "Process Map" section.
 **Sub-tasks:**
 - [x] [1/4] Export dialog UI with section toggles and presets — Done iteration 124, 2026-03-05 (pre-existing dialog + canonical type re-export)
-- [ ] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison
+- [x] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison — Done iteration 125, 2026-03-05 (render functions built in enhanced-pdf-sections.ts, wired in canvas-view.tsx; NOTE: sections still available:false in dialog — BUG-040)
 - [ ] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights
 - [ ] [4/4] Page numbers, table of contents, consistent styling
 

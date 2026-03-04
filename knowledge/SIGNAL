@@ -1,1 +1,1 @@
-CONTINUE: FEAT-043 [2/4] new PDF sections — executive summary, journey map, journey sentiment, perspective comparison
+CONTINUE: Fix BUG-040 (flip 4 sections available:false → true in export-pdf-dialog.tsx SECTION_GROUPS), then FEAT-043 [3/4] new sections: prioritization matrix, tool landscape, improvements, AI insights

@@ -90,7 +90,7 @@ Core consulting insight features:
 - [x] #FEAT-042 Tool overlap and gap analysis (client-side computation) — DONE iteration 119
 - [ ] #FEAT-043 Enhanced PDF export — multi-section report (4 sub-tasks) — IN PROGRESS
   - [x] [1/4] Export dialog UI with section toggles and presets — DONE iteration 124
-  - [ ] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison
+  - [x] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison — DONE iteration 125
   - [ ] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights
   - [ ] [4/4] Page numbers, table of contents, consistent styling
 - [ ] #FEAT-044 Phase 3b testing gate

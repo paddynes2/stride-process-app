@@ -1,31 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 124,
+  "iteration": 71,
   "slot": 3,
-  "task_id": "#IMP-060",
+  "task_id": "#BUG-038",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/components/layout/sidebar.tsx",
+      "path": "src/components/panels/export-pdf-dialog.tsx",
       "action": "modified",
-      "lines_added": 14,
-      "lines_removed": 7
+      "lines_added": 28,
+      "lines_removed": 22
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/layout/sidebar.tsx"],
+  "staged_files": ["src/components/panels/export-pdf-dialog.tsx"],
   "ownership_violations": [],
-  "notes": "Extracted fetch logic into fetchCount(), added visibilitychange listener that calls fetchCount() when tab becomes visible. Cleanup removes listener and sets cancelled=true. No polling — event-driven only. Error path sets null (hides badge) instead of 0 to avoid showing stale count.",
+  "notes": "Renamed presets: quick->executive (Executive Summary), full->full (Full Audit), custom->gap (Gap Report). Updated configs: EXECUTIVE_SUMMARY_CONFIG enables canvasSnapshot+gapAnalysis+executiveSummary. FULL_AUDIT_CONFIG enables all sections. GAP_REPORT_CONFIG enables canvasSnapshot+gapAnalysis+perspectiveComparison+improvements. Preset type extended to 'executive'|'full'|'gap'|'custom' (custom kept as internal state for handleToggle auto-deselect). Added aria-describedby={undefined} to DialogContent to suppress Radix BUG-039 warning; DialogDescription already present in header.",
 
   "failure_details": null
 }

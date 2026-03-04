@@ -168,16 +168,23 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` (summary sidebar panel)
   - **Fix applied:** Added `<h1 className="sr-only">Tools</h1>` as first child of outermost container div. Existing h2 unchanged. Heading hierarchy now h1→h2, WCAG 1.3.1 compliant. No visual change.
 
-- [ ] #BUG-038 Export dialog preset button names deviate from spec (P2) — Attempts: 0
+- [x] #BUG-038 Export dialog preset button names deviate from spec (P2) — DONE iteration 125, 2026-03-05 — Attempts: 1
   - **Found:** Iteration 124 (acceptance tester)
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset buttons
   - **What:** Spec requires "Full Audit", "Executive Summary", "Gap Report". Implementation shows "Quick Summary", "Full Report", "Custom". Functionally correct but label names don't match design spec.
   - **Steps to reproduce:** 1. Navigate to canvas tab. 2. Click "Export PDF" button. 3. Observe preset button labels in dialog header.
   - **Suggested fix:** Rename preset labels: "Quick Summary" → "Executive Summary", "Full Report" → "Full Audit", "Custom" → "Gap Report" (or add Gap Report as 4th preset).
 
-- [ ] #BUG-039 Radix Dialog aria-describedby warnings on Export PDF dialog (P2) — Attempts: 0
+- [x] #BUG-039 Radix Dialog aria-describedby warnings on Export PDF dialog (P2) — DONE iteration 125, 2026-03-05 — Attempts: 1
   - **Found:** Iteration 124 (acceptance tester)
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — Radix Dialog
   - **What:** Two "Missing Description or aria-describedby" warnings fire in console when Export PDF dialog opens. Pre-existing pattern (BUG-023) but newly exposed by this dialog.
   - **Steps to reproduce:** 1. Open canvas. 2. Click Export PDF. 3. Check browser console for aria-description warnings.
   - **Suggested fix:** Add `DialogDescription` to the dialog or set `aria-describedby={undefined}` on DialogContent to suppress.
+
+- [ ] #BUG-040 Export dialog SECTION_GROUPS still marks 4 new sections as available: false (P1) — Attempts: 0
+  - **Found:** Iteration 125 (acceptance tester)
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — SECTION_GROUPS array
+  - **What:** The 4 new PDF sections (executiveSummary, journeyMap, journeySentiment, perspectiveComparison) have render functions built in enhanced-pdf-sections.ts and wired in canvas-view.tsx, but SECTION_GROUPS still has `available: false` for all 4. Users see "coming soon" badges and cannot enable them. Handoff gap between slot 1 (owned export logic, deferred enabling to slot 3) and slot 3 (renamed presets but didn't flip available flag).
+  - **Steps to reproduce:** 1. Open canvas tab. 2. Click "Export PDF". 3. Observe Executive Summary, Journey Map, Journey Sentiment, Perspective Comparison all show "coming soon" and are disabled.
+  - **Suggested fix:** Change `available: false` to `available: true` for executiveSummary, journeyMap, journeySentiment, and perspectiveComparison in SECTION_GROUPS.
