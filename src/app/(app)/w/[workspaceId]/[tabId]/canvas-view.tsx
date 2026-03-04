@@ -60,56 +60,56 @@ export function CanvasView({
   const selectedStep = selectedStepId ? steps.find((s) => s.id === selectedStepId) ?? null : null;
   const selectedSection = selectedSectionId ? sections.find((s) => s.id === selectedSectionId) ?? null : null;
 
-  const handleStepSelect = (stepId: string | null) => {
+  const handleStepSelect = React.useCallback((stepId: string | null) => {
     setSelectedStepId(stepId);
     if (stepId) setSelectedSectionId(null);
-  };
+  }, []);
 
-  const handleSectionSelect = (sectionId: string | null) => {
+  const handleSectionSelect = React.useCallback((sectionId: string | null) => {
     setSelectedSectionId(sectionId);
     if (sectionId) setSelectedStepId(null);
-  };
+  }, []);
 
-  const handleStepUpdate = (updated: Step) => {
+  const handleStepUpdate = React.useCallback((updated: Step) => {
     setSteps((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
-  };
+  }, []);
 
-  const handleStepCreate = (step: Step) => {
+  const handleStepCreate = React.useCallback((step: Step) => {
     setSteps((prev) => [...prev, step]);
-  };
+  }, []);
 
-  const handleStepDelete = (stepId: string) => {
+  const handleStepDelete = React.useCallback((stepId: string) => {
     setSteps((prev) => prev.filter((s) => s.id !== stepId));
     setConnections((prev) =>
       prev.filter((c) => c.source_step_id !== stepId && c.target_step_id !== stepId)
     );
     if (selectedStepId === stepId) setSelectedStepId(null);
-  };
+  }, [selectedStepId]);
 
-  const handleSectionCreate = (section: Section) => {
+  const handleSectionCreate = React.useCallback((section: Section) => {
     setSections((prev) => [...prev, section]);
-  };
+  }, []);
 
-  const handleSectionUpdate = (updated: Section) => {
+  const handleSectionUpdate = React.useCallback((updated: Section) => {
     setSections((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
-  };
+  }, []);
 
-  const handleSectionDelete = (sectionId: string) => {
+  const handleSectionDelete = React.useCallback((sectionId: string) => {
     setSections((prev) => prev.filter((s) => s.id !== sectionId));
     // Orphan steps that were in this section
     setSteps((prev) =>
       prev.map((s) => (s.section_id === sectionId ? { ...s, section_id: null } : s))
     );
     if (selectedSectionId === sectionId) setSelectedSectionId(null);
-  };
+  }, [selectedSectionId]);
 
-  const handleConnectionCreate = (connection: Connection) => {
+  const handleConnectionCreate = React.useCallback((connection: Connection) => {
     setConnections((prev) => [...prev, connection]);
-  };
+  }, []);
 
-  const handleConnectionDelete = (connectionId: string) => {
+  const handleConnectionDelete = React.useCallback((connectionId: string) => {
     setConnections((prev) => prev.filter((c) => c.id !== connectionId));
-  };
+  }, []);
 
   const { workspace, tabs, perspectives, activePerspective } = useWorkspace();
   const tab = tabs.find((t) => t.id === tabId);
