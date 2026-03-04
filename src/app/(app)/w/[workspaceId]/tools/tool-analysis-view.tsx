@@ -84,7 +84,9 @@ export function ToolAnalysisView({
     return [...steps]
       .filter((s) => !coveredStepIds.has(s.id))
       .sort(
-        (a, b) => (b.frequency_per_month ?? 0) - (a.frequency_per_month ?? 0)
+        (a, b) =>
+          (b.frequency_per_month ?? -Infinity) -
+          (a.frequency_per_month ?? -Infinity)
       );
   }, [steps, stepTools]);
 
