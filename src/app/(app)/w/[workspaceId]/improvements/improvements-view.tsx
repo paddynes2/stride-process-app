@@ -51,6 +51,17 @@ const ALL_PRIORITIES: ImprovementPriority[] = ["low", "medium", "high", "critica
 
 const RATE_LIMIT_RE = /Please wait (\d+) seconds/;
 
+function formatTimeAgo(isoString: string): string {
+  const diffMs = Date.now() - new Date(isoString).getTime();
+  const diffMins = Math.floor(diffMs / 60_000);
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays}d ago`;
+}
+
 function classifySuggestionsError(err: unknown): SuggestionsState {
   const msg = err instanceof Error ? err.message : String(err);
   if (msg.includes("OPENROUTER_API_KEY") || msg.includes("OpenRouter API key")) {
@@ -84,6 +95,10 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("all");
   const [priorityFilter, setPriorityFilter] = React.useState<PriorityFilter>("all");
   const [suggestionsState, setSuggestionsState] = React.useState<SuggestionsState>({ type: "idle" });
+  const [lastGeneratedAt, setLastGeneratedAt] = React.useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(`stride:ai-suggestions:${workspaceId}:generated-at`);
+  });
   const [isPanelOpen, setIsPanelOpen] = React.useState(false);
   const [addedIndices, setAddedIndices] = React.useState<Set<number>>(new Set());
 
@@ -122,6 +137,9 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
     setIsPanelOpen(true);
     try {
       const suggestions = await fetchAISuggestions(workspaceId);
+      const ts = new Date().toISOString();
+      localStorage.setItem(`stride:ai-suggestions:${workspaceId}:generated-at`, ts);
+      setLastGeneratedAt(ts);
       setSuggestionsState({ type: "loaded", suggestions });
     } catch (err) {
       setSuggestionsState(classifySuggestionsError(err));
@@ -168,6 +186,12 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
             <h1 className="text-[15px] font-semibold text-[var(--text-primary)]">Improvements</h1>
             <span className="text-[12px] text-[var(--text-tertiary)]">{filtered.length}</span>
           </div>
+          <div className="flex items-center gap-2">
+            {lastGeneratedAt && !isLoading && (
+              <span className="text-[11px] text-white/30">
+                Last generated {formatTimeAgo(lastGeneratedAt)}
+              </span>
+            )}
           <button
             onClick={handleGenerateSuggestions}
             disabled={isLoading || suggestionsState.type === "rate_limited" || !hasSteps}
@@ -186,6 +210,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
             )}
             {isLoading ? "Generating…" : "AI Suggestions"}
           </button>
+          </div>
         </div>
       </div>
 
