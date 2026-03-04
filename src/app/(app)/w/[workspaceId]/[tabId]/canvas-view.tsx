@@ -112,6 +112,7 @@ export function CanvasView({
   };
 
   const { workspace, tabs, perspectives, activePerspective } = useWorkspace();
+  const tab = tabs.find((t) => t.id === tabId);
   const { handleExportPng } = useCanvasExport({
     workspaceName: workspace.name,
     sections,
@@ -314,7 +315,7 @@ export function CanvasView({
 
   const sectionAvailability = React.useMemo(() => {
     const hasJourneyTab = tabs.some((t) => t.canvas_type === "journey");
-    const hasAiInsights = !!(workspace.settings?.last_analysis_at);
+    const hasAiInsights = !!(workspace.settings?.last_analysis_at && workspace.settings?.last_analysis);
     const hasPerspectives = perspectives.length > 0;
     const hasPrioritizationScores = steps.some(
       (s) => s.effort_score != null || s.impact_score != null
@@ -534,6 +535,7 @@ export function CanvasView({
     <TaskCountsContext.Provider value={taskCounts}>
     <CommentCountsContext.Provider value={commentCounts}>
       <div className="flex h-full">
+        <h1 className="sr-only">{tab?.name || workspace.name}</h1>
         {/* Canvas */}
         <div className="flex-1 relative">
           <FlowCanvas
