@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import type { Section, Step, Stage, Touchpoint, Perspective, PerspectiveAnnotation } from "@/types/database";
+import type { Section, Step, Stage, Touchpoint, Perspective, PerspectiveAnnotation, Tool, ImprovementIdea, AIAnalysisResult } from "@/types/database";
 import { MATURITY_COLORS } from "@/lib/maturity";
 import { PAIN_COLORS } from "@/lib/pain";
 
@@ -614,6 +614,535 @@ export function renderJourneySentiment(pdf: jsPDF, data: JourneySentimentData): 
       pdf.roundedRect(colX, y + 0.5, barW, 3, 1, 1, "F");
     }
     y += 6;
+  }
+}
+
+// ── Prioritization Matrix ─────────────────────────────────────────────────────
+
+export interface PrioritizationMatrixData {
+  steps: Step[];
+  sections: Section[];
+}
+
+export function renderPrioritizationMatrix(pdf: jsPDF, data: PrioritizationMatrixData): void {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+
+  const scoredSteps = data.steps.filter((s) => s.effort_score != null && s.impact_score != null);
+
+  pdf.addPage("a4", "landscape");
+  pdf.setFillColor(10, 10, 11);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  let y = margin;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("Prioritization Matrix", margin, y);
+  y += 12;
+
+  const getQuadrant = (effort: number, impact: number): string => {
+    const highImpact = impact >= 4;
+    const lowEffort = effort <= 2;
+    if (highImpact && lowEffort) return "Quick Win";
+    if (highImpact && !lowEffort) return "Major Project";
+    if (!highImpact && lowEffort) return "Fill In";
+    return "Thankless Task";
+  };
+
+  const cards = [
+    { label: "Scored Steps", value: String(scoredSteps.length) },
+    { label: "Quick Wins", value: String(scoredSteps.filter((s) => getQuadrant(s.effort_score!, s.impact_score!) === "Quick Win").length) },
+    { label: "Major Projects", value: String(scoredSteps.filter((s) => getQuadrant(s.effort_score!, s.impact_score!) === "Major Project").length) },
+    { label: "Thankless Tasks", value: String(scoredSteps.filter((s) => getQuadrant(s.effort_score!, s.impact_score!) === "Thankless Task").length) },
+  ];
+
+  const cardCols = 4;
+  const cardGap = 5;
+  const cardW = (contentWidth - (cardCols - 1) * cardGap) / cardCols;
+  const cardH = 18;
+
+  cards.forEach((card, i) => {
+    const x = margin + i * (cardW + cardGap);
+    pdf.setFillColor(20, 20, 21);
+    pdf.roundedRect(x, y, cardW, cardH, 2, 2, "F");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(card.value, x + cardW / 2, y + 10, { align: "center" });
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text(card.label.toUpperCase(), x + cardW / 2, y + 15, { align: "center" });
+  });
+
+  y += cardH + 8;
+
+  if (scoredSteps.length === 0) {
+    pdf.setFontSize(9);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text("No steps have been scored for effort and impact.", margin, y + 10);
+    return;
+  }
+
+  const quadrantOrder = ["Quick Win", "Major Project", "Fill In", "Thankless Task"];
+  const sortedSteps = [...scoredSteps].sort((a, b) => {
+    const qa = getQuadrant(a.effort_score!, a.impact_score!);
+    const qb = getQuadrant(b.effort_score!, b.impact_score!);
+    if (qa !== qb) return quadrantOrder.indexOf(qa) - quadrantOrder.indexOf(qb);
+    return (b.impact_score ?? 0) - (a.impact_score ?? 0);
+  });
+
+  const sectionMap = new Map(data.sections.map((s) => [s.id, s.name]));
+
+  const cols = [
+    { label: "Step", width: 90 },
+    { label: "Section", width: 70 },
+    { label: "Effort", width: 22 },
+    { label: "Impact", width: 22 },
+    { label: "Quadrant", width: contentWidth - 90 - 70 - 22 - 22 },
+  ];
+
+  y = drawTableHeader(pdf, cols, margin, contentWidth, y);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7);
+
+  for (let rowIndex = 0; rowIndex < sortedSteps.length; rowIndex++) {
+    const step = sortedSteps[rowIndex];
+    if (y > pageHeight - margin - 5) {
+      y = newTablePage(pdf, "Prioritization Matrix", cols, margin, contentWidth, pageWidth, pageHeight);
+    }
+    if (rowIndex % 2 === 0) {
+      pdf.setFillColor(14, 14, 15);
+      pdf.rect(margin, y - 1, contentWidth, 6, "F");
+    }
+    let colX = margin + 2;
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(truncate(step.name, 52), colX, y + 3);
+    colX += cols[0].width;
+
+    pdf.setTextColor(255, 255, 255, 140);
+    const secName = step.section_id ? sectionMap.get(step.section_id) ?? "\u2014" : "\u2014";
+    pdf.text(truncate(secName, 40), colX, y + 3);
+    colX += cols[1].width;
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(String(step.effort_score), colX + 5, y + 3);
+    colX += cols[2].width;
+
+    pdf.text(String(step.impact_score), colX + 5, y + 3);
+    colX += cols[3].width;
+
+    const quadrant = getQuadrant(step.effort_score!, step.impact_score!);
+    const quadrantColor =
+      quadrant === "Quick Win" ? "#22C55E" :
+      quadrant === "Major Project" ? "#3B82F6" :
+      quadrant === "Fill In" ? "#EAB308" : "#6B7280";
+    const [qr, qg, qb] = hexToRgb(quadrantColor);
+    pdf.setFillColor(qr, qg, qb);
+    pdf.circle(colX + 1.5, y + 2, 1.2, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(quadrant, colX + 5, y + 3);
+
+    y += 6;
+  }
+}
+
+// ── Tool Landscape ─────────────────────────────────────────────────────────────
+
+export interface ToolLandscapeData {
+  tools: Tool[];
+}
+
+const TOOL_STATUS_COLORS: Record<string, string> = {
+  active: "#22C55E",
+  considering: "#EAB308",
+  cancelled: "#EF4444",
+};
+
+export function renderToolLandscape(pdf: jsPDF, data: ToolLandscapeData): void {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+
+  pdf.addPage("a4", "landscape");
+  pdf.setFillColor(10, 10, 11);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  let y = margin;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("Tool Landscape", margin, y);
+  y += 12;
+
+  const active = data.tools.filter((t) => t.status === "active");
+  const considering = data.tools.filter((t) => t.status === "considering");
+  const totalMonthlyCost = active.reduce((sum, t) => sum + (t.cost_per_month ?? 0), 0);
+
+  const cards = [
+    { label: "Total Tools", value: String(data.tools.length) },
+    { label: "Active", value: String(active.length) },
+    { label: "Considering", value: String(considering.length) },
+    { label: "Monthly Cost", value: totalMonthlyCost > 0 ? `$${formatCurrency(totalMonthlyCost)}` : "\u2014" },
+  ];
+
+  const cardCols = 4;
+  const cardGap = 5;
+  const cardW = (contentWidth - (cardCols - 1) * cardGap) / cardCols;
+  const cardH = 18;
+
+  cards.forEach((card, i) => {
+    const x = margin + i * (cardW + cardGap);
+    pdf.setFillColor(20, 20, 21);
+    pdf.roundedRect(x, y, cardW, cardH, 2, 2, "F");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(card.value, x + cardW / 2, y + 10, { align: "center" });
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text(card.label.toUpperCase(), x + cardW / 2, y + 15, { align: "center" });
+  });
+
+  y += cardH + 8;
+
+  if (data.tools.length === 0) {
+    pdf.setFontSize(9);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text("No tools have been added to this workspace.", margin, y + 10);
+    return;
+  }
+
+  const statusOrder: Record<string, number> = { active: 0, considering: 1, cancelled: 2 };
+  const sortedTools = [...data.tools].sort((a, b) => {
+    const sa = statusOrder[a.status] ?? 99;
+    const sb = statusOrder[b.status] ?? 99;
+    if (sa !== sb) return sa - sb;
+    return a.name.localeCompare(b.name);
+  });
+
+  const cols = [
+    { label: "Tool", width: 75 },
+    { label: "Category", width: 45 },
+    { label: "Vendor", width: 45 },
+    { label: "Status", width: 35 },
+    { label: "Monthly Cost", width: contentWidth - 75 - 45 - 45 - 35 },
+  ];
+
+  y = drawTableHeader(pdf, cols, margin, contentWidth, y);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7);
+
+  for (let rowIndex = 0; rowIndex < sortedTools.length; rowIndex++) {
+    const tool = sortedTools[rowIndex];
+    if (y > pageHeight - margin - 5) {
+      y = newTablePage(pdf, "Tool Landscape", cols, margin, contentWidth, pageWidth, pageHeight);
+    }
+    if (rowIndex % 2 === 0) {
+      pdf.setFillColor(14, 14, 15);
+      pdf.rect(margin, y - 1, contentWidth, 6, "F");
+    }
+    let colX = margin + 2;
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(truncate(tool.name, 44), colX, y + 3);
+    colX += cols[0].width;
+
+    pdf.setTextColor(255, 255, 255, 140);
+    pdf.text(truncate(tool.category ?? "\u2014", 26), colX, y + 3);
+    colX += cols[1].width;
+
+    pdf.text(truncate(tool.vendor ?? "\u2014", 26), colX, y + 3);
+    colX += cols[2].width;
+
+    const statusColor = TOOL_STATUS_COLORS[tool.status] ?? "#6B7280";
+    const [sr, sg, sb] = hexToRgb(statusColor);
+    pdf.setFillColor(sr, sg, sb);
+    pdf.circle(colX + 1.5, y + 2, 1.2, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(capitalize(tool.status), colX + 5, y + 3);
+    colX += cols[3].width;
+
+    if (tool.cost_per_month != null && tool.cost_per_month > 0) {
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(`$${formatCurrency(tool.cost_per_month)}`, colX, y + 3);
+    } else {
+      pdf.setTextColor(255, 255, 255, 76);
+      pdf.text("\u2014", colX, y + 3);
+    }
+
+    y += 6;
+  }
+}
+
+// ── Improvements ──────────────────────────────────────────────────────────────
+
+export interface ImprovementsData {
+  ideas: ImprovementIdea[];
+}
+
+const IMPROVEMENT_STATUS_COLORS: Record<string, string> = {
+  proposed: "#6B7280",
+  approved: "#3B82F6",
+  in_progress: "#F97316",
+  completed: "#22C55E",
+  rejected: "#EF4444",
+};
+
+const IMPROVEMENT_PRIORITY_COLORS: Record<string, string> = {
+  critical: "#EF4444",
+  high: "#F97316",
+  medium: "#EAB308",
+  low: "#6B7280",
+};
+
+export function renderImprovements(pdf: jsPDF, data: ImprovementsData): void {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+
+  pdf.addPage("a4", "landscape");
+  pdf.setFillColor(10, 10, 11);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  let y = margin;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("Improvement Ideas", margin, y);
+  y += 12;
+
+  const criticalCount = data.ideas.filter((i) => i.priority === "critical").length;
+  const inProgressCount = data.ideas.filter((i) => i.status === "in_progress").length;
+  const completedCount = data.ideas.filter((i) => i.status === "completed").length;
+
+  const cards = [
+    { label: "Total Ideas", value: String(data.ideas.length) },
+    { label: "In Progress", value: String(inProgressCount) },
+    { label: "Completed", value: String(completedCount) },
+    { label: "Critical Priority", value: String(criticalCount) },
+  ];
+
+  const cardCols = 4;
+  const cardGap = 5;
+  const cardW = (contentWidth - (cardCols - 1) * cardGap) / cardCols;
+  const cardH = 18;
+
+  cards.forEach((card, i) => {
+    const x = margin + i * (cardW + cardGap);
+    pdf.setFillColor(20, 20, 21);
+    pdf.roundedRect(x, y, cardW, cardH, 2, 2, "F");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(card.value, x + cardW / 2, y + 10, { align: "center" });
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text(card.label.toUpperCase(), x + cardW / 2, y + 15, { align: "center" });
+  });
+
+  y += cardH + 8;
+
+  if (data.ideas.length === 0) {
+    pdf.setFontSize(9);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text("No improvement ideas have been recorded.", margin, y + 10);
+    return;
+  }
+
+  const priorityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+  const statusOrder: Record<string, number> = { in_progress: 0, approved: 1, proposed: 2, completed: 3, rejected: 4 };
+  const sortedIdeas = [...data.ideas].sort((a, b) => {
+    const pa = priorityOrder[a.priority] ?? 99;
+    const pb = priorityOrder[b.priority] ?? 99;
+    if (pa !== pb) return pa - pb;
+    const sa = statusOrder[a.status] ?? 99;
+    const sb = statusOrder[b.status] ?? 99;
+    return sa - sb;
+  });
+
+  const cols = [
+    { label: "Title", width: 90 },
+    { label: "Status", width: 38 },
+    { label: "Priority", width: 28 },
+    { label: "Description", width: contentWidth - 90 - 38 - 28 },
+  ];
+
+  y = drawTableHeader(pdf, cols, margin, contentWidth, y);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7);
+
+  for (let rowIndex = 0; rowIndex < sortedIdeas.length; rowIndex++) {
+    const idea = sortedIdeas[rowIndex];
+    if (y > pageHeight - margin - 5) {
+      y = newTablePage(pdf, "Improvement Ideas", cols, margin, contentWidth, pageWidth, pageHeight);
+    }
+    if (rowIndex % 2 === 0) {
+      pdf.setFillColor(14, 14, 15);
+      pdf.rect(margin, y - 1, contentWidth, 6, "F");
+    }
+    let colX = margin + 2;
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(truncate(idea.title, 52), colX, y + 3);
+    colX += cols[0].width;
+
+    const statusColor = IMPROVEMENT_STATUS_COLORS[idea.status] ?? "#6B7280";
+    const [ssr, ssg, ssb] = hexToRgb(statusColor);
+    pdf.setFillColor(ssr, ssg, ssb);
+    pdf.circle(colX + 1.5, y + 2, 1.2, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(capitalize(idea.status.replace(/_/g, " ")), colX + 5, y + 3);
+    colX += cols[1].width;
+
+    const priorityColor = IMPROVEMENT_PRIORITY_COLORS[idea.priority] ?? "#6B7280";
+    const [pr, pg, pb] = hexToRgb(priorityColor);
+    pdf.setFillColor(pr, pg, pb);
+    pdf.circle(colX + 1.5, y + 2, 1.2, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(capitalize(idea.priority), colX + 5, y + 3);
+    colX += cols[2].width;
+
+    pdf.setTextColor(255, 255, 255, 140);
+    const desc = idea.description
+      ? idea.description.replace(/<[^>]*>/g, "").trim()
+      : "\u2014";
+    pdf.text(truncate(desc, 52), colX, y + 3);
+
+    y += 6;
+  }
+}
+
+// ── AI Insights ───────────────────────────────────────────────────────────────
+
+export interface AIInsightsData {
+  analysis: AIAnalysisResult;
+}
+
+const SEVERITY_COLORS: Record<string, string> = {
+  high: "#EF4444",
+  medium: "#F97316",
+  low: "#EAB308",
+};
+
+export function renderAIInsights(pdf: jsPDF, data: AIInsightsData): void {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+
+  const categories = [
+    { label: "Bottlenecks", insights: data.analysis.bottlenecks ?? [] },
+    { label: "Redundancies", insights: data.analysis.redundancies ?? [] },
+    { label: "Automation Candidates", insights: data.analysis.automation_candidates ?? [] },
+    { label: "Maturity Recommendations", insights: data.analysis.maturity_recommendations ?? [] },
+  ];
+
+  const totalInsights = categories.reduce((sum, c) => sum + c.insights.length, 0);
+  const highSeverityCount = categories.reduce(
+    (sum, c) => sum + c.insights.filter((i) => i.severity === "high").length,
+    0,
+  );
+
+  pdf.addPage("a4", "landscape");
+  pdf.setFillColor(10, 10, 11);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  let y = margin;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("AI Insights", margin, y);
+  y += 12;
+
+  const cards = [
+    { label: "Total Insights", value: String(totalInsights) },
+    { label: "Bottlenecks", value: String(data.analysis.bottlenecks?.length ?? 0) },
+    { label: "High Severity", value: String(highSeverityCount) },
+    { label: "Auto Candidates", value: String(data.analysis.automation_candidates?.length ?? 0) },
+  ];
+
+  const cardCols = 4;
+  const cardGap = 5;
+  const cardW = (contentWidth - (cardCols - 1) * cardGap) / cardCols;
+  const cardH = 18;
+
+  cards.forEach((card, i) => {
+    const x = margin + i * (cardW + cardGap);
+    pdf.setFillColor(20, 20, 21);
+    pdf.roundedRect(x, y, cardW, cardH, 2, 2, "F");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(card.value, x + cardW / 2, y + 10, { align: "center" });
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text(card.label.toUpperCase(), x + cardW / 2, y + 15, { align: "center" });
+  });
+
+  y += cardH + 8;
+
+  if (totalInsights === 0) {
+    pdf.setFontSize(9);
+    pdf.setTextColor(255, 255, 255, 76);
+    pdf.text(
+      "No AI analysis results available. Run AI analysis to generate insights.",
+      margin,
+      y + 10,
+    );
+    return;
+  }
+
+  const cols = [
+    { label: "Category", width: 55 },
+    { label: "Title", width: 80 },
+    { label: "Severity", width: 28 },
+    { label: "Description", width: contentWidth - 55 - 80 - 28 },
+  ];
+
+  y = drawTableHeader(pdf, cols, margin, contentWidth, y);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7);
+
+  let rowIndex = 0;
+  for (const cat of categories) {
+    for (const insight of cat.insights) {
+      if (y > pageHeight - margin - 5) {
+        y = newTablePage(pdf, "AI Insights", cols, margin, contentWidth, pageWidth, pageHeight);
+      }
+      if (rowIndex % 2 === 0) {
+        pdf.setFillColor(14, 14, 15);
+        pdf.rect(margin, y - 1, contentWidth, 6, "F");
+      }
+      let colX = margin + 2;
+
+      pdf.setTextColor(255, 255, 255, 140);
+      pdf.text(truncate(cat.label, 32), colX, y + 3);
+      colX += cols[0].width;
+
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(truncate(insight.title, 46), colX, y + 3);
+      colX += cols[1].width;
+
+      const sevColor = SEVERITY_COLORS[insight.severity] ?? "#6B7280";
+      const [sr, sg, sb] = hexToRgb(sevColor);
+      pdf.setFillColor(sr, sg, sb);
+      pdf.circle(colX + 1.5, y + 2, 1.2, "F");
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(capitalize(insight.severity), colX + 5, y + 3);
+      colX += cols[2].width;
+
+      pdf.setTextColor(255, 255, 255, 140);
+      pdf.text(truncate(insight.description, 60), colX, y + 3);
+
+      y += 6;
+      rowIndex++;
+    }
   }
 }
 

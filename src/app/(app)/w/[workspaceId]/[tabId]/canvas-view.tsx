@@ -12,11 +12,11 @@ import { TaskPanel } from "@/components/panels/task-panel";
 import { ColoringPanel } from "@/components/canvas/coloring-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch } from "@/lib/api/client";
+import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch, fetchTools, fetchImprovementIdeas } from "@/lib/api/client";
 import type { ExportConfig } from "@/components/panels/export-pdf-dialog";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
-import type { Section, Step, Connection, ColoringRule, Template } from "@/types/database";
+import type { Section, Step, Connection, ColoringRule, Template, AIAnalysisResult } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -296,7 +296,7 @@ export function CanvasView({
   const handleEnhancedExportPdf = React.useCallback(
     async (canvasElement: HTMLElement, config: ExportConfig) => {
       try {
-        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison }] = await Promise.all([
+        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison, renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights }] = await Promise.all([
           import("@/lib/export/pdf"),
           import("@/lib/export/enhanced-pdf-sections"),
         ]);
@@ -384,6 +384,31 @@ export function CanvasView({
           });
         }
 
+        // Prioritization Matrix
+        if (config.prioritizationMatrix) {
+          renderPrioritizationMatrix(pdf, { steps, sections });
+        }
+
+        // Tool Landscape
+        if (config.toolLandscape) {
+          const tools = await fetchTools(workspaceId);
+          renderToolLandscape(pdf, { tools });
+        }
+
+        // Improvements
+        if (config.improvements) {
+          const ideas = await fetchImprovementIdeas(workspaceId);
+          renderImprovements(pdf, { ideas });
+        }
+
+        // AI Insights — cached in workspace.settings.last_analysis
+        if (config.aiInsights) {
+          const analysis = workspace.settings.last_analysis as AIAnalysisResult | undefined;
+          if (analysis) {
+            renderAIInsights(pdf, { analysis });
+          }
+        }
+
         // Add footer to all pages (base + enhanced)
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
@@ -411,7 +436,7 @@ export function CanvasView({
         toastError("Failed to export PDF", { error: err });
       }
     },
-    [workspace.name, sections, steps, connections, workspaceId],
+    [workspace, sections, steps, connections, workspaceId],
   );
 
   return (
