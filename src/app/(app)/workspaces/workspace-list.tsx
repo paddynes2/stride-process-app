@@ -97,7 +97,7 @@ export function WorkspaceList({ workspaces: initialWorkspaces }: WorkspaceListPr
                 </div>
                 <h2 className="text-[14px] font-semibold text-[var(--text-primary)] mb-1">{ws.name}</h2>
                 <p className="text-[11px] text-[var(--text-quaternary)]">
-                  Created {new Date(ws.created_at).toLocaleDateString()}
+                  Created {new Date(ws.created_at).toISOString().slice(0, 10)}
                 </p>
               </button>
             ))}
