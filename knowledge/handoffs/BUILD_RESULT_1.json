@@ -1,40 +1,47 @@
 {
   "schema_version": "1.0",
-  "iteration": 129,
+  "iteration": 130,
   "slot": 1,
-  "task_id": "#BUG-042",
+  "task_id": "#IMP-105",
   "status": "completed",
   "duration_seconds": 420,
 
   "files_changed": [
     {
-      "path": "src/lib/export/pdf.ts",
+      "path": "src/components/panels/export-pdf-dialog.tsx",
       "action": "modified",
-      "lines_added": 28,
-      "lines_removed": 7
+      "lines_added": 32,
+      "lines_removed": 20
+    },
+    {
+      "path": "src/components/canvas/flow-canvas.tsx",
+      "action": "modified",
+      "lines_added": 18,
+      "lines_removed": 1
     },
     {
       "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
       "action": "modified",
-      "lines_added": 13,
-      "lines_removed": 4
+      "lines_added": 44,
+      "lines_removed": 1
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused), no errors" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning: 'addEdge' unused in flow-canvas.tsx (documented in LEARNINGS.md)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/lib/export/pdf.ts",
+    "src/components/panels/export-pdf-dialog.tsx",
+    "src/components/canvas/flow-canvas.tsx",
     "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Added StepToolForExport interface and optional stepTools field to ExportPdfOptions. Added buildStepToolsMap() helper. Updated computeStepMonthlyCost() to accept toolsMap and sum tool cost_per_month in addition to labor cost (handles steps with tool cost but no labor time/frequency). Fixed step costs table filter from .filter(s => s.hours > 0) to .filter(s => s.hours > 0 || s.cost > 0) so tool-only steps appear. In canvas-view.tsx: added fetchStepToolsByStep import, parallel-fetched step tools for all steps when costAnalysis enabled (Promise.allSettled to handle BUG-035 gracefully), passed exportStepTools to createWorkspacePdf. exportStepTools cleared when costAnalysis disabled.",
+  "notes": "export-pdf-dialog.tsx: added maskWithAvailability() helper (casts via unknown to satisfy TS); removed static available field from SectionDef interface and SECTION_GROUPS entries; added availability:Record<keyof ExportConfig,boolean> prop to ExportPdfDialogProps; useEffect resets config on dialog open using prevOpenRef to track false→true transition (avoids spurious resets when availability changes while dialog is open); handlePreset masks preset configs with availability; render uses availability[key] per section. flow-canvas.tsx: added ALL_AVAILABLE default constant; added optional sectionAvailability prop to FlowCanvasProps; passes sectionAvailability ?? ALL_AVAILABLE to ExportPdfDialog. canvas-view.tsx: destructures tabs+perspectives from useWorkspace(); adds hasTools/hasImprovements boolean state fetched via useEffect on mount; computes sectionAvailability useMemo (core 5 always true, conditional 7 from workspace data); passes sectionAvailability to FlowCanvas.",
 
   "failure_details": null
 }

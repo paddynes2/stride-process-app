@@ -650,7 +650,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — section should auto-associate or indicate the step is unlinked
   - **Suggested fix:** When a step node is dropped inside a section node's bounding box, auto-assign section_id. Or show visual indicator for unlinked steps.
 
-- [ ] #IMP-090 Overlapping 'NEW GROUP' tool section nodes on default canvas — Attempts: 0
+- [x] #IMP-090 Overlapping 'NEW GROUP' tool section nodes on default canvas — Attempts: 1 — DONE iteration 130, 2026-03-05
   - **Found:** Iteration 120 (regression tester — Playwright browser)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — initial tool section positioning
@@ -746,7 +746,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status + H6: Recognition rather than recall
   - **Suggested fix:** Wrap step names in Link or button with onClick → router.push('/w/workspaceId/tabId'), matching pattern in tool-analysis-view.tsx.
 
-- [ ] #IMP-103 PDF Table of Contents may truncate with 12+ sections enabled — Attempts: 0
+- [x] #IMP-103 PDF Table of Contents may truncate with 12+ sections enabled — Attempts: 1 — DONE iteration 130, 2026-03-05
   - **Found:** Iteration 128 (regression tester)
   - **Category:** Usability
   - **Where:** `src/lib/export/enhanced-pdf-sections.ts` — `renderTableOfContents()` (line ~1349)
@@ -762,13 +762,21 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Add Analysis button to the toolbar Panel alongside 'Add Tool' and 'Add Tool Section'.
 
-- [ ] #IMP-105 Export dialog section availability should be computed dynamically from workspace data — Attempts: 0
+- [x] #IMP-105 Export dialog section availability should be computed dynamically from workspace data — Attempts: 1 — DONE iteration 130, 2026-03-05
   - **Found:** Iteration 129 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — SECTION_GROUPS `available` field
   - **What:** All SECTION_GROUPS entries have `available: true` hardcoded as a static constant. Section availability should be computed dynamically: journeyMap disabled when workspace has no journey tab, improvements disabled when improvementIdeas array is empty, aiInsights disabled when AI analysis hasn't been run, etc. This would make the IMP-094 tooltip feature actually functional.
   - **Design principle:** Nielsen H1: Visibility of system status — users should understand when a section requires prerequisites
   - **Suggested fix:** Accept availability flags as props (hasJourneyTab, hasImprovements, hasAiInsights, hasPerspectives, hasPrioritizationScores, hasTools) and compute `available` per section. Pass from canvas-view.tsx which has access to tabs, improvementIdeas, etc.
+
+- [ ] #IMP-106 Preset masked sections info note — Attempts: 0
+  - **Found:** Iteration 130 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset buttons area
+  - **What:** When a preset (e.g. 'Full Audit') is applied and some sections are masked by availability, no visual indication tells the user why the preset didn't enable all expected sections.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Show a small info note under the preset buttons when a preset was applied but some sections were masked, e.g. '3 sections unavailable — add data to unlock them'.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

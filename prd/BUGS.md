@@ -200,9 +200,17 @@
   - **Suggested fix:** Add `stepTools` field to `ExportPdfOptions`. Pass step-tool associations to `computeStepMonthlyCost()`. Sum tool costs into step total cost before section rollup.
   - **Fix applied:** Added `StepToolForExport` interface, `buildStepToolsMap()` helper, updated `computeStepMonthlyCost()` to accept toolsMap and sum tool costs. canvas-view.tsx fetches step tools via `Promise.allSettled` batch. Filter changed from `hours > 0` to `hours > 0 || cost > 0`.
 
-- [ ] #BUG-043 IMP-094 tooltip infrastructure unreachable — all SECTION_GROUPS available:true hardcoded (P2) — Attempts: 0
+- [x] #BUG-043 IMP-094 tooltip infrastructure unreachable — all SECTION_GROUPS available:true hardcoded (P2) — Attempts: 1 — DONE iteration 130, 2026-03-05 (resolved by #IMP-105)
   - **Found:** Iteration 129 (acceptance tester)
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — SECTION_GROUPS constant
   - **What:** IMP-094 added `disabledTooltip` strings and `title={!available ? disabledTooltip : undefined}` to labels. However, all SECTION_GROUPS entries have `available: true` as a static constant. No section is ever disabled, so no tooltip ever appears at runtime. The disabled styling (opacity-50, cursor-not-allowed, checkbox disabled) is also never triggered.
   - **Steps to reproduce:** 1. Open any workspace. 2. Click Export PDF. 3. Inspect labels in DevTools — none have a title attribute.
   - **Suggested fix:** Compute `available` dynamically from workspace data (see IMP-105). Accept props like `hasJourneyTab`, `hasImprovements`, etc. from canvas-view.tsx.
+  - **Fix applied:** IMP-105 removed static `available` from SECTION_GROUPS, added `availability` prop (Record<keyof ExportConfig, boolean>) computed in canvas-view.tsx. All sections now dynamically enabled/disabled.
+
+- [ ] #BUG-044 AI Insights section enabled in export dialog despite no AI analysis run (P2) — Attempts: 0
+  - **Found:** Iteration 130 (acceptance tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` — `sectionAvailability` useMemo
+  - **What:** AI Insights checkbox is enabled (checked:true, disabled:false) even when OPENROUTER_API_KEY is not configured and no AI analysis has run. The `hasAiInsights` check uses `!!(workspace.settings?.last_analysis_at)` but `workspace.settings` may be unexpectedly truthy or `last_analysis_at` may have a default value.
+  - **Steps to reproduce:** 1. Navigate to /w/[workspaceId]/[tabId] on a workspace with no AI analysis. 2. Click Export PDF. 3. Observe AI Insights is enabled when it should be disabled.
+  - **Suggested fix:** Investigate `workspace.settings` shape — confirm `last_analysis_at` is null/undefined when AI analysis hasn't been run. May need stricter check or different field.

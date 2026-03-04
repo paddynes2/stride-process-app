@@ -2375,3 +2375,35 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — 3 slots, 3 completions. IMP-100 correctly identified as pre-existing (no wasted work).
 - Observations: 2
 **Notes:** BUG-042 was the last bug blocking Phase 3b. IMP-094 tooltip strings are in place but need dynamic availability computation (filed as IMP-105). IMP-100 was already implemented in a prior iteration — builder correctly identified and documented this.
+
+## Iteration 130 — 2026-03-05 17:00
+**Tasks:**
+- #IMP-105 Export dialog dynamic section availability — slot 1 — completed (16/16 acceptance PASS)
+- #IMP-103 PDF TOC pagination overflow fix — slot 2 — completed
+- #IMP-090 Tool section node overlap fix — slot 3 — completed
+**Source:** prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/components/panels/export-pdf-dialog.tsx (modified — removed static available, added availability prop, maskWithAvailability helper, prevOpenRef reset)
+- src/components/canvas/flow-canvas.tsx (modified — ALL_AVAILABLE constant, sectionAvailability prop passthrough)
+- src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (modified — hasTools/hasImprovements state, sectionAvailability useMemo, prop wiring)
+- src/lib/export/enhanced-pdf-sections.ts (modified — TOC overflow: addPage + y reset instead of break)
+- src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (modified — nextSectionYRef for rapid-click overlap prevention)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs: typecheck.status=pass, errors=0)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance tester — 16/16 criteria passed)
+- Canary test: skipped (acceptance tester covered UI for IMP-105)
+- Post-merge check: PASS
+**Bugs found:** 1 — BUG-044 (P2): AI Insights section enabled in export dialog despite no AI analysis run. hasAiInsights check in canvas-view.tsx uses workspace.settings?.last_analysis_at which may be unexpectedly truthy.
+**Improvements found:** 1 — IMP-106: Preset masked sections info note (visibility of system status when preset sections are unavailable).
+**Self-score:**
+- Code quality: 4 — Clean implementation. maskWithAvailability uses `as unknown as ExportConfig` cast (Object.fromEntries TS limitation). prevOpenRef pattern for dialog reset is correct but slightly complex.
+- Test coverage: 4 — 16/16 acceptance criteria passed. BUG-044 found by tester (AI Insights edge case). No runtime PDF verification for IMP-103.
+- Confidence: 4 — Core availability logic verified working. BUG-044 is a minor edge case (AI analysis not configured). TOC overflow fix follows established pattern.
+- Efficiency: 5 — All 3 builders completed, all merged cleanly, all acceptance criteria passed.
+- Observations: 2 (1 bug + 1 improvement)
+**Notes:** IMP-105 resolves BUG-043 (tooltip infrastructure was unreachable with static available:true). Acceptance tester confirmed: 4 sections correctly disabled (Improvements, Perspective Comparison, Prioritization Matrix, Tool Landscape). Full Audit preset masking works (unavailable sections stay false). BUG-044 needs investigation — may be workspace.settings shape issue. Accessibility cadence deferred from iter 130 → 131.

@@ -1,24 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 129,
+  "iteration": 130,
   "slot": 2,
-  "task_id": "#IMP-100",
+  "task_id": "#IMP-103",
   "status": "completed",
-  "duration_seconds": 45,
+  "duration_seconds": 120,
 
-  "files_changed": [],
+  "files_changed": [
+    {
+      "path": "src/lib/export/enhanced-pdf-sections.ts",
+      "action": "modified",
+      "lines_added": 8,
+      "lines_removed": 1
+    }
+  ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "skipped", "errors": 0, "output": "" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0" },
+    "lint": { "status": "pass", "errors": 0, "output": "eslint exited 0" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [],
+  "staged_files": ["src/lib/export/enhanced-pdf-sections.ts"],
   "ownership_violations": [],
-  "notes": "Empty state was already implemented in tools-canvas-view.tsx (lines 479-506) from a prior iteration. The implementation fully satisfies all acceptance criteria: centered overlay when tools.length === 0 && toolSections.length === 0, heading 'No tools yet' with body guiding user to add tools and inline Add buttons, disappears when tools/sections are added, uses var(--text-secondary)/var(--text-tertiary) (dark theme equivalents of text-white/55 and text-white/30), and TypeScript compiles with zero errors. No changes required.",
+  "notes": "Replaced `break` on TOC y-overflow with pdf.addPage() + dark background fill + y reset to margin + font reapplication. Matches the newTablePage() overflow pattern in pdf.ts. When TOC entries exceed page height (pageHeight - margin - 8), a new landscape A4 page is added and rendering continues from the top margin.",
 
   "failure_details": null
 }

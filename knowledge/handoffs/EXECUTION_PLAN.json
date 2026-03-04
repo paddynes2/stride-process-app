@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 129,
-  "date": "2026-03-05T12:00:00Z",
+  "iteration": 130,
+  "date": "2026-03-05T15:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "cfd71f3d0801a48bf0d9bbe55e62b4b8a7c7eeaf",
+    "last_commit_hash": "6c47a8a",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,128 +13,150 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#BUG-042",
-      "description": "Fix PDF Cost Summary to include tool costs in step/section/workspace totals. Add stepTools field to ExportPdfOptions, pass step-tool associations from canvas-view.tsx, and sum tool cost_per_month into computeStepMonthlyCost().",
-      "source": "prd/BUGS.md",
-      "type": "fix",
+      "id": "#IMP-105",
+      "description": "Compute export dialog section availability dynamically from workspace data. Currently all SECTION_GROUPS have available:true hardcoded, making IMP-094 tooltip infrastructure unreachable. Accept availability flags as props, compute per-section availability. This also resolves BUG-043.",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "M",
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "ExportPdfOptions interface has an optional stepTools field typed as an array of { step_id: string; tool: { cost_per_month: number | null } }",
-        "computeStepMonthlyCost() sums tool cost_per_month values for the step in addition to labor cost",
-        "canvas-view.tsx handleEnhancedExportPdf fetches stepTools (via fetchStepToolsByStep or batch) and passes them to createWorkspacePdf when config.costAnalysis is enabled",
-        "PDF Cost Summary section totals now include tool costs (step total = labor + tool monthly cost)",
-        "Section rollup totals include tool costs",
-        "Workspace total cost includes tool costs",
-        "Steps with zero labor cost but non-zero tool cost still appear in cost table",
-        "TypeScript compiles with zero errors (npx tsc --noEmit)"
+        "ExportPdfDialogProps accepts an `availability` record mapping ExportConfig keys to booleans",
+        "SECTION_GROUPS `available` field is replaced with dynamic lookup from the availability prop",
+        "Sections disabled when data is missing: journeyMap/journeySentiment disabled when no journey tab exists, improvements disabled when no improvement ideas, aiInsights disabled when no AI analysis cached, perspectiveComparison disabled when no perspectives, toolLandscape disabled when no tools, prioritizationMatrix disabled when no prioritization scores on steps",
+        "canvasSnapshot, dataTable, gapAnalysis, costAnalysis, executiveSummary always available (core sections)",
+        "Disabled sections show tooltip text (from disabledTooltip) on hover",
+        "Disabled sections are unchecked and cannot be toggled",
+        "FlowCanvas receives and passes availability prop to ExportPdfDialog",
+        "canvas-view.tsx computes availability flags from workspace data (tabs, improvementIdeas, perspectives, tools, steps, workspace.settings)",
+        "Preset configs (Full Audit, Executive Summary, Gap Report) only enable sections that are available — unavailable sections in a preset stay false",
+        "TypeScript compiles with zero errors"
       ],
       "files_owned": [
-        "src/lib/export/pdf.ts",
+        "src/components/panels/export-pdf-dialog.tsx",
+        "src/components/canvas/flow-canvas.tsx",
         "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
       ],
       "files_read_only": [
         "src/types/database.ts",
-        "src/lib/api/client.ts",
-        "src/components/panels/step-detail-panel.tsx"
+        "src/lib/context/workspace-context.tsx"
       ],
       "context": {
-        "similar_files": ["src/components/panels/step-detail-panel.tsx lines 500-520 — UI combined cost calculation pattern"],
+        "similar_files": [],
         "patterns_to_follow": [
-          "step-detail-panel.tsx: stepTools.reduce((sum, st) => sum + (st.tool.cost_per_month ?? 0), 0) — same pattern for tool cost aggregation",
-          "fetchStepToolsByStep(stepId) in client.ts returns StepToolWithTool[] with tool.cost_per_month",
-          "ExportPdfOptions already has optional stepRoles — follow same pattern for stepTools"
+          "ExportPdfDialog is rendered inside flow-canvas.tsx (line 512), which receives props from canvas-view.tsx",
+          "canvas-view.tsx already fetches improvementIdeas, tools, steps, sections, and has access to tabs/perspectives via useWorkspace()",
+          "SectionDef interface at export-pdf-dialog.tsx:77 has { key, label, available, disabledTooltip? }",
+          "SECTION_GROUPS at lines 84-117 defines 4 groups with 12 sections total",
+          "FlowCanvasProps at flow-canvas.tsx:44 defines component props — add sectionAvailability prop here",
+          "Preset configs (EXECUTIVE_SUMMARY_CONFIG, FULL_AUDIT_CONFIG, GAP_REPORT_CONFIG) should mask unavailable sections"
         ],
         "learnings_relevant": [
-          "apiFetch unwraps envelope — fetchStepToolsByStep returns StepToolWithTool[] directly",
-          "BUG-035: step-tools API returns 500 when migration 024 not pushed — but code should still compile and work structurally"
+          "Optional prop + page.tsx wiring gap: builders must update BOTH the view component AND the page/parent that passes props"
         ],
-        "affected_urls": []
+        "affected_urls": [
+          "/w/[workspaceId]/[tabId] (canvas view with Export PDF button)"
+        ]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The step-tools API may return 500 if migration 024 isn't pushed (BUG-035). The fix is still correct structurally — it handles empty/failed fetch gracefully. Use the existing StepToolWithTool type from database.ts. For batch fetching all step tools, consider fetching once for all steps in the workspace (similar to how stepRoles are fetched) rather than N+1 per-step fetches. Check if a workspace-level step-tools endpoint exists; if not, fetch per-step or add a simple loop. The cost filter condition in the Cost Summary (totalMonthlyHours > 0 || totalMonthlyCost > 0) should naturally include tool-only costs now."
+      "special_instructions": "Key implementation detail: ExportPdfDialog should accept a Record<keyof ExportConfig, boolean> prop for availability instead of computing it internally. flow-canvas.tsx passes it through. canvas-view.tsx computes it: hasJourneyTab = tabs.some(t => t.canvas_type === 'journey'), hasImprovements = check if improvementIdeas array has items, hasAiInsights = check workspace.settings?.last_analysis_at, hasPerspectives = perspectives.length > 0, hasTools = tools.length > 0, hasPrioritizationScores = steps.some(s => s.effort_score != null || s.impact_score != null). When a preset is applied, AND its config with availability to prevent enabling unavailable sections."
     },
     {
       "slot": 2,
-      "id": "#IMP-100",
-      "description": "Add empty state guidance to tools canvas when no tools exist. Show centered prompt like 'Add your first tool to start tracking your tech stack' with a pointer to the toolbar Add button.",
+      "id": "#IMP-103",
+      "description": "Fix PDF Table of Contents truncation when 12+ sections are enabled — add page overflow handling with pdf.addPage() and y reset.",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "S",
       "attempts": 1,
-      "risk_score": 0,
+      "risk_score": 1,
       "acceptance_criteria": [
-        "When tools array is empty, a centered empty state message is visible on the tools canvas",
-        "Message text guides user to add their first tool",
-        "Message disappears when tools are added",
-        "Styling follows dark theme conventions (text-white/55 or text-white/30 for secondary text)",
+        "renderTableOfContents() in enhanced-pdf-sections.ts handles overflow by calling pdf.addPage() and resetting y when entries exceed page height",
+        "All 12 sections appear in TOC when all are enabled",
+        "Page number tracking continues correctly after TOC pagination",
+        "TypeScript compiles with zero errors"
+      ],
+      "files_owned": [
+        "src/lib/export/enhanced-pdf-sections.ts"
+      ],
+      "files_read_only": [
+        "src/lib/export/pdf.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "src/lib/export/pdf.ts — uses newTablePage() pattern for page overflow"
+        ],
+        "patterns_to_follow": [
+          "Look at newTablePage() in pdf.ts for the existing page overflow pattern",
+          "renderTableOfContents is around line 1349 in enhanced-pdf-sections.ts"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": []
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "Small fix: replace the `break` on y overflow with pdf.addPage() + reset y to top margin. Increment pageNumber. Match existing page overflow patterns in the file."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-090",
+      "description": "Fix overlapping NEW GROUP tool section nodes on default canvas — ensure auto-positioned tool sections have non-overlapping coordinates with minimum gap.",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 1,
+      "acceptance_criteria": [
+        "New tool section nodes created via Add Tool Section button are positioned with non-overlapping coordinates",
+        "Minimum 50px gap between auto-positioned tool section nodes",
+        "Existing tool section positions are not affected (only new creations)",
         "TypeScript compiles with zero errors"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
       ],
-      "files_read_only": [],
+      "files_read_only": [
+        "src/app/api/v1/tool-sections/route.ts"
+      ],
       "context": {
-        "similar_files": ["src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — existing empty state patterns"],
-        "patterns_to_follow": ["Dark theme empty state: centered div with text-white/55 heading, text-white/30 body"],
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — handleSectionCreate uses viewport center positioning"
+        ],
+        "patterns_to_follow": [
+          "Check existing tool section positions before computing new position",
+          "Use viewport center + offset based on existing section count"
+        ],
         "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/tools"]
+        "affected_urls": [
+          "/w/[workspaceId]/tools"
+        ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Simple overlay or conditional render. Check how the existing canvas-view.tsx handles empty state for reference."
-    },
-    {
-      "slot": 3,
-      "id": "#IMP-094",
-      "description": "Add tooltips to disabled export dialog sections explaining what data is needed to enable them (e.g., 'Requires journey tab', 'Requires improvement ideas').",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Disabled checkboxes in export dialog show a tooltip on hover explaining the prerequisite",
-        "Tooltip text is contextual per section (e.g., 'Add a journey tab to enable' for journey sections)",
-        "Tooltips only appear on disabled sections, not enabled ones",
-        "Uses Radix Tooltip or native title attribute (match existing pattern)",
-        "TypeScript compiles with zero errors"
-      ],
-      "files_owned": [
-        "src/components/panels/export-pdf-dialog.tsx"
-      ],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": ["Radix Tooltip already imported in other components — check if available in export-pdf-dialog.tsx"],
-        "learnings_relevant": [],
-        "affected_urls": []
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "SECTION_GROUPS has an 'available' field per section and a 'disabledReason' or similar could be added. Simplest approach: add a 'disabledTooltip' string to each section group item, then render as title attribute on the label when disabled. Radix Tooltip is fine too if already used in the file."
+      "special_instructions": "Find the handleAddToolSection (or equivalent) function in tools-canvas-view.tsx. Currently likely uses a fixed position. Change to compute position based on existing tool sections count — offset each new one by (count * spacing) to avoid overlap."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
     "owner": null,
-    "note": "No shared file modifications needed. database.ts types and client.ts functions are read-only references."
+    "note": "No shared file modifications needed"
   },
-  "merge_order": ["#BUG-042", "#IMP-100", "#IMP-094"],
+  "merge_order": ["#IMP-105", "#IMP-103", "#IMP-090"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Last regression was iteration 128 (1 iteration ago). BUG-042 fix is contained to PDF export logic. No regression needed this iteration.",
+    "regression_reason": null,
     "suites_to_run": ["acceptance"],
-    "cadence_trigger": null
+    "cadence_trigger": "accessibility_deferred_to_131"
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": [
+      "Accessibility cadence due at iter 130 — deferred to 131 in favor of BUG-043 resolution via IMP-105"
+    ],
     "diagnoses_written": false,
     "signal_override": null
   }

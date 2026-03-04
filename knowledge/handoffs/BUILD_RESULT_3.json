@@ -1,31 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 129,
+  "iteration": 130,
   "slot": 3,
-  "task_id": "#IMP-094",
+  "task_id": "#IMP-090",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/components/panels/export-pdf-dialog.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
       "action": "modified",
-      "lines_added": 12,
-      "lines_removed": 15
+      "lines_added": 17,
+      "lines_removed": 3
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated unused var)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/panels/export-pdf-dialog.tsx"],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
+  ],
   "ownership_violations": [],
-  "notes": "Added disabledTooltip?: string to SectionDef interface. Added contextual tooltip strings to all non-trivial sections (journey sections: 'Add a journey tab to enable'; improvements: 'Requires improvement ideas'; aiInsights: 'Requires AI analysis to be run'; etc.). Rendered as native title attribute on <label> only when !available. Removed the 'coming soon' span — tooltip on hover replaces it.",
+  "notes": "The existing code already had a Math.max-based Y calculation. The root bug was a race condition: rapid clicks read stale toolSections closure state before React re-renders, causing multiple sections to land at the same Y coordinate. Fix: added nextSectionYRef (useRef<number>(0)) updated immediately before the async createToolSection call. Each click takes Math.max(existingMaxBottom, nextSectionYRef.current) as the base, guaranteeing minimum 50px gap even under rapid clicking. Single-click behavior is unchanged; existing section positions are unaffected.",
 
   "failure_details": null
 }
