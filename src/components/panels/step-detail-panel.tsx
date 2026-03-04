@@ -401,9 +401,9 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
           </label>
           {allTools.length === 0 ? (
             <p className="text-[12px] text-[var(--text-tertiary)]">
-              No tools defined yet.{" "}
+              No tools assigned.{" "}
               <Link href={`/w/${workspaceId}/tools`} className="text-[var(--accent-blue)] hover:underline">
-                Go to Tools →
+                Assign from Tools page →
               </Link>
             </p>
           ) : (
