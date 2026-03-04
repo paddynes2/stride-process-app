@@ -722,5 +722,45 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show estimated page count (e.g., '~8 pages') next to the Export button, computed from the number of selected sections.
 
+- [ ] #IMP-100 Tools canvas empty state lacks onboarding guidance — Attempts: 0
+  - **Found:** Iteration 128 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx`
+  - **What:** Tools canvas shows empty state with no tools — no guidance shown (e.g., 'Add your first tool to start tracking your tech stack'). Only toolbar buttons visible.
+  - **Design principle:** Nielsen H6: Recognition rather than recall — empty state should guide users toward first action
+  - **Suggested fix:** Add empty state overlay or centered prompt inside the canvas when no tools exist.
+
+- [ ] #IMP-101 Coverage Gaps table lacks section/tab navigation context — Attempts: 0
+  - **Found:** Iteration 128 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Coverage Gaps card
+  - **What:** Coverage Gaps table shows step name and frequency, but no link to navigate to the step's parent section/canvas tab. User must manually find where the step lives.
+  - **Design principle:** Nielsen H1: Visibility of system status — user should know where the uncovered step lives
+  - **Suggested fix:** Add section/tab context to Coverage Gaps table rows, or make the step button navigate directly to the step on the canvas.
+
+- [ ] #IMP-102 Tool detail panel Step Usage list items not clickable — Attempts: 0
+  - **Found:** Iteration 128 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/tool-detail-panel.tsx` — Step Usage list
+  - **What:** Step Usage list shows step names as plain text (cursor-default). Users cannot click a step name to navigate to it on the canvas.
+  - **Design principle:** Nielsen H1: Visibility of system status + H6: Recognition rather than recall
+  - **Suggested fix:** Wrap step names in Link or button with onClick → router.push('/w/workspaceId/tabId'), matching pattern in tool-analysis-view.tsx.
+
+- [ ] #IMP-103 PDF Table of Contents may truncate with 12+ sections enabled — Attempts: 0
+  - **Found:** Iteration 128 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/lib/export/enhanced-pdf-sections.ts` — `renderTableOfContents()` (line ~1349)
+  - **What:** TOC uses `break` when y exceeds page height. With 12+ sections enabled, entries may be truncated instead of paginating to a second TOC page.
+  - **Design principle:** Nielsen H5: Error prevention
+  - **Suggested fix:** Add pdf.addPage() + reset y when TOC entries overflow, similar to newTablePage() pattern in other PDF sections.
+
+- [ ] #IMP-104 Tool Analysis toggle button not in toolbar Panel — Attempts: 0
+  - **Found:** Iteration 128 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — toolbar Panel
+  - **What:** Summary sidebar shows Analysis toggle, but it's not in the main toolbar. On smaller screens the sidebar toggle requires scrolling.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Add Analysis button to the toolbar Panel alongside 'Add Tool' and 'Add Tool Section'.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

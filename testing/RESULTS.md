@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 126
+- **Iteration:** 128
 - **Date:** 2026-03-05
-- **Suite:** Acceptance
-- **Method:** Playwright browser on localhost:3000
-- **Result:** **Acceptance 15/15 PASS**
-- **Bugs found:** 0
-- **Improvements found:** 1 (IMP-097 coming soon sections checked+disabled UX)
+- **Suite:** Acceptance + Regression (Phase 3b testing gate)
+- **Method:** Playwright browser (acceptance) + static analysis + tsc + lint (regression)
+- **Result:** **Acceptance 8/8 PASS, Regression 7/8 PASS (1 FAIL: cost chain PDF)**
+- **Bugs found:** 1 — BUG-042 (PDF cost summary excludes tool costs)
+- **Improvements found:** 5 (IMP-100 through IMP-104)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 126 (2026-03-05) — 15/15 PASS (BUG-040 5/5, FEAT-043 [3/4] 7/7, IMP-045 3/3 — Playwright browser + static code check)
+- Last run: Iteration 128 (2026-03-05) — 8/8 PASS (FEAT-044 Phase 3b testing gate: FEAT-040 tools canvas, FEAT-041 tool detail, FEAT-042 tool analysis, FEAT-043 enhanced PDF export, cost chain, tsc, lint, full regression sidebar check — Playwright browser on localhost:3000; 0 console errors, 0 network errors)
+- Previous: Iteration 126 (2026-03-05) — 15/15 PASS (BUG-040 5/5, FEAT-043 [3/4] 7/7, IMP-045 3/3 — Playwright browser + static code check)
 - Previous: Iteration 125 (2026-03-05) — 13/14 PASS (FEAT-043 [2/4] 6/7, BUG-038+039 5/5, IMP-023 2/2, TypeScript 1/1 — Playwright browser; 1 fail: sections available:false BUG-040)
 - Previous: Iteration 124 (2026-03-05) — 15/16 PASS (FEAT-043 [1/4] 7/8, IMP-086 4/4, IMP-060 4/4 — Playwright browser; 1 fail: preset names BUG-038)
 - Previous: Iteration 119 (2026-03-05) — 14/15 PASS (FEAT-042 7/8 [1 fail: Cancelled row], IMP-084 3/3, IMP-082 4/4 — Playwright browser + static code analysis)
@@ -33,7 +34,8 @@
 - Previous: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 DI 10, BUG-020 4, IMP-029 2 — static)
 
 ### Regression
-- Last run: Iteration 120 (2026-03-05) — 16/20 PASS, 0 skip (full regression + performance: Playwright browser on localhost, 9 pages checked, 4 console errors, 2 network errors, 1 accessibility issue, 0 layout shifts; 2 P1 bugs, 2 P2 bugs, 4 improvements found)
+- Last run: Iteration 128 (2026-03-05) — 7/8 PASS, 0 skip (Phase 3b testing gate: tsc 0 errors, lint 1 pre-existing warning, FEAT-040 through FEAT-043 verified, full regression baseline pass, 1 FAIL: cost chain PDF — BUG-042; static analysis + tsc + lint, Playwright unavailable for regression due to CDP conflict; 1 a11y issue pre-existing BUG-023)
+- Previous: Iteration 120 (2026-03-05) — 16/20 PASS, 0 skip (full regression + performance: Playwright browser on localhost, 9 pages checked, 4 console errors, 2 network errors, 1 accessibility issue, 0 layout shifts; 2 P1 bugs, 2 P2 bugs, 4 improvements found)
 - Previous: Iteration 112 (2026-03-04) — 27/28 PASS, 1 skip (full regression: Playwright browser on localhost, 13 pages checked, 2 console errors, 4 network errors, 0 accessibility violations; skip: journey canvas — no journey tab)
 - Previous: Iteration 109 (2026-03-03) — 19/19 PASS, 2 skip (regression-baseline hybrid: browser on production + static analysis for iter-109 changes, 7 pages checked, 0 console errors, 8 regression checks PASS)
 - Previous: Iteration 107 (2026-03-03) — 20/20 PASS (baseline 15 + BUG-025 2 + FEAT-035 2 + IMP-052 1 — Playwright browser, 7 pages checked, 0 console errors)

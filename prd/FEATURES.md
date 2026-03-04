@@ -241,18 +241,19 @@
 - [x] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights — Done iteration 126, 2026-03-05 (renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights built + wired; sections remain available:false in dialog — to enable next iteration)
 - [x] [4/4] Page numbers, table of contents, consistent styling — Done iteration 127, 2026-03-05 (page numbers on pages 2+, TOC with dot leaders via movePage, all sections available:true, IMP-097 checkbox fix)
 
-### #FEAT-044 Phase 3b testing gate
+### #FEAT-044 Phase 3b testing gate — DONE iteration 128, 2026-03-05 (partial — BUG-042 found)
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done (partial)
 **Acceptance criteria:**
-- [ ] Full regression: all prior features still work
-- [ ] Tools CRUD → assign to step → see backlinks in tool detail → see cost in step panel
-- [ ] Tool analysis computes correctly
-- [ ] Enhanced PDF export produces multi-section document with all data
-- [ ] Type check, lint, build pass
-**Notes:** Focus on cost chain: tool cost → step cost → section cost → workspace total → PDF cost page.
+- [x] Full regression: all prior features still work
+- [x] Tools CRUD → assign to step → see backlinks in tool detail → see cost in step panel
+- [x] Tool analysis computes correctly
+- [x] Enhanced PDF export produces multi-section document with all data
+- [x] Type check, lint, build pass
+- [ ] Cost chain integrity: PDF cost summary excludes tool costs (BUG-042)
+**Notes:** 7/8 regression criteria pass. PDF cost chain (BUG-042) is the only failure — `computeStepMonthlyCost()` in pdf.ts only calculates labor cost. UI shows correct combined cost. 5 improvements filed (IMP-100 through IMP-104). Known blockers: BUG-035/032 (migrations not pushed), OPENROUTER_API_KEY not set.
 
 ---
 

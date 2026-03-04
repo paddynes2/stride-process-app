@@ -2308,3 +2308,36 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed, all merged cleanly. IMP-092 was already done (no-op builder, correct outcome).
 - Observations: 1
 **Notes:** FEAT-043 is now fully complete (all 4 sub-tasks done). createWorkspacePdf return type is a breaking change for any external callers — exportWorkspacePdf updated to destructure. The TOC renders last then moves to page 2 via pdf.movePage(). All section page numbers adjusted +1 to account for TOC insertion.
+
+## Iteration 128 — 2026-03-05 10:00
+**Tasks:**
+- #FEAT-044 Phase 3b testing gate — full regression + acceptance for FEAT-040 through FEAT-043 — slot 1 — completed (partial)
+**Source:** prd/FEATURES.md
+**Mode:** testing_only
+**Result:** completed (partial — BUG-042 found)
+**Changes:** Documentation only (testing iteration — no code changes)
+- knowledge/STATUS.md (updated handoff)
+- knowledge/PROGRESS.md (this entry)
+- knowledge/METRICS.jsonl (appended)
+- knowledge/TASK-COUNTER.json (BUG 41→42, IMP 99→104)
+- prd/FEATURES.md (FEAT-044 marked done with partial)
+- prd/BUGS.md (added BUG-042)
+- prd/IMPROVEMENTS.md (added IMP-100 through IMP-104)
+- testing/RESULTS.md (updated)
+**Verification:**
+- Type check: pass (0 errors — confirmed by regression tester)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx — confirmed by regression tester)
+- Build: N/A (testing-only)
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance tester — Playwright, 8/8 criteria passed)
+- Canary test: skipped (no UI changes)
+- Post-merge check: PASS
+**Bugs found:** 1 — BUG-042 (P2): PDF Cost Summary excludes tool costs from step/section/workspace totals. computeStepMonthlyCost() in pdf.ts calculates labor only. Known BUG-035/032 (step-tools 500 from unpushed migration) confirmed but not new.
+**Improvements found:** 5 — IMP-100 (tools empty state guidance), IMP-101 (coverage gaps navigation context), IMP-102 (tool detail step usage clickable), IMP-103 (TOC pagination overflow), IMP-104 (analysis button in toolbar)
+**Self-score:**
+- Code quality: 0 — No code changes (testing iteration)
+- Test coverage: 4 — Acceptance (Playwright) + regression (static analysis + tsc + lint). Cost chain partial fail caught. FEAT-041 step panel tools section not directly tested (no tools assigned, action budget).
+- Confidence: 4 — Phase 3b features verified working. One real bug found (BUG-042) in PDF cost chain.
+- Efficiency: 5 — Both testers completed within budget. Clear findings.
+- Observations: 6
+**Notes:** Phase 3b testing gate passed with 1 bug (BUG-042). All 4 features (FEAT-040 through FEAT-043) are functionally working. The cost chain gap is PDF-only — UI correctly combines labor + tool costs. BUG-042 should be fixed before declaring Phase 3b fully complete.

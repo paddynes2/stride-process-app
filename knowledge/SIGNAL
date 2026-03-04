@@ -1,1 +1,1 @@
-CONTINUE: FEAT-044 Phase 3b testing gate — full regression + acceptance for all Phase 3b features (FEAT-040 through FEAT-043)
+CONTINUE: Fix BUG-042 (PDF cost summary excludes tool costs from step/section/workspace totals) then mark Phase 3b complete
