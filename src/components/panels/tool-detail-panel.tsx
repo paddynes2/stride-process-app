@@ -14,7 +14,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { updateTool, deleteTool as apiDeleteTool } from "@/lib/api/client";
+import { updateTool, deleteTool as apiDeleteTool, fetchStepToolsByTool } from "@/lib/api/client";
+import type { StepToolWithStep } from "@/lib/api/client";
 import type { Tool, ToolStatus } from "@/types/database";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
@@ -50,6 +51,7 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
   const [costPerMonth, setCostPerMonth] = React.useState(
     tool.cost_per_month != null ? String(tool.cost_per_month) : ""
   );
+  const [stepTools, setStepTools] = React.useState<StepToolWithStep[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
 
@@ -66,6 +68,16 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
     setUrl(tool.url ?? "");
     setCostPerMonth(tool.cost_per_month != null ? String(tool.cost_per_month) : "");
   }, [tool.id, tool.name, tool.category, tool.vendor, tool.url, tool.cost_per_month]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchStepToolsByTool(tool.id).then((data) => {
+      if (!cancelled) setStepTools(data);
+    }).catch(() => {
+      if (!cancelled) setStepTools([]);
+    });
+    return () => { cancelled = true; };
+  }, [tool.id]);
 
   const handleFieldUpdate = async (field: string, value: unknown) => {
     try {
@@ -227,6 +239,27 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
             content={tool.description ?? ""}
             onChange={(html) => handleFieldUpdate("description", html)}
           />
+        </div>
+
+        <Separator />
+
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+            Step Usage
+          </label>
+          {stepTools.length === 0 ? (
+            <p className="text-[12px] text-[var(--text-tertiary)] italic">No steps linked to this tool.</p>
+          ) : (
+            <ul className="space-y-1">
+              {stepTools.map((st) => (
+                <li key={st.id}>
+                  <span className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-default">
+                    {st.step.name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 
