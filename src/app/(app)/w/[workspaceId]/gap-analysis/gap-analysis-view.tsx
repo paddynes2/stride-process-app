@@ -318,11 +318,12 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
                   API key not configured
                 </p>
                 <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed">
-                  AI features require an OpenRouter API key. Add{" "}
+                  AI features require configuration. Contact your workspace administrator
+                  to enable AI analysis, or if you manage your own deployment, add{" "}
                   <code className="text-[var(--text-primary)] bg-[var(--bg-surface-active)] px-1 rounded">
                     OPENROUTER_API_KEY
                   </code>{" "}
-                  to your environment variables and redeploy.
+                  to your environment variables.
                 </p>
               </div>
             </div>
