@@ -1,12 +1,14 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpDown, TrendingDown, Sparkles, RefreshCw, AlertCircle, KeyRound, Clock, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Step } from "@/types/database";
 import { MATURITY_LABELS } from "@/lib/maturity";
 import { generateGapNarrative } from "@/lib/api/client";
+import { useWorkspace } from "@/lib/context/workspace-context";
 
 interface GapAnalysisViewProps {
   workspaceId: string;
@@ -61,6 +63,8 @@ function classifyNarrativeError(err: unknown): NarrativeState {
 
 export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisViewProps) {
   const router = useRouter();
+  const { tabs } = useWorkspace();
+  const firstProcessTab = tabs.find((t) => t.canvas_type === "process") ?? tabs[0] ?? null;
   const [sectionFilter, setSectionFilter] = React.useState<string | null>(null);
   const [sortField, setSortField] = React.useState<SortField>("gap");
   const [sortDir, setSortDir] = React.useState<SortDir>("desc");
@@ -271,27 +275,39 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
         {/* AI Narrative section — above the table, always visible */}
         <div className="mb-6">
           {narrativeState.type === "idle" && narrativeText === null && (
-            <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-              <Sparkles className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" />
-              <p className="text-[13px] text-[var(--text-secondary)] flex-1">
-                {hasGapData
-                  ? "Generate a consulting-grade narrative summary of this gap analysis."
-                  : "Score steps to enable AI narrative."}
-              </p>
-              <button
-                onClick={handleGenerateNarrative}
-                disabled={!hasGapData}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium shrink-0",
-                  hasGapData
-                    ? "bg-[var(--accent-blue)] text-white hover:opacity-90 transition-opacity"
-                    : "bg-[var(--bg-surface-active)] text-[var(--text-tertiary)] cursor-not-allowed"
-                )}
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                Generate Summary
-              </button>
-            </div>
+            <>
+              <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+                <Sparkles className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" />
+                <p className="text-[13px] text-[var(--text-secondary)] flex-1">
+                  {hasGapData
+                    ? "Generate a consulting-grade narrative summary of this gap analysis."
+                    : "Score steps to enable AI narrative."}
+                </p>
+                <button
+                  onClick={handleGenerateNarrative}
+                  disabled={!hasGapData}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium shrink-0",
+                    hasGapData
+                      ? "bg-[var(--accent-blue)] text-white hover:opacity-90 transition-opacity"
+                      : "bg-[var(--bg-surface-active)] text-[var(--text-tertiary)] cursor-not-allowed"
+                  )}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Generate Summary
+                </button>
+              </div>
+              {!hasGapData && firstProcessTab && (
+                <p className="mt-2 text-[12px] text-[var(--text-tertiary)]">
+                  <Link
+                    href={`/w/${workspaceId}/${firstProcessTab.id}`}
+                    className="text-[var(--accent-blue)] hover:underline"
+                  >
+                    Open the canvas to set maturity scores →
+                  </Link>
+                </p>
+              )}
+            </>
           )}
 
           {narrativeState.type === "loading" && (
