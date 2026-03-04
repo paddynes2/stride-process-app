@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-import { RunbookView, type RunbookStepEnriched } from "./runbook-view";
-import type { Runbook } from "@/types/database";
+import { RunbookView, type RunbookStepEnriched, type RunbookWithCreator } from "./runbook-view";
 
 export default async function RunbookViewPage({
   params,
@@ -16,7 +15,7 @@ export default async function RunbookViewPage({
   const [{ data: runbook }, { data: steps }] = await Promise.all([
     supabase
       .from("runbooks")
-      .select("*")
+      .select("*, users!runbooks_created_by_fkey(email)")
       .eq("id", runbookId)
       .eq("workspace_id", workspaceId)
       .single(),
@@ -31,7 +30,7 @@ export default async function RunbookViewPage({
 
   return (
     <RunbookView
-      runbook={runbook as Runbook}
+      runbook={runbook as RunbookWithCreator}
       initialSteps={(steps ?? []) as RunbookStepEnriched[]}
       workspaceId={workspaceId}
       userId={user.id}
