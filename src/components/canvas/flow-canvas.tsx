@@ -21,6 +21,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { Plus, Square, Thermometer, FileDown, ImageDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ExportPdfDialog } from "@/components/panels/export-pdf-dialog";
+import type { ExportConfig } from "@/components/panels/export-pdf-dialog";
 import { StepNode } from "./step-node";
 import { SectionNode } from "./section-node";
 import {
@@ -63,7 +65,7 @@ interface FlowCanvasProps {
   onSectionDelete: (id: string) => void;
   onConnectionCreate: (conn: Connection) => void;
   onConnectionDelete: (id: string) => void;
-  onExportPdf?: (canvasElement: HTMLElement) => void;
+  onExportPdf?: (canvasElement: HTMLElement, config: ExportConfig) => Promise<void> | void;
   onExportPng?: (canvasElement: HTMLElement) => Promise<void>;
 }
 
@@ -189,6 +191,7 @@ export function FlowCanvas({
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const [heatMapMode, setHeatMapMode] = React.useState(false);
   const [exporting, setExporting] = React.useState(false);
+  const [showExportDialog, setShowExportDialog] = React.useState(false);
 
   const initialNodes = React.useMemo(
     () => buildNodes(sections, steps, selectedStepId, selectedSectionId, heatMapMode, annotatedIds, annotationColor),
@@ -379,15 +382,19 @@ export function FlowCanvas({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  const handleExportPdf = React.useCallback(async () => {
-    if (!onExportPdf || !wrapperRef.current || exporting) return;
-    setExporting(true);
-    try {
-      await onExportPdf(wrapperRef.current);
-    } finally {
-      setExporting(false);
-    }
-  }, [onExportPdf, exporting]);
+  const handleExportWithConfig = React.useCallback(
+    async (config: ExportConfig) => {
+      if (!onExportPdf || !wrapperRef.current || exporting) return;
+      setExporting(true);
+      try {
+        await onExportPdf(wrapperRef.current, config);
+        setShowExportDialog(false);
+      } finally {
+        setExporting(false);
+      }
+    },
+    [onExportPdf, exporting]
+  );
 
   return (
     <div ref={wrapperRef} className="w-full h-full relative">
@@ -442,7 +449,7 @@ export function FlowCanvas({
           <Button
             variant="secondary"
             size="sm"
-            onClick={handleExportPdf}
+            onClick={() => setShowExportDialog(true)}
             disabled={exporting}
             title="Export workspace as PDF"
           >
@@ -498,6 +505,16 @@ export function FlowCanvas({
           </div>
         </div>
       </div>
+    )}
+
+    {/* Export PDF dialog — portal-rendered, placed here for co-location with export logic */}
+    {onExportPdf && (
+      <ExportPdfDialog
+        open={showExportDialog}
+        onOpenChange={(open) => { if (!exporting) setShowExportDialog(open); }}
+        onExport={handleExportWithConfig}
+        exporting={exporting}
+      />
     )}
     </div>
   );
