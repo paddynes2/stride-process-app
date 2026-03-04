@@ -71,7 +71,7 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
         const open = ideas.filter((i) => i.status !== "completed" && i.status !== "rejected").length;
         setImprovementsOpenCount(open > 0 ? open : null);
       })
-      .catch(() => {});
+      .catch(() => { if (!cancelled) setImprovementsOpenCount(0); });
     return () => { cancelled = true; };
   }, [workspaceId]);
 
