@@ -70,7 +70,8 @@ npx supabase db push     # Push migrations
 - `teams/route.ts` + `[id]/route.ts` — CRUD
 - `roles/route.ts` + `[id]/route.ts` — CRUD
 - `people/route.ts` + `[id]/route.ts` — CRUD
-- `tools/route.ts` + `[id]/route.ts` — CRUD (GET list, POST create, PATCH, DELETE)
+- `tools/route.ts` + `[id]/route.ts` — CRUD (GET list, POST create with position_x/position_y/status, PATCH with status validation, DELETE)
+- `tool-sections/route.ts` + `[id]/route.ts` — CRUD (GET by workspace_id, POST create, PATCH name/description/position/size, DELETE with PGRST116→404)
 - `step-roles/route.ts` + `[id]/route.ts` — POST, GET, DELETE
 - `shares/route.ts` + `[id]/route.ts` — CRUD
 - `perspectives/route.ts` + `[id]/route.ts` — CRUD
@@ -122,7 +123,7 @@ npx supabase db push     # Push migrations
 ### Types
 | File | Key Types |
 |------|-----------|
-| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule, Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData, ImprovementIdea + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType, ImprovementStatus, ImprovementPriority) |
+| `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, Tool, ToolSection, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule, Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData, ImprovementIdea + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType, ImprovementStatus, ImprovementPriority, ToolStatus) |
 | `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 
@@ -156,6 +157,7 @@ npx supabase db push     # Push migrations
 | 020 | Section templates (templates table with JSONB template_data + RLS via can_access_workspace + index + update_updated_at trigger) |
 | 021 | Prioritization scores (effort_score + impact_score INT CHECK 1-5 nullable on steps + touchpoints) |
 | 022 | Improvement ideas (improvement_status + improvement_priority enums + improvement_ideas table + RLS via can_access_workspace + index) |
+| 023 | Tool sections (tool_sections table + RLS via can_access_workspace + update trigger + index) + ALTER tools (position_x, position_y, status CHECK) |
 
 ## Patterns
 <!-- Updated: iter-55, 2026-02-26 -->

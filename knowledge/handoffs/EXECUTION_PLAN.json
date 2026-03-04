@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 113,
-  "date": "2026-03-04T17:00:00Z",
+  "iteration": 115,
+  "date": "2026-03-04T19:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "6c313dc24921bb1ff62c61dcead5ac28a45938f3",
+    "last_commit_hash": "c6b16524e67be183fa702976f82099045e651fdd",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,21 +13,86 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#BUG-027",
-      "description": "Fix gap analysis Generate Summary button hidden when no gap data + add live countdown timer to rate-limited state (IMP-066)",
-      "source": "prd/BUGS.md",
-      "type": "fix",
+      "id": "#FEAT-040 [1/3]",
+      "description": "Tools canvas data layer — migration for tool_sections table + ALTER tools with position_x/position_y/status columns, TypeScript types, API routes (tool-sections CRUD), update tools API for new columns, client wrappers",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 3,
+      "acceptance_criteria": [
+        "New migration file (023) creates tool_sections table: id UUID PK, workspace_id UUID FK, name TEXT, description TEXT, position_x NUMERIC DEFAULT 0, position_y NUMERIC DEFAULT 0, width NUMERIC DEFAULT 600, height NUMERIC DEFAULT 400, created_at, updated_at. RLS via can_access_workspace(). update_updated_at trigger. Index on workspace_id.",
+        "Same migration ALTERs tools table: ADD COLUMN position_x NUMERIC DEFAULT 0, position_y NUMERIC DEFAULT 0, status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','considering','cancelled'))",
+        "New ToolSection interface in types/database.ts matching all columns. Tool interface updated with position_x, position_y, status fields.",
+        "New API route: POST /api/v1/tool-sections (create) + GET by workspace_id in same route. Follows existing pattern (successResponse/errorResponse envelope). Requires workspace_id.",
+        "New API route: PATCH/DELETE /api/v1/tool-sections/[id]. PATCH supports name, description, position_x, position_y, width, height. DELETE with 0-row detection → 404.",
+        "Existing tools API routes (POST + PATCH) updated to accept position_x, position_y, status in editable fields",
+        "Client wrappers in client.ts: fetchToolSections, createToolSection, updateToolSection, deleteToolSection. All use apiFetch<T>() pattern.",
+        "TypeScript compiles clean (npx tsc --noEmit)"
+      ],
+      "files_owned": [
+        "supabase/migrations/023_tool_sections.sql",
+        "src/types/database.ts",
+        "src/app/api/v1/tool-sections/route.ts",
+        "src/app/api/v1/tool-sections/[id]/route.ts",
+        "src/app/api/v1/tools/route.ts",
+        "src/app/api/v1/tools/[id]/route.ts",
+        "src/lib/api/client.ts"
+      ],
+      "files_read_only": [
+        "src/lib/api/response.ts",
+        "src/lib/supabase/server.ts",
+        "src/lib/api/activity.ts",
+        "supabase/migrations/013_tools.sql",
+        "src/app/api/v1/sections/route.ts",
+        "src/app/api/v1/sections/[id]/route.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "supabase/migrations/013_tools.sql",
+          "src/app/api/v1/sections/route.ts",
+          "src/app/api/v1/sections/[id]/route.ts",
+          "src/app/api/v1/stages/route.ts"
+        ],
+        "patterns_to_follow": [
+          "Migration pattern: CREATE TABLE + RLS policies + update_updated_at trigger + workspace_id index (see 013_tools.sql)",
+          "API envelope: successResponse(data) / errorResponse(code, message) from lib/api/response.ts",
+          "apiFetch<T>() unwraps envelope — client wrappers return apiFetch<T>(url) directly",
+          "PATCH editable fields: const EDITABLE_FIELDS = [...] then pick from body",
+          "DELETE with 0-row detection: .delete().eq().select().single() → PGRST116 → 404",
+          "logActivity() fire-and-forget with void prefix on all mutations"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — do NOT add nested property access",
+          "Supabase RLS silent mutations — check data is null after mutations, return 403",
+          "React 19 useRef requires initial value"
+        ],
+        "affected_urls": [
+          "/api/v1/tool-sections",
+          "/api/v1/tool-sections/[id]",
+          "/api/v1/tools",
+          "/api/v1/tools/[id]"
+        ]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": true,
+      "special_instructions": "Existing tools table has: id, workspace_id, name, description, category, vendor, url, cost_per_month, created_at, updated_at. Use ALTER TABLE to add 3 new columns. tool_sections follows the sections/stages pattern (position + size for React Flow container nodes). The tools canvas is workspace-level (NOT tab-based) — tool_sections reference workspace_id directly, not tab_id. Status enum uses TEXT + CHECK constraint (not a pg enum) — simpler for a 3-value column. Follow stages/route.ts as the closest model for tool-sections API routes."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-075",
+      "description": "Gap analysis not_configured message: replace 'redeploy' with SaaS-appropriate language (same fix as IMP-064 in ai-analysis-view.tsx but for gap-analysis-view.tsx)",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
       "phase": "Phase 3a: Analysis Intelligence",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Generate Summary button visible even when hasGapData is false",
-        "Button is disabled with muted styling and hint text like 'Score steps to enable AI narrative' when no gap data",
-        "Button remains fully functional when gap data exists (no regression)",
-        "Rate-limited state shows live M:SS countdown timer instead of static 'about N minutes' (IMP-066 pattern from IMP-065 in ai-analysis-view.tsx)",
-        "Countdown auto-transitions to idle state when reaching 0",
-        "Regenerate button disabled during rate_limited state"
+        "gap-analysis-view.tsx not_configured block no longer contains the word 'redeploy'",
+        "Replacement text is SaaS-appropriate (e.g., 'Contact your administrator to configure the OPENROUTER_API_KEY.' or similar to what IMP-064 used in ai-analysis-view.tsx)",
+        "TypeScript compiles clean"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
@@ -36,111 +101,72 @@
         "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
       ],
       "context": {
-        "similar_files": ["src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"],
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
+        ],
         "patterns_to_follow": [
-          "IMP-065 countdown timer pattern: formatCountdown() helper, countdown state, useEffect with setInterval(1s), auto-transition to idle at 0, display format 'Try again in M:SS'",
-          "BUG-027 fix: move Generate Summary button outside the {hasGapData && (...)} block, show disabled state when !hasGapData"
+          "IMP-064 already fixed this exact text in ai-analysis-view.tsx — read that file's not_configured block and use the same wording"
         ],
         "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/gap-analysis"]
+        "affected_urls": [
+          "/w/[workspaceId]/gap-analysis"
+        ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Read ai-analysis-view.tsx to copy the exact IMP-065 countdown pattern. The NarrativeState type already has rate_limited with retryAfterSeconds — wire the countdown to that. For BUG-027: show the AI narrative section (button + results) unconditionally, but disable the Generate Summary button when !hasGapData with a tooltip/hint."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-069",
-      "description": "Wrap StageNode and TouchpointNode in React.memo() matching existing StepNode/SectionNode pattern",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 2a: Journey Canvas",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "StageNode export wrapped in React.memo() matching step-node.tsx line 145 pattern",
-        "TouchpointNode export wrapped in React.memo() matching section-node.tsx line 96 pattern",
-        "No functional changes to either component",
-        "TypeScript compilation passes"
-      ],
-      "files_owned": [
-        "src/components/canvas/stage-node.tsx",
-        "src/components/canvas/touchpoint-node.tsx"
-      ],
-      "files_read_only": [
-        "src/components/canvas/step-node.tsx",
-        "src/components/canvas/section-node.tsx"
-      ],
-      "context": {
-        "similar_files": ["src/components/canvas/step-node.tsx", "src/components/canvas/section-node.tsx"],
-        "patterns_to_follow": [
-          "step-node.tsx: export const StepNode = React.memo(function StepNode(...) { ... })",
-          "Change 'export function StageNode' to 'function StageNodeInner' and add 'export const StageNode = React.memo(StageNodeInner)' — or use named function expression pattern from step-node.tsx"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": []
-      },
-      "has_ui_changes": false,
-      "has_data_model_changes": false,
-      "special_instructions": "Read step-node.tsx to see the exact React.memo pattern used. Apply identically to stage-node.tsx and touchpoint-node.tsx. Minimal change — just wrap the export."
+      "special_instructions": "The offending text is at line ~325: 'to your environment variables and redeploy.' Read ai-analysis-view.tsx's not_configured block for the replacement wording used by IMP-064."
     },
     {
       "slot": 3,
-      "id": "#IMP-071",
-      "description": "Sidebar improvements badge defaults to 0 on fetch error + Add as Improvement visual confirmation feedback (IMP-068)",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
+      "id": "#BUG-030",
+      "description": "Fix pre-existing hydration mismatch on AI analysis date format — server renders different date string than client. Use consistent formatting.",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3a: Analysis Intelligence",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "IMP-071: When /api/v1/improvement-ideas returns an error (500, network failure), sidebar badge shows 0 instead of blank",
-        "IMP-071: .catch() handler sets improvementsOpenCount to null (hides badge) OR 0 — choose 0 so badge renders consistently",
-        "IMP-068: After 'Add as Improvement' button is clicked and succeeds, button text changes to 'Added ✓' for 2 seconds before reverting",
-        "IMP-068: Pattern matches the Copy button in gap-analysis-view.tsx (copied state with setTimeout reset)",
-        "TypeScript compilation passes"
+        "ai-analysis-view.tsx 'Last run' date uses a consistent format that produces identical output on server and client (e.g., toISOString().slice(0, 10) for YYYY-MM-DD, or Intl.DateTimeFormat with explicit locale)",
+        "No hydration mismatch warning in browser console for the AI analysis date",
+        "TypeScript compiles clean"
       ],
       "files_owned": [
-        "src/components/layout/sidebar.tsx",
-        "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
+        "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
       ],
-      "files_read_only": [
-        "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
-      ],
+      "files_read_only": [],
       "context": {
-        "similar_files": ["src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"],
+        "similar_files": [],
         "patterns_to_follow": [
-          "IMP-071: Change .catch(() => {}) to .catch(() => { if (!cancelled) setImprovementsOpenCount(0); }) at sidebar.tsx:74",
-          "IMP-068: Copy button pattern from gap-analysis-view.tsx — useState for 'added' per suggestion index, onClick sets true + setTimeout(2000) resets to false, show Check icon + 'Added' text while true"
+          "Use toISOString().slice(0, 10) for deterministic YYYY-MM-DD output, or new Intl.DateTimeFormat('en-US', { ... }) with explicit locale"
         ],
-        "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/improvements"]
+        "learnings_relevant": [
+          "Hydration mismatch: server renders as YYYY/MM/DD, client as M/D/YYYY due to different locales"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/ai-analysis"
+        ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "IMP-071 is a one-line fix in sidebar.tsx. IMP-068 requires adding a Map<number, boolean> or Set state to track which AI suggestion 'Add as Improvement' buttons show confirmation. Read gap-analysis-view.tsx Copy button pattern (uses copied useState + setTimeout) as reference."
+      "special_instructions": "The bug is at line ~194: `new Date(lastAt).toLocaleDateString()`. This produces locale-dependent output. Replace with `new Date(lastAt).toISOString().slice(0, 10)` for consistent YYYY-MM-DD, or use suppressHydrationWarning on the span if a relative time approach is preferred. The simplest fix is toISOString().slice(0, 10)."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
-    "owner": null,
-    "note": "No shared file modifications needed this iteration"
+    "read_only": ["package.json", "tsconfig.json", "src/lib/utils.ts"],
+    "owner": "#FEAT-040 [1/3]",
+    "note": "Slot 1 owns database.ts and client.ts as they need type + wrapper additions. Slots 2 and 3 do not modify shared files."
   },
-  "merge_order": ["#BUG-027", "#IMP-069", "#IMP-071"],
+  "merge_order": ["#FEAT-040 [1/3]", "#IMP-075", "#BUG-030"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Regression just ran in iter 112 (27/28 PASS). Next due at iter 120. All tasks are S-complexity additive changes with zero data model changes and risk_score 0.",
+    "regression_reason": "Last regression was iteration 112 (3 iterations ago). Cadence floor is every 8th — not due until iteration 120.",
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "BUG-028 and BUG-029 (improvement-ideas + coloring-rules 500) are caused by unpushed migrations 019/022 — NOT code bugs. Requires human action: npx supabase db push. Cannot be fixed by builders.",
-      "Phase 3b (FEAT-040+) is next phase but first feature is L-XL complexity. Clearing P2 bugs and improvements first."
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

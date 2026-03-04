@@ -125,7 +125,7 @@
   - **Related:** FEAT-051 (conditional coloring feature)
   - **Suggested fix:** Debug API route — likely RLS policy issue or migration 019 not applied to local dev DB.
 
-- [ ] #BUG-030 Pre-existing hydration mismatch on AI analysis date format (P3) — Attempts: 0
+- [x] #BUG-030 Pre-existing hydration mismatch on AI analysis date format (P3) — DONE iteration 115, 2026-03-04
   - **Found:** Iteration 114 (acceptance tester — browser console)
   - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx` — "Last run" timestamp
   - **What:** Server renders date as '2026/03/04' but client locale formats it as '3/4/2026'. React detects the mismatch and regenerates the subtree on the client. Appears as a console error on every page load with existing analysis results.

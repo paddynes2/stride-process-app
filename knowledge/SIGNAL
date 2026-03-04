@@ -1,1 +1,1 @@
-CONTINUE: Clear remaining P2 improvements (IMP-067, IMP-070, IMP-073, IMP-074) or start Phase 3b (FEAT-040+)
+CONTINUE: #FEAT-040 [2/3] Tools canvas React Flow UI — upgrade tools page to canvas with tool nodes (card with name, status badge, cost), tool section container nodes, Add Tool/Add Tool Section toolbar buttons, drag-and-drop, zoom/pan controls

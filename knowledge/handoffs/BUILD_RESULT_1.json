@@ -1,32 +1,75 @@
 {
   "schema_version": "1.0",
-  "iteration": 113,
+  "iteration": 115,
   "slot": 1,
-  "task_id": "#BUG-027",
+  "task_id": "#FEAT-040 [1/3]",
   "status": "completed",
   "duration_seconds": 180,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
+      "path": "supabase/migrations/023_tool_sections.sql",
+      "action": "created",
+      "lines_added": 49,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/types/database.ts",
       "action": "modified",
-      "lines_added": 147,
-      "lines_removed": 118
+      "lines_added": 22,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/tool-sections/route.ts",
+      "action": "created",
+      "lines_added": 74,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/tool-sections/[id]/route.ts",
+      "action": "created",
+      "lines_added": 90,
+      "lines_removed": 0
+    },
+    {
+      "path": "src/app/api/v1/tools/route.ts",
+      "action": "modified",
+      "lines_added": 10,
+      "lines_removed": 9
+    },
+    {
+      "path": "src/app/api/v1/tools/[id]/route.ts",
+      "action": "modified",
+      "lines_added": 15,
+      "lines_removed": 4
+    },
+    {
+      "path": "src/lib/api/client.ts",
+      "action": "modified",
+      "lines_added": 38,
+      "lines_removed": 2
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not owned by this task)" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit: no output (clean)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (documented in LEARNINGS.md as acceptable)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
+    "supabase/migrations/023_tool_sections.sql",
+    "src/types/database.ts",
+    "src/app/api/v1/tool-sections/route.ts",
+    "src/app/api/v1/tool-sections/[id]/route.ts",
+    "src/app/api/v1/tools/route.ts",
+    "src/app/api/v1/tools/[id]/route.ts",
+    "src/lib/api/client.ts"
   ],
   "ownership_violations": [],
-  "notes": "BUG-027: Moved AI Narrative section outside {hasGapData && (...)} block — now always visible. Generate Summary button shows disabled (muted styling, cursor-not-allowed) with hint text 'Score steps to enable AI narrative.' when !hasGapData; fully functional when hasGapData. IMP-066: Added formatCountdown() helper (M:SS format), lastTextRef to restore narrative text after countdown expires, countdown useState, and useEffect with setInterval(1s) auto-transitioning to idle (restoring last known text) when countdown reaches 0. Rate-limited state now shows 'Try again in M:SS' live countdown instead of static 'about N minutes'. Regenerate button remains disabled during loading state. Fixed TS2367: removed impossible narrativeState.type === 'rate_limited' check inside idle+text JSX block (TypeScript narrows type there). All 6 acceptance criteria met.",
+  "notes": "All acceptance criteria met. Migration 023 creates tool_sections table (workspace-scoped, RLS via can_access_workspace, update_updated_at trigger, workspace_id index) and ALTERs tools table to add position_x/position_y NUMERIC NOT NULL DEFAULT 0 and status TEXT NOT NULL DEFAULT 'active' CHECK (active|considering|cancelled). ToolStatus type and ToolSection interface added to database.ts; Tool interface updated with position_x, position_y, status. tool-sections GET+POST route follows tools/route.ts pattern; [id] PATCH+DELETE route follows sections/[id]/route.ts pattern with PGRST116 detection returning 404. tools API routes updated: POST accepts position_x, position_y, status; PATCH EDITABLE_FIELDS extended with position_x, position_y, status (with status validation). Client wrappers added: fetchToolSections, createToolSection, updateToolSection, deleteToolSection. createTool and updateTool signatures extended for new Tool fields.",
+
   "failure_details": null
 }

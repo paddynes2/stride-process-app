@@ -1,40 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 113,
+  "iteration": 115,
   "slot": 3,
-  "task_id": "#IMP-071",
+  "task_id": "#BUG-030",
   "status": "completed",
-  "duration_seconds": 180,
+  "duration_seconds": 45,
 
   "files_changed": [
     {
-      "path": "src/components/layout/sidebar.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx",
       "action": "modified",
       "lines_added": 1,
       "lines_removed": 1
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
-      "action": "modified",
-      "lines_added": 22,
-      "lines_removed": 5
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not touched)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not in owned files)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/components/layout/sidebar.tsx",
-    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
+    "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "IMP-071: Changed .catch(() => {}) to .catch(() => { if (!cancelled) setImprovementsOpenCount(0); }) in sidebar.tsx. Badge now shows 0 on fetch error instead of blank. IMP-068: Added Check icon import, addedIndices Set<number> state, updated handleAddAsImprovement to accept index + set confirmation with 2s setTimeout reset, updated button to show Check icon + 'Added \u2713' in green while confirmed. Pattern matches gap-analysis-view.tsx Copy button (setCopied + setTimeout reset).",
+  "notes": "Replaced toLocaleDateString() with toISOString().slice(0, 10) at line 194. This produces deterministic YYYY-MM-DD output regardless of server/client locale, eliminating the hydration mismatch.",
 
   "failure_details": null
 }

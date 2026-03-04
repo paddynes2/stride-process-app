@@ -82,10 +82,10 @@ Core consulting insight features:
 - [x] #FEAT-038 AI improvement suggestions (bridges AI analysis → improvement tracker) — DONE iteration 111
 - [x] #FEAT-039 Phase 3a testing gate — DONE iteration 112 (acceptance 14/14, regression 27/28, accessibility 0 violations)
 
-## Phase 3b: Tools Canvas + Enhanced Export — DEFERRED (per human feedback — Phase 4 prioritized)
+## Phase 3b: Tools Canvas + Enhanced Export — IN PROGRESS
 **Depends on:** Phase 3a complete ✓ (iteration 112)
 
-- [ ] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape)
+- [ ] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape) — [1/3] data layer DONE iteration 115
 - [ ] #FEAT-041 Tool detail panel + step-tool assignment (junction table, cost integration)
 - [ ] #FEAT-042 Tool overlap and gap analysis (client-side computation)
 - [ ] #FEAT-043 Enhanced PDF export — multi-section report (4 sub-tasks)
@@ -177,3 +177,4 @@ Deferred indefinitely:
 - [2026-03-04] Iteration 112: **PHASE 3a COMPLETE.** FEAT-039 Phase 3a testing gate passed — acceptance 14/14, regression 27/28 (1 skip), accessibility 0 violations. 2 new P2 bugs (BUG-028 improvement-ideas 500, BUG-029 coloring-rules 500). 4 new improvements (IMP-069-072). Phase 3b now unblocked.
 - [2026-03-04] Iteration 113: Cleanup iteration. BUG-027 resolved (gap analysis button visible). IMP-066 done (countdown timer). IMP-069 done (React.memo). IMP-071 done (sidebar badge fallback). IMP-068 done (confirmation feedback). 2 new improvements (IMP-073, IMP-074). Phase 3b next.
 - [2026-03-04] Iteration 114: Final AI improvement cleanup. IMP-073 done (Regenerate button visible during loading/rate_limited). IMP-067 done (disable AI Suggestions when no steps). IMP-070 done (fetchAISuggestions moved to client.ts). IMP-074 verified already resolved. IMP-064 done (SaaS-friendly not_configured message). 2 new bugs (BUG-030 hydration mismatch P3), 2 new improvements (IMP-075 gap-analysis "redeploy", IMP-076 "last generated" indicator). All Phase 3a improvements cleared. Ready for Phase 3b or remaining improvements.
+- [2026-03-04] Iteration 115: Phase 3b started. FEAT-040 [1/3] data layer complete (migration 023, tool_sections table, tools ALTER, types, API, client wrappers). IMP-075 done (gap-analysis text fix). BUG-030 done (hydration fix). 2 new improvements (IMP-077, IMP-078). Next: FEAT-040 [2/3] React Flow UI.

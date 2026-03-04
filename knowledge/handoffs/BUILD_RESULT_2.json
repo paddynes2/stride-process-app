@@ -1,40 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 113,
+  "iteration": 61,
   "slot": 2,
-  "task_id": "#IMP-069",
+  "task_id": "#IMP-075",
   "status": "completed",
-  "duration_seconds": 60,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/components/canvas/stage-node.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
       "action": "modified",
       "lines_added": 3,
-      "lines_removed": 1
-    },
-    {
-      "path": "src/components/canvas/touchpoint-node.tsx",
-      "action": "modified",
-      "lines_added": 3,
-      "lines_removed": 1
+      "lines_removed": 2
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unowned file, unrelated to changes)" },
+    "lint": { "status": "pass", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/components/canvas/stage-node.tsx",
-    "src/components/canvas/touchpoint-node.tsx"
+    "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Renamed export function StageNode to StageNodeComponent and added export const StageNode = React.memo(StageNodeComponent). Same pattern applied to TouchpointNode. Matches step-node.tsx and section-node.tsx patterns exactly. No functional changes.",
+  "notes": "Replaced 'to your environment variables and redeploy.' with SaaS-appropriate wording matching IMP-064's fix in ai-analysis-view.tsx. The not_configured block now reads: 'AI features require configuration. Contact your workspace administrator to enable AI analysis, or if you manage your own deployment, add OPENROUTER_API_KEY to your environment variables.'",
 
   "failure_details": null
 }

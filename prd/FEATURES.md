@@ -181,11 +181,11 @@
 ### #FEAT-040 Tools canvas upgrade
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in_progress (1/3 complete — data layer done iteration 115)
 **Acceptance criteria:**
 - [ ] Upgrade existing tools page to React Flow canvas (reuse canvas infrastructure from process/journey)
-- [ ] New `tool_sections` table: id, workspace_id, name, position_x, position_y, width, height — groups tools visually
+- [x] New `tool_sections` table: id, workspace_id, name, position_x, position_y, width, height — groups tools visually — DONE iteration 115
 - [ ] Tool nodes: card with name, status badge (active=green, considering=yellow, cancelled=gray), cost ($/mo)
 - [ ] Tool section nodes: group containers (like process sections)
 - [ ] Drag tools into/out of tool sections

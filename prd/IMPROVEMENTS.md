@@ -534,7 +534,7 @@
   - **Design principle:** Nielsen H9: Help users recognize, diagnose, and recover from errors
   - **Suggested fix:** Show an inline error state in the AI Suggestions panel when the endpoint returns a non-ok response, rather than silently failing.
 
-- [ ] #IMP-075 Gap analysis not_configured message still says "redeploy" — Attempts: 0
+- [x] #IMP-075 Gap analysis not_configured message still says "redeploy" — DONE iteration 115, 2026-03-04
   - **Found:** Iteration 114 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx` (line 325)
@@ -549,6 +549,22 @@
   - **What:** AI Suggestions button has no visual indicator showing whether suggestions have been generated previously. A user returning to the page sees the same button with no memory of prior state.
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show a small badge or "Last generated N min ago" label near the button when cached suggestions exist.
+
+- [ ] #IMP-077 Gap analysis "Generate Summary" disabled state lacks guidance — Attempts: 0
+  - **Found:** Iteration 115 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
+  - **What:** The "Generate Summary" button is disabled with text "Score steps to enable AI narrative" but there is no inline guidance directing users to where they can score steps. A new user would not know to go to the canvas and open a step's detail panel.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Add a small link or tooltip near the disabled state: "Open a step on the canvas to set maturity scores" with a link to the canvas tab.
+
+- [ ] #IMP-078 Workspace card date uses locale-dependent toLocaleDateString — Attempts: 0
+  - **Found:** Iteration 115 (acceptance tester)
+  - **Category:** Visual consistency
+  - **Where:** Workspace list card component (workspace-list.tsx or similar)
+  - **What:** Workspace card shows "Created 3/4/2026" using toLocaleDateString() — same locale-dependent pattern that BUG-030 fixed on the ai-analysis page. Causes hydration mismatch.
+  - **Design principle:** Consistency and standards
+  - **Suggested fix:** Apply same toISOString().slice(0, 10) fix to the workspace creation date display.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

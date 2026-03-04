@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 114
+- **Iteration:** 115
 - **Date:** 2026-03-04
-- **Suite:** Acceptance (iteration 114 tasks)
+- **Suite:** Acceptance (iteration 115 tasks)
 - **Method:** Playwright browser + static code analysis
-- **Result:** **Acceptance 18/18 PASS**
-- **Bugs found:** 2 (BUG-030 pre-existing hydration mismatch, IMP-075 gap-analysis "redeploy" text)
-- **Improvements found:** 1 (IMP-076 AI Suggestions "last generated" indicator)
+- **Result:** **Acceptance 14/14 PASS** + Canary PASS
+- **Bugs found:** 1 (BUG-028 improvement-ideas 500 — pre-existing, already tracked)
+- **Improvements found:** 2 (IMP-077 gap analysis disabled guidance, IMP-078 workspace card date hydration)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 114 (2026-03-04) — 18/18 PASS (IMP-073 6/6, IMP-067+IMP-070+IMP-074 7/7, IMP-064 5/5 — Playwright browser + static code analysis)
+- Last run: Iteration 115 (2026-03-04) — 14/14 PASS (FEAT-040 [1/3] 8/8, IMP-075 3/3, BUG-030 3/3 — Playwright browser + static code analysis)
+- Previous: Iteration 114 (2026-03-04) — 18/18 PASS (IMP-073 6/6, IMP-067+IMP-070+IMP-074 7/7, IMP-064 5/5 — Playwright browser + static code analysis)
 - Previous: Iteration 113 (2026-03-04) — 10/10 PASS (BUG-027 6/6, IMP-069 2/2, IMP-071+IMP-068 2/2 — Playwright browser + static code analysis)
 - Previous: Iteration 112 (2026-03-04) — 14/14 PASS (Phase 3a gate: FEAT-033 through FEAT-038 acceptance, regression checks, accessibility audit — static code analysis)
 - Previous: Iteration 111 (2026-03-04) — 16/16 PASS (FEAT-037 7/7, FEAT-038 5/5, IMP-065 4/4 — static code analysis, Playwright unavailable)

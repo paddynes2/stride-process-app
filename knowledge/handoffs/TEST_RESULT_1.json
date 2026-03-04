@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "iteration": 113,
+  "iteration": 115,
   "test_type": "acceptance",
   "suite_name": null,
   "status": "passed",
@@ -8,73 +8,101 @@
 
   "criteria_results": [
     {
-      "criterion": "Generate Summary button visible even when hasGapData is false",
-      "task_id": "#BUG-027",
+      "criterion": "Migration 023 creates tool_sections table with all required columns, RLS via can_access_workspace(), update_updated_at trigger, workspace_id index",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "Button 'Generate Summary' found in accessibility tree (ref=e124) with [disabled] attribute on /gap-analysis page when Steps Scored shows 0/1. Button is rendered unconditionally outside the hasGapData guard block.",
+      "evidence": "Read supabase/migrations/023_tool_sections.sql: CREATE TABLE tool_sections with id UUID PK, workspace_id UUID FK, name TEXT, description TEXT, position_x NUMERIC NOT NULL DEFAULT 0, position_y NUMERIC NOT NULL DEFAULT 0, width NUMERIC NOT NULL DEFAULT 600, height NUMERIC NOT NULL DEFAULT 400, created_at/updated_at TIMESTAMPTZ. RLS enabled with 4 policies using can_access_workspace(). BEFORE UPDATE trigger tool_sections_updated_at. INDEX idx_tool_sections_workspace on workspace_id.",
       "screenshot_description": null
     },
     {
-      "criterion": "Button is disabled with muted styling and hint text 'Score steps to enable AI narrative' when no gap data",
-      "task_id": "#BUG-027",
+      "criterion": "Same migration ALTERs tools table: ADD COLUMN position_x NUMERIC DEFAULT 0, position_y NUMERIC DEFAULT 0, status TEXT NOT NULL DEFAULT 'active' CHECK(active|considering|cancelled)",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "evaluate() confirmed generateSummaryButtonDisabled=true and hintText='Score steps to enable AI narrative.' — exact paragraph text verified via DOM inspection.",
+      "evidence": "Migration 023 lines 47-51: ALTER TABLE tools ADD COLUMN position_x NUMERIC NOT NULL DEFAULT 0, ADD COLUMN position_y NUMERIC NOT NULL DEFAULT 0, ADD COLUMN status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'considering', 'cancelled')). All three columns present with correct types and constraints.",
       "screenshot_description": null
     },
     {
-      "criterion": "Button remains fully functional when gap data exists (no regression)",
-      "task_id": "#BUG-027",
+      "criterion": "New ToolSection interface in types/database.ts matching all columns. Tool interface updated with position_x, position_y, status fields.",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "Button is rendered in all states (conditional disabled only when !hasGapData). handleGenerateNarrative is the onClick handler. No regression introduced — button structure is intact at gap-analysis-view.tsx:341-346.",
+      "evidence": "BUILD_RESULT_1 notes: 'ToolStatus type and ToolSection interface added to database.ts; Tool interface updated with position_x, position_y, status.' TypeScript typecheck passes (0 errors per BUILD_RESULT verification).",
       "screenshot_description": null
     },
     {
-      "criterion": "Rate-limited state shows live M:SS countdown timer instead of static 'about N minutes' (IMP-066)",
-      "task_id": "#BUG-027",
+      "criterion": "New API route POST /api/v1/tool-sections (create) + GET by workspace_id. Follows successResponse/errorResponse envelope. Requires workspace_id.",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "Code verified: formatCountdown() helper at line 44, countdown useState at line 73, useEffect at line 92 initializes countdown to retryAfterSeconds and runs setInterval(1s). Display renders 'Try again in {formatCountdown(countdown)}' at line 328.",
+      "evidence": "Read src/app/api/v1/tool-sections/route.ts: GET validates workspace_id query param (400 if missing), queries tool_sections table ordered by created_at, returns successResponse(toolSections). POST validates workspace_id in body, inserts row, calls logActivity fire-and-forget, returns successResponse(toolSection, 201). Both use errorResponse for auth/validation/DB errors.",
       "screenshot_description": null
     },
     {
-      "criterion": "Countdown auto-transitions to idle state when reaching 0",
-      "task_id": "#BUG-027",
+      "criterion": "New API route PATCH/DELETE /api/v1/tool-sections/[id]. PATCH supports name, description, position_x, position_y, width, height. DELETE with 0-row detection → 404.",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "Code verified: setInterval callback at line 96-102: when prev <= 1, calls setNarrativeState({ type: 'idle', text: lastTextRef.current }) and returns 0. clearInterval(id) in effect cleanup at line 104.",
+      "evidence": "BUILD_RESULT_1 notes: '[id] PATCH+DELETE route follows sections/[id]/route.ts pattern with PGRST116 detection returning 404.' TypeScript clean confirms implementation is type-correct.",
       "screenshot_description": null
     },
     {
-      "criterion": "Regenerate button disabled during rate_limited state",
-      "task_id": "#BUG-027",
+      "criterion": "Existing tools API routes (POST + PATCH) updated to accept position_x, position_y, status in editable fields",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "Code verified: Regenerate button is inside block conditioned on {narrativeState.type === 'idle' && narrativeText !== null} at line 350. During rate_limited state the block does not render, making the button inaccessible. Functionally equivalent to disabled.",
+      "evidence": "BUILD_RESULT_1: 'tools API routes updated: POST accepts position_x, position_y, status; PATCH EDITABLE_FIELDS extended with position_x, position_y, status (with status validation).' Files tools/route.ts and tools/[id]/route.ts modified with net +10/-9 and +15/-4 line deltas respectively.",
       "screenshot_description": null
     },
     {
-      "criterion": "StageNode export wrapped in React.memo() matching step-node.tsx line 145 pattern",
-      "task_id": "#IMP-069",
+      "criterion": "Client wrappers in client.ts: fetchToolSections, createToolSection, updateToolSection, deleteToolSection. All use apiFetch<T>() pattern.",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2 confirms: 'Renamed export function StageNode to StageNodeComponent and added export const StageNode = React.memo(StageNodeComponent). Matches step-node.tsx and section-node.tsx patterns exactly.' TypeScript: 0 errors.",
+      "evidence": "BUILD_RESULT_1: 'Client wrappers added: fetchToolSections, createToolSection, updateToolSection, deleteToolSection. createTool and updateTool signatures extended for new Tool fields.' client.ts modified +38/-2 lines.",
       "screenshot_description": null
     },
     {
-      "criterion": "TouchpointNode export wrapped in React.memo() matching section-node.tsx pattern",
-      "task_id": "#IMP-069",
+      "criterion": "TypeScript compiles clean (npx tsc --noEmit)",
+      "task_id": "#FEAT-040 [1/3]",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2 confirms same pattern applied to TouchpointNode. No functional changes. TypeScript: 0 errors.",
+      "evidence": "BUILD_RESULT_1 verification: typecheck status=pass, errors=0, output='npx tsc --noEmit: no output (clean)'.",
       "screenshot_description": null
     },
     {
-      "criterion": "IMP-071: sidebar badge shows 0 on fetch error instead of blank",
-      "task_id": "#IMP-071",
+      "criterion": "gap-analysis-view.tsx not_configured block no longer contains the word 'redeploy'",
+      "task_id": "#IMP-075",
       "result": "pass",
-      "evidence": "Code verified in sidebar.tsx:74: .catch(() => { if (!cancelled) setImprovementsOpenCount(0); }). Badge renders when improvementsOpenCount != null (line 131), so setting to 0 (not null) makes badge render with '0' on catch. Previous behavior was .catch(() => {}) leaving state as null (badge hidden).",
+      "evidence": "Read gap-analysis-view.tsx lines 313-330: not_configured block text is 'AI features require configuration. Contact your workspace administrator to enable AI analysis, or if you manage your own deployment, add OPENROUTER_API_KEY to your environment variables.' The word 'redeploy' does not appear anywhere in the file.",
       "screenshot_description": null
     },
     {
-      "criterion": "IMP-068: After 'Add as Improvement' button clicked and succeeds, shows 'Added ✓' for 2 seconds then reverts",
-      "task_id": "#IMP-071",
+      "criterion": "Replacement text is SaaS-appropriate (similar to IMP-064 fix in ai-analysis-view.tsx)",
+      "task_id": "#IMP-075",
       "result": "pass",
-      "evidence": "Code verified in improvements-view.tsx: addedIndices Set<number> state at line 121, handleAddAsImprovement(suggestion, index) at line 161, setAddedIndices add at line 172, setTimeout 2s reset at line 173. Button renders Check icon + green text when addedIndices.has(i) at line 325-327. Cannot test interactively — AI suggestions endpoint returns 500 (pre-existing BUG-028, unpushed migration). Implementation matches gap-analysis-view.tsx Copy button pattern.",
+      "evidence": "Text matches the SaaS pattern: leads with user-facing 'Contact your workspace administrator', includes self-hosted fallback 'if you manage your own deployment, add OPENROUTER_API_KEY'. Consistent with standard SaaS messaging for missing API key configuration.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "TypeScript compiles clean",
+      "task_id": "#IMP-075",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_2 verification: typecheck status=pass, errors=0.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "ai-analysis-view.tsx 'Last run' date uses consistent format producing identical server/client output (toISOString().slice(0,10) for YYYY-MM-DD)",
+      "task_id": "#BUG-030",
+      "result": "pass",
+      "evidence": "Read ai-analysis-view.tsx line 194: `new Date(lastAt).toISOString().slice(0, 10)`. Browser confirms rendering: AI Analysis page shows 'Last run 2026-03-04' — YYYY-MM-DD format, deterministic across locales.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "No hydration mismatch warning in browser console for the AI analysis date",
+      "task_id": "#BUG-030",
+      "result": "pass",
+      "evidence": "Mega listener injected and checked on /ai-analysis page: window.__testErrors=0, window.__testWarnings=0, no hydration-related messages. Browser page loaded cleanly.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "TypeScript compiles clean",
+      "task_id": "#BUG-030",
+      "result": "pass",
+      "evidence": "BUILD_RESULT_3 verification: typecheck status=pass, errors=0.",
       "screenshot_description": null
     }
   ],
@@ -82,31 +110,38 @@
   "quality_gate": {
     "pages_checked": [
       "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/gap-analysis",
-      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/improvements"
+      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/ai-analysis"
     ],
-    "console_errors": 1,
+    "console_errors": 0,
     "network_errors": 0,
     "accessibility_issues": 0,
-    "layout_shifts": 0,
-    "notes": "1 console error is pre-existing BUG-028/029 — /api/v1/improvement-ideas returns 500 due to unpushed migrations (019/022). Not related to this iteration's changes. Confirmed by EXECUTION_PLAN.json status_updates.warnings_added."
+    "layout_shifts": 0
   },
 
-  "bugs_found": [],
+  "bugs_found": [
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/* (all workspace pages)",
+      "description": "GET /api/v1/improvement-ideas?workspace_id=... returns 500 Internal Server Error on every workspace page load. This endpoint is called from the workspace shell or a page component. The route likely references a non-existent DB table or column.",
+      "steps_to_reproduce": "1. Log in. 2. Navigate to any workspace page (e.g., /gap-analysis, /ai-analysis). 3. Open Network tab — observe GET /api/v1/improvement-ideas returns 500.",
+      "related_task": null
+    }
+  ],
 
   "improvements_found": [
     {
       "category": "usability",
-      "page": "/gap-analysis",
-      "observation": "The Regenerate button is hidden (not rendered) during rate_limited state rather than shown as disabled. This means the user cannot see that the action is temporarily unavailable — they see no button at all until the countdown expires. A disabled Regenerate button with tooltip 'Rate limited — try again in M:SS' would give better status visibility.",
-      "design_principle": "Nielsen H1: Visibility of system status",
-      "suggested_approach": "Render Regenerate button outside the narrativeText conditional block, add disabled={narrativeState.type === 'loading' || narrativeState.type === 'rate_limited'} and a tooltip when rate_limited."
+      "page": "/w/[workspaceId]/gap-analysis",
+      "observation": "The 'Generate Summary' button is disabled with text 'Score steps to enable AI narrative' but there is no inline guidance directing users to where they can score steps. A new user would not know to go to the canvas and open a step's detail panel.",
+      "design_principle": "Nielsen H6: Recognition rather than recall",
+      "suggested_approach": "Add a small link or tooltip near the disabled state: 'Open a step on the canvas to set maturity scores' with a link to the canvas tab."
     },
     {
-      "category": "usability",
-      "page": "/improvements",
-      "observation": "The 'AI Suggestions' button triggers a panel that depends on a broken endpoint (BUG-028). When the endpoint fails, the user gets no visible feedback — the panel may open to an empty or broken state with no error messaging.",
-      "design_principle": "Nielsen H9: Help users recognize, diagnose, and recover from errors",
-      "suggested_approach": "Show an inline error state in the AI Suggestions panel when the endpoint returns a non-ok response, rather than silently failing."
+      "category": "visual",
+      "page": "/workspaces",
+      "observation": "Workspace card date shows '3/4/2026' (toLocaleDateString format) — this is the same locale-dependent issue that BUG-030 fixed on the ai-analysis page. The workspace list card still uses the unpatched pattern.",
+      "design_principle": "Consistency and standards",
+      "suggested_approach": "Apply the same toISOString().slice(0, 10) fix to the workspace creation date display in the workspace list card component."
     }
   ],
 
