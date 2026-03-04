@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 125
+- **Iteration:** 126
 - **Date:** 2026-03-05
 - **Suite:** Acceptance
 - **Method:** Playwright browser on localhost:3000
-- **Result:** **Acceptance 13/14 PASS** (1 fail: 4 new sections still available:false — BUG-040)
-- **Bugs found:** 1 (BUG-040 sections available:false P1)
-- **Improvements found:** 1 (IMP-096 Executive Summary preset config too broad)
+- **Result:** **Acceptance 15/15 PASS**
+- **Bugs found:** 0
+- **Improvements found:** 1 (IMP-097 coming soon sections checked+disabled UX)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 125 (2026-03-05) — 13/14 PASS (FEAT-043 [2/4] 6/7, BUG-038+039 5/5, IMP-023 2/2, TypeScript 1/1 — Playwright browser; 1 fail: sections available:false BUG-040)
+- Last run: Iteration 126 (2026-03-05) — 15/15 PASS (BUG-040 5/5, FEAT-043 [3/4] 7/7, IMP-045 3/3 — Playwright browser + static code check)
+- Previous: Iteration 125 (2026-03-05) — 13/14 PASS (FEAT-043 [2/4] 6/7, BUG-038+039 5/5, IMP-023 2/2, TypeScript 1/1 — Playwright browser; 1 fail: sections available:false BUG-040)
 - Previous: Iteration 124 (2026-03-05) — 15/16 PASS (FEAT-043 [1/4] 7/8, IMP-086 4/4, IMP-060 4/4 — Playwright browser; 1 fail: preset names BUG-038)
 - Previous: Iteration 119 (2026-03-05) — 14/15 PASS (FEAT-042 7/8 [1 fail: Cancelled row], IMP-084 3/3, IMP-082 4/4 — Playwright browser + static code analysis)
 - Previous: Iteration 118 (2026-03-04) — 18/18 PASS (FEAT-041 [3/3] 8/8, IMP-081 5/5, IMP-083 5/5 — Playwright browser + static code analysis)

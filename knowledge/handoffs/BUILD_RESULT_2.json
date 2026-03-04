@@ -1,33 +1,40 @@
 {
   "schema_version": "1.0",
-  "iteration": 125,
+  "iteration": 126,
   "slot": 2,
-  "task_id": "#IMP-023",
+  "task_id": "#FEAT-043 [3/4]",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 420,
 
   "files_changed": [
     {
+      "path": "src/lib/export/enhanced-pdf-sections.ts",
+      "action": "modified",
+      "lines_added": 350,
+      "lines_removed": 1
+    },
+    {
       "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
       "action": "modified",
-      "lines_added": 5,
-      "lines_removed": 0
+      "lines_added": 30,
+      "lines_removed": 3
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "skipped", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (addEdge unused import) — unchanged from baseline" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
+    "src/lib/export/enhanced-pdf-sections.ts",
     "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Wrapped paintbrush button in a relative div. Added a 6px teal dot (bg-[#14B8A6], w-1.5 h-1.5) absolutely positioned at -top-1 -right-1, rendered only when coloringRules.some(r => r.is_active) is true. Only touched the paintbrush button JSX — no export-related code modified.",
+  "notes": "Built 4 new PDF render functions in enhanced-pdf-sections.ts: renderPrioritizationMatrix (steps with effort_score/impact_score, quadrant classification), renderToolLandscape (tools grouped by status with cost summary), renderImprovements (improvement ideas sorted by priority/status), renderAIInsights (4 AI insight categories with severity). All follow the exact style of existing render functions (margin=15, dark background, drawTableHeader, newTablePage for overflow, alternating row shading). All 4 wired into handleEnhancedExportPdf in canvas-view.tsx with lazy data fetching (fetchTools for toolLandscape, fetchImprovementIdeas for improvements, workspace.settings.last_analysis cast as AIAnalysisResult for aiInsights, existing steps+sections state for prioritizationMatrix). Added Tool, ImprovementIdea, AIAnalysisResult type imports to enhanced-pdf-sections.ts. Added fetchTools and fetchImprovementIdeas to canvas-view.tsx client imports. Added AIAnalysisResult to canvas-view.tsx type imports. Changed useCallback dep from workspace.name to workspace to cover workspace.settings.last_analysis and resolve lint warning. The 4 new sections remain available:false in export-pdf-dialog.tsx (owned by slot 1) per special_instructions.",
 
   "failure_details": null
 }

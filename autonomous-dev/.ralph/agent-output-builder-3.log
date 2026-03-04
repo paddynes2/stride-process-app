@@ -1,17 +1,7 @@
-BUILD_RESULT_3.json written. Summary:
+Done. Task `#IMP-045` completed:
 
-**Task #BUG-035 — Status: `failed`**
-
-- **Blocker:** Supabase CLI is not authenticated on this machine. No access token exists in any standard location (`~/.config/supabase/access-token`, `AppData\Roaming\supabase\`, `SUPABASE_ACCESS_TOKEN` env var).
-- `npx supabase link` → `Unauthorized`  
-- `npx supabase db push` → `Cannot find project ref`
-- **Migration file is correct** — `supabase/migrations/024_step_tools.sql` uses `gen_random_uuid()`, has proper RLS policies, mirrors the step_roles pattern. No code changes needed.
-- **TypeScript:** passes clean (0 errors)
-- **Table status confirmed:** `GET /rest/v1/step_tools` returns 404 — table does not yet exist in remote schema.
-
-**Manual fix required (3 steps in any terminal):**
-```bash
-npx supabase login
-npx supabase link --project-ref tkcyxtxkmveipnwgrddd
-npx supabase db push
-```
+- Added `aria-label="Rule color picker"` to both `input[type="color"]` elements (add form + edit form)
+- Added `aria-label="Rule color hex value"` to both associated hex text inputs
+- TypeScript compiles cleanly (0 errors)
+- File staged: `src/components/canvas/coloring-panel.tsx`
+- BUILD_RESULT_3.json written

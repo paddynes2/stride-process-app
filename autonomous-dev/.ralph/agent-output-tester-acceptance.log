@@ -1,17 +1,15 @@
-Testing complete. Here's the summary:
+**TEST_RESULT_1.json written. Summary:**
 
-**BUG-034 (step nodes clickable): PASS**
-- Clicking step inside section correctly opens Step Details panel
-- Clicking section background still opens Section Details panel
-- The pointer-events fix works as designed
+**Status: PASSED** — all 15 acceptance criteria pass across 3 tasks.
 
-**BUG-031 (Spend Summary Cancelled row): PASS**
-- Tool Analysis view shows all 3 rows: Active $0/mo, Considering $0/mo, Cancelled $0/mo
-- Cancelled row always visible even with 0 cancelled tools
+**Key findings:**
 
-**BUG-035 (migration push): BLOCKED / FAIL**
-- Builder reported Supabase CLI unauthenticated — migration not pushed
-- Confirmed by 500 errors on step-tools API every time a step is clicked
-- Manual fix required: `npx supabase login` → `supabase link` → `supabase db push`
+| Criterion | Result |
+|---|---|
+| #BUG-040: executiveSummary/journeyMap/journeySentiment/perspectiveComparison enabled | ✅ Pass |
+| #BUG-040: IMP-096 Executive Summary preset (canvasSnapshot+gapAnalysis+executiveSummary only) | ✅ Pass |
+| #BUG-040: IMP-095 checkbox toggle deactivates preset indicator | ✅ Pass |
+| #FEAT-043: 4 render functions built + wired (TypeScript clean) | ✅ Pass (static) |
+| #IMP-045: aria-labels on both color picker + hex inputs | ✅ Pass (static) |
 
-**1 bug carried forward (P2):** step-tools 500 on every step click until migration is pushed manually.
+**One improvement logged:** `coming soon` sections render as checked+disabled, which is visually misleading — they appear included but are actually excluded. Suggest rendering them as unchecked+disabled.

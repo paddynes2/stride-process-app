@@ -226,7 +226,7 @@
 ### #FEAT-043 Enhanced PDF export — multi-section report
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 2
+**Attempts:** 3
 **Status:** in_progress
 **Acceptance criteria:**
 - [ ] Export dialog (replaces direct download) with toggleable sections
@@ -238,7 +238,7 @@
 **Sub-tasks:**
 - [x] [1/4] Export dialog UI with section toggles and presets — Done iteration 124, 2026-03-05 (pre-existing dialog + canonical type re-export)
 - [x] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison — Done iteration 125, 2026-03-05 (render functions built in enhanced-pdf-sections.ts, wired in canvas-view.tsx; NOTE: sections still available:false in dialog — BUG-040)
-- [ ] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights
+- [x] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights — Done iteration 126, 2026-03-05 (renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights built + wired; sections remain available:false in dialog — to enable next iteration)
 - [ ] [4/4] Page numbers, table of contents, consistent styling
 
 ### #FEAT-044 Phase 3b testing gate

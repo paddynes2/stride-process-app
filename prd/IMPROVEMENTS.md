@@ -308,7 +308,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Apply Load More pattern (offset pagination) from activity-view.tsx, default first 50 comments.
 
-- [ ] #IMP-045 Coloring panel color picker input lacks aria-label — Attempts: 0
+- [x] #IMP-045 Coloring panel color picker input lacks aria-label — Attempts: 1 — Done iteration 126, 2026-03-05
   - **Found:** Iteration 103 (regression tester)
   - **Category:** Accessibility
   - **Where:** `src/components/canvas/coloring-panel.tsx`
@@ -690,7 +690,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — users should understand why a feature is unavailable
   - **Suggested fix:** Add tooltip on disabled checkboxes: "Requires journey tab" or "Requires improvement ideas".
 
-- [ ] #IMP-095 Export dialog presets don't auto-switch to Custom on manual checkbox change — Attempts: 0
+- [x] #IMP-095 Export dialog presets don't auto-switch to Custom on manual checkbox change — Attempts: 1 — Done iteration 126, 2026-03-05 (already working — handleToggle calls setActivePreset('custom'))
   - **Found:** Iteration 124 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset button state
@@ -698,13 +698,21 @@
   - **Design principle:** Nielsen H4: Consistency and standards — preset systems typically auto-switch to "Custom" when user deviates
   - **Suggested fix:** When any checkbox state is manually changed, auto-activate the Custom preset button.
 
-- [ ] #IMP-096 Executive Summary preset config includes Data Table + Cost Analysis — should only enable canvasSnapshot + gapAnalysis + executiveSummary — Attempts: 0
+- [x] #IMP-096 Executive Summary preset config includes Data Table + Cost Analysis — should only enable canvasSnapshot + gapAnalysis + executiveSummary — Attempts: 1 — Done iteration 126, 2026-03-05 (already correct — EXECUTIVE_SUMMARY_CONFIG only enables canvasSnapshot + gapAnalysis + executiveSummary)
   - **Found:** Iteration 125 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — EXECUTIVE_SUMMARY_CONFIG
   - **What:** Executive Summary preset currently enables all 4 available sections (Canvas Snapshot, Data Table, Gap Analysis, Cost Analysis). Per spec, it should only enable canvasSnapshot + gapAnalysis + executiveSummary. Data Table and Cost Analysis add noise to a summary-oriented export.
   - **Design principle:** Nielsen H8: Aesthetic and minimalist design — presets should surface only what is relevant to the named use case
   - **Suggested fix:** Set `dataTable: false` and `costAnalysis: false` in EXECUTIVE_SUMMARY_CONFIG.
+
+- [ ] #IMP-097 Coming soon export sections shown as checked+disabled — should be unchecked+disabled — Attempts: 0
+  - **Found:** Iteration 126 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — available:false sections
+  - **What:** Sections with available:false render as checked+disabled checkboxes. A checked-but-disabled checkbox implies the feature is included but locked, when it cannot be included at all.
+  - **Design principle:** Nielsen H1: Visibility of system status — state should accurately reflect what will happen
+  - **Suggested fix:** Render available:false sections as unchecked+disabled, or hide them entirely.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

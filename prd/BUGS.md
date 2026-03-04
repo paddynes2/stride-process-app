@@ -182,7 +182,7 @@
   - **Steps to reproduce:** 1. Open canvas. 2. Click Export PDF. 3. Check browser console for aria-description warnings.
   - **Suggested fix:** Add `DialogDescription` to the dialog or set `aria-describedby={undefined}` on DialogContent to suppress.
 
-- [ ] #BUG-040 Export dialog SECTION_GROUPS still marks 4 new sections as available: false (P1) — Attempts: 0
+- [x] #BUG-040 Export dialog SECTION_GROUPS still marks 4 new sections as available: false (P1) — Attempts: 1 — Done iteration 126, 2026-03-05
   - **Found:** Iteration 125 (acceptance tester)
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — SECTION_GROUPS array
   - **What:** The 4 new PDF sections (executiveSummary, journeyMap, journeySentiment, perspectiveComparison) have render functions built in enhanced-pdf-sections.ts and wired in canvas-view.tsx, but SECTION_GROUPS still has `available: false` for all 4. Users see "coming soon" badges and cannot enable them. Handoff gap between slot 1 (owned export logic, deferred enabling to slot 3) and slot 3 (renamed presets but didn't flip available flag).

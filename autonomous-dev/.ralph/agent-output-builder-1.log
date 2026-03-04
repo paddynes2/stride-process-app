@@ -1,12 +1,16 @@
 Done. Summary:
 
-**#BUG-034 — Section overlay intercepting step node clicks**
+**BUG-040 / IMP-095 / IMP-096 — completed**
 
-Fix: Added `pointerEvents: "none"` to `section-node.tsx`'s main content div (merged into both heatmap and default style branches). Added `pointerEvents: "auto"` to three interactive children:
-- Perspective annotation dot
-- Section label flex row (name + maturity badge)  
-- Comment count badge
+Changes to `export-pdf-dialog.tsx`:
+- `executiveSummary`: `available: false` → `true`
+- `journeyMap`: `available: false` → `true`
+- `journeySentiment`: `available: false` → `true`
+- `perspectiveComparison`: `available: false` → `true`
+- `improvements` / `aiInsights` remain `false` (render functions not yet built)
 
-This lets click events on step nodes pass through the section's content div to React Flow's step node wrappers. Clicks on empty section background pass through the content div to the React Flow node wrapper (which still fires `onNodeClick` for section selection).
+**IMP-096** (Executive Summary preset): `EXECUTIVE_SUMMARY_CONFIG` was already correct — `dataTable` and `costAnalysis` are already `false`. No change needed.
 
-**Verification:** TypeScript clean (no output), ESLint 0 errors (1 pre-existing warning in unowned file).
+**IMP-095** (auto-switch to Custom): `handleToggle` already calls `setActivePreset("custom")` — since "custom" doesn't match any preset button's `id`, all preset buttons deactivate automatically. No change needed.
+
+Type-check: clean. Lint: no errors (1 pre-existing warning in unrelated file).

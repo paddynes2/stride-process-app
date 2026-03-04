@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 125,
-  "date": "2026-03-05T06:00:00Z",
+  "iteration": 126,
+  "date": "2026-03-05T07:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "a8da406",
+    "last_commit_hash": "f9035f870dc3cb11283fb3e5202c6b7b58f150e5",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,150 +13,111 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-043 [2/4]",
-      "description": "New PDF sections: executive summary, journey map, journey sentiment, perspective comparison. Add 4 new render functions to src/lib/export/pdf.ts that the export dialog can invoke. Executive summary = key metrics card page (sections, steps, maturity avg, gap count, cost totals). Journey map = canvas snapshot + touchpoint table (reuse journey-pdf.ts patterns). Journey sentiment = sentiment distribution bar + pain ranking table. Perspective comparison = divergence table with ratings per perspective.",
-      "source": "prd/FEATURES.md",
-      "type": "build",
+      "id": "#BUG-040",
+      "description": "Enable 4 new export sections (flip available:false → true for executiveSummary, journeyMap, journeySentiment, perspectiveComparison). Also fix IMP-096 (Executive Summary preset config — should only enable canvasSnapshot + gapAnalysis + executiveSummary, not dataTable + costAnalysis) and IMP-095 (auto-switch to Custom preset when user manually toggles a checkbox after selecting a preset).",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "L",
+      "complexity": "S",
       "attempts": 1,
       "risk_score": 1,
       "acceptance_criteria": [
-        "New exported function renderExecutiveSummary(pdf, options) in src/lib/export/pdf.ts — adds page with key metrics: total sections, total steps, avg maturity, steps below target, total monthly hours, total monthly cost, top 3 gaps",
-        "New exported function renderJourneyMap(pdf, options) — adds journey canvas snapshot page + touchpoint details table (reuse patterns from journey-pdf.ts)",
-        "New exported function renderJourneySentiment(pdf, options) — adds sentiment distribution bar + pain point ranking table (reuse journey-pdf.ts patterns)",
-        "New exported function renderPerspectiveComparison(pdf, options) — adds perspective comparison table with columns: element name, perspective A rating, perspective B rating, divergence. Highlight rows with divergence >= 2",
-        "Export dialog SECTION_GROUPS marks executiveSummary, journeyMap, journeySentiment, perspectiveComparison as available: true",
-        "canvas-view.tsx onExport handler reads ExportConfig and calls the new render functions when their flags are true",
-        "Each new section starts on a new page with dark background and consistent heading style matching existing sections",
-        "TypeScript compiles with no errors"
+        "executiveSummary, journeyMap, journeySentiment, perspectiveComparison all have available: true in SECTION_GROUPS",
+        "All 4 sections appear enabled (no 'coming soon' badge) in the Export PDF dialog",
+        "Selecting 'Executive Summary' preset only enables canvasSnapshot, gapAnalysis, and executiveSummary — NOT dataTable or costAnalysis",
+        "Toggling any checkbox while a preset is active auto-switches the active preset indicator to show no preset is active (or 'Custom' if a custom state exists)",
+        "TypeScript compiles cleanly"
       ],
-      "files_owned": [
-        "src/lib/export/pdf.ts",
-        "src/lib/export/enhanced-pdf-sections.ts",
-        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
-      ],
-      "files_read_only": [
-        "src/lib/export/journey-pdf.ts",
-        "src/lib/export/comparison-pdf.ts",
-        "src/components/panels/export-pdf-dialog.tsx",
-        "src/types/database.ts",
-        "src/types/export.ts",
-        "src/lib/maturity.ts",
-        "src/lib/pain.ts"
-      ],
-      "context": {
-        "similar_files": [
-          "src/lib/export/journey-pdf.ts",
-          "src/lib/export/comparison-pdf.ts"
-        ],
-        "patterns_to_follow": [
-          "Dark background pages: pdf.setFillColor(10,10,11); pdf.rect(0,0,pageWidth,pageHeight,'F')",
-          "Section headings: helvetica bold 14pt white",
-          "Summary stat cards: roundedRect with bold number + small uppercase label",
-          "Table headers: drawTableHeader() helper",
-          "Alternating row backgrounds: rowIndex%2 === 0 → fillColor(14,14,15)",
-          "Page overflow: check y > pageHeight - margin - 5 before each row",
-          "Color indicators: 1.2 radius circles before text values"
-        ],
-        "learnings_relevant": [
-          "apiFetch unwraps envelope — client functions return T directly",
-          "Canvas null guards: (arr ?? []).filter(Boolean) before .map()"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] (canvas view export)"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "This is the largest sub-task of FEAT-043. Create a new file src/lib/export/enhanced-pdf-sections.ts for the 4 new render functions to keep pdf.ts manageable. Each function takes (pdf: jsPDF, data, pageConfig) and adds pages. The export dialog already has the section toggles — just change available: false to available: true for the 4 sections. canvas-view.tsx must fetch the additional data (perspectives, annotations, journey data) when those sections are enabled and pass it to the render functions. Use the EXISTING patterns from journey-pdf.ts and comparison-pdf.ts — do NOT invent new styling. Executive summary is pure computation from steps/sections already available. Journey sections need stages/touchpoints data. Perspective comparison needs perspectives + annotations data."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-023",
-      "description": "Add active indicator dot on paintbrush button when coloring rules are active. Small teal dot in top-right corner of button.",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3b",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Paintbrush button in canvas-view.tsx shows a small dot indicator (e.g., 6px teal circle) when any active coloring rule exists",
-        "Dot is positioned at top-right corner of the button (absolute positioning within relative container)",
-        "No dot when coloringRules is empty or all rules are inactive (is_active=false)",
-        "TypeScript compiles"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
-      ],
-      "files_read_only": [
-        "src/components/canvas/coloring-panel.tsx"
-      ],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "Comment/task count badges use absolute positioned small circles",
-          "Brand teal: var(--brand) / #14B8A6"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId]"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "canvas-view.tsx already has coloringRules state. Check if any rule has is_active=true. Add a relative wrapper around the paintbrush button and an absolute-positioned small teal dot. NOTE: Slot 1 also owns canvas-view.tsx. This slot should ONLY touch the paintbrush button JSX — add a relative wrapper and dot indicator. Do NOT modify any export-related code in canvas-view.tsx."
-    },
-    {
-      "slot": 3,
-      "id": "#BUG-038",
-      "description": "Fix export dialog preset names: Quick Summary → Executive Summary, Full Report → Full Audit, Custom → Gap Report (or add as 4th). Also fix BUG-039: add DialogDescription or aria-describedby={undefined} to suppress Radix warnings.",
-      "source": "prd/BUGS.md",
-      "type": "fix",
-      "phase": "Phase 3b",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Preset buttons labeled: 'Executive Summary', 'Full Audit', 'Gap Report' matching FEAT-043 spec",
-        "Executive Summary preset: canvasSnapshot + gapAnalysis + executiveSummary (when available)",
-        "Full Audit preset: all available sections enabled",
-        "Gap Report preset: canvasSnapshot + gapAnalysis + perspectiveComparison + improvements (when available)",
-        "No Radix aria-describedby console warnings when dialog opens (BUG-039)",
-        "TypeScript compiles"
-      ],
-      "files_owned": [
-        "src/components/panels/export-pdf-dialog.tsx"
-      ],
+      "files_owned": ["src/components/panels/export-pdf-dialog.tsx"],
       "files_read_only": [],
       "context": {
         "similar_files": [],
-        "patterns_to_follow": [
-          "Existing Radix Dialog pattern: DialogDescription already imported and used"
-        ],
-        "learnings_relevant": [
-          "BUG-023 pattern: use DialogPrimitive.Title for a11y"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] (export dialog)"
-        ]
+        "patterns_to_follow": ["SECTION_GROUPS array has { key, label, available } objects", "Preset configs are typed ExportConfig objects at module scope"],
+        "learnings_relevant": [],
+        "affected_urls": ["/w/[workspaceId]/[tabId] (Export PDF dialog)"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Rename the 3 presets to match spec. Update the config objects: EXECUTIVE_SUMMARY_CONFIG should enable executiveSummary + canvasSnapshot + gapAnalysis. FULL_AUDIT_CONFIG should enable everything. GAP_REPORT_CONFIG should enable canvasSnapshot + gapAnalysis + perspectiveComparison + improvements. The preset type should change from 'quick'|'full'|'custom' to 'executive'|'full'|'gap'. For BUG-039, a DialogDescription already exists in the dialog — the warning may be from a second nested dialog or from the content not being properly associated. Check if aria-describedby={undefined} on DialogContent suppresses it, or ensure DialogDescription is rendered. IMP-095 (auto-Custom) is already handled by the existing handleToggle which calls setActivePreset('custom') — verify this still works after rename."
+      "special_instructions": "Lines 101, 102, 103, 109, 110, 111, 112, 113: change available: false to available: true for executiveSummary, journeyMap, journeySentiment, perspectiveComparison. Lines 102-103 (improvements, aiInsights) should stay available: false — those render functions don't exist yet (being built in slot 2). For IMP-096: update EXECUTIVE_SUMMARY_CONFIG to only set canvasSnapshot, gapAnalysis, executiveSummary to true, everything else false. For IMP-095: in handleToggle or wherever checkbox change is handled, clear the active preset state so no preset button appears selected."
+    },
+    {
+      "slot": 2,
+      "id": "#FEAT-043 [3/4]",
+      "description": "Build 4 new PDF render functions: renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights. Wire them into handleEnhancedExportPdf in canvas-view.tsx. These sections use existing data types (Step with effort_score/impact_score, Tool with status/monthly_cost, ImprovementIdea with status/priority, AIAnalysisResult from workspace settings).",
+      "source": "prd/FEATURES.md",
+      "type": "build",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "M",
+      "attempts": 1,
+      "risk_score": 2,
+      "acceptance_criteria": [
+        "renderPrioritizationMatrix function exists and renders steps with effort_score/impact_score in a table or quadrant summary",
+        "renderToolLandscape function exists and renders tools grouped by status with cost summary",
+        "renderImprovements function exists and renders improvement ideas grouped by status/priority",
+        "renderAIInsights function exists and renders AI analysis results (bottlenecks, redundancies, automation, general)",
+        "All 4 functions are wired into handleEnhancedExportPdf in canvas-view.tsx with lazy data fetching",
+        "Export config keys prioritizationMatrix, toolLandscape, improvements, aiInsights control inclusion",
+        "TypeScript compiles cleanly"
+      ],
+      "files_owned": ["src/lib/export/enhanced-pdf-sections.ts", "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"],
+      "files_read_only": [
+        "src/types/database.ts",
+        "src/lib/api/client.ts",
+        "src/components/panels/export-pdf-dialog.tsx"
+      ],
+      "context": {
+        "similar_files": ["src/lib/export/enhanced-pdf-sections.ts (existing 4 render functions to match style)"],
+        "patterns_to_follow": [
+          "Each render function: adds new page, renders section header, renders content tables/cards, returns void",
+          "Data interfaces defined at top of enhanced-pdf-sections.ts",
+          "canvas-view.tsx handleEnhancedExportPdf: lazy-imports enhanced-pdf-sections, fetches data conditionally based on config, calls render functions in sequence",
+          "Fetch data from API client functions (fetchImprovementIdeas, fetchTools, etc.) — check client.ts for existing wrappers"
+        ],
+        "learnings_relevant": ["apiFetch unwraps envelope — returns T directly"],
+        "affected_urls": ["/w/[workspaceId]/[tabId] (Export PDF with new sections)"]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "Follow the exact style of the existing 4 render functions in enhanced-pdf-sections.ts. Use the same PDF layout patterns (margins, fonts, colors, table rendering). For AI insights, the data is stored in workspace.settings.last_analysis (JSONB). For prioritization, use steps with effort_score/impact_score. For tools, use Tool[] with status/monthly_cost. For improvements, use ImprovementIdea[]. All data should be fetched lazily in canvas-view.tsx only when the corresponding config flag is true. After building render functions, flip the remaining 4 sections to available: true in export-pdf-dialog.tsx — BUT WAIT: export-pdf-dialog.tsx is owned by slot 1. Instead, add these sections to available:true ONLY in enhanced-pdf-sections.ts exports and canvas-view.tsx wiring. Slot 1 is NOT flipping these 4 to true (they stay false until render functions exist). Once this slot builds the render functions, the sections need to be enabled. RESOLUTION: This slot should ALSO modify export-pdf-dialog.tsx to flip improvements, aiInsights, prioritizationMatrix, toolLandscape to available: true. OWNERSHIP CONFLICT — moving export-pdf-dialog.tsx to shared_files with slot 1 as owner. Slot 2 must NOT modify export-pdf-dialog.tsx. Instead, leave those 4 as available: false for now — they'll be enabled in the next iteration once render functions are verified."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-045",
+      "description": "Add aria-label to color picker input in coloring panel for WCAG 1.3.1 compliance.",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "input[type='color'] in coloring-panel.tsx has aria-label='Rule color picker' or similar descriptive label",
+        "Associated hex text input has aria-label describing its purpose",
+        "TypeScript compiles cleanly"
+      ],
+      "files_owned": ["src/components/canvas/coloring-panel.tsx"],
+      "files_read_only": [],
+      "context": {
+        "similar_files": ["src/app/(app)/w/[workspaceId]/settings/page.tsx (IMP-002 color picker a11y pattern)"],
+        "patterns_to_follow": ["Use aria-label on native input elements per WCAG 1.3.1"],
+        "learnings_relevant": [],
+        "affected_urls": ["/w/[workspaceId]/[tabId] (coloring panel overlay)"]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "Simple a11y fix. Find the <input type='color'> element(s) in coloring-panel.tsx and add aria-label. Also check if the associated hex text input needs an aria-label."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/types/index.ts"],
-    "owner": null,
-    "note": "canvas-view.tsx is shared between slot 1 and slot 2 — slot 1 owns export logic changes, slot 2 owns paintbrush button indicator only. Non-overlapping regions."
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts"],
+    "owner": "#BUG-040",
+    "note": "export-pdf-dialog.tsx is owned by slot 1 (#BUG-040). Slot 2 may READ it but must NOT modify it. The 4 new sections (improvements, aiInsights, prioritizationMatrix, toolLandscape) will remain available: false until next iteration when render functions are verified."
   },
-  "merge_order": ["#BUG-038", "#IMP-023", "#FEAT-043 [2/4]"],
+  "merge_order": ["#BUG-040", "#FEAT-043 [3/4]", "#IMP-045"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Last regression was iteration 120 (5 iterations ago). Risk score is 1. No regression trigger.",
+    "regression_reason": null,
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },

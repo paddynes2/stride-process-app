@@ -1,1 +1,17 @@
-Done. The fix removes the `{spendByStatus.cancelled > 0 && (...)}` conditional and adds Cancelled as a standard grid item matching Active/Considering styling. TypeScript and lint both pass clean.
+Build complete. Here's what was done:
+
+**`src/lib/export/enhanced-pdf-sections.ts`** — Added 4 new render functions:
+- `renderPrioritizationMatrix` — steps with `effort_score`/`impact_score`, classified into quadrants (Quick Win / Major Project / Fill In / Thankless Task), sorted by quadrant priority
+- `renderToolLandscape` — tools grouped by status (active/considering/cancelled), monthly cost summary cards, sorted by status then name
+- `renderImprovements` — improvement ideas sorted by priority (critical→low) then status, with colored status/priority dots
+- `renderAIInsights` — 4 AI insight categories (bottlenecks, redundancies, automation candidates, maturity recommendations) in a flat table with severity dots
+
+All follow the exact style of existing render functions: landscape A4, dark background, `drawTableHeader`, `newTablePage` overflow, alternating row shading.
+
+**`src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`** — Wired all 4 into `handleEnhancedExportPdf` with lazy fetching:
+- `prioritizationMatrix` → uses existing `steps`/`sections` state (no fetch needed)
+- `toolLandscape` → `fetchTools(workspaceId)` 
+- `improvements` → `fetchImprovementIdeas(workspaceId)`
+- `aiInsights` → `workspace.settings.last_analysis` cast as `AIAnalysisResult`
+
+TypeScript: ✅ clean. Lint: ✅ 0 errors (1 pre-existing warning in flow-canvas.tsx unchanged).
