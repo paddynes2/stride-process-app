@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { GapAnalysisView } from "./gap-analysis-view";
+
+export const metadata: Metadata = { title: "Gap Analysis" };
 
 export default async function GapAnalysisPage({
   params,

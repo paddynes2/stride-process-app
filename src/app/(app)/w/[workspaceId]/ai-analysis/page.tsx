@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AIAnalysisView } from "./ai-analysis-view";
 import type { AIAnalysisResult } from "@/types/database";
+
+export const metadata: Metadata = { title: "AI Analysis" };
 
 export default async function AIAnalysisPage({
   params,

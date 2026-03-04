@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { DashboardView } from "./dashboard-view";
+
+export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function DashboardPage({
   params,

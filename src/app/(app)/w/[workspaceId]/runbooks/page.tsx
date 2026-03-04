@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { RunbooksListView, type RunbookWithRelations } from "./runbooks-list-view";
+
+export const metadata: Metadata = { title: "Runbooks" };
 
 export default async function RunbooksPage({
   params,

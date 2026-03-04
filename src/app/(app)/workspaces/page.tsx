@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkspaceList } from "./workspace-list";
+
+export const metadata: Metadata = { title: "Workspaces" };
 
 export default async function WorkspacesPage() {
   const supabase = await createClient();

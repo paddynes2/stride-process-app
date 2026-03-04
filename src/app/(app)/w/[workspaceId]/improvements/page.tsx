@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ImprovementsView } from "./improvements-view";
 import type { ImprovementIdea } from "@/types/database";
+
+export const metadata: Metadata = { title: "Improvements" };
 
 export default async function ImprovementsPage({
   params,

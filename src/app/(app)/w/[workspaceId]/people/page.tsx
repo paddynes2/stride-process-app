@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { PeopleView } from "./people-view";
+
+export const metadata: Metadata = { title: "People" };
 
 export default async function PeoplePage({
   params,

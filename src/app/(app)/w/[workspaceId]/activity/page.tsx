@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ActivityView } from "./activity-view";
 import type { ActivityLog } from "@/types/database";
+
+export const metadata: Metadata = { title: "Activity" };
 
 export default async function ActivityPage({
   params,

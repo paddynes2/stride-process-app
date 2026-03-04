@@ -19,7 +19,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stride — Process Mapping & Continuous Improvement",
+  title: {
+    template: "%s — Stride",
+    default: "Stride — Process Mapping & Continuous Improvement",
+  },
   description: "Map it, score it, fix it, run it. The operating system for business process improvement.",
 };
 
