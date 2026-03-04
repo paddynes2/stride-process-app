@@ -810,7 +810,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Add `aria-label` and `title` attribute clarifying the button's action; confirm whether `type="submit"` is intentional.
 
-- [ ] #IMP-111 Tools canvas toolbar Analysis button is one-way navigation — Attempts: 0
+- [x] #IMP-111 Tools canvas toolbar Analysis button is one-way navigation — Attempts: 1 — DONE iteration 138
   - **Found:** Iteration 133 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — toolbar Panel
@@ -850,7 +850,7 @@
   - **Design principle:** WCAG 2.2 1.3.1 Info and Relationships
   - **Suggested fix:** Add `aria-label="Perspectives comparison"` to the table element.
 
-- [ ] #IMP-116 PDF custom mode disabled section guidance — Attempts: 0
+- [x] #IMP-116 PDF custom mode disabled section guidance — Attempts: 1 — DONE iteration 138
   - **Found:** Iteration 134 (regression tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — custom mode
@@ -866,13 +866,21 @@
   - **Design principle:** Nielsen H6: Recognition over recall
   - **Suggested fix:** Add empty-state hint in Step Usage section when a tool has no linked steps (e.g., 'No steps linked yet. Open a step on the canvas and assign this tool.').
 
-- [ ] #IMP-118 AI Suggestions "last generated" label lacks exact datetime tooltip — Attempts: 0
+- [x] #IMP-118 AI Suggestions "last generated" label lacks exact datetime tooltip — Attempts: 1 — DONE iteration 138 (bundled with BUG-055)
   - **Found:** Iteration 137 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` — "Last generated X ago" label
   - **What:** The relative time label (e.g., "2h ago") has no tooltip showing the exact datetime. Users cannot determine the precise generation time.
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Add a `title` attribute or Tooltip component showing the full ISO datetime in user locale.
+
+- [ ] #IMP-119 Export PDF dialog custom mode has no explicit toggle button — Attempts: 0
+  - **Found:** Iteration 138 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset buttons area
+  - **What:** Custom mode is only triggered implicitly when a user clicks a section checkbox. There is no visual affordance that custom mode exists or how to activate it. Users may not discover they can build a custom export.
+  - **Design principle:** Nielsen H6: Recognition over recall — users should see options rather than have to discover hidden interaction patterns
+  - **Suggested fix:** Add a 'Custom' button alongside the preset buttons (Executive Summary, Full Audit, Gap Report) so users can explicitly enter custom selection mode.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

@@ -1,1 +1,1 @@
-CONTINUE: Fix BUG-055 (hydration mismatch on improvements page — move localStorage read to useEffect), then continue improvement backlog
+CONTINUE: Continue improvement backlog — pick from remaining items (IMP-005, IMP-010, IMP-038, IMP-119, or other medium/high priority)

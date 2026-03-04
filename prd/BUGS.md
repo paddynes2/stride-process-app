@@ -288,7 +288,7 @@
   - **Suggested fix:** Add `aria-label="Tool cost breakdown"` to the `<table>` element.
   - **Fix applied:** Added `aria-label="Tool cost breakdown"` to `<table>` element at line 288.
 
-- [ ] #BUG-055 Hydration mismatch on Improvements page when localStorage has AI suggestions timestamp (P2) — Attempts: 0
+- [x] #BUG-055 Hydration mismatch on Improvements page when localStorage has AI suggestions timestamp (P2) — Attempts: 1 — DONE iteration 138
   - **Found:** Iteration 137 (acceptance tester)
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` — `lastGeneratedAt` useState initializer
   - **What:** `useState` initializer reads `localStorage` via `typeof window === "undefined"` check. Server renders `null` (no label), client first render returns stored timestamp (renders label span). React reports hydration mismatch. Page functions correctly after client-side recovery but console error appears.

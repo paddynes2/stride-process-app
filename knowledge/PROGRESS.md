@@ -2630,3 +2630,32 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders succeeded cleanly, zero merge failures
 - Observations: 2 (hydration bug, tooltip improvement)
 **Notes:** Source changes committed via ralph merge commits. Reviewer tagged and updated docs.
+
+## Iteration 138 — 2026-03-06 04:30
+**Tasks:**
+- #BUG-055 Fix hydration mismatch on improvements page (+ #IMP-118 datetime tooltip) — slot 1 — completed
+- #IMP-111 Add "Canvas" back-button in tools analysis view — slot 2 — completed
+- #IMP-116 Add custom mode guidance text in export PDF dialog — slot 3 — completed
+**Source:** prd/BUGS.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx (moved localStorage read to useEffect, added title tooltip)
+- src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (added ChevronLeft back-button bar in analysis view)
+- src/components/panels/export-pdf-dialog.tsx (added unavailableCount, conditional guidance text in custom mode)
+**Verification:**
+- Type check: pass (all 3 builders, post-merge tsc)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A
+- Browser test: pass (acceptance tester verified 10/11 criteria — 1 fail was action budget exhaustion on IMP-116 custom mode, code confirmed correct via diff review)
+- Canary test: skipped (changes are in secondary views)
+**Bugs found:** None
+**Improvements found:** 1 — #IMP-119 (export PDF custom mode has no explicit toggle button)
+**Self-score:**
+- Code quality: 5 — All 3 changes are minimal, correct, follow existing patterns
+- Test coverage: 4 — Acceptance tester verified 10/11 criteria; IMP-116 custom mode not browser-verified (action budget) but code review confirms correctness
+- Confidence: 5 — BUG-055 fix is the standard SSR pattern, IMP-111/IMP-116 are additive UI-only
+- Efficiency: 5 — All 3 builders succeeded cleanly, zero merge failures
+- Observations: 1 (custom mode discoverability)
+**Notes:** Source changes committed via ralph merge commits. IMP-118 bundled with BUG-055 in slot 1.
