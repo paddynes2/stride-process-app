@@ -555,7 +555,7 @@ export function ToolsCanvasView({
                 title={showAnalysis ? "Back to canvas" : "Tool Analysis"}
                 className={
                   showAnalysis
-                    ? "flex items-center gap-1.5 px-2 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--accent-blue)]/15 text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/25 transition-colors"
+                    ? "flex items-center gap-1.5 px-2 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--brand)]/20 text-[var(--brand)] hover:bg-[var(--brand)]/30 transition-colors"
                     : "flex items-center gap-1.5 px-2 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--bg-surface-active)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 }
               >
