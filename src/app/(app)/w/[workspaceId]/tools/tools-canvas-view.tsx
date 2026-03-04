@@ -141,6 +141,10 @@ export function ToolsCanvasView({
   >(null);
   const [showAnalysis, setShowAnalysis] = React.useState(false);
 
+  // Track anticipated bottom Y so rapid clicks don't produce overlapping sections
+  // (toolSections state may be stale between clicks before React re-renders)
+  const nextSectionYRef = React.useRef<number>(0);
+
   // Stable resize callback passed through node data
   const handleSectionResizeEnd = React.useCallback(
     (sectionId: string, width: number, height: number) => {
@@ -344,10 +348,20 @@ export function ToolsCanvasView({
       const SECTION_HEIGHT = 300;
       const SECTION_GAP = 50;
       const newX = 50;
-      const newY =
+
+      // Take the greater of: current sections' max bottom, or last pending assignment.
+      // The ref guards against overlap when the button is clicked rapidly before
+      // React re-renders and the closure's toolSections state is still stale.
+      const existingMaxBottom =
         toolSections.length > 0
-          ? Math.max(...toolSections.map((s) => s.position_y + s.height)) + SECTION_GAP
-          : 50;
+          ? Math.max(...toolSections.map((s) => s.position_y + s.height))
+          : 0;
+      const baseY = Math.max(existingMaxBottom, nextSectionYRef.current);
+      const newY = baseY > 0 ? baseY + SECTION_GAP : 50;
+
+      // Update ref immediately (before await) so the next rapid click sees this Y
+      nextSectionYRef.current = newY + SECTION_HEIGHT;
+
       const ts = await createToolSection({
         workspace_id: workspaceId,
         name: "New Group",
