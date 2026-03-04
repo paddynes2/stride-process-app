@@ -279,9 +279,21 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
               <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
                 <Sparkles className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" />
                 <p className="text-[13px] text-[var(--text-secondary)] flex-1">
-                  {hasGapData
-                    ? "Generate a consulting-grade narrative summary of this gap analysis."
-                    : "Score steps to enable AI narrative."}
+                  {hasGapData ? (
+                    "Generate a consulting-grade narrative summary of this gap analysis."
+                  ) : firstProcessTab ? (
+                    <>
+                      <Link
+                        href={`/w/${workspaceId}/${firstProcessTab.id}`}
+                        className="text-[var(--accent-blue)] hover:underline"
+                      >
+                        Open the canvas to set maturity scores on steps
+                      </Link>
+                      {" "}to enable gap analysis and AI narrative →
+                    </>
+                  ) : (
+                    "Open the canvas to set maturity scores on steps to enable gap analysis and AI narrative."
+                  )}
                 </p>
                 <button
                   onClick={handleGenerateNarrative}
@@ -297,16 +309,6 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
                   Generate Summary
                 </button>
               </div>
-              {!hasGapData && firstProcessTab && (
-                <p className="mt-2 text-[12px] text-[var(--text-tertiary)]">
-                  <Link
-                    href={`/w/${workspaceId}/${firstProcessTab.id}`}
-                    className="text-[var(--accent-blue)] hover:underline"
-                  >
-                    Open the canvas to set maturity scores →
-                  </Link>
-                </p>
-              )}
             </>
           )}
 
