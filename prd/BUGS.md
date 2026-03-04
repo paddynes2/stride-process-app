@@ -263,3 +263,24 @@
   - **What:** The steps data table has no `<caption>`, `aria-label`, or `aria-labelledby`. Screen readers announce it as an unlabeled table.
   - **Steps to reproduce:** 1. Navigate to /list. 2. Inspect `<table>` element — no caption, aria-label, or aria-labelledby attribute.
   - **Fix applied:** Added `aria-label="Steps"` to the `<table>` element.
+
+- [ ] #BUG-052 Export PDF dialog close button has no accessible name (P2) — Attempts: 0
+  - **Found:** Iteration 134 (acceptance tester)
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — dialog close button (top-right X)
+  - **What:** The close button has no text content, no aria-label, and no aria-labelledby. Fails WCAG 2.1 SC 4.1.2 (Name, Role, Value). Screen readers cannot announce the button's purpose.
+  - **Steps to reproduce:** 1. Navigate to workflow canvas. 2. Click 'Export PDF' toolbar button. 3. Inspect the 'X' close button in top-right of dialog. 4. Run accessibility audit — button-no-label violation reported.
+  - **Suggested fix:** Add `aria-label="Close"` to the dialog close button.
+
+- [ ] #BUG-053 Gap analysis table lacks aria-label (P2) — Attempts: 0
+  - **Found:** Iteration 134 (regression tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx` — ranking table (~line 444)
+  - **What:** The gap analysis ranking table has no aria-label, making it inaccessible to screen readers. The step-list table was fixed (BUG-051) but this table was missed.
+  - **Steps to reproduce:** 1. Navigate to /w/[workspaceId]/gap-analysis. 2. Use a screen reader or accessibility audit. 3. Observe table has no accessible name.
+  - **Suggested fix:** Add `aria-label="Gap analysis ranking"` to the `<table>` element.
+
+- [ ] #BUG-054 Tool analysis cost breakdown table lacks aria-label (P2) — Attempts: 0
+  - **Found:** Iteration 134 (regression tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — cost breakdown table (~line 288)
+  - **What:** Newly added feature table has no aria-label. Screen readers cannot announce the table's purpose.
+  - **Steps to reproduce:** 1. Navigate to /w/[workspaceId]/tools. 2. Click 'Analysis' button. 3. Use a screen reader — table has no accessible name.
+  - **Suggested fix:** Add `aria-label="Tool cost breakdown"` to the `<table>` element.

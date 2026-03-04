@@ -818,5 +818,45 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Either render the toolbar panel inside the analysis view with 'Canvas' button, or accept current behavior since sidebar toggle serves the return path.
 
+- [ ] #IMP-112 Tool Analysis panel transition animation — Attempts: 0
+  - **Found:** Iteration 134 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/` — Tool Analysis panel
+  - **What:** The Tool Analysis panel opens abruptly with no visual animation or transition. It replaces the canvas summary panel without signaling the state change.
+  - **Design principle:** Nielsen H1: Visibility of system status — transitions should signal state changes
+  - **Suggested fix:** Add a fade-in or slide-in animation to the analysis panel.
+
+- [ ] #IMP-113 PDF export preset buttons should show section contents on hover — Attempts: 0
+  - **Found:** Iteration 134 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset buttons
+  - **What:** The PDF export preset buttons (Executive Summary, Full Audit, Gap Report) do not show which sections each preset selects before clicking. User must click each to discover the preset configuration.
+  - **Design principle:** Nielsen H6: Recognition rather than recall — show preset contents on hover
+  - **Suggested fix:** Add a tooltip or description below each preset button listing the sections it includes.
+
+- [ ] #IMP-114 AI Regenerate button disabled state needs explanatory tooltip — Attempts: 0
+  - **Found:** Iteration 134 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/` — Regenerate button
+  - **What:** The Regenerate button is disabled when hasSteps=false but only shows cursor:not-allowed with no explanation of why.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Add tooltip: 'Add steps to the canvas before running AI analysis'.
+
+- [ ] #IMP-115 Perspectives comparison table missing aria-label — Attempts: 0
+  - **Found:** Iteration 134 (regression tester)
+  - **Category:** Accessibility
+  - **Where:** `src/app/(app)/w/[workspaceId]/compare/perspectives-compare-view.tsx` — comparison table (~line 388)
+  - **What:** Same missing aria-label pattern as gap analysis and tool analysis tables.
+  - **Design principle:** WCAG 2.2 1.3.1 Info and Relationships
+  - **Suggested fix:** Add `aria-label="Perspectives comparison"` to the table element.
+
+- [ ] #IMP-116 PDF custom mode disabled section guidance — Attempts: 0
+  - **Found:** Iteration 134 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — custom mode
+  - **What:** The maskedCount unavailability hint only appears when using a named preset. In custom mode, disabled sections have individual tooltips but there's no top-level guidance about why certain sections remain disabled.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Verify individual disabled tooltips are visible on hover/focus in browser. If so, no change needed.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->
