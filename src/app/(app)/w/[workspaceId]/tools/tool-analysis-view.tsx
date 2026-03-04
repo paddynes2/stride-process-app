@@ -121,7 +121,7 @@ export function ToolAnalysisView({
           <h2 className="text-[13px] font-semibold text-[var(--text-primary)] mb-3">
             Spend Summary
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
                 Monthly Total
@@ -138,29 +138,36 @@ export function ToolAnalysisView({
                 ${totalAnnual.toLocaleString()}
               </p>
             </div>
-            <div>
-              <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
-                Active
-              </p>
-              <p className="text-[16px] font-semibold text-[var(--success)]">
-                ${spendByStatus.active.toLocaleString()}/mo
-              </p>
-            </div>
-            <div>
-              <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
-                Considering
-              </p>
-              <p className="text-[16px] font-semibold text-[var(--warning)]">
-                ${spendByStatus.considering.toLocaleString()}/mo
-              </p>
-            </div>
-            <div>
-              <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
-                Cancelled
-              </p>
-              <p className="text-[16px] font-semibold text-[var(--text-tertiary)]">
-                ${spendByStatus.cancelled.toLocaleString()}/mo
-              </p>
+          </div>
+          <div className="mt-4 pt-3 border-t border-[var(--border-subtle)]">
+            <p className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide mb-3">
+              By Status
+            </p>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
+                  Active
+                </p>
+                <p className="text-[16px] font-semibold text-[var(--success)]">
+                  ${spendByStatus.active.toLocaleString()}/mo
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
+                  Considering
+                </p>
+                <p className="text-[16px] font-semibold text-[var(--warning)]">
+                  ${spendByStatus.considering.toLocaleString()}/mo
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wide mb-1">
+                  Cancelled
+                </p>
+                <p className="text-[16px] font-semibold text-[var(--text-tertiary)]">
+                  ${spendByStatus.cancelled.toLocaleString()}/mo
+                </p>
+              </div>
             </div>
           </div>
         </div>
