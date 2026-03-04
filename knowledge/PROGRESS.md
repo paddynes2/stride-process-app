@@ -2481,3 +2481,39 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed successfully, all merged cleanly, 7 bugs resolved in one iteration.
 - Observations: 0
 **Notes:** Resolves all P1 accessibility bugs from iteration 131 audit (BUG-045, BUG-046, BUG-047) plus 4 P2 bugs (BUG-044, BUG-049, BUG-050, BUG-051). Only BUG-048 (dynamic page titles) remains from the accessibility audit — deferred as cross-cutting concern.
+
+## Iteration 133 — 2026-03-05 22:00
+**Tasks:**
+- #BUG-048 Dynamic page titles via generateMetadata — slot 1 — completed
+- #IMP-106 Preset masked sections info note in export dialog — slot 2 — completed
+- #IMP-104 Analysis toggle button in tools canvas toolbar — slot 3 — completed
+**Source:** prd/BUGS.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/app/layout.tsx (title template)
+- src/app/(app)/w/[workspaceId]/layout.tsx (generateMetadata with workspace name)
+- src/app/(app)/w/[workspaceId]/[tabId]/page.tsx (generateMetadata with tab name)
+- src/app/(app)/w/[workspaceId]/{activity,ai-analysis,comments,compare,dashboard,gap-analysis,improvements,list,people,prioritization,runbooks,teams,tools}/page.tsx (static metadata)
+- src/app/(app)/workspaces/page.tsx (static metadata)
+- src/app/(auth)/login/page.tsx (static metadata)
+- src/app/(auth)/signup/page.tsx (refactored to server component)
+- src/app/(auth)/signup/signup-form.tsx (new — extracted client component)
+- src/components/panels/export-pdf-dialog.tsx (masked count info note)
+- src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (Analysis toolbar button)
+**Verification:**
+- Type check: pass (all 3 slots)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A
+- Browser test: pass (acceptance tester verified titles, export dialog note, toolbar button)
+- Canary test: skipped (no canary-critical UI changes)
+**Bugs found:** None
+**Improvements found:** IMP-111 (toolbar Analysis button is one-way navigation)
+**Self-score:**
+- Code quality: 5 — Clean metadata pattern, minimal changes, proper component extraction for signup
+- Test coverage: 4 — Acceptance tester verified all criteria with live browser + static analysis
+- Confidence: 5 — Pure metadata additions + small UI additions, zero logic risk
+- Efficiency: 5 — All 3 builders completed, all merged cleanly
+- Observations: 1
+**Notes:** Also marked IMP-107, IMP-108, IMP-109, IMP-110 as done (resolved by iter 132 bug fixes + BUG-048).

@@ -1,17 +1,19 @@
 ## Handoff
 
-- **Iteration:** 132
-- **Date:** 2026-03-05 20:30
+- **Iteration:** 133
+- **Date:** 2026-03-05 22:00
 - **Phase:** Phase 3b — Tools Canvas + Enhanced Export
 - **Branch:** ralph/init-stride
-- **Last task(s):** #BUG-045, #BUG-047 (sidebar aria-labels), #BUG-044, #BUG-049 (AI Insights check + canvas h1), #BUG-046, #BUG-050, #BUG-051 (settings label, workspaces main, table aria-label)
+- **Last task(s):** #BUG-048 (dynamic page titles), #IMP-106 (preset masked sections info), #IMP-104 (toolbar analysis toggle)
 - **Result:** completed
-- **Next task:** Remaining Phase 3b improvements (IMP-106, IMP-104, IMP-102, IMP-091) or BUG-048 (dynamic page titles)
+- **Next task:** #FEAT-044 (Phase 3b testing gate) or remaining improvements (#IMP-102, #IMP-091)
 - **Blockers:** BUG-035 + BUG-032 blocked on Supabase CLI authentication — `npx supabase login` required before migration 024 can be pushed.
 
 ## Context
 
-Iteration 132 fixed 7 accessibility bugs across 5 files. Slot 1 added aria-labels to all sidebar navigation links, header logo, and footer button (sidebar.tsx). Slot 2 tightened AI Insights export availability check to require both `last_analysis_at` AND `last_analysis` non-null, and added sr-only h1 to canvas page (canvas-view.tsx). Slot 3 added htmlFor/id label association in settings, `<main>` landmark on workspaces page, and aria-label on steps table. All 3 builders passed typecheck. Post-merge tsc: PASS.
+Iteration 133 completed 3 parallel tasks. Slot 1 (BUG-048) added dynamic page titles via Next.js generateMetadata template pattern — root layout uses `%s — Stride`, workspace layout fetches workspace name and uses `%s — {workspaceName} — Stride`, all 15 page.tsx files export static/dynamic metadata. Signup page.tsx was refactored: client component extracted to signup-form.tsx so page.tsx could become server component exporting metadata. Slot 2 (IMP-106) added masked sections count info note in export PDF dialog. Slot 3 (IMP-104) added Analysis toggle button to tools canvas toolbar.
+
+IMP-107, IMP-108, IMP-109, IMP-110 marked done — resolved by iteration 132's bug fixes (BUG-045/046/047) and iteration 133 (BUG-048 resolves IMP-108).
 
 ## Dev Server
 
@@ -22,9 +24,8 @@ Iteration 132 fixed 7 accessibility bugs across 5 files. Slot 1 added aria-label
 ## Warnings
 
 - **P1 BUG-035:** step-tools API returns 500 (migration 024 not pushed — Supabase CLI unauthenticated).
-- **P2 BUG-048:** All pages share identical title (WCAG 2.4.2) — deferred, cross-cutting concern.
 - **CRITICAL:** OPENROUTER_API_KEY not set — AI analysis route returns 503.
-- Production (origin/main) is behind ralph/init-stride by 70+ commits
+- Production (origin/main) is behind ralph/init-stride by 90+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - step-detail-panel.tsx ~770 lines — exceeding complexity threshold

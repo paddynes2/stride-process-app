@@ -754,7 +754,7 @@
   - **Design principle:** Nielsen H5: Error prevention
   - **Suggested fix:** Add pdf.addPage() + reset y when TOC entries overflow, similar to newTablePage() pattern in other PDF sections.
 
-- [ ] #IMP-104 Tool Analysis toggle button not in toolbar Panel — Attempts: 0
+- [x] #IMP-104 Tool Analysis toggle button not in toolbar Panel — DONE iteration 133, 2026-03-05 — Attempts: 1
   - **Found:** Iteration 128 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — toolbar Panel
@@ -770,7 +770,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — users should understand when a section requires prerequisites
   - **Suggested fix:** Accept availability flags as props (hasJourneyTab, hasImprovements, hasAiInsights, hasPerspectives, hasPrioritizationScores, hasTools) and compute `available` per section. Pass from canvas-view.tsx which has access to tabs, improvementIdeas, etc.
 
-- [ ] #IMP-106 Preset masked sections info note — Attempts: 0
+- [x] #IMP-106 Preset masked sections info note — DONE iteration 133, 2026-03-05 — Attempts: 1
   - **Found:** Iteration 130 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset buttons area
@@ -778,7 +778,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show a small info note under the preset buttons when a preset was applied but some sections were masked, e.g. '3 sections unavailable — add data to unlock them'.
 
-- [ ] #IMP-107 Add aria-label to sidebar nav links matching tooltip text — Attempts: 0
+- [x] #IMP-107 Add aria-label to sidebar nav links matching tooltip text — DONE iteration 132, 2026-03-05 (resolved by BUG-045) — Attempts: 0
   - **Found:** Iteration 131 (accessibility audit)
   - **Category:** Accessibility
   - **Where:** `src/components/layout/sidebar.tsx` — all navigation links
@@ -786,7 +786,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall — names/labels prevent users from having to remember icon meanings
   - **Suggested fix:** Add `aria-label` to each sidebar link matching its destination name (e.g., `aria-label="Canvas"`, `aria-label="Step List"`, etc.)
 
-- [ ] #IMP-108 Dynamic page titles pattern — [Page Name] — [Workspace] — Stride — Attempts: 0
+- [x] #IMP-108 Dynamic page titles pattern — [Page Name] — [Workspace] — Stride — DONE iteration 133, 2026-03-05 (resolved by BUG-048) — Attempts: 0
   - **Found:** Iteration 131 (accessibility audit)
   - **Category:** Accessibility
   - **Where:** All pages — `<title>` element
@@ -794,7 +794,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — users should always know where they are
   - **Suggested fix:** In each page's server component or layout, set document title dynamically to include workspace name + view name.
 
-- [ ] #IMP-109 Wrap workspace name visible label text in label element — Attempts: 0
+- [x] #IMP-109 Wrap workspace name visible label text in label element — DONE iteration 132, 2026-03-05 (resolved by BUG-046) — Attempts: 0
   - **Found:** Iteration 131 (accessibility audit)
   - **Category:** Accessibility
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — workspace name input
@@ -802,13 +802,21 @@
   - **Design principle:** WCAG 1.3.1 Info and Relationships
   - **Suggested fix:** Use `htmlFor` on a `<label>` element pointing to the input's id, or add `aria-label="Workspace name"` directly to the input.
 
-- [ ] #IMP-110 Add aria-label and title to sidebar footer button — Attempts: 0
+- [x] #IMP-110 Add aria-label and title to sidebar footer button — DONE iteration 132, 2026-03-05 (resolved by BUG-047) — Attempts: 0
   - **Found:** Iteration 131 (accessibility audit)
   - **Category:** Usability
   - **Where:** `src/components/layout/sidebar.tsx` — sidebar footer button
   - **What:** The icon-only submit button in the sidebar footer (bottom-left) has no tooltip, no title, and is `type="submit"` which is unusual for a navigation context. Its purpose is not immediately clear. If it's a form submission trigger it should be explicitly labeled.
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Add `aria-label` and `title` attribute clarifying the button's action; confirm whether `type="submit"` is intentional.
+
+- [ ] #IMP-111 Tools canvas toolbar Analysis button is one-way navigation — Attempts: 0
+  - **Found:** Iteration 133 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — toolbar Panel
+  - **What:** The toolbar Analysis button only shows 'Analysis' because the toolbar Panel is hidden when analysis view is active. Users in analysis view must use the sidebar toggle to return to canvas — no toolbar affordance for the return path.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Either render the toolbar panel inside the analysis view with 'Canvas' button, or accept current behavior since sidebar toggle serves the return path.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

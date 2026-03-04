@@ -1,17 +1,17 @@
 {
   "schema_version": "1.0",
-  "iteration": 132,
+  "iteration": 133,
   "slot": 2,
-  "task_id": "#BUG-044, #BUG-049",
+  "task_id": "#IMP-106",
   "status": "completed",
-  "duration_seconds": 120,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+      "path": "src/components/panels/export-pdf-dialog.tsx",
       "action": "modified",
-      "lines_added": 3,
-      "lines_removed": 1
+      "lines_added": 17,
+      "lines_removed": 0
     }
   ],
 
@@ -23,11 +23,9 @@
   },
 
   "dependencies_added": [],
-  "staged_files": [
-    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
-  ],
+  "staged_files": ["src/components/panels/export-pdf-dialog.tsx"],
   "ownership_violations": [],
-  "notes": "BUG-044: Tightened hasAiInsights check at line 318 to require both last_analysis_at AND last_analysis to be non-null. BUG-049: Added `const tab = tabs.find((t) => t.id === tabId)` after useWorkspace() destructure, then added `<h1 className=\"sr-only\">{tab?.name || workspace.name}</h1>` as first child of the flex h-full div, matching the tools-canvas-view.tsx BUG-037 pattern.",
+  "notes": "Added maskedCount computation using presetConfig (maps activePreset to its constant config, null for 'custom'). Counts keys where preset=true but availability=false. Shows muted info note (text-xs text-white/55) below preset buttons when activePreset !== 'custom' && maskedCount > 0. Pluralizes 'section/sections' correctly.",
 
   "failure_details": null
 }
