@@ -20,6 +20,7 @@ export default async function ImprovementsPage({
     { data: steps },
     { data: sections },
     { data: touchpoints },
+    { data: tabs },
   ] = await Promise.all([
     supabase
       .from("improvement_ideas")
@@ -29,6 +30,7 @@ export default async function ImprovementsPage({
     supabase.from("steps").select("id, name, tab_id").eq("workspace_id", workspaceId),
     supabase.from("sections").select("id, name, tab_id").eq("workspace_id", workspaceId),
     supabase.from("touchpoints").select("id, name, tab_id").eq("workspace_id", workspaceId),
+    supabase.from("tabs").select("id, canvas_type").eq("workspace_id", workspaceId).order("position"),
   ]);
 
   const entityNames: Record<string, string> = {};
@@ -53,6 +55,7 @@ export default async function ImprovementsPage({
       entityNames={entityNames}
       workspaceId={workspaceId}
       entityTabMap={entityTabMap}
+      tabs={(tabs ?? []).map((t) => ({ id: t.id, canvas_type: t.canvas_type }))}
     />
   );
 }
