@@ -1,1 +1,1 @@
-CONTINUE: #BUG-031 Fix Cancelled row in Tool Analysis Spend Summary (always show, not conditional), then #FEAT-043 Enhanced PDF export or remaining bugs/improvements
+CONTINUE: Fix P1 #BUG-034 (step nodes unclickable — section overlay intercepts pointer events) and P1 #BUG-035 (step-tools API 500 — push migration 024), then #FEAT-043 Enhanced PDF export

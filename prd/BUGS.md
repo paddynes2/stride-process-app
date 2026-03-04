@@ -146,3 +146,32 @@
   - **What:** After clicking 'Create Journey Tab' in Compare view, URL navigates to the new tab's ID but the tab bar still only shows the original process tab. Workspace context may not be re-fetching tabs after creation.
   - **Steps to reproduce:** 1. Navigate to /w/{workspaceId}/compare with only a process tab. 2. Click 'Create Journey Tab'. 3. Observe tab bar — new journey tab not shown.
   - **Suggested fix:** After createTab(), call the workspace context refresh/invalidation method to re-fetch tabs list, or use router.refresh().
+
+- [ ] #BUG-034 Step nodes unclickable — section overlay intercepts pointer events (P1) — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright browser)
+  - **Where:** `src/components/canvas/section-node.tsx` pointer event overlay + `src/components/canvas/step-node.tsx`
+  - **What:** Clicking on a step node (mouse click) opens the Section Details panel instead of Step Details panel. The section node's pointer-event overlay intercepts all click events from child step nodes. Step Details only opens via JavaScript's dispatchEvent(). This blocks the primary step-editing workflow.
+  - **Steps to reproduce:** 1. Navigate to workspace workflow canvas. 2. Ensure a section with at least one step node is visible. 3. Click directly on the step node card. 4. Observe: Section Details panel opens instead of Step Details panel.
+  - **Suggested fix:** Set `pointer-events: none` on the section node's overlay div, or use `stopPropagation()` on step node click handler, or adjust z-index layering so step nodes are above section overlays.
+
+- [ ] #BUG-035 step-tools API returns HTTP 500 — migration 024 likely not pushed (P1) — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright browser)
+  - **Where:** `src/app/api/v1/step-tools` route
+  - **What:** GET /api/v1/step-tools?step_id=... returns HTTP 500 Internal Server Error. Called twice every time Step Details panel opens. Prevents tool assignments from loading. Likely the step_tools table (migration 024) was never created or pushed to the DB.
+  - **Steps to reproduce:** 1. Open Step Details panel for any step. 2. Observe 2x HTTP 500 errors in network tab for /api/v1/step-tools?step_id=[uuid].
+  - **Suggested fix:** Verify step_tools migration exists. Run `npx supabase db push` to apply. If migration doesn't exist, create it with step_tools junction table (step_id FK, tool_id FK, RLS, indexes).
+  - **Note:** May be the same root cause as BUG-032 but confirmed independently by regression tester with P1 severity upgrade.
+
+- [ ] #BUG-036 Radix hydration mismatch on gap-analysis and tools pages (P2) — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright browser)
+  - **Where:** `src/components/layout/header.tsx` (User Menu DropdownMenuTrigger)
+  - **What:** Radix UI DropdownMenuTrigger generates different IDs on server vs client: server renders 'radix-_R_9knebn9erlb_', client expects 'radix-_R_16knebn9erlb_'. The ID counter offset (9 vs 16) suggests gap-analysis and tools pages render more Radix components on client than server. Causes aria-controls mismatch.
+  - **Steps to reproduce:** 1. Cold-navigate to /w/[id]/gap-analysis or /w/[id]/tools. 2. Open browser console. 3. Observe hydration mismatch warning with DropdownMenuTrigger ID diff.
+  - **Suggested fix:** Wrap the client-only Radix components with `suppressHydrationWarning` or ensure SSR/CSR component trees match (likely a conditional render that differs between server and client).
+
+- [ ] #BUG-037 Tools page heading hierarchy violation — h2 without h1 (P2) — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright browser)
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` (summary sidebar panel)
+  - **What:** The right-hand summary panel uses `<h2>` ('Tools Summary') as the first heading on the page without a preceding `<h1>`. WCAG 1.3.1 requires logical heading structure. Screen readers cannot navigate the page structure correctly.
+  - **Steps to reproduce:** 1. Navigate to /w/[id]/tools. 2. Inspect heading structure (h1, h2, h3...). 3. Observe: first heading is h2, no h1 present.
+  - **Suggested fix:** Either add a visually hidden `<h1>` for the page title or change `<h2>` to `<h1>` for the primary heading.

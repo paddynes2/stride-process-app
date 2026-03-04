@@ -2053,3 +2053,46 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 slots completed, zero merge failures, zero reviewer fixes needed.
 - Observations: 5 (3 bugs + 2 improvements)
 **Notes:** FEAT-042 complete with one minor deficiency (BUG-031 — Cancelled row only shows when cancelled > 0, should always show). IMP-082 verified pre-existing (implemented in iter 117 via IMP-072). IMP-084 clean implementation with Next.js Link. BUG-032 (step-tools 500) needs investigation — may be pre-existing API issue.
+
+## Iteration 120 — 2026-03-05 01:00
+**Tasks:**
+- Regression-full (20 checks) — 16 pass, 4 fail
+- Performance-static-audit (4 checks) — 2 pass, 2 fail (transfer budget exceeded)
+**Source:** EXECUTION_PLAN.json (testing_only mode, regression cadence trigger)
+**Mode:** testing_only
+**Result:** completed
+**Changes:** Documentation only (testing iteration — no app code changes)
+- knowledge/STATUS.md (updated handoff)
+- knowledge/PROGRESS.md (this entry)
+- knowledge/METRICS.jsonl (appended)
+- knowledge/RETROSPECTIVES.md (iteration 120 retrospective)
+- testing/RESULTS.md (updated regression + performance results)
+- prd/BUGS.md (added BUG-034 through BUG-037)
+- prd/IMPROVEMENTS.md (added IMP-088 through IMP-091)
+- knowledge/TASK-COUNTER.json (updated counters)
+**Verification:**
+- Type check: pass (POST_MERGE_CHECK.txt: PASS)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A (testing-only iteration)
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (regression tester used Playwright — 16/20 pass, 4 fail)
+- Canary test: skipped (no code changes)
+- Regression test: 16/20 (2 P1 bugs, 2 P2 bugs found)
+- Performance test: 2/4 (canvas 1208KB, tools 1150KB exceed 1MB budget)
+**Bugs found:** 4
+- BUG-034 (P1): Step nodes unclickable — section overlay intercepts pointer events
+- BUG-035 (P1): step-tools API returns HTTP 500 (likely unpushed migration 024)
+- BUG-036 (P2): Radix hydration mismatch on gap-analysis + tools pages (DropdownMenuTrigger ID offset)
+- BUG-037 (P2): Tools page heading hierarchy violation (h2 without h1, WCAG 1.3.1)
+**Improvements found:** 4
+- IMP-088: Canvas + tools transfer size exceeds 1MB — evaluate React Flow lazy loading or shared chunks
+- IMP-089: Section-step visual/data association mismatch — auto-assign section_id when dropped inside section bounds
+- IMP-090: Overlapping 'NEW GROUP' tool section nodes on default canvas layout
+- IMP-091: Journey canvas needs test data for regression coverage (0 stages, 0 touchpoints)
+**Self-score:**
+- Code quality: N/A — no app code produced
+- Test coverage: 5 — 24 checks across 2 suites (20 regression + 4 performance), comprehensive Playwright browser testing, 4 new bugs found
+- Confidence: 5 — all findings verified in live browser with clear reproduction steps
+- Efficiency: 5 — single tester completed within action budget (36/40)
+- Observations: 8 (4 bugs + 4 improvements)
+**Notes:** Testing-only iteration triggered by regression cadence (8 iterations since iter 112). Most significant finding is P1 BUG-034 (step nodes unclickable) — blocks primary step-editing workflow. P1 BUG-035 (step-tools 500) confirms migration 024 not pushed. Both P1 bugs should be prioritized before FEAT-043. Retrospective performed (120 = 10th iteration milestone).

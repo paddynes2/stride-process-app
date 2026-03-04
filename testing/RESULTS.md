@@ -1,13 +1,13 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 119
+- **Iteration:** 120
 - **Date:** 2026-03-05
-- **Suite:** Acceptance (iteration 119 tasks)
-- **Method:** Playwright browser + static code analysis
-- **Result:** **Acceptance 14/15 PASS** (1 fail: Cancelled row hidden) + Quality gate: 2 console errors, 2 network errors
-- **Bugs found:** 3 (BUG-031 Cancelled row, BUG-032 step-tools 500, BUG-033 tab bar refresh)
-- **Improvements found:** 2 (IMP-086 analysis toggle indicator, IMP-087 null frequency sorting)
+- **Suite:** Regression-full + Performance-static-audit
+- **Method:** Playwright browser on localhost:3000
+- **Result:** **Regression 16/20 PASS** (4 fail: step click P1, step-tools 500 P1, hydration P2, heading hierarchy P2) + **Performance 2/4 PASS** (canvas 1208KB, tools 1150KB exceed 1MB)
+- **Bugs found:** 4 (BUG-034 step click P1, BUG-035 step-tools 500 P1, BUG-036 hydration P2, BUG-037 heading hierarchy P2)
+- **Improvements found:** 4 (IMP-088 transfer budget, IMP-089 section-step association, IMP-090 overlapping nodes, IMP-091 journey test data)
 
 ## Suite Results
 
@@ -30,7 +30,8 @@
 - Previous: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 DI 10, BUG-020 4, IMP-029 2 — static)
 
 ### Regression
-- Last run: Iteration 112 (2026-03-04) — 27/28 PASS, 1 skip (full regression: Playwright browser on localhost, 13 pages checked, 2 console errors, 4 network errors, 0 accessibility violations; skip: journey canvas — no journey tab)
+- Last run: Iteration 120 (2026-03-05) — 16/20 PASS, 0 skip (full regression + performance: Playwright browser on localhost, 9 pages checked, 4 console errors, 2 network errors, 1 accessibility issue, 0 layout shifts; 2 P1 bugs, 2 P2 bugs, 4 improvements found)
+- Previous: Iteration 112 (2026-03-04) — 27/28 PASS, 1 skip (full regression: Playwright browser on localhost, 13 pages checked, 2 console errors, 4 network errors, 0 accessibility violations; skip: journey canvas — no journey tab)
 - Previous: Iteration 109 (2026-03-03) — 19/19 PASS, 2 skip (regression-baseline hybrid: browser on production + static analysis for iter-109 changes, 7 pages checked, 0 console errors, 8 regression checks PASS)
 - Previous: Iteration 107 (2026-03-03) — 20/20 PASS (baseline 15 + BUG-025 2 + FEAT-035 2 + IMP-052 1 — Playwright browser, 7 pages checked, 0 console errors)
 - Previous: Iteration 105 (2026-03-02) — 12/12 PASS (regression-baseline static, feat-034-data-integrity static — Playwright unavailable)
@@ -78,8 +79,8 @@
 - Previous: BUG-002 through BUG-009 fixed in iteration 21 (not re-audited with RALPH until now)
 
 ### Performance
-- Last run: Iteration 100 (2026-03-02)
-- Result: 3/6 PASS, 3 WARN (node types module-level ✓, flow-canvas useCallback ✓, no circular imports ✓; canvas-view handlers not useCallback ⚠, nodes not React.memo ⚠ [IMP-032 fixed iter 101], 5 files >500 lines ⚠)
+- Last run: Iteration 120 (2026-03-05) — 2/4 PASS (Playwright browser cold load audit; /workspaces 792KB ✓, /gap-analysis 997KB ✓, /w/[id]/[tabId] 1208KB ✗ [exceeds 1MB], /tools 1150KB ✗ [exceeds 1MB]. CLS: 0 across all pages. React Flow bundle is primary contributor.)
+- Previous: Iteration 100 (2026-03-02) — 3/6 PASS, 3 WARN (static audit; node types module-level ✓, flow-canvas useCallback ✓, no circular imports ✓; canvas-view handlers not useCallback ⚠, nodes not React.memo ⚠ [IMP-032 fixed iter 101], 5 files >500 lines ⚠)
 
 ### Forms
 - Last run: N/A

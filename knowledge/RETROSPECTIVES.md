@@ -88,3 +88,43 @@
   - BUG-021 (P1) should be prioritized alongside FEAT-052 [2/2] in next build iteration
   - Accessibility cadence overdue — schedule audit after Phase 4 testing gate
   - Pipeline worktree merge reliability improved but still ~30% failure rate on build iterations
+
+## Retrospective — Iteration 110 (skipped)
+- Note: Iteration 110 retrospective was not triggered during review.
+
+## Retrospective — Iteration 120 (2026-03-05)
+- Success rate (last 10 — iter 111-120): **10/10 fully completed** (100%)
+  - Completed: 111, 112, 113, 114, 115, 116, 117, 118, 119, 120
+  - Partial: 0
+  - Blocked: 0
+- Most-failed task type: None — zero failures in this window. Best stretch in project history.
+- Hotspot files (top 3):
+  - src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx (4 iterations: 111, 113, 114, 115) — AI narrative feature + improvement cleanup
+  - src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx (4 iterations: 111, 113, 114, 117) — AI suggestions + polish
+  - src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (3 iterations: 116, 117, 119) — new Phase 3b canvas
+- Recurring pattern: **Zero pipeline merge failures** across all 10 iterations. This is a major improvement from iter 91-100 (30% failure rate) and iter 71-80 (50% failure rate). Pipeline is now stable.
+- Recurring pattern: **Unpushed migration root cause** — BUG-032/035 (step-tools 500) is the same pattern as BUG-028/029 (iter 112). Builders create migrations but `npx supabase db push` is not automated. 3rd occurrence of this class of bug.
+- Velocity trend: **Improving.** 10 iterations completed 3 features (FEAT-040, FEAT-041, FEAT-042), 1 phase gate (FEAT-039), 1 bug (BUG-027, BUG-030), 15 improvements, 2 testing-only iterations. Phase 3a completed and Phase 3b 75% done in 10 iterations.
+- Self-score trends:
+  - Code quality: 5/5 consistently on build iterations (stable, highest)
+  - Test coverage: 2-5 (bifurcated — 5 on testing_only, 2-4 on builds depending on Playwright availability)
+  - Confidence: 4-5 consistently (high, stable)
+  - Efficiency: 5/5 across all 10 iterations (zero merge failures, zero re-attempts)
+- Key observations:
+  - Phase 3a completed (iter 112) and Phase 3b 75% done (FEAT-040, 041, 042 of 044 complete)
+  - Pipeline reliability: 0% merge failure rate (down from 30% in iter 91-100, 50% in iter 71-80). This is the single biggest operational improvement.
+  - P1 BUG-034 (step nodes unclickable) is a significant regression — blocks primary user workflow. Was not caught until live browser testing in iter 120. May have been introduced as early as iter 116 (section-node.tsx created).
+  - Testing cadence working well: regression every 8 iterations, performance every 10-20 iterations. Playwright browser testing is now more reliable than earlier iterations.
+  - Improvement backlog growing: 91 total IMP items logged. Consider dedicated improvement cleanup iterations.
+- Codebase health check (iter 120):
+  - Hotspot: gap-analysis-view.tsx in 4/10 — expected (AI features concentrated here), not a refactor candidate
+  - Hotspot: improvements-view.tsx in 4/10 — expected (AI suggestions + polish), monitor
+  - step-detail-panel.tsx at ~770 lines — exceeding 500-line threshold, flagged since iter 118
+  - tools-canvas-view.tsx growing (521+ lines) — monitor
+  - No duplication issues detected
+  - Transfer size regression: canvas pages now exceed 1MB (1208KB) — React Flow bundle size
+- Action:
+  - P1 BUG-034 (step click interception) must be fixed before any new features
+  - P1 BUG-035 (step-tools 500) — push migration 024 or verify/create step_tools table
+  - Consider automating `npx supabase db push` in pipeline (3rd occurrence of migration-not-pushed bugs)
+  - step-detail-panel.tsx needs refactoring (770+ lines) — add to IMPROVEMENTS.md if not already tracked

@@ -634,5 +634,37 @@
   - **Design principle:** Nielsen H7: Flexibility and efficiency of use
   - **Suggested fix:** Treat null frequency as -1 for sorting so unset steps always appear at the bottom of the Coverage Gaps list.
 
+- [ ] #IMP-088 Canvas + tools page transfer size exceeds 1MB performance budget — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright performance audit)
+  - **Category:** Performance
+  - **Where:** All React Flow canvas pages (workflow 1208KB, tools 1150KB, compare)
+  - **What:** Cold load transfer size exceeds the 1MB warning threshold. React Flow and its peer dependencies are the primary contributors. All three canvas pages load the full React Flow bundle independently.
+  - **Design principle:** Performance budget: keep single-page transfer under 1MB
+  - **Suggested fix:** Evaluate dynamic import() for React Flow bundle or shared chunk splitting so React Flow is fetched once and reused across canvas routes.
+
+- [ ] #IMP-089 Section-step visual/data association mismatch on canvas — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright browser)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` + section-node.tsx
+  - **What:** Section Details panel shows 'Steps (0)' even when a step node is visually positioned inside the section container. The step has no section_id association despite visual placement. Users may expect drag-into-section to auto-associate.
+  - **Design principle:** Nielsen H1: Visibility of system status — section should auto-associate or indicate the step is unlinked
+  - **Suggested fix:** When a step node is dropped inside a section node's bounding box, auto-assign section_id. Or show visual indicator for unlinked steps.
+
+- [ ] #IMP-090 Overlapping 'NEW GROUP' tool section nodes on default canvas — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright browser)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — initial tool section positioning
+  - **What:** Two 'NEW GROUP' tool section nodes overlap on the default canvas layout. The second group node partially covers the first, creating visual confusion.
+  - **Design principle:** Nielsen H8: Aesthetic and minimalist design — initial layout should not show overlapping nodes
+  - **Suggested fix:** Ensure default tool section nodes are positioned with non-overlapping coordinates. Add minimum gap between auto-positioned nodes.
+
+- [ ] #IMP-091 Journey canvas needs test data for regression coverage — Attempts: 0
+  - **Found:** Iteration 120 (regression tester — Playwright browser)
+  - **Category:** Testing
+  - **Where:** Journey canvas regression testing
+  - **What:** Journey canvas has 0 stages and 0 touchpoints, making it impossible to verify touchpoint/stage detail panel behavior in regression runs. Panel interactions are untestable without data.
+  - **Design principle:** Regression testing coverage — critical paths need representative test data
+  - **Suggested fix:** Seed the test workspace with at least one stage and one touchpoint for regression runs.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->
