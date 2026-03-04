@@ -18,6 +18,10 @@ import { toastError } from "@/lib/api/toast-helpers";
 import { cn } from "@/lib/utils";
 import type { Runbook, RunbookStep, RunbookStatus, RunbookStepStatus } from "@/types/database";
 
+export type RunbookWithCreator = Runbook & {
+  users?: { email: string } | null;
+};
+
 export type RunbookStepEnriched = RunbookStep & {
   steps: { id: string; name: string } | null;
 };
@@ -49,14 +53,14 @@ function formatDate(dateString: string): string {
 }
 
 interface RunbookViewProps {
-  runbook: Runbook;
+  runbook: RunbookWithCreator;
   initialSteps: RunbookStepEnriched[];
   workspaceId: string;
   userId?: string;
 }
 
 export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId, userId }: RunbookViewProps) {
-  const [runbook, setRunbook] = React.useState(initialRunbook);
+  const [runbook, setRunbook] = React.useState<RunbookWithCreator>(initialRunbook);
   const [steps, setSteps] = React.useState(initialSteps);
   const [confirmCompleteOpen, setConfirmCompleteOpen] = React.useState(false);
   const [confirmCancelOpen, setConfirmCancelOpen] = React.useState(false);
@@ -106,7 +110,7 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
     setRunbook((r) => ({ ...r, status: "completed" as RunbookStatus, completed_at: now }));
     try {
       const updated = await updateRunbook(runbook.id, { status: "completed", completed_at: now });
-      setRunbook(updated);
+      setRunbook((prev) => ({ ...updated, users: prev.users }));
     } catch (err) {
       setRunbook(prev);
       toastError("Failed to complete runbook", { error: err });
@@ -119,7 +123,7 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
     setRunbook((r) => ({ ...r, status: "cancelled" as RunbookStatus }));
     try {
       const updated = await updateRunbook(runbook.id, { status: "cancelled" });
-      setRunbook(updated);
+      setRunbook((prev) => ({ ...updated, users: prev.users }));
     } catch (err) {
       setRunbook(prev);
       toastError("Failed to cancel runbook", { error: err });
@@ -127,7 +131,9 @@ export function RunbookView({ runbook: initialRunbook, initialSteps, workspaceId
   };
 
   const createdByLabel =
-    userId && runbook.created_by === userId ? "by you" : `by ${runbook.created_by.slice(0, 8)}`;
+    userId && runbook.created_by === userId
+      ? "by you"
+      : `by ${runbook.users?.email ?? "[Deleted User]"}`;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
