@@ -7,7 +7,7 @@
 - **Last task(s):** #FEAT-041 [1/3] tool detail panel + tool section detail panel + IMP-079 fix (slot 1), #IMP-061 optimistic status update (slot 2), #IMP-072 compare view CTA button (slot 3)
 - **Result:** completed
 - **Next task:** #FEAT-041 [2/3] step_tools junction table data layer + "Step Usage" in tool detail panel (slot 1), next priority improvements/bugs (slots 2-3)
-- **Blockers:** Migrations 014-023 not pushed — requires human action (`npx supabase db push`). OPENROUTER_API_KEY not configured — AI features return 503 until key is added to .env.local and Vercel.
+- **Blockers:** OPENROUTER_API_KEY not configured — AI features return 503 until key is added to .env.local and Vercel.
 
 ## Context
 
@@ -21,10 +21,8 @@ Iteration 117 completed 3 tasks across 3 builder slots. Slot 1 created `tool-det
 
 ## Warnings
 
-- **CRITICAL:** Migrations 014-023 not pushed to remote DB — `npx supabase db push` required (human action). Tools canvas CRUD is non-functional until migration 023 is applied.
 - **CRITICAL:** OPENROUTER_API_KEY not set — AI analysis route returns 503 until configured in .env.local (local dev) and Vercel (production).
-- BUG-028: /api/v1/improvement-ideas returns HTTP 500 — caused by unpushed migration 022 (P2).
-- BUG-029: /api/v1/coloring-rules returns HTTP 500 — caused by unpushed migration 019 (P2).
+- BUG-028, BUG-029, BUG-022: RESOLVED — migrations 018-023 pushed to remote DB (2026-03-04).
 - Production (origin/main) is behind ralph/init-stride by 65+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)

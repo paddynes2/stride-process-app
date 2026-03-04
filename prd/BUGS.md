@@ -72,12 +72,10 @@
   - **Suggested fix:** Add 'runbooks', 'activity', 'gap-analysis' to the exclusion list in workspace-shell.tsx. Verify all route segment directories under `w/[workspaceId]/` are covered.
   - **Note:** Already fixed in current codebase (ralph/init-stride) per planner analysis (iter 101). Exists only on production which is 20+ commits behind. Mark resolved once deployed.
 
-- [ ] #BUG-022 Migration 020 (section_templates) not pushed to remote Supabase DB (P1) — Attempts: 0
+- [x] #BUG-022 Migration 020 (section_templates) not pushed to remote Supabase DB (P1) — DONE 2026-03-04
   - **Found:** Iteration 101 (acceptance tester — browser)
   - **Where:** Remote Supabase DB (project ref: tkcyxtxkmveipnwgrddd)
-  - **What:** The `templates` table does not exist in production schema. GET /api/v1/templates returns HTTP 500 with error "Could not find the table public.templates in the schema cache". This blocks the entire Templates feature — dialog opens but cannot display any templates or allow deployment of DB templates. Migration file exists at `supabase/migrations/020_section_templates.sql` but has not been pushed.
-  - **Steps to reproduce:** Open any workspace canvas → click Templates button → dialog shows error message instead of template cards.
-  - **Suggested fix:** Run `npx supabase db push` to apply migration 020 (and migrations 014-019 if also pending). Verify the templates table exists after push.
+  - **Fix applied:** Pushed migrations 018-023 to remote DB via `npx supabase db push`. Fixed `uuid_generate_v4()` → `gen_random_uuid()` in migrations 019, 020, 022 (Supabase puts uuid-ossp in `extensions` schema).
 
 - [x] #BUG-023 DialogTitle accessibility warning fires when Templates dialog opens (P2) — Attempts: 1 — DONE iteration 102, 2026-03-02
   - **Found:** Iteration 101 (acceptance tester — browser console)
@@ -109,21 +107,17 @@
   - **What:** The entire AI narrative section (including "Generate Summary" button) is hidden when hasGapData is false. A new or empty workspace gives no indication that the AI narrative feature exists.
   - **Fix applied:** Moved AI narrative section outside `{hasGapData && (...)}` block — now always visible. Generate Summary button shows disabled state with muted styling, cursor-not-allowed, and hint text "Score steps to enable AI narrative." when !hasGapData. Fully functional when hasGapData. Also added live countdown timer for rate-limited state (IMP-066).
 
-- [ ] #BUG-028 /api/v1/improvement-ideas returns HTTP 500 for authenticated users (P2) — Attempts: 0
+- [x] #BUG-028 /api/v1/improvement-ideas returns HTTP 500 for authenticated users (P2) — DONE 2026-03-04
   - **Found:** Iteration 112 (regression tester — browser)
   - **Where:** `src/app/api/v1/improvement-ideas/route.ts`, sidebar.tsx badge fetch
-  - **What:** GET /api/v1/improvement-ideas?workspace_id=... returns HTTP 500 for authenticated users. Sidebar useEffect fetches this endpoint to render the Improvements badge count — 500 response causes badge to show blank. Double-fires (2x) due to React 18 StrictMode dev double-invoke.
-  - **Steps to reproduce:** 1. Log in. 2. Navigate to any workspace page. 3. Open DevTools Network tab. 4. Observe /api/v1/improvement-ideas returns 500.
-  - **Related:** FEAT-035 (improvement ideas feature)
-  - **Suggested fix:** Debug API route — likely RLS policy issue or migration 022 not applied to local dev DB.
+  - **Root cause:** Migration 022 (improvement_ideas table) not pushed to remote DB.
+  - **Fix applied:** Pushed migrations 018-023 via `npx supabase db push`. Table now exists in remote schema.
 
-- [ ] #BUG-029 /api/v1/coloring-rules returns HTTP 500 for authenticated users (P2) — Attempts: 0
+- [x] #BUG-029 /api/v1/coloring-rules returns HTTP 500 for authenticated users (P2) — DONE 2026-03-04
   - **Found:** Iteration 112 (regression tester — browser)
   - **Where:** `src/app/api/v1/coloring-rules/route.ts`, flow-canvas.tsx mount fetch
-  - **What:** GET /api/v1/coloring-rules?workspace_id=... returns HTTP 500 for authenticated users. flow-canvas.tsx calls fetchColoringRules on mount — 500 means coloring rules panel loads empty and any saved rules are invisible. Double-fires (2x) in dev StrictMode.
-  - **Steps to reproduce:** 1. Log in. 2. Navigate to a canvas tab. 3. Open DevTools Network. 4. Observe /api/v1/coloring-rules returns 500.
-  - **Related:** FEAT-051 (conditional coloring feature)
-  - **Suggested fix:** Debug API route — likely RLS policy issue or migration 019 not applied to local dev DB.
+  - **Root cause:** Migration 019 (coloring_rules table) not pushed to remote DB.
+  - **Fix applied:** Pushed migrations 018-023 via `npx supabase db push`. Table now exists in remote schema.
 
 - [x] #BUG-030 Pre-existing hydration mismatch on AI analysis date format (P3) — DONE iteration 115, 2026-03-04
   - **Found:** Iteration 114 (acceptance tester — browser console)
