@@ -35,6 +35,12 @@ interface AIAnalysisViewProps {
   hasSteps: boolean;
 }
 
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
 function classifyError(err: unknown): AnalysisState {
   const msg = err instanceof Error ? err.message : String(err);
   if (msg.includes("OPENROUTER_API_KEY") || msg.includes("OpenRouter API key")) {
@@ -144,6 +150,22 @@ export function AIAnalysisView({
     result: initialAnalysis,
   });
   const [lastAt, setLastAt] = React.useState<string | null>(lastAnalysisAt);
+  const [countdown, setCountdown] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    if (state.type !== "rate_limited") return;
+    setCountdown(state.retryAfterSeconds);
+    const id = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          setState({ type: "idle", result: initialAnalysis });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [state, initialAnalysis]);
 
   const handleRegenerate = async () => {
     setState({ type: "loading" });
@@ -175,10 +197,10 @@ export function AIAnalysisView({
           </div>
           <button
             onClick={handleRegenerate}
-            disabled={isLoading || !hasSteps}
+            disabled={isLoading || !hasSteps || state.type === "rate_limited"}
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors",
-              isLoading || !hasSteps
+              isLoading || !hasSteps || state.type === "rate_limited"
                 ? "bg-[var(--bg-surface-active)] text-[var(--text-tertiary)] cursor-not-allowed"
                 : "bg-[var(--accent-blue)] text-white hover:opacity-90"
             )}
@@ -230,9 +252,7 @@ export function AIAnalysisView({
               Analysis rate limited
             </p>
             <p className="text-[12px] text-[var(--text-secondary)]">
-              Try again in about{" "}
-              {Math.ceil(state.retryAfterSeconds / 60)}{" "}
-              minute{Math.ceil(state.retryAfterSeconds / 60) !== 1 ? "s" : ""}.
+              Try again in {formatCountdown(countdown)}
             </p>
           </div>
         ) : state.type === "error" ? (
