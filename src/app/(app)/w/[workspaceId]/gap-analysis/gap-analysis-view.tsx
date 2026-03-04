@@ -297,9 +297,16 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
           {narrativeState.type === "loading" && (
             <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
               <RefreshCw className="h-4 w-4 text-[var(--text-tertiary)] animate-spin shrink-0" />
-              <p className="text-[13px] text-[var(--text-secondary)]">
+              <p className="text-[13px] text-[var(--text-secondary)] flex-1">
                 Generating narrative… this may take a few seconds
               </p>
+              <button
+                disabled
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--bg-surface-active)] text-[var(--text-secondary)] opacity-50 cursor-not-allowed shrink-0"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Regenerate
+              </button>
             </div>
           )}
 
@@ -324,9 +331,16 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
           {narrativeState.type === "rate_limited" && (
             <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
               <Clock className="h-4 w-4 text-[var(--text-quaternary)] shrink-0" />
-              <p className="text-[13px] text-[var(--text-secondary)]">
+              <p className="text-[13px] text-[var(--text-secondary)] flex-1">
                 Try again in {formatCountdown(countdown)}
               </p>
+              <button
+                disabled
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--bg-surface-active)] text-[var(--text-secondary)] opacity-50 cursor-not-allowed shrink-0"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Regenerate
+              </button>
             </div>
           )}
 
