@@ -16,7 +16,7 @@ const CHANNEL_ICONS: Record<string, string> = {
   other: "📋",
 };
 
-export function StageNode({ data, selected }: NodeProps) {
+function StageNodeComponent({ data, selected }: NodeProps) {
   const nodeData = data as unknown as StageNodeData;
   const { stage, averagePainScore, heatMapMode, annotationColor } = nodeData;
   const channelIcon = stage.channel ? CHANNEL_ICONS[stage.channel] ?? "📋" : null;
@@ -106,3 +106,5 @@ export function StageNode({ data, selected }: NodeProps) {
     </>
   );
 }
+
+export const StageNode = React.memo(StageNodeComponent);
