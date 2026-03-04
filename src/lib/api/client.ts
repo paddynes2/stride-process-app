@@ -3,7 +3,7 @@
 // { data, error } envelope format returned by all /api/v1/* routes.
 // =============================================================================
 
-import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template, ImprovementIdea, ImprovementStatus, ImprovementPriority, AIAnalysisResult } from "@/types/database";
+import type { Workspace, Tab, Section, Step, Connection, Team, Role, Person, Tool, ToolSection, ToolStatus, StepRole, PublicShare, Stage, Touchpoint, TouchpointConnection, Perspective, PerspectiveAnnotation, AnnotatableType, Comment, CommentCategory, CommentableType, Task, Runbook, RunbookStep, ActivityLog, ActivityAction, ColoringRule, CriteriaType, Template, ImprovementIdea, ImprovementStatus, ImprovementPriority, AIAnalysisResult } from "@/types/database";
 
 interface ApiEnvelope<T> {
   data: T | null;
@@ -259,7 +259,7 @@ export async function fetchTools(workspaceId: string): Promise<Tool[]> {
   return apiFetch<Tool[]>(`/api/v1/tools?workspace_id=${workspaceId}`);
 }
 
-export async function createTool(data: { workspace_id: string; name?: string; description?: string; category?: string; vendor?: string; url?: string; cost_per_month?: number }): Promise<Tool> {
+export async function createTool(data: { workspace_id: string; name?: string; description?: string; category?: string; vendor?: string; url?: string; cost_per_month?: number; position_x?: number; position_y?: number; status?: ToolStatus }): Promise<Tool> {
   return apiFetch<Tool>("/api/v1/tools", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -267,7 +267,7 @@ export async function createTool(data: { workspace_id: string; name?: string; de
   });
 }
 
-export async function updateTool(id: string, data: Partial<Pick<Tool, "name" | "description" | "category" | "vendor" | "url" | "cost_per_month">>): Promise<Tool> {
+export async function updateTool(id: string, data: Partial<Pick<Tool, "name" | "description" | "category" | "vendor" | "url" | "cost_per_month" | "position_x" | "position_y" | "status">>): Promise<Tool> {
   return apiFetch<Tool>(`/api/v1/tools/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -277,6 +277,42 @@ export async function updateTool(id: string, data: Partial<Pick<Tool, "name" | "
 
 export async function deleteTool(id: string): Promise<void> {
   await apiFetch(`/api/v1/tools/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Tool Sections (tools canvas grouping)
+// ---------------------------------------------------------------------------
+
+export async function fetchToolSections(workspaceId: string): Promise<ToolSection[]> {
+  return apiFetch<ToolSection[]>(`/api/v1/tool-sections?workspace_id=${workspaceId}`);
+}
+
+export async function createToolSection(data: {
+  workspace_id: string;
+  name?: string;
+  description?: string;
+  position_x?: number;
+  position_y?: number;
+  width?: number;
+  height?: number;
+}): Promise<ToolSection> {
+  return apiFetch<ToolSection>("/api/v1/tool-sections", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateToolSection(id: string, data: Partial<Omit<ToolSection, "id" | "workspace_id" | "created_at" | "updated_at">>): Promise<ToolSection> {
+  return apiFetch<ToolSection>(`/api/v1/tool-sections/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteToolSection(id: string): Promise<void> {
+  await apiFetch(`/api/v1/tool-sections/${id}`, { method: "DELETE" });
 }
 
 // ---------------------------------------------------------------------------

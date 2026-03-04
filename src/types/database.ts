@@ -131,6 +131,8 @@ export interface Person {
   updated_at: string;
 }
 
+export type ToolStatus = "active" | "considering" | "cancelled";
+
 export interface Tool {
   id: string;
   workspace_id: string;
@@ -140,6 +142,22 @@ export interface Tool {
   vendor: string | null;
   url: string | null;
   cost_per_month: number | null;
+  position_x: number;
+  position_y: number;
+  status: ToolStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ToolSection {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string | null;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
   created_at: string;
   updated_at: string;
 }

@@ -3,8 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
 import { logActivity } from "@/lib/api/activity";
 
-const EDITABLE_FIELDS = ["name", "description", "category", "vendor", "url", "cost_per_month", "position_x", "position_y", "status"] as const;
-const VALID_STATUSES = ["active", "considering", "cancelled"] as const;
+const EDITABLE_FIELDS = [
+  "name",
+  "description",
+  "position_x",
+  "position_y",
+  "width",
+  "height",
+] as const;
 
 export async function PATCH(
   request: NextRequest,
@@ -23,16 +29,7 @@ export async function PATCH(
 
   for (const field of EDITABLE_FIELDS) {
     if (body[field] !== undefined) {
-      if (field === "cost_per_month" || field === "position_x" || field === "position_y") {
-        updates[field] = body[field] != null ? Number(body[field]) : null;
-      } else if (field === "status") {
-        if (!VALID_STATUSES.includes(body[field])) {
-          return errorResponse("validation", `status must be one of: ${VALID_STATUSES.join(", ")}`, 400);
-        }
-        updates[field] = body[field];
-      } else {
-        updates[field] = typeof body[field] === "string" ? body[field].trim() || null : body[field];
-      }
+      updates[field] = body[field];
     }
   }
 
@@ -40,8 +37,8 @@ export async function PATCH(
     return errorResponse("validation", "No valid fields to update", 400);
   }
 
-  const { data: tool, error } = await supabase
-    .from("tools")
+  const { data: toolSection, error } = await supabase
+    .from("tool_sections")
     .update(updates)
     .eq("id", id)
     .select()
@@ -51,9 +48,18 @@ export async function PATCH(
     return errorResponse("update_failed", error.message, 500);
   }
 
-  void logActivity({ supabase, workspace_id: tool.workspace_id, user_id: user.id, action: "updated", entity_type: "tools", entity_id: tool.id, entity_name: tool.name, details: { changed_fields: Object.keys(updates) } });
+  void logActivity({
+    supabase,
+    workspace_id: toolSection.workspace_id,
+    user_id: user.id,
+    action: "updated",
+    entity_type: "tool_sections",
+    entity_id: toolSection.id,
+    entity_name: toolSection.name,
+    details: { changed_fields: Object.keys(updates) },
+  });
 
-  return successResponse(tool);
+  return successResponse(toolSection);
 }
 
 export async function DELETE(
@@ -68,20 +74,29 @@ export async function DELETE(
     return errorResponse("unauthorized", "Not authenticated", 401);
   }
 
-  const { data: tool, error } = await supabase
-    .from("tools")
+  const { data: toolSection, error } = await supabase
+    .from("tool_sections")
     .delete()
     .eq("id", id)
     .select()
     .single();
 
   if (error) {
+    if (error.code === "PGRST116") {
+      return errorResponse("not_found", "Tool section not found", 404);
+    }
     return errorResponse("delete_failed", error.message, 500);
   }
 
-  if (tool) {
-    void logActivity({ supabase, workspace_id: tool.workspace_id, user_id: user.id, action: "deleted", entity_type: "tools", entity_id: id, entity_name: tool.name });
-  }
+  void logActivity({
+    supabase,
+    workspace_id: toolSection?.workspace_id,
+    user_id: user.id,
+    action: "deleted",
+    entity_type: "tool_sections",
+    entity_id: id,
+    entity_name: toolSection?.name ?? "Tool Section",
+  });
 
   return successResponse({ deleted: true });
 }
