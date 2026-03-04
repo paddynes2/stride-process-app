@@ -41,6 +41,12 @@ function getGapColor(gap: number): string {
   return GAP_COLORS[gap] ?? GAP_COLORS[3];
 }
 
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
 function classifyNarrativeError(err: unknown): NarrativeState {
   const msg = err instanceof Error ? err.message : String(err);
   if (msg.includes("OPENROUTER_API_KEY") || msg.includes("OpenRouter API key")) {
@@ -64,6 +70,8 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
     text: null,
   });
   const [copied, setCopied] = React.useState(false);
+  const [countdown, setCountdown] = React.useState<number>(0);
+  const lastTextRef = React.useRef<string | null>(null);
 
   // Load cached narrative from localStorage on mount
   React.useEffect(() => {
@@ -73,12 +81,28 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
         const parsed = JSON.parse(cached) as { text: string; generatedAt: string };
         if (parsed.text) {
           setNarrativeState({ type: "idle", text: parsed.text });
+          lastTextRef.current = parsed.text;
         }
       }
     } catch {
       // Ignore localStorage errors
     }
   }, [workspaceId]);
+
+  React.useEffect(() => {
+    if (narrativeState.type !== "rate_limited") return;
+    setCountdown(narrativeState.retryAfterSeconds);
+    const id = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          setNarrativeState({ type: "idle", text: lastTextRef.current });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [narrativeState]);
 
   const handleGenerateNarrative = async () => {
     setNarrativeState({ type: "loading" });
@@ -92,6 +116,7 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
       } catch {
         // Ignore localStorage errors
       }
+      lastTextRef.current = text;
       setNarrativeState({ type: "idle", text });
     } catch (err) {
       setNarrativeState(classifyNarrativeError(err));
@@ -243,132 +268,136 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
           </div>
         )}
 
-        {/* AI Narrative section — above the table */}
-        {hasGapData && (
-          <div className="mb-6">
-            {narrativeState.type === "idle" && narrativeText === null && (
-              <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <Sparkles className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" />
-                <p className="text-[13px] text-[var(--text-secondary)] flex-1">
-                  Generate a consulting-grade narrative summary of this gap analysis.
+        {/* AI Narrative section — above the table, always visible */}
+        <div className="mb-6">
+          {narrativeState.type === "idle" && narrativeText === null && (
+            <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+              <Sparkles className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" />
+              <p className="text-[13px] text-[var(--text-secondary)] flex-1">
+                {hasGapData
+                  ? "Generate a consulting-grade narrative summary of this gap analysis."
+                  : "Score steps to enable AI narrative."}
+              </p>
+              <button
+                onClick={handleGenerateNarrative}
+                disabled={!hasGapData}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium shrink-0",
+                  hasGapData
+                    ? "bg-[var(--accent-blue)] text-white hover:opacity-90 transition-opacity"
+                    : "bg-[var(--bg-surface-active)] text-[var(--text-tertiary)] cursor-not-allowed"
+                )}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Generate Summary
+              </button>
+            </div>
+          )}
+
+          {narrativeState.type === "loading" && (
+            <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+              <RefreshCw className="h-4 w-4 text-[var(--text-tertiary)] animate-spin shrink-0" />
+              <p className="text-[13px] text-[var(--text-secondary)]">
+                Generating narrative… this may take a few seconds
+              </p>
+            </div>
+          )}
+
+          {narrativeState.type === "not_configured" && (
+            <div className="flex items-start gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+              <KeyRound className="h-4 w-4 text-[var(--text-quaternary)] shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-1">
+                  API key not configured
                 </p>
-                <button
-                  onClick={handleGenerateNarrative}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium bg-[var(--accent-blue)] text-white hover:opacity-90 transition-opacity shrink-0"
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Generate Summary
-                </button>
-              </div>
-            )}
-
-            {narrativeState.type === "loading" && (
-              <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <RefreshCw className="h-4 w-4 text-[var(--text-tertiary)] animate-spin shrink-0" />
-                <p className="text-[13px] text-[var(--text-secondary)]">
-                  Generating narrative… this may take a few seconds
-                </p>
-              </div>
-            )}
-
-            {narrativeState.type === "not_configured" && (
-              <div className="flex items-start gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <KeyRound className="h-4 w-4 text-[var(--text-quaternary)] shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-1">
-                    API key not configured
-                  </p>
-                  <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed">
-                    AI features require an OpenRouter API key. Add{" "}
-                    <code className="text-[var(--text-primary)] bg-[var(--bg-surface-active)] px-1 rounded">
-                      OPENROUTER_API_KEY
-                    </code>{" "}
-                    to your environment variables and redeploy.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {narrativeState.type === "rate_limited" && (
-              <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <Clock className="h-4 w-4 text-[var(--text-quaternary)] shrink-0" />
-                <p className="text-[13px] text-[var(--text-secondary)]">
-                  Narrative was generated recently. Try again in about{" "}
-                  {Math.ceil(narrativeState.retryAfterSeconds / 60)}{" "}
-                  minute{Math.ceil(narrativeState.retryAfterSeconds / 60) !== 1 ? "s" : ""}.
+                <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed">
+                  AI features require an OpenRouter API key. Add{" "}
+                  <code className="text-[var(--text-primary)] bg-[var(--bg-surface-active)] px-1 rounded">
+                    OPENROUTER_API_KEY
+                  </code>{" "}
+                  to your environment variables and redeploy.
                 </p>
               </div>
-            )}
+            </div>
+          )}
 
-            {narrativeState.type === "error" && (
-              <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                <AlertCircle className="h-4 w-4 text-[#EF4444]/60 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-[var(--text-secondary)] truncate">
-                    {narrativeState.message}
+          {narrativeState.type === "rate_limited" && (
+            <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+              <Clock className="h-4 w-4 text-[var(--text-quaternary)] shrink-0" />
+              <p className="text-[13px] text-[var(--text-secondary)]">
+                Try again in {formatCountdown(countdown)}
+              </p>
+            </div>
+          )}
+
+          {narrativeState.type === "error" && (
+            <div className="flex items-center gap-3 p-4 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+              <AlertCircle className="h-4 w-4 text-[#EF4444]/60 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] text-[var(--text-secondary)] truncate">
+                  {narrativeState.message}
+                </p>
+              </div>
+              <button
+                onClick={handleGenerateNarrative}
+                className="text-[12px] text-[var(--accent-blue)] hover:underline shrink-0"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {narrativeState.type === "idle" && narrativeText !== null && (
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+              <div className="flex items-center justify-between gap-4 mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[var(--text-tertiary)]" />
+                  <span className="text-[13px] font-semibold text-[var(--text-primary)]">
+                    AI Gap Summary
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleCopy(narrativeText)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium transition-colors",
+                      copied
+                        ? "bg-[#22C55E]/15 text-[#22C55E]"
+                        : "bg-[var(--bg-surface-active)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    )}
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleGenerateNarrative}
+                    disabled={isNarrativeLoading}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--bg-surface-active)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Regenerate
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {narrativeText.split("\n\n").filter(Boolean).map((paragraph, i) => (
+                  <p key={i} className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
+                    {paragraph}
                   </p>
-                </div>
-                <button
-                  onClick={handleGenerateNarrative}
-                  className="text-[12px] text-[var(--accent-blue)] hover:underline shrink-0"
-                >
-                  Retry
-                </button>
+                ))}
               </div>
-            )}
-
-            {narrativeState.type === "idle" && narrativeText !== null && (
-              <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-[var(--text-tertiary)]" />
-                    <span className="text-[13px] font-semibold text-[var(--text-primary)]">
-                      AI Gap Summary
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleCopy(narrativeText)}
-                      className={cn(
-                        "flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium transition-colors",
-                        copied
-                          ? "bg-[#22C55E]/15 text-[#22C55E]"
-                          : "bg-[var(--bg-surface-active)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                      )}
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="h-3 w-3" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3 w-3" />
-                          Copy
-                        </>
-                      )}
-                    </button>
-                    <button
-                      onClick={handleGenerateNarrative}
-                      disabled={isNarrativeLoading}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium bg-[var(--bg-surface-active)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <RefreshCw className="h-3 w-3" />
-                      Regenerate
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {narrativeText.split("\n\n").filter(Boolean).map((paragraph, i) => (
-                    <p key={i} className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
         {/* Table */}
         {gapSteps.length === 0 ? (
