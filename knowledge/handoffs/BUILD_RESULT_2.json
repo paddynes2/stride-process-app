@@ -1,33 +1,40 @@
 {
   "schema_version": "1.0",
-  "iteration": 109,
+  "iteration": 113,
   "slot": 2,
-  "task_id": "#IMP-057",
+  "task_id": "#IMP-069",
   "status": "completed",
-  "duration_seconds": 120,
+  "duration_seconds": 60,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
+      "path": "src/components/canvas/stage-node.tsx",
       "action": "modified",
-      "lines_added": 20,
-      "lines_removed": 2
+      "lines_added": 3,
+      "lines_removed": 1
+    },
+    {
+      "path": "src/components/canvas/touchpoint-node.tsx",
+      "action": "modified",
+      "lines_added": 3,
+      "lines_removed": 1
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unowned file, unrelated to changes)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
+    "src/components/canvas/stage-node.tsx",
+    "src/components/canvas/touchpoint-node.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Added Trash2 to lucide-react import, deleteImprovementIdea to client import, handleDelete async function with window.confirm + try/catch, and delete button after priority badge with specified styling.",
+  "notes": "Renamed export function StageNode to StageNodeComponent and added export const StageNode = React.memo(StageNodeComponent). Same pattern applied to TouchpointNode. Matches step-node.tsx and section-node.tsx patterns exactly. No functional changes.",
 
   "failure_details": null
 }

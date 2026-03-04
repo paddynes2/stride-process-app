@@ -1,46 +1,32 @@
 {
   "schema_version": "1.0",
-  "iteration": 109,
+  "iteration": 113,
   "slot": 1,
-  "task_id": "#FEAT-036 [1/2]",
+  "task_id": "#BUG-027",
   "status": "completed",
-  "duration_seconds": 420,
+  "duration_seconds": 180,
 
   "files_changed": [
     {
-      "path": "src/app/api/v1/ai/analyze-process/route.ts",
-      "action": "created",
-      "lines_added": 168,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/types/database.ts",
+      "path": "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
       "action": "modified",
-      "lines_added": 16,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/lib/api/client.ts",
-      "action": "modified",
-      "lines_added": 12,
-      "lines_removed": 1
+      "lines_added": 147,
+      "lines_removed": 118
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known/acceptable per LEARNINGS.md). Zero errors in new files." },
-    "build": { "status": "not_applicable", "output": "Full build not run — typecheck + lint sufficient for API/type-only changes" },
-    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "No unit tests exist for API routes in this codebase" }
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not owned by this task)" },
+    "build": { "status": "not_applicable", "output": "" },
+    "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/api/v1/ai/analyze-process/route.ts",
-    "src/types/database.ts",
-    "src/lib/api/client.ts"
+    "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "All acceptance criteria met. POST /api/v1/ai/analyze-process: auth guard, workspace fetch (implicit RLS), 5-min rate limit (reads settings.last_analysis_at, returns 429 with retry_after_seconds), OPENROUTER_API_KEY check (503 if missing), parallel fetch of steps + sections, empty analysis short-circuit when no steps, prompt construction grouped by section with all metrics (name/status/executor/maturity/target/gap/time/frequency/effort/impact/type), OpenRouter call using native fetch() with deepseek/deepseek-chat-v3-0324 at temp 0.3 + max_tokens 4096 + json_object response_format, JSON parse with try/catch (502 on failure), workspace settings cache via spread (...settings) preserving existing keys, logActivity fire-and-forget (action: created, entity_type: ai_analysis). Client wrapper: analyzeProcess(workspaceId) using apiFetch<AIAnalysisResult>. Types: AIInsight + AIAnalysisResult added to database.ts. Zero new dependencies.",
+  "notes": "BUG-027: Moved AI Narrative section outside {hasGapData && (...)} block — now always visible. Generate Summary button shows disabled (muted styling, cursor-not-allowed) with hint text 'Score steps to enable AI narrative.' when !hasGapData; fully functional when hasGapData. IMP-066: Added formatCountdown() helper (M:SS format), lastTextRef to restore narrative text after countdown expires, countdown useState, and useEffect with setInterval(1s) auto-transitioning to idle (restoring last known text) when countdown reaches 0. Rate-limited state now shows 'Try again in M:SS' live countdown instead of static 'about N minutes'. Regenerate button remains disabled during loading state. Fixed TS2367: removed impossible narrativeState.type === 'rate_limited' check inside idle+text JSX block (TypeScript narrows type there). All 6 acceptance criteria met.",
   "failure_details": null
 }

@@ -462,7 +462,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Distinguish self-hosted from cloud-hosted messaging, or link to documentation about configuring AI features.
 
-- [ ] #IMP-066 Gap analysis rate-limited state uses static minutes display instead of live countdown — Attempts: 0
+- [x] #IMP-066 Gap analysis rate-limited state uses static minutes display instead of live countdown — Attempts: 1 — DONE iteration 113, 2026-03-04
   - **Found:** Iteration 111 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
@@ -478,7 +478,7 @@
   - **Design principle:** Nielsen H5: Error Prevention
   - **Suggested fix:** Disable button when workspace has no steps (add hasSteps prop from page.tsx, same pattern as ai-analysis-view).
 
-- [ ] #IMP-068 Add as Improvement button lacks visual confirmation feedback — Attempts: 0
+- [x] #IMP-068 Add as Improvement button lacks visual confirmation feedback — Attempts: 1 — DONE iteration 113, 2026-03-04
   - **Found:** Iteration 111 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
@@ -486,7 +486,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show brief inline confirmation — change button text to "Added" with checkmark for 2 seconds (same Copy button pattern in gap-analysis-view).
 
-- [ ] #IMP-069 StageNode and TouchpointNode not wrapped in React.memo() — Attempts: 0
+- [x] #IMP-069 StageNode and TouchpointNode not wrapped in React.memo() — Attempts: 1 — DONE iteration 113, 2026-03-04
   - **Found:** Iteration 112 (acceptance tester)
   - **Category:** Performance
   - **Where:** `src/components/canvas/stage-node.tsx`, `src/components/canvas/touchpoint-node.tsx`
@@ -502,7 +502,7 @@
   - **Design principle:** Code consistency — all API calls should use apiFetch via lib/api/client.ts
   - **Suggested fix:** Extract a fetchAISuggestions() function in lib/api/client.ts and use it from improvements-view.tsx.
 
-- [ ] #IMP-071 Sidebar improvements badge shows nothing on API 500 instead of fallback 0 — Attempts: 0
+- [x] #IMP-071 Sidebar improvements badge shows nothing on API 500 instead of fallback 0 — Attempts: 1 — DONE iteration 113, 2026-03-04
   - **Found:** Iteration 112 (regression tester)
   - **Category:** Usability
   - **Where:** `src/components/layout/sidebar.tsx` (lines 131-135)
@@ -517,6 +517,22 @@
   - **What:** The compare view empty state says "create a journey canvas tab" but has no direct CTA button or link. Users must remember to add a tab via the tab bar.
   - **Design principle:** Nielsen H6: Recognition over recall — users should not have to remember where to take action
   - **Suggested fix:** Add a small "Add Journey Tab" button in the empty state that triggers the tab creation flow directly.
+
+- [ ] #IMP-073 Regenerate button hidden during rate_limited state instead of shown as disabled — Attempts: 0
+  - **Found:** Iteration 113 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
+  - **What:** The Regenerate button is inside a block conditioned on `narrativeState.type === 'idle' && narrativeText !== null`. During rate_limited state, the button is completely absent — users see no button at all until the countdown expires. A disabled Regenerate button would give better status visibility.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Render Regenerate button outside the narrativeText conditional, add disabled={narrativeState.type === 'loading' || narrativeState.type === 'rate_limited'} with tooltip when rate_limited.
+
+- [ ] #IMP-074 AI Suggestions panel shows no error state on endpoint failure — Attempts: 0
+  - **Found:** Iteration 113 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
+  - **What:** The AI Suggestions button triggers a panel that depends on a broken endpoint (BUG-028). When the endpoint fails, the user gets no visible feedback — the panel may open to an empty or broken state with no error messaging.
+  - **Design principle:** Nielsen H9: Help users recognize, diagnose, and recover from errors
+  - **Suggested fix:** Show an inline error state in the AI Suggestions panel when the endpoint returns a non-ok response, rather than silently failing.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

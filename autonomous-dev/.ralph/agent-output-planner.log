@@ -1,17 +1,15 @@
-EXECUTION_PLAN.json written for iteration 108. Summary:
+EXECUTION_PLAN.json written. Here's the summary:
 
-**Mode:** multi_task (3 independent slots, zero file overlap)
+**Iteration 113 — Multi-task (3 slots)**
 
-| Slot | Task | Type | Complexity | Files |
-|------|------|------|------------|-------|
-| 1 | **#FEAT-035 [2/2]** — Improvement ideas UI | build | M | 7 files (3 detail panels, 2 new page files, sidebar, workspace-shell) |
-| 2 | **#IMP-055** — Delete Perspective button label specificity | improve | S | 1 file (settings/page.tsx) |
-| 3 | **#IMP-053** — Prioritization empty state CTA link | improve | S | 1 file (prioritization-view.tsx) |
+| Slot | Task | Files | Complexity |
+|------|------|-------|------------|
+| 1 | **#BUG-027** (P2) + **#IMP-066** | `gap-analysis-view.tsx` | S |
+| 2 | **#IMP-069** | `stage-node.tsx`, `touchpoint-node.tsx` | S |
+| 3 | **#IMP-071** + **#IMP-068** | `sidebar.tsx`, `improvements-view.tsx` | S |
 
-**Validation:** Last commit `d9588df` valid, compilation passing, no revert needed.
-
-**Risk assessment:** Iter 107 risk score = 7 (schema + shared components + >5 files). Testing already passed 39/39 in iter 107. Regression scheduled alongside acceptance for iter 108.
-
-**Testing plan:** Acceptance for FEAT-035 [2/2] UI + regression baseline. Both testers should run.
-
-**Warning:** Accessibility cadence is 86 iterations overdue (last at iter 21). Next trigger: iteration 110.
+**Key decisions:**
+- BUG-028/BUG-029 are **not code bugs** — they're caused by unpushed migrations 019/022. Requires human `npx supabase db push`.
+- Phase 3b (FEAT-040) is the natural next phase but first feature is L-XL complexity. Clearing P2 bugs and improvements first.
+- No regression needed — just ran in iter 112 (27/28 PASS). Risk score 0.
+- All 3 slots have zero file overlap.

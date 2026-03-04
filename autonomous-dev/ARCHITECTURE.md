@@ -192,12 +192,19 @@ of each iteration and gitignored.
 
 ### Circuit Breaker (ralph.sh)
 
-ralph.sh counts consecutive `blocked` or `partial` results in PROGRESS.md.
-If the count reaches `LOOP_CIRCUIT_BREAKER` (default: 3), the loop stops.
-This prevents runaway iterations burning tokens on an unsolvable problem.
+ralph.sh uses a **dual-counter** circuit breaker:
+
+1. **PROGRESS.md parser** — counts consecutive `blocked` or `partial` results from the
+   bottom of PROGRESS.md (authoritative across sessions)
+2. **File-based counter** — `.ralph/failure_count` incremented on each pipeline failure,
+   reset on success (backup within a session, protects against reviewer formatting drift)
+
+The higher of the two counts is used. If it reaches `LOOP_CIRCUIT_BREAKER` (default: 3),
+the loop stops. The file counter resets at session start (stale value from a crashed
+session won't immediately trip the breaker).
 
 ```
-Iteration 7: completed ✓  (counter resets to 0)
+Iteration 7: completed ✓  (both counters reset to 0)
 Iteration 8: partial   ✗  (counter = 1)
 Iteration 9: blocked   ✗  (counter = 2)
 Iteration 10: blocked  ✗  (counter = 3 → CIRCUIT BREAKER TRIPPED)
@@ -255,6 +262,45 @@ git stash clear                    # Nuclear option: drop all stashes
 
 Future fix: ralph.sh should pop its auto-stash at session end, or tag stashes with
 session IDs and clean up stashes older than N sessions.
+
+### Agent Timeouts (ralph.sh)
+
+Every `claude` CLI invocation is wrapped with GNU `timeout --kill-after=10 $SECONDS`.
+This prevents hung API calls from blocking the pipeline indefinitely. Per-role defaults:
+
+| Role | Timeout | Config key |
+|------|---------|------------|
+| Planner | 15 min | `AGENT_TIMEOUT_PLANNER` |
+| Builder | 15 min | `AGENT_TIMEOUT_BUILDER` |
+| Tester | 10 min | `AGENT_TIMEOUT_TESTER` |
+| Reviewer | 15 min | `AGENT_TIMEOUT_REVIEWER` |
+
+`--kill-after=10` escalates from SIGTERM to SIGKILL after 10s — without this, a
+SIGTERM-ignoring claude process keeps the tee pipe open and the subshell hangs forever.
+Exit code 124 = timeout killed the process (logged as WARNING, iteration continues).
+
+The post-merge `npx tsc --noEmit` also has a 120s timeout to prevent hung type resolution.
+
+### Process Tree Cleanup (ralph.sh)
+
+On INT/TERM/HUP, `trap_cleanup` kills the entire process tree:
+1. `jobs -p` finds direct children (builder/tester subshells)
+2. `ps -ef | awk` finds grandchildren (claude processes inside subshells)
+3. Kill grandchildren first (claude), then children (subshells)
+4. Wait 3s, then SIGKILL any survivors
+
+This prevents orphaned claude processes from continuing after ralph exits (see G018).
+MSYS2/Git Bash has no `pkill -P`, so `ps -ef | awk` is used for portable descendant lookup.
+
+### Log Rotation (ralph.sh)
+
+At session start, if `ralph.log` exceeds 5000 lines, it's truncated to the last 2000 lines.
+Prevents unbounded growth over long multi-session runs.
+
+### Iteration Watchdog (ralph.sh)
+
+After each iteration, if duration exceeds 45 minutes (2700s), a WARNING is logged.
+This flags potential agent hangs for post-run diagnosis without blocking the pipeline.
 
 ### Signal File (knowledge/SIGNAL)
 
@@ -629,11 +675,18 @@ first `if` test.
 | Failure | Detection | Recovery |
 |---------|-----------|----------|
 | Planner crashes | Exit code != 0 | Reviewer documents failure |
+| Planner blocked | EXECUTION_PLAN.mode=blocked | Reviewer documents, return code 2, circuit breaker increments |
+| Agent timeout | Exit code 124 from `timeout` | WARNING logged, pipeline continues (SIGKILL after 10s) |
 | Builder fails | BUILD_RESULT.status=failed | Skip merge for that slot |
 | All builders fail | All results failed | Reviewer documents, no commit |
 | Merge conflict | git merge exit != 0 | Abort merge, skip conflicting slot |
+| Post-merge tsc fails | tsc exit != 0 | Skip testers, reviewer handles |
+| Post-merge tsc hangs | tsc timeout (120s) | Skip testers, reviewer handles |
+| Revert fails | git revert exit != 0 | `git revert --abort` restores clean state |
 | Tester unavailable | Playwright not detected | Skip testing, reviewer notes |
 | Reviewer crashes | Exit code != 0 | Critical — needs human review |
+| Dev server down | HTTP 000 after 15s retry | Skip iteration, increment failure counter |
+| Ralph killed (Ctrl+C) | INT/TERM/HUP signal | Kill process tree, cleanup worktrees, write session summary |
 
 ## Evolution Path
 

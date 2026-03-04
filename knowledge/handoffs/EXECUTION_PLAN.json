@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 109,
-  "date": "2026-03-03T02:30:00Z",
+  "iteration": 113,
+  "date": "2026-03-04T17:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "2a8dcf5390c1d06a10483938d4f33247002676e0",
+    "last_commit_hash": "6c313dc24921bb1ff62c61dcead5ac28a45938f3",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,113 +13,82 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-036 [1/2]",
-      "description": "AI process analysis backend — API route (OpenRouter/DeepSeek), types, client wrapper, workspace settings caching, rate limiting",
-      "source": "prd/FEATURES.md",
-      "type": "build",
+      "id": "#BUG-027",
+      "description": "Fix gap analysis Generate Summary button hidden when no gap data + add live countdown timer to rate-limited state (IMP-066)",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3a: Analysis Intelligence",
-      "complexity": "M",
+      "complexity": "S",
       "attempts": 1,
-      "risk_score": 2,
+      "risk_score": 0,
       "acceptance_criteria": [
-        "New POST route at src/app/api/v1/ai/analyze-process/route.ts — accepts { workspace_id } in request body, authenticates user, validates workspace access via Supabase RLS",
-        "Route fetches all steps for the workspace via supabase.from('steps').select('*').eq('workspace_id', workspaceId) — gets maturity_score, target_maturity, effort_score, impact_score, executor, time_minutes, frequency_per_month, status, step_type, section_id",
-        "Route fetches all sections for the workspace via supabase.from('sections').select('*').eq('workspace_id', workspaceId) — for grouping context",
-        "Constructs a system prompt setting persona as process optimization consultant, and user prompt enumerating each section's steps with their actual metrics (name, status, executor, maturity current/target, time, frequency, effort, impact, gaps)",
-        "Calls OpenRouter API at https://openrouter.ai/api/v1/chat/completions using native fetch() — model: deepseek/deepseek-chat-v3-0324, temperature: 0.3, max_tokens: 4096, Authorization: Bearer ${process.env.OPENROUTER_API_KEY}",
-        "Parses response.choices[0].message.content as JSON into AIAnalysisResult type (with try/catch for parse failures)",
-        "Types added to src/types/database.ts: AIAnalysisResult { bottlenecks: AIInsight[], redundancies: AIInsight[], automation_candidates: AIInsight[], maturity_recommendations: AIInsight[] }, AIInsight { title: string, description: string, severity: 'high' | 'medium' | 'low', affected_step_ids: string[] }",
-        "Caches result by updating workspace settings JSONB directly via Supabase: merge { last_analysis: result, last_analysis_at: new Date().toISOString() } into existing settings object — preserves other settings keys",
-        "Rate limit: reads workspace.settings.last_analysis_at — if less than 5 minutes ago, returns 429 with { error: { code: 'rate_limited', message: '...' }, retry_after_seconds: N }",
-        "Error handling: OPENROUTER_API_KEY not set → returns 503 { error: { code: 'ai_not_configured', message: 'AI analysis requires an OpenRouter API key. Add OPENROUTER_API_KEY to your environment variables.' } }",
-        "Error handling: OpenRouter API failure → returns 502 with error detail from upstream",
-        "Client wrapper in src/lib/api/client.ts: analyzeProcess(workspaceId: string): Promise<AIAnalysisResult> using apiFetch<AIAnalysisResult>",
-        "Uses native fetch() only — zero new dependencies",
-        "logActivity() called on successful analysis (action: 'created', entity_type: 'ai_analysis')"
+        "Generate Summary button visible even when hasGapData is false",
+        "Button is disabled with muted styling and hint text like 'Score steps to enable AI narrative' when no gap data",
+        "Button remains fully functional when gap data exists (no regression)",
+        "Rate-limited state shows live M:SS countdown timer instead of static 'about N minutes' (IMP-066 pattern from IMP-065 in ai-analysis-view.tsx)",
+        "Countdown auto-transitions to idle state when reaching 0",
+        "Regenerate button disabled during rate_limited state"
       ],
       "files_owned": [
-        "src/app/api/v1/ai/analyze-process/route.ts",
-        "src/types/database.ts",
-        "src/lib/api/client.ts"
+        "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
       ],
       "files_read_only": [
-        "src/lib/api/response.ts",
-        "src/lib/api/activity.ts",
-        "src/lib/supabase/server.ts",
-        "src/app/api/v1/improvement-ideas/route.ts"
+        "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
       ],
       "context": {
-        "similar_files": [
-          "src/app/api/v1/improvement-ideas/route.ts — same auth + envelope + validation pattern",
-          "src/app/api/v1/workspaces/[id]/route.ts — workspace access pattern, settings column usage"
-        ],
+        "similar_files": ["src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"],
         "patterns_to_follow": [
-          "API envelope: successResponse(data) / errorResponse(code, message, status)",
-          "Auth guard: const { data: { user } } = await supabase.auth.getUser(); if (!user) return errorResponse('unauthorized', 'Not authenticated', 401);",
-          "apiFetch<T>() unwraps envelope, returns T directly — client wrapper returns apiFetch<AIAnalysisResult>(url, opts)",
-          "void logActivity() for fire-and-forget audit logging",
-          "Server-only env vars: process.env.OPENROUTER_API_KEY (no NEXT_PUBLIC_ prefix)"
+          "IMP-065 countdown timer pattern: formatCountdown() helper, countdown state, useEffect with setInterval(1s), auto-transition to idle at 0, display format 'Try again in M:SS'",
+          "BUG-027 fix: move Generate Summary button outside the {hasGapData && (...)} block, show disabled state when !hasGapData"
         ],
-        "learnings_relevant": [
-          "apiFetch unwraps envelope — client functions return apiFetch<T>() directly, no nested access",
-          "NEXT_PUBLIC_ static replacement — OPENROUTER_API_KEY is server-only, must NOT use NEXT_PUBLIC_ prefix",
-          "Supabase RLS + workspace access — use workspace fetch as implicit RLS check"
-        ],
-        "affected_urls": [
-          "/api/v1/ai/analyze-process"
-        ]
+        "learnings_relevant": [],
+        "affected_urls": ["/w/[workspaceId]/gap-analysis"]
       },
-      "has_ui_changes": false,
+      "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "OpenRouter uses OpenAI-compatible API format. Request body: { model: 'deepseek/deepseek-chat-v3-0324', messages: [{role:'system', content: systemPrompt}, {role:'user', content: userPrompt}], temperature: 0.3, max_tokens: 4096, response_format: { type: 'json_object' } }. Response shape: { choices: [{ message: { content: string } }] } — content is a JSON string to parse. The workspace settings JSONB column already exists (migration 003, DEFAULT '{}'). To cache: fetch current workspace, spread existing settings, add last_analysis and last_analysis_at, then update. Use direct Supabase update: supabase.from('workspaces').update({ settings: { ...currentSettings, last_analysis: result, last_analysis_at: isoDate } }).eq('id', workspaceId). Do NOT modify the workspace PATCH API route. Step data: steps table has workspace_id directly — query supabase.from('steps').select('*').eq('workspace_id', workspaceId). Sections table also has workspace_id. Prompt structure: system prompt sets AI as 'senior process optimization consultant analyzing a business process map', user prompt lists each section with its steps and their metrics. Request JSON output matching AIAnalysisResult schema. If workspace has no steps, return empty analysis (no API call needed). The route file goes in src/app/api/v1/ai/analyze-process/route.ts — create the ai/ and analyze-process/ directories."
+      "special_instructions": "Read ai-analysis-view.tsx to copy the exact IMP-065 countdown pattern. The NarrativeState type already has rate_limited with retryAfterSeconds — wire the countdown to that. For BUG-027: show the AI narrative section (button + results) unconditionally, but disable the Generate Summary button when !hasGapData with a tooltip/hint."
     },
     {
       "slot": 2,
-      "id": "#IMP-057",
-      "description": "Add delete action button on improvement idea cards with confirmation",
+      "id": "#IMP-069",
+      "description": "Wrap StageNode and TouchpointNode in React.memo() matching existing StepNode/SectionNode pattern",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
-      "phase": "Phase 3a: Analysis Intelligence",
+      "phase": "Phase 2a: Journey Canvas",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Each improvement card has a Trash2 icon button in the top-right area (next to priority badge)",
-        "Click triggers window.confirm('Delete this improvement idea?') — simple pattern matching other delete actions",
-        "On confirm, calls deleteImprovementIdea(idea.id) imported from @/lib/api/client",
-        "On success, removes idea from local state: setIdeas(prev => prev.filter(i => i.id !== idea.id))",
-        "On error, calls toastError('Failed to delete improvement', { error: err })",
-        "Delete button styled subtle: text-[var(--text-tertiary)] hover:text-[#EF4444] transition-colors, Trash2 h-3.5 w-3.5",
-        "TypeScript compiles without errors"
+        "StageNode export wrapped in React.memo() matching step-node.tsx line 145 pattern",
+        "TouchpointNode export wrapped in React.memo() matching section-node.tsx line 96 pattern",
+        "No functional changes to either component",
+        "TypeScript compilation passes"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
+        "src/components/canvas/stage-node.tsx",
+        "src/components/canvas/touchpoint-node.tsx"
       ],
       "files_read_only": [
-        "src/lib/api/client.ts"
+        "src/components/canvas/step-node.tsx",
+        "src/components/canvas/section-node.tsx"
       ],
       "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/comments/comments-view.tsx — delete pattern with confirmation"
-        ],
+        "similar_files": ["src/components/canvas/step-node.tsx", "src/components/canvas/section-node.tsx"],
         "patterns_to_follow": [
-          "Import deleteImprovementIdea from @/lib/api/client (already exists line 791-792)",
-          "Import Trash2 from lucide-react (add to existing import line 5)",
-          "toastError pattern already used in handleStatusChange (line 63)"
+          "step-node.tsx: export const StepNode = React.memo(function StepNode(...) { ... })",
+          "Change 'export function StageNode' to 'function StageNodeInner' and add 'export const StageNode = React.memo(StageNodeInner)' — or use named function expression pattern from step-node.tsx"
         ],
         "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/improvements"
-        ]
+        "affected_urls": []
       },
-      "has_ui_changes": true,
+      "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "deleteImprovementIdea already exists in client.ts — do NOT modify client.ts. Only modify improvements-view.tsx. Add the delete button inside each card's top-right badge area. Add a handleDelete async function similar to handleStatusChange. Use window.confirm() for simplicity (this is a lightweight improvement, not a major feature). The function should also be async with try/catch wrapping the API call."
+      "special_instructions": "Read step-node.tsx to see the exact React.memo pattern used. Apply identically to stage-node.tsx and touchpoint-node.tsx. Minimal change — just wrap the export."
     },
     {
       "slot": 3,
-      "id": "#IMP-062",
-      "description": "Prioritization 'Go to Canvas' link targets first process-type tab instead of tabs[0]",
+      "id": "#IMP-071",
+      "description": "Sidebar improvements badge defaults to 0 on fetch error + Add as Improvement visual confirmation feedback (IMP-068)",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 3a: Analysis Intelligence",
@@ -127,48 +96,51 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Go to Canvas link targets first tab with canvas_type === 'process' instead of tabs[0]",
-        "Falls back to tabs[0] if no process-type tab exists",
-        "Link still hidden when tabs.length === 0",
-        "TypeScript compiles without errors"
+        "IMP-071: When /api/v1/improvement-ideas returns an error (500, network failure), sidebar badge shows 0 instead of blank",
+        "IMP-071: .catch() handler sets improvementsOpenCount to null (hides badge) OR 0 — choose 0 so badge renders consistently",
+        "IMP-068: After 'Add as Improvement' button is clicked and succeeds, button text changes to 'Added ✓' for 2 seconds before reverting",
+        "IMP-068: Pattern matches the Copy button in gap-analysis-view.tsx (copied state with setTimeout reset)",
+        "TypeScript compilation passes"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx"
+        "src/components/layout/sidebar.tsx",
+        "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
       ],
       "files_read_only": [
-        "src/types/database.ts"
+        "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
       ],
       "context": {
-        "similar_files": [],
+        "similar_files": ["src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"],
         "patterns_to_follow": [
-          "Replace tabs[0].id at line 169 with (tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id",
-          "Tab type has canvas_type: 'process' | 'journey' field"
+          "IMP-071: Change .catch(() => {}) to .catch(() => { if (!cancelled) setImprovementsOpenCount(0); }) at sidebar.tsx:74",
+          "IMP-068: Copy button pattern from gap-analysis-view.tsx — useState for 'added' per suggestion index, onClick sets true + setTimeout(2000) resets to false, show Check icon + 'Added' text while true"
         ],
         "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/prioritization"
-        ]
+        "affected_urls": ["/w/[workspaceId]/improvements"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Minimal one-line change at line 169 of prioritization-view.tsx. Change `tabs[0].id` to `(tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id`. The Tab type from database.ts includes canvas_type. Verify the tabs prop passed to PrioritizationView includes canvas_type in its type signature — if using a subset type, ensure canvas_type is included."
+      "special_instructions": "IMP-071 is a one-line fix in sidebar.tsx. IMP-068 requires adding a Map<number, boolean> or Set state to track which AI suggestion 'Add as Improvement' buttons show confirmation. Read gap-analysis-view.tsx Copy button pattern (uses copied useState + setTimeout) as reference."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/lib/api/response.ts", "src/lib/supabase/server.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
     "owner": null,
-    "note": "src/types/database.ts and src/lib/api/client.ts owned exclusively by slot 1. No other slot may modify these files."
+    "note": "No shared file modifications needed this iteration"
   },
-  "merge_order": ["#FEAT-036 [1/2]", "#IMP-057", "#IMP-062"],
+  "merge_order": ["#BUG-027", "#IMP-069", "#IMP-071"],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": true,
-    "regression_reason": "Risk score 4 from iteration 108 (9 files changed including shared components: sidebar, workspace-shell, 3 detail panels). Last regression: iteration 107.",
-    "suites_to_run": ["acceptance", "regression-baseline"],
+    "run_regression": false,
+    "regression_reason": "Regression just ran in iter 112 (27/28 PASS). Next due at iter 120. All tasks are S-complexity additive changes with zero data model changes and risk_score 0.",
+    "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": [
+      "BUG-028 and BUG-029 (improvement-ideas + coloring-rules 500) are caused by unpushed migrations 019/022 — NOT code bugs. Requires human action: npx supabase db push. Cannot be fixed by builders.",
+      "Phase 3b (FEAT-040+) is next phase but first feature is L-XL complexity. Clearing P2 bugs and improvements first."
+    ],
     "diagnoses_written": false,
     "signal_override": null
   }

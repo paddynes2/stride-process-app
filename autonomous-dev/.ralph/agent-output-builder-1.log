@@ -1,16 +1,12 @@
-All tasks complete. Here's a summary of what was implemented for **#FEAT-035**:
+Done. Summary of changes to `gap-analysis-view.tsx`:
 
-## Implementation Summary
+**BUG-027 fix:**
+- AI Narrative section moved outside `{hasGapData && (...)}` — always visible
+- Generate Summary button disabled with muted styling + hint text "Score steps to enable AI narrative." when `!hasGapData`
+- Button fully functional when `hasGapData` (no regression)
 
-**7 files changed, 0 typecheck errors, 0 lint errors**
-
-### New files:
-- **`improvements/page.tsx`** — Server component: fetches `improvement_ideas` + entity name/tab lookups (steps, sections, touchpoints), passes to view
-- **`improvements/improvements-view.tsx`** — Client view: status filter tabs (All/Proposed/Approved/In Progress/Completed/Rejected), priority dropdown filter, cards with title + colored status/priority badges + linked entity link + description preview, inline status change via DropdownMenu → `updateImprovementIdea()`
-
-### Modified files:
-- **`step-detail-panel.tsx`** — Added "Add Improvement" button + Radix Dialog (using `DialogPrimitive.Title` per BUG-023 pattern) with title/description/priority form, pre-fills `linked_step_id`
-- **`section-detail-panel.tsx`** — Same dialog pattern, pre-fills `linked_section_id`, uses `section.workspace_id`
-- **`touchpoint-detail-panel.tsx`** — Same dialog pattern, pre-fills `linked_touchpoint_id`, uses `touchpoint.workspace_id`
-- **`sidebar.tsx`** — Added `Lightbulb` import, Improvements nav item between Prioritization and Comments, open-count badge via `useEffect` fetch, `!p.includes('/improvements')` added to Workflows active check
-- **`workspace-shell.tsx`** — `'improvements'` added to reserved paths array
+**IMP-066 (countdown timer):**
+- Added `formatCountdown()` helper (M:SS format, copied from ai-analysis-view.tsx)
+- Added `countdown` state + `lastTextRef` (restores previous narrative text when countdown expires)
+- Added `useEffect` with `setInterval(1s)` — auto-transitions to `idle` at 0
+- Rate-limited panel now shows `"Try again in M:SS"` instead of static minutes estimate

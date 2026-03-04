@@ -103,12 +103,11 @@
   - **What:** BUILD_RESULT_2.json has `iteration: 54` but current plan is iteration 108. Pipeline slot 2 builder wrote stale iteration number. Code change (Delete Perspective label) is correct but tracking metadata is wrong. Can cause confusion when correlating build results to iterations.
   - **Impact:** Pipeline metadata only — no user-facing impact.
 
-- [ ] #BUG-027 Gap analysis Generate Summary button hidden when no gap data (P2) — Attempts: 0
+- [x] #BUG-027 Gap analysis Generate Summary button hidden when no gap data (P2) — Attempts: 1 — DONE iteration 113, 2026-03-04
   - **Found:** Iteration 111 (acceptance tester)
   - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx` — `{hasGapData && (...)}` block
-  - **What:** The entire AI narrative section (including "Generate Summary" button) is hidden when hasGapData is false. A new or empty workspace gives no indication that the AI narrative feature exists. The spec says the button should be "above the table" without specifying a conditional.
-  - **Steps to reproduce:** Create a new workspace → Navigate to Gap Analysis → Observe: no "Generate Summary" button visible.
-  - **Suggested fix:** Show the button in a muted/disabled state with hint text like "Score steps to enable AI narrative" when no gap data exists.
+  - **What:** The entire AI narrative section (including "Generate Summary" button) is hidden when hasGapData is false. A new or empty workspace gives no indication that the AI narrative feature exists.
+  - **Fix applied:** Moved AI narrative section outside `{hasGapData && (...)}` block — now always visible. Generate Summary button shows disabled state with muted styling, cursor-not-allowed, and hint text "Score steps to enable AI narrative." when !hasGapData. Fully functional when hasGapData. Also added live countdown timer for rate-limited state (IMP-066).
 
 - [ ] #BUG-028 /api/v1/improvement-ideas returns HTTP 500 for authenticated users (P2) — Attempts: 0
   - **Found:** Iteration 112 (regression tester — browser)

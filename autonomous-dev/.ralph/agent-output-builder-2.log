@@ -1,8 +1,7 @@
-Done. Here's a summary:
+Done. Here's what was done for task `#IMP-069`:
 
-**Task #IMP-055 — completed**
+**Changes:**
+- `stage-node.tsx`: Renamed `export function StageNode` → `function StageNodeComponent`, added `export const StageNode = React.memo(StageNodeComponent);` at the end
+- `touchpoint-node.tsx`: Same pattern — `function TouchpointNodeComponent` + `export const TouchpointNode = React.memo(TouchpointNodeComponent);`
 
-- **Change:** Line 463 in `settings/page.tsx` — destructive button in the Delete Perspective `DialogFooter` changed from `Delete` to `Delete Perspective`
-- **Typecheck:** pass (0 errors)
-- **Lint:** pass (0 errors; 1 pre-existing warning in unrelated file)
-- **Staged:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`
+**Verification:** TypeScript: ✅ 0 errors | Lint: ✅ 0 errors (1 pre-existing warning in unowned file) | Both files staged.

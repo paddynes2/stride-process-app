@@ -1,33 +1,40 @@
 {
   "schema_version": "1.0",
-  "iteration": 109,
+  "iteration": 113,
   "slot": 3,
-  "task_id": "#IMP-062",
+  "task_id": "#IMP-071",
   "status": "completed",
-  "duration_seconds": 60,
+  "duration_seconds": 180,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx",
+      "path": "src/components/layout/sidebar.tsx",
       "action": "modified",
       "lines_added": 1,
       "lines_removed": 1
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
+      "action": "modified",
+      "lines_added": 22,
+      "lines_removed": 5
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "skipped", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not touched)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx"
+    "src/components/layout/sidebar.tsx",
+    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Minimal one-line change at line 169. Changed `tabs[0].id` to `(tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id`. The tabs prop already included canvas_type in its Pick<Tab, 'id' | 'name' | 'canvas_type'> type signature from the previous iteration, so no type changes were needed. TypeScript compiled without errors.",
+  "notes": "IMP-071: Changed .catch(() => {}) to .catch(() => { if (!cancelled) setImprovementsOpenCount(0); }) in sidebar.tsx. Badge now shows 0 on fetch error instead of blank. IMP-068: Added Check icon import, addedIndices Set<number> state, updated handleAddAsImprovement to accept index + set confirmation with 2s setTimeout reset, updated button to show Check icon + 'Added \u2713' in green while confirmed. Pattern matches gap-analysis-view.tsx Copy button (setCopied + setTimeout reset).",
 
   "failure_details": null
 }

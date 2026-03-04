@@ -1,15 +1,11 @@
-Task complete. Here's a summary of what was done:
+Both tasks implemented and verified:
 
-**#IMP-053 — Prioritization empty state CTA**
+**IMP-071 (sidebar.tsx):** One-line fix — `.catch(() => {})` → `.catch(() => { if (!cancelled) setImprovementsOpenCount(0); })`. Badge now shows `0` on fetch error instead of blank.
 
-**Changes made** to `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`:
+**IMP-068 (improvements-view.tsx):**
+- Added `Check` icon import
+- Added `addedIndices: Set<number>` state
+- Updated `handleAddAsImprovement(suggestion, index)` — on success, adds index to set + clears it after 2 seconds via `setTimeout`
+- Button shows `<Check /> Added ✓` in green while confirmed, reverts to `<Plus /> Add as Improvement` after 2s — matches the Copy button pattern from gap-analysis-view.tsx exactly
 
-1. Added `import Link from "next/link"` 
-2. Modified the empty state `<div>` from `flex items-center justify-center` to `flex flex-col items-center justify-center gap-2` to support stacked content
-3. Wrapped the existing message text in a `<span>`
-4. Added a conditional `<Link>` component below the message:
-   - Only renders when `tabs.length > 0` (hidden if no tabs)
-   - Navigates to `/w/${workspaceId}/${tabs[0].id}` (first tab)
-   - Styled `text-[var(--accent-blue)] hover:underline`
-
-**Verification:** typecheck ✅ (0 errors), lint ✅ (0 errors, 1 pre-existing warning)
+**Verification:** TypeScript: ✅ 0 errors | Lint: ✅ 0 errors (1 pre-existing warning in flow-canvas.tsx)
