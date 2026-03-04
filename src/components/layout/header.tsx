@@ -41,13 +41,13 @@ export function Header({ userName, userEmail }: HeaderProps) {
       style={{ height: "var(--header-height)" }}
     >
       <div className="flex items-center gap-2">
-        {perspectives.length > 0 && (
+        <div className={perspectives.length === 0 ? "hidden" : undefined}>
           <PerspectiveSwitcher
             perspectives={perspectives}
             activePerspective={activePerspective}
             onSelect={setActivePerspectiveId}
           />
-        )}
+        </div>
       </div>
 
       <DropdownMenu>
