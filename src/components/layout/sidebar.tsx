@@ -100,7 +100,7 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
     >
       {/* Header */}
       <div className="flex items-center gap-2 px-3 h-[var(--header-height)] border-b border-[var(--border-subtle)]">
-        <Link href="/workspaces" className="flex items-center gap-2 min-w-0 flex-1">
+        <Link href="/workspaces" aria-label="Back to workspaces" className="flex items-center gap-2 min-w-0 flex-1">
           <div
             className="flex items-center justify-center shrink-0"
             style={{ width: 24, height: 24, borderRadius: 6, background: "var(--brand)" }}
@@ -132,6 +132,7 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
             <Link
               key={item.label}
               href={href}
+              aria-label={item.label}
               className={cn(
                 "flex items-center gap-2 px-2 py-1.5 rounded-[var(--radius-sm)]",
                 "text-[var(--text-sm)] font-medium transition-colors",
@@ -154,8 +155,8 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
 
       {/* Bottom */}
       <div className="px-2 pb-3">
-        <Link href="/workspaces">
-          <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
+        <Link href="/workspaces" aria-label="All Workspaces">
+          <Button variant="ghost" size="sm" aria-label="All Workspaces" className="w-full justify-start gap-2">
             <LayoutDashboard className="h-3.5 w-3.5" />
             {!collapsed && <span>All Workspaces</span>}
           </Button>
