@@ -385,7 +385,7 @@ function ComparisonTable({
 }) {
   return (
     <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--border-subtle)]">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm" aria-label="Perspectives comparison">
         <thead>
           <tr className="bg-[var(--bg-surface)] border-b border-[var(--border-subtle)]">
             <th className="text-left px-4 py-2.5 text-xs font-medium text-[var(--text-tertiary)]">
