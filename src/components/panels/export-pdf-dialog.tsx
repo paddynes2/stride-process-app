@@ -180,6 +180,18 @@ export function ExportPdfDialog({
     (k) => config[k]
   ).length;
 
+  const presetConfig =
+    activePreset === "executive" ? EXECUTIVE_SUMMARY_CONFIG
+    : activePreset === "full" ? FULL_AUDIT_CONFIG
+    : activePreset === "gap" ? GAP_REPORT_CONFIG
+    : null;
+
+  const maskedCount = presetConfig
+    ? (Object.keys(presetConfig) as (keyof ExportConfig)[]).filter(
+        (k) => presetConfig[k] && !availability[k]
+      ).length
+    : 0;
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!exporting) onOpenChange(o); }}>
       <DialogContent className="max-w-lg" aria-describedby={undefined}>
@@ -219,6 +231,11 @@ export function ExportPdfDialog({
               </button>
             ))}
           </div>
+          {activePreset !== "custom" && maskedCount > 0 && (
+            <p className="mt-2 text-xs text-white/55">
+              {maskedCount} section{maskedCount !== 1 ? "s" : ""} unavailable — add data to unlock them
+            </p>
+          )}
         </div>
 
         {/* Section checkboxes */}
