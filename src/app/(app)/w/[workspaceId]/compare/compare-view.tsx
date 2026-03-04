@@ -266,6 +266,7 @@ export function CompareView({
 
   const router = useRouter();
   const [creating, setCreating] = React.useState(false);
+  const [creatingProcess, setCreatingProcess] = React.useState(false);
 
   const handleCreateJourneyTab = React.useCallback(async () => {
     setCreating(true);
@@ -275,6 +276,17 @@ export function CompareView({
     } catch (err) {
       toastError("Failed to create journey tab", { error: err });
       setCreating(false);
+    }
+  }, [workspaceId, router]);
+
+  const handleCreateProcessTab = React.useCallback(async () => {
+    setCreatingProcess(true);
+    try {
+      const newTab = await createTab({ workspace_id: workspaceId, name: "Process", canvas_type: "process" });
+      router.push(`/w/${workspaceId}/${newTab.id}`);
+    } catch (err) {
+      toastError("Failed to create process tab", { error: err });
+      setCreatingProcess(false);
     }
   }, [workspaceId, router]);
 
@@ -345,11 +357,18 @@ export function CompareView({
                 : "Create a process canvas tab to compare the customer journey with your internal operations."}
           </p>
         </div>
-        {journeyTab === null && (
-          <Button onClick={handleCreateJourneyTab} loading={creating}>
-            Create Journey Tab
-          </Button>
-        )}
+        <div className="flex gap-3">
+          {processTab === null && (
+            <Button onClick={handleCreateProcessTab} loading={creatingProcess}>
+              Create Process Tab
+            </Button>
+          )}
+          {journeyTab === null && (
+            <Button onClick={handleCreateJourneyTab} loading={creating}>
+              Create Journey Tab
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
