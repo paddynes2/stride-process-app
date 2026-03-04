@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Lightbulb, ChevronDown, ChevronUp, Trash2, Sparkles, RefreshCw, AlertCircle, KeyRound, Clock, Plus } from "lucide-react";
+import { Lightbulb, ChevronDown, ChevronUp, Trash2, Sparkles, RefreshCw, AlertCircle, KeyRound, Clock, Plus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -118,6 +118,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
   const [priorityFilter, setPriorityFilter] = React.useState<PriorityFilter>("all");
   const [suggestionsState, setSuggestionsState] = React.useState<SuggestionsState>({ type: "idle" });
   const [isPanelOpen, setIsPanelOpen] = React.useState(false);
+  const [addedIndices, setAddedIndices] = React.useState<Set<number>>(new Set());
 
   const filtered = React.useMemo(() => {
     return ideas.filter((idea) => {
@@ -157,7 +158,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
     }
   };
 
-  const handleAddAsImprovement = async (suggestion: AISuggestion) => {
+  const handleAddAsImprovement = async (suggestion: AISuggestion, index: number) => {
     const linkedStepId = suggestion.affected_step_ids[0] ?? null;
     try {
       const newIdea = await createImprovementIdea({
@@ -168,6 +169,14 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
         ...(linkedStepId ? { linked_step_id: linkedStepId } : {}),
       });
       setIdeas((prev) => [newIdea, ...prev]);
+      setAddedIndices((prev) => new Set(prev).add(index));
+      setTimeout(() => {
+        setAddedIndices((prev) => {
+          const next = new Set(prev);
+          next.delete(index);
+          return next;
+        });
+      }, 2000);
     } catch (err) {
       toastError("Failed to add improvement", { error: err });
     }
@@ -304,11 +313,26 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
                           </p>
                         )}
                         <button
-                          onClick={() => handleAddAsImprovement(suggestion)}
-                          className="flex items-center gap-1 text-[11px] text-[var(--accent-blue)] hover:underline"
+                          onClick={() => handleAddAsImprovement(suggestion, i)}
+                          disabled={addedIndices.has(i)}
+                          className={cn(
+                            "flex items-center gap-1 text-[11px]",
+                            addedIndices.has(i)
+                              ? "text-[#22C55E] cursor-default"
+                              : "text-[var(--accent-blue)] hover:underline"
+                          )}
                         >
-                          <Plus className="h-3 w-3" />
-                          Add as Improvement
+                          {addedIndices.has(i) ? (
+                            <>
+                              <Check className="h-3 w-3" />
+                              Added ✓
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-3 w-3" />
+                              Add as Improvement
+                            </>
+                          )}
                         </button>
                       </div>
                     );
