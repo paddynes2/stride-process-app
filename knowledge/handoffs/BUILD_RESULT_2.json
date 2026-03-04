@@ -1,33 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 120,
+  "iteration": 122,
   "slot": 2,
-  "task_id": "#BUG-031",
+  "task_id": "#BUG-037",
   "status": "completed",
   "duration_seconds": 60,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
       "action": "modified",
-      "lines_added": 7,
-      "lines_removed": 10
+      "lines_added": 1,
+      "lines_removed": 0
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning (unrelated addEdge unused var in flow-canvas.tsx)" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused addEdge) — not in owned files" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx"
+    "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Removed conditional wrapper around Cancelled row. Moved Cancelled into the grid as a 5th column div, matching Active and Considering styling. Shows $0/mo when no cancelled tools exist.",
+  "notes": "Added <h1 className=\"sr-only\">Tools</h1> as first child of the outermost <div className=\"flex h-full\"> at line 408. The existing h2 'Tools Summary' at line 540 is unchanged. Heading hierarchy is now h1 then h2 with no skipped levels. Visual appearance is unchanged (sr-only is Tailwind's screen-reader-only utility).",
 
   "failure_details": null
 }

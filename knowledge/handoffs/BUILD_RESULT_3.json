@@ -1,28 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 121,
+  "iteration": 122,
   "slot": 3,
-  "task_id": "#BUG-035",
-  "status": "failed",
-  "duration_seconds": 180,
+  "task_id": "#BUG-036",
+  "status": "completed",
+  "duration_seconds": 120,
 
-  "files_changed": [],
+  "files_changed": [
+    {
+      "path": "src/components/layout/header.tsx",
+      "action": "modified",
+      "lines_added": 2,
+      "lines_removed": 0
+    }
+  ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0" },
-    "lint": { "status": "skipped", "errors": 0, "output": "No code changes made — lint not applicable" },
-    "build": { "status": "not_applicable", "output": "DB-only task, no build step" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused var), no errors" },
+    "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [],
+  "staged_files": ["src/components/layout/header.tsx"],
   "ownership_violations": [],
-  "notes": "BLOCKED: Supabase CLI is not authenticated on this machine. No access token found in any expected location (~/.config/supabase/access-token, AppData/Roaming/supabase/access-token, SUPABASE_ACCESS_TOKEN env var). 'npx supabase link --project-ref tkcyxtxkmveipnwgrddd' returns Unauthorized. 'npx supabase db push' returns 'Cannot find project ref. Have you run supabase link?'. Manual fix required: (1) run 'npx supabase login' in a terminal, (2) run 'npx supabase link --project-ref tkcyxtxkmveipnwgrddd', (3) run 'npx supabase db push'. Migration file supabase/migrations/024_step_tools.sql is correct and ready — uses gen_random_uuid(), has RLS policies, mirrors step_roles pattern. TypeScript compiles clean. Verified table does NOT yet exist (GET /rest/v1/step_tools returned 404 from Supabase PostgREST).",
+  "notes": "Added suppressHydrationWarning to both DropdownMenuTrigger child elements in header.tsx: (1) the user avatar Button on line 55, and (2) the perspective switcher button on line 106. Radix increments internal IDs during render; client-only Radix components on gap-analysis/tools pages shift that counter, causing a mismatch on the header DropdownMenuTrigger aria-controls/id attributes. suppressHydrationWarning silences the mismatch without affecting functionality.",
 
-  "failure_details": {
-    "phase": "build",
-    "error": "Cannot find project ref. Have you run supabase link?\nUnexpected error retrieving remote project status: {\"message\":\"Unauthorized\"}\nNo SUPABASE_ACCESS_TOKEN in environment. No access-token file found. CLI unauthenticated — cannot push migration to remote DB.",
-    "attempts": 2
-  }
+  "failure_details": null
 }

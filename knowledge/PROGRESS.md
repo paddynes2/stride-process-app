@@ -2127,3 +2127,33 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 4 — 2/3 tasks completed. Slot 3 failure was environmental (no CLI auth), not code issue.
 - Observations: 3 (1 bug confirmed + 2 improvements)
 **Notes:** BUG-035 blocked on Supabase CLI authentication — not a code issue. Migration file exists and is correct. Needs manual `npx supabase login` before retry. BUG-034 P1 fix restores primary step-editing workflow. BUG-031 P2 fix ensures Cancelled row always visible in Spend Summary.
+
+## Iteration 122 — 2026-03-05 03:30
+**Tasks:**
+- #BUG-033 Journey tab not in tab bar after creation from Compare view CTA — slot 1 — completed
+- #BUG-037 Tools page heading hierarchy violation (h2 without h1) — slot 2 — completed
+- #BUG-036 Radix hydration mismatch on gap-analysis and tools pages — slot 3 — failed (not merged)
+**Source:** prd/BUGS.md
+**Mode:** multi_task
+**Result:** partial
+**Changes:**
+- src/app/(app)/w/[workspaceId]/compare/compare-view.tsx (modified — added refreshTabs() after createTab())
+- src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (modified — added sr-only h1)
+- src/components/layout/header.tsx (built but NOT merged — slot 3 merge failed)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs: typecheck.status=pass)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (no tester ran this iteration)
+- Canary test: skipped (has_ui_changes=false for all tasks)
+- Post-merge check: PASS
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Both merged fixes are minimal, targeted, follow existing patterns. No debug artifacts.
+- Test coverage: 2 — No tester ran. Changes are low-risk (refreshTabs call, sr-only h1).
+- Confidence: 4 — BUG-033 and BUG-037 fixes are straightforward. BUG-036 needs retry.
+- Efficiency: 3 — 2/3 tasks merged. Slot 3 pipeline merge failure lost work that needs retry.
+- Observations: 0
+**Notes:** BUG-036 (header.tsx suppressHydrationWarning) built successfully in slot 3 but was not merged by the pipeline. Needs retry next iteration.

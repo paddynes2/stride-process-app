@@ -138,12 +138,10 @@
   - **Steps to reproduce:** 1. Navigate to a canvas tab. 2. Click any step node. 3. Observe network: /api/v1/step-tools?step_id={id} returns 500.
   - **Suggested fix:** Investigate step-tools API route handler — likely missing step_tools table (migration 024 not pushed) or query error.
 
-- [ ] #BUG-033 Journey tab not in tab bar after creation from Compare view CTA (P2) — Attempts: 0
+- [x] #BUG-033 Journey tab not in tab bar after creation from Compare view CTA (P2) — Attempts: 1 — DONE iteration 122, 2026-03-05
   - **Found:** Iteration 119 (acceptance tester)
   - **Where:** `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` + workspace-shell.tsx tab bar
-  - **What:** After clicking 'Create Journey Tab' in Compare view, URL navigates to the new tab's ID but the tab bar still only shows the original process tab. Workspace context may not be re-fetching tabs after creation.
-  - **Steps to reproduce:** 1. Navigate to /w/{workspaceId}/compare with only a process tab. 2. Click 'Create Journey Tab'. 3. Observe tab bar — new journey tab not shown.
-  - **Suggested fix:** After createTab(), call the workspace context refresh/invalidation method to re-fetch tabs list, or use router.refresh().
+  - **Fix applied:** Imported `useWorkspace`, destructured `refreshTabs`. Added `await refreshTabs()` after `createTab()` and before `router.push()` in both `handleCreateJourneyTab` and `handleCreateProcessTab`. Updated dependency arrays.
 
 - [x] #BUG-034 Step nodes unclickable — section overlay intercepts pointer events (P1) — Attempts: 1 — DONE iteration 121, 2026-03-05
   - **Found:** Iteration 120 (regression tester — Playwright browser)
@@ -158,16 +156,14 @@
   - **Suggested fix:** Verify step_tools migration exists. Run `npx supabase db push` to apply. If migration doesn't exist, create it with step_tools junction table (step_id FK, tool_id FK, RLS, indexes).
   - **Note:** May be the same root cause as BUG-032 but confirmed independently by regression tester with P1 severity upgrade.
 
-- [ ] #BUG-036 Radix hydration mismatch on gap-analysis and tools pages (P2) — Attempts: 0
+- [ ] #BUG-036 Radix hydration mismatch on gap-analysis and tools pages (P2) — Attempts: 1
   - **Found:** Iteration 120 (regression tester — Playwright browser)
   - **Where:** `src/components/layout/header.tsx` (User Menu DropdownMenuTrigger)
   - **What:** Radix UI DropdownMenuTrigger generates different IDs on server vs client: server renders 'radix-_R_9knebn9erlb_', client expects 'radix-_R_16knebn9erlb_'. The ID counter offset (9 vs 16) suggests gap-analysis and tools pages render more Radix components on client than server. Causes aria-controls mismatch.
   - **Steps to reproduce:** 1. Cold-navigate to /w/[id]/gap-analysis or /w/[id]/tools. 2. Open browser console. 3. Observe hydration mismatch warning with DropdownMenuTrigger ID diff.
   - **Suggested fix:** Wrap the client-only Radix components with `suppressHydrationWarning` or ensure SSR/CSR component trees match (likely a conditional render that differs between server and client).
 
-- [ ] #BUG-037 Tools page heading hierarchy violation — h2 without h1 (P2) — Attempts: 0
+- [x] #BUG-037 Tools page heading hierarchy violation — h2 without h1 (P2) — Attempts: 1 — DONE iteration 122, 2026-03-05
   - **Found:** Iteration 120 (regression tester — Playwright browser)
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` (summary sidebar panel)
-  - **What:** The right-hand summary panel uses `<h2>` ('Tools Summary') as the first heading on the page without a preceding `<h1>`. WCAG 1.3.1 requires logical heading structure. Screen readers cannot navigate the page structure correctly.
-  - **Steps to reproduce:** 1. Navigate to /w/[id]/tools. 2. Inspect heading structure (h1, h2, h3...). 3. Observe: first heading is h2, no h1 present.
-  - **Suggested fix:** Either add a visually hidden `<h1>` for the page title or change `<h2>` to `<h1>` for the primary heading.
+  - **Fix applied:** Added `<h1 className="sr-only">Tools</h1>` as first child of outermost container div. Existing h2 unchanged. Heading hierarchy now h1→h2, WCAG 1.3.1 compliant. No visual change.
