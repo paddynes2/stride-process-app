@@ -1310,3 +1310,63 @@ export function renderPerspectiveComparison(
     y += 6;
   }
 }
+
+// ── Table of Contents ─────────────────────────────────────────────────────────
+
+export interface TocEntry {
+  name: string;
+  page: number;
+}
+
+export function renderTableOfContents(pdf: jsPDF, entries: TocEntry[]): void {
+  if (entries.length === 0) return;
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+
+  pdf.addPage("a4", "landscape");
+  pdf.setFillColor(10, 10, 11);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
+  let y = margin;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("Table of Contents", margin, y);
+  y += 6;
+
+  // Brand accent line
+  pdf.setFillColor(20, 184, 166);
+  pdf.rect(margin, y, contentWidth, 0.5, "F");
+  y += 10;
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+
+  for (const entry of entries) {
+    if (y > pageHeight - margin - 8) break;
+
+    const pageStr = `${entry.page}`;
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(entry.name, margin, y);
+
+    pdf.setTextColor(255, 255, 255, 140);
+    pdf.text(pageStr, pageWidth - margin, y, { align: "right" });
+
+    // Dot leader
+    const nameWidth = pdf.getTextWidth(entry.name);
+    const pageNumWidth = pdf.getTextWidth(pageStr);
+    const lineStart = margin + nameWidth + 4;
+    const lineEnd = pageWidth - margin - pageNumWidth - 4;
+    if (lineEnd > lineStart + 4) {
+      pdf.setDrawColor(255, 255, 255, 25);
+      pdf.setLineWidth(0.3);
+      pdf.line(lineStart, y - 1, lineEnd, y - 1);
+    }
+
+    y += 9;
+  }
+}

@@ -26,6 +26,11 @@ interface ExportPdfOptions {
   stepRoles?: StepRoleForExport[];
 }
 
+export interface PdfSectionEntry {
+  name: string;
+  page: number;
+}
+
 export async function createWorkspacePdf(
   {
     workspaceName,
@@ -36,7 +41,7 @@ export async function createWorkspacePdf(
     stepRoles = [],
   }: ExportPdfOptions,
   skipFooter = false,
-): Promise<jsPDF> {
+): Promise<{ pdf: jsPDF; sections: PdfSectionEntry[] }> {
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "mm",
@@ -52,6 +57,7 @@ export async function createWorkspacePdf(
   // Pre-compute shared lookups
   const sectionMap = new Map(sections.map((s) => [s.id, s.name]));
   const stepRolesMap = buildStepRolesMap(stepRoles);
+  const sectionEntries: PdfSectionEntry[] = [];
 
   // --- Title Page ---
   pdf.setFillColor(10, 10, 11);
@@ -110,6 +116,7 @@ export async function createWorkspacePdf(
   // --- Canvas Snapshot Page ---
   if (canvasElement !== null) {
     pdf.addPage("a4", "landscape");
+    sectionEntries.push({ name: "Canvas Snapshot", page: pdf.getNumberOfPages() });
     y = margin;
 
     pdf.setFillColor(10, 10, 11);
@@ -176,6 +183,7 @@ export async function createWorkspacePdf(
   // --- Step List Page ---
   if (steps.length > 0) {
     pdf.addPage("a4", "landscape");
+    sectionEntries.push({ name: "Step Details", page: pdf.getNumberOfPages() });
     y = margin;
 
     pdf.setFillColor(10, 10, 11);
@@ -318,6 +326,7 @@ export async function createWorkspacePdf(
 
   if (gapSteps.length > 0) {
     pdf.addPage("a4", "landscape");
+    sectionEntries.push({ name: "Gap Analysis", page: pdf.getNumberOfPages() });
     y = margin;
     pdf.setFillColor(10, 10, 11);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
@@ -449,6 +458,7 @@ export async function createWorkspacePdf(
 
   if (totalMonthlyHours > 0 || totalMonthlyCost > 0) {
     pdf.addPage("a4", "landscape");
+    sectionEntries.push({ name: "Cost Summary", page: pdf.getNumberOfPages() });
     y = margin;
     pdf.setFillColor(10, 10, 11);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
@@ -669,11 +679,11 @@ export async function createWorkspacePdf(
     }
   }
 
-  return pdf;
+  return { pdf, sections: sectionEntries };
 }
 
 export async function exportWorkspacePdf(opts: ExportPdfOptions): Promise<void> {
-  const pdf = await createWorkspacePdf(opts);
+  const { pdf } = await createWorkspacePdf(opts);
   const safeFilename = opts.workspaceName.replace(/[^a-zA-Z0-9-_ ]/g, "").replace(/\s+/g, "-");
   pdf.save(`${safeFilename}-process-report.pdf`);
 }
