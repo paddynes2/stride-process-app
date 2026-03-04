@@ -191,7 +191,7 @@ export function AIAnalysisView({
             <h1 className="text-[15px] font-semibold text-[var(--text-primary)]">AI Analysis</h1>
             {lastAt && state.type === "idle" && (
               <span className="text-[11px] text-[var(--text-tertiary)]">
-                Last run {new Date(lastAt).toLocaleDateString()}
+                Last run {new Date(lastAt).toISOString().slice(0, 10)}
               </span>
             )}
           </div>
