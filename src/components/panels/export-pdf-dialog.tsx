@@ -78,6 +78,7 @@ interface SectionDef {
   key: keyof ExportConfig;
   label: string;
   available: boolean;
+  disabledTooltip?: string;
 }
 
 const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
@@ -91,26 +92,26 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
     group: "Process Data",
     sections: [
       { key: "dataTable", label: "Data Table", available: true },
-      { key: "gapAnalysis", label: "Gap Analysis", available: true },
-      { key: "costAnalysis", label: "Cost Analysis", available: true },
+      { key: "gapAnalysis", label: "Gap Analysis", available: true, disabledTooltip: "Requires steps with maturity scores" },
+      { key: "costAnalysis", label: "Cost Analysis", available: true, disabledTooltip: "Requires steps with cost data" },
     ],
   },
   {
     group: "Insights",
     sections: [
       { key: "executiveSummary", label: "Executive Summary", available: true },
-      { key: "improvements", label: "Improvements", available: true },
-      { key: "aiInsights", label: "AI Insights", available: true },
+      { key: "improvements", label: "Improvements", available: true, disabledTooltip: "Requires improvement ideas" },
+      { key: "aiInsights", label: "AI Insights", available: true, disabledTooltip: "Requires AI analysis to be run" },
     ],
   },
   {
     group: "Journey & Perspectives",
     sections: [
-      { key: "journeyMap", label: "Journey Map", available: true },
-      { key: "journeySentiment", label: "Journey Sentiment", available: true },
-      { key: "perspectiveComparison", label: "Perspective Comparison", available: true },
-      { key: "prioritizationMatrix", label: "Prioritization Matrix", available: true },
-      { key: "toolLandscape", label: "Tool Landscape", available: true },
+      { key: "journeyMap", label: "Journey Map", available: true, disabledTooltip: "Add a journey tab to enable" },
+      { key: "journeySentiment", label: "Journey Sentiment", available: true, disabledTooltip: "Add a journey tab to enable" },
+      { key: "perspectiveComparison", label: "Perspective Comparison", available: true, disabledTooltip: "Requires perspectives" },
+      { key: "prioritizationMatrix", label: "Prioritization Matrix", available: true, disabledTooltip: "Requires prioritization scores" },
+      { key: "toolLandscape", label: "Tool Landscape", available: true, disabledTooltip: "Requires tools to be added" },
     ],
   },
 ];
@@ -203,9 +204,10 @@ export function ExportPdfDialog({
                 {group}
               </p>
               <div className="space-y-0.5">
-                {sections.map(({ key, label, available }) => (
+                {sections.map(({ key, label, available, disabledTooltip }) => (
                   <label
                     key={key}
+                    title={!available ? disabledTooltip : undefined}
                     className={cn(
                       "flex items-center gap-2.5 px-2 py-1.5 rounded-[var(--radius-sm)]",
                       available
@@ -223,11 +225,6 @@ export function ExportPdfDialog({
                     <span className="text-[13px] text-[var(--text-primary)] flex-1">
                       {label}
                     </span>
-                    {!available && (
-                      <span className="text-[10px] text-[var(--text-tertiary)]">
-                        coming soon
-                      </span>
-                    )}
                   </label>
                 ))}
               </div>
