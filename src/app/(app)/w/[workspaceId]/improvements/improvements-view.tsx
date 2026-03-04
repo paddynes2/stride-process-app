@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Lightbulb, ChevronDown, Trash2 } from "lucide-react";
+import { Lightbulb, ChevronDown, ChevronUp, Trash2, Sparkles, RefreshCw, AlertCircle, KeyRound, Clock, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -10,9 +10,31 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { updateImprovementIdea, deleteImprovementIdea } from "@/lib/api/client";
+import { updateImprovementIdea, deleteImprovementIdea, createImprovementIdea } from "@/lib/api/client";
 import { toastError } from "@/lib/api/toast-helpers";
 import type { ImprovementIdea, ImprovementStatus, ImprovementPriority, Tab } from "@/types/database";
+
+// ─── Local AI Suggestion types (duplicate acceptable — reviewer will consolidate) ─
+
+type AISuggestionCategory = "process" | "technology" | "people" | "governance";
+
+interface AISuggestion {
+  title: string;
+  description: string;
+  affected_step_ids: string[];
+  estimated_impact: string;
+  category: AISuggestionCategory;
+}
+
+type SuggestionsState =
+  | { type: "idle" }
+  | { type: "loading" }
+  | { type: "loaded"; suggestions: AISuggestion[] }
+  | { type: "not_configured" }
+  | { type: "rate_limited"; retryAfterSeconds: number }
+  | { type: "error"; message: string };
+
+// ─── Config ──────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<ImprovementStatus, { label: string; className: string }> = {
   proposed: { label: "Proposed", className: "bg-[var(--bg-surface-secondary)] text-[var(--text-secondary)]" },
@@ -29,8 +51,53 @@ const PRIORITY_CONFIG: Record<ImprovementPriority, { label: string; className: s
   critical: { label: "Critical", className: "bg-[#EF4444]/15 text-[#EF4444]" },
 };
 
+const CATEGORY_CONFIG: Record<AISuggestionCategory, { label: string; className: string }> = {
+  process: { label: "Process", className: "bg-[#8B5CF6]/15 text-[#8B5CF6]" },
+  technology: { label: "Technology", className: "bg-[#3B82F6]/15 text-[#3B82F6]" },
+  people: { label: "People", className: "bg-[#22C55E]/15 text-[#22C55E]" },
+  governance: { label: "Governance", className: "bg-[#EAB308]/15 text-[#EAB308]" },
+};
+
 const ALL_STATUSES: ImprovementStatus[] = ["proposed", "approved", "in_progress", "completed", "rejected"];
 const ALL_PRIORITIES: ImprovementPriority[] = ["low", "medium", "high", "critical"];
+
+const RATE_LIMIT_RE = /Please wait (\d+) seconds/;
+
+// ─── Inline API fetch (client.ts is owned by slot 1 — use inline fetch here) ─
+
+async function fetchSuggestionsAPI(workspaceId: string): Promise<AISuggestion[]> {
+  const res = await fetch("/api/v1/ai/suggest-improvements", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ workspace_id: workspaceId }),
+  });
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+  }
+  const json = await res.json() as {
+    data: AISuggestion[] | null;
+    error: { code: string; message: string } | null;
+  };
+  if (json.error) {
+    throw new Error(json.error.message);
+  }
+  return json.data ?? [];
+}
+
+function classifySuggestionsError(err: unknown): SuggestionsState {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (msg.includes("OPENROUTER_API_KEY") || msg.includes("OpenRouter API key")) {
+    return { type: "not_configured" };
+  }
+  const rateMatch = RATE_LIMIT_RE.exec(msg);
+  if (rateMatch) {
+    return { type: "rate_limited", retryAfterSeconds: parseInt(rateMatch[1], 10) };
+  }
+  return { type: "error", message: msg };
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 type StatusFilter = "all" | ImprovementStatus;
 type PriorityFilter = "all" | ImprovementPriority;
@@ -43,10 +110,14 @@ interface ImprovementsViewProps {
   tabs?: Pick<Tab, "id" | "canvas_type">[];
 }
 
+// ─── Component ───────────────────────────────────────────────────────────────
+
 export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entityTabMap, tabs = [] }: ImprovementsViewProps) {
   const [ideas, setIdeas] = React.useState<ImprovementIdea[]>(initialIdeas);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("all");
   const [priorityFilter, setPriorityFilter] = React.useState<PriorityFilter>("all");
+  const [suggestionsState, setSuggestionsState] = React.useState<SuggestionsState>({ type: "idle" });
+  const [isPanelOpen, setIsPanelOpen] = React.useState(false);
 
   const filtered = React.useMemo(() => {
     return ideas.filter((idea) => {
@@ -75,19 +146,179 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
     }
   };
 
+  const handleGenerateSuggestions = async () => {
+    setSuggestionsState({ type: "loading" });
+    setIsPanelOpen(true);
+    try {
+      const suggestions = await fetchSuggestionsAPI(workspaceId);
+      setSuggestionsState({ type: "loaded", suggestions });
+    } catch (err) {
+      setSuggestionsState(classifySuggestionsError(err));
+    }
+  };
+
+  const handleAddAsImprovement = async (suggestion: AISuggestion) => {
+    const linkedStepId = suggestion.affected_step_ids[0] ?? null;
+    try {
+      const newIdea = await createImprovementIdea({
+        workspace_id: workspaceId,
+        title: suggestion.title,
+        description: suggestion.description,
+        priority: "medium",
+        ...(linkedStepId ? { linked_step_id: linkedStepId } : {}),
+      });
+      setIdeas((prev) => [newIdea, ...prev]);
+    } catch (err) {
+      toastError("Failed to add improvement", { error: err });
+    }
+  };
+
   const getLinkedEntityId = (idea: ImprovementIdea): string | null =>
     idea.linked_step_id ?? idea.linked_section_id ?? idea.linked_touchpoint_id ?? null;
+
+  const isLoading = suggestionsState.type === "loading";
+  const showPanel = suggestionsState.type !== "idle";
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-[var(--border-subtle)] shrink-0">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-4 w-4 text-[var(--text-tertiary)]" />
-          <h1 className="text-[15px] font-semibold text-[var(--text-primary)]">Improvements</h1>
-          <span className="text-[12px] text-[var(--text-tertiary)]">{filtered.length}</span>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="h-4 w-4 text-[var(--text-tertiary)]" />
+            <h1 className="text-[15px] font-semibold text-[var(--text-primary)]">Improvements</h1>
+            <span className="text-[12px] text-[var(--text-tertiary)]">{filtered.length}</span>
+          </div>
+          <button
+            onClick={handleGenerateSuggestions}
+            disabled={isLoading || suggestionsState.type === "rate_limited"}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors",
+              isLoading || suggestionsState.type === "rate_limited"
+                ? "bg-[var(--bg-surface-active)] text-[var(--text-tertiary)] cursor-not-allowed"
+                : "bg-[var(--accent-blue)] text-white hover:opacity-90"
+            )}
+          >
+            {isLoading ? (
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
+            {isLoading ? "Generating…" : "AI Suggestions"}
+          </button>
         </div>
       </div>
+
+      {/* AI Suggestions collapsible panel */}
+      {showPanel && (
+        <div className="border-b border-[var(--border-subtle)] shrink-0">
+          <button
+            onClick={() => setIsPanelOpen((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-2 hover:bg-[var(--bg-surface-hover)] transition-colors"
+          >
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-[var(--accent-blue)]" />
+              <span className="text-[12px] font-semibold text-[var(--text-primary)]">AI Suggestions</span>
+              {suggestionsState.type === "loaded" && (
+                <span className="text-[11px] text-[var(--text-tertiary)]">
+                  {suggestionsState.suggestions.length}
+                </span>
+              )}
+            </div>
+            {isPanelOpen ? (
+              <ChevronUp className="h-3.5 w-3.5 text-[var(--text-tertiary)]" />
+            ) : (
+              <ChevronDown className="h-3.5 w-3.5 text-[var(--text-tertiary)]" />
+            )}
+          </button>
+
+          {isPanelOpen && (
+            <div className="px-4 pb-3">
+              {suggestionsState.type === "loading" ? (
+                <div className="flex items-center justify-center gap-2 py-4">
+                  <RefreshCw className="h-4 w-4 text-[var(--text-tertiary)] animate-spin" />
+                  <span className="text-[12px] text-[var(--text-secondary)]">Generating suggestions…</span>
+                </div>
+              ) : suggestionsState.type === "not_configured" ? (
+                <div className="flex items-start gap-2 py-3">
+                  <KeyRound className="h-4 w-4 text-[var(--text-quaternary)] shrink-0 mt-0.5" />
+                  <p className="text-[12px] text-[var(--text-secondary)]">
+                    AI suggestions require{" "}
+                    <code className="text-[var(--text-primary)] bg-[var(--bg-surface-active)] px-1 rounded">
+                      OPENROUTER_API_KEY
+                    </code>{" "}
+                    in your environment variables.
+                  </p>
+                </div>
+              ) : suggestionsState.type === "rate_limited" ? (
+                <div className="flex items-center justify-center gap-2 py-4">
+                  <Clock className="h-4 w-4 text-[var(--text-quaternary)]" />
+                  <span className="text-[12px] text-[var(--text-secondary)]">
+                    Rate limited — try again in about{" "}
+                    {Math.ceil(suggestionsState.retryAfterSeconds / 60)}{" "}
+                    minute{Math.ceil(suggestionsState.retryAfterSeconds / 60) !== 1 ? "s" : ""}.
+                  </span>
+                </div>
+              ) : suggestionsState.type === "error" ? (
+                <div className="flex items-start gap-2 py-3">
+                  <AlertCircle className="h-4 w-4 text-[#EF4444]/60 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[12px] text-[var(--text-secondary)] mb-1">{suggestionsState.message}</p>
+                    <button
+                      onClick={handleGenerateSuggestions}
+                      className="text-[11px] text-[var(--accent-blue)] hover:underline"
+                    >
+                      Try again
+                    </button>
+                  </div>
+                </div>
+              ) : suggestionsState.type === "loaded" && suggestionsState.suggestions.length === 0 ? (
+                <div className="flex items-center justify-center py-4">
+                  <span className="text-[12px] text-[var(--text-secondary)]">
+                    No suggestions generated — add more steps with metrics to improve results.
+                  </span>
+                </div>
+              ) : suggestionsState.type === "loaded" ? (
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-1 mt-1">
+                  {suggestionsState.suggestions.map((suggestion, i) => {
+                    const catConf = CATEGORY_CONFIG[suggestion.category] ?? CATEGORY_CONFIG.process;
+                    return (
+                      <div
+                        key={i}
+                        className="rounded-[var(--radius-sm)] p-3 bg-[var(--bg-surface-active)] border border-[var(--border-subtle)]"
+                      >
+                        <div className="flex items-start gap-2 mb-1">
+                          <span className="text-[12px] font-semibold text-[var(--text-primary)] flex-1 min-w-0 leading-snug">
+                            {suggestion.title}
+                          </span>
+                          <span className={cn("text-[10px] px-1.5 py-0.5 rounded-sm font-medium shrink-0", catConf.className)}>
+                            {catConf.label}
+                          </span>
+                        </div>
+                        <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed mb-1.5">
+                          {suggestion.description}
+                        </p>
+                        {suggestion.estimated_impact && (
+                          <p className="text-[11px] text-[#22C55E] mb-2">
+                            {suggestion.estimated_impact}
+                          </p>
+                        )}
+                        <button
+                          onClick={() => handleAddAsImprovement(suggestion)}
+                          className="flex items-center gap-1 text-[11px] text-[var(--accent-blue)] hover:underline"
+                        >
+                          <Plus className="h-3 w-3" />
+                          Add as Improvement
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Status filter tabs + priority filter */}
       <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[var(--border-subtle)] overflow-x-auto shrink-0">
