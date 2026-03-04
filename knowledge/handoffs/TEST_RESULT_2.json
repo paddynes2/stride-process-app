@@ -1,0 +1,282 @@
+{
+  "schema_version": "1.0",
+  "iteration": 131,
+  "test_type": "regression",
+  "suite_name": "regression + accessibility",
+  "status": "passed",
+  "duration_seconds": 420,
+
+  "criteria_results": [
+    {
+      "criterion": "Navigate to /workspaces — page renders",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Redirected to /workspaces, heading 'Workspaces' visible, workspace card 'My Workspace' present",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to workspace → canvas tab loads with nodes",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Canvas renders with 'New Section' group and 'Test Regression Step' step node in Draft status",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Click a step node → detail panel opens",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Clicking 'Test Regression Step' opened Step Details panel with Name, Status, Type, Executor, Roles, Tools, Maturity, Effort, Impact, Notes, Video fields",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Edit step name → saves without error",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Typed in step name field, Tab to blur — no console errors, no network errors (step-tools 500 is pre-existing BUG-035, unrelated to save)",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Click a section node → section detail panel opens",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Clicking 'New Section' opened Section Details panel with Name, Summary, Steps count, Notes fields and action buttons",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Canvas zoom/pan works",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Zoom In button activated successfully; Fit View button activated successfully. MiniMap visible.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Switch to journey tab → journey canvas renders",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Journey tab navigated to /w/.../08a252d4..., empty state shown with 'Add Stage' and 'Add Touchpoint' buttons",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Click touchpoint → detail panel opens",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Added touchpoint 'Untitled', clicked it — Touchpoint Details panel opened with Name, Sentiment, Pain/Gain/Effort/Impact scores, Customer Emotion, Notes",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Click stage → stage detail panel opens",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Added Stage 1, clicked it — Stage Details panel opened with Name, Channel, Owner, Touchpoints list, Description fields",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to step list → data displays",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Step list /list shows heading 'All Steps (1)', table with 'Test Regression Step' row, search and filter controls present",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to gap analysis → maturity gaps shown",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Gap Analysis page loaded, summary stats (0/1 scored, 0 below target, 0.0 avg gap), empty state with guidance to set maturity scores",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to comparison view → side-by-side renders",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Compare page shows Process Map (Workflow) and Journey Map (Journey) canvases side-by-side, both with React Flow instances and node counts",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to workspace settings → page loads",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Settings page loaded with Workspace Name, Public Sharing, Perspectives, Duplicate Workspace, Danger Zone sections",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to teams page → teams/roles display",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Teams page loaded, summary stats (0 teams, 0 roles, — avg hourly), empty state with 'Add Team' guidance",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Navigate to perspectives (in settings) → list displays",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Settings page Perspectives section shows empty state with guidance text and 'Add Perspective' button",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Trigger PDF export → file generates",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Export PDF dialog opened with preset buttons and section toggles; clicking Export PDF downloaded 'My-Workspace-process-report.pdf'",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Trigger PNG export → file generates",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "Clicking Export PNG downloaded 'My-Workspace-canvas.png' and toast 'PNG exported successfully' appeared",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Check window.__testErrors — no new errors",
+      "task_id": "regression-suite",
+      "result": "pass",
+      "evidence": "window.__testErrors empty after injection. 3 console errors all from '/api/v1/step-tools?step_id=...' returning 500 — pre-existing BUG-035 (migration 024 not pushed). No new errors introduced.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Accessibility: /workspaces page audit",
+      "task_id": "accessibility-suite",
+      "result": "pass",
+      "evidence": "0 automated violations. lang='en', 1 h1, title set. Missing <main> and <nav> landmarks (P2).",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Accessibility: canvas page audit",
+      "task_id": "accessibility-suite",
+      "result": "fail",
+      "evidence": "1 button-no-label violation. h1 count=0 (canvas page has no h1 heading — WCAG 1.3.1). has <main> and <nav>.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Accessibility: settings page audit",
+      "task_id": "accessibility-suite",
+      "result": "fail",
+      "evidence": "2 violations: button-no-label (icon-only SVG submit button in sidebar footer, 31x28px, no title/aria-label) + input-no-label (workspace name input has no associated label element, only placeholder-less styling). 16 icon-only sidebar nav links all missing aria-labels.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Accessibility: page title uniqueness",
+      "task_id": "accessibility-suite",
+      "result": "fail",
+      "evidence": "All pages share identical title 'Stride — Process Mapping & Continuous Improvement'. WCAG 2.4.2 requires descriptive, unique titles per page.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Accessibility: step list table labeling",
+      "task_id": "accessibility-suite",
+      "result": "fail",
+      "evidence": "Data table on /list has no <caption>, aria-label, or aria-labelledby. Screen readers cannot identify the table's purpose.",
+      "screenshot_description": null
+    }
+  ],
+
+  "quality_gate": {
+    "pages_checked": [
+      "/workspaces",
+      "/w/.../canvas (workflow tab)",
+      "/w/.../canvas (journey tab)",
+      "/w/.../list",
+      "/w/.../gap-analysis",
+      "/w/.../compare",
+      "/w/.../settings",
+      "/w/.../teams"
+    ],
+    "console_errors": 3,
+    "network_errors": 2,
+    "accessibility_issues": 6,
+    "layout_shifts": 0
+  },
+
+  "bugs_found": [
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/[tabId] (canvas)",
+      "description": "Opening a step detail panel triggers two console errors: 'Failed to load resource: Internal Server Error' from GET /api/v1/step-tools?step_id=... This is BUG-035 — migration 024 (step_tools table) has not been pushed to the remote Supabase instance. The 'Assigned Tools' section displays 'No tools assigned' but silently fails to query the DB.",
+      "steps_to_reproduce": "1. Navigate to any workspace canvas tab. 2. Click a step node to open the detail panel. 3. Check browser console — two 500 errors from /api/v1/step-tools.",
+      "related_task": "BUG-035"
+    },
+    {
+      "severity": "P1",
+      "page": "All pages (sidebar navigation)",
+      "description": "16 icon-only sidebar navigation links have no accessible name. All links in the sidebar <nav> use only SVG icons with no text content, no aria-label, and no aria-labelledby. Screen reader users cannot determine the destination of any sidebar link. WCAG 4.1.2 (Name, Role, Value).",
+      "steps_to_reproduce": "1. Navigate to any workspace page. 2. Use a screen reader (e.g. NVDA) and Tab through the sidebar links. 3. All links announce as 'link' with no destination name.",
+      "related_task": "accessibility-suite"
+    },
+    {
+      "severity": "P1",
+      "page": "/w/[workspaceId]/settings",
+      "description": "The workspace name text input has no programmatic label. It has a visible label text ('Workspace Name') rendered as a <generic> element but no <label for=...>, aria-label, or aria-labelledby association. WCAG 1.3.1 (Info and Relationships).",
+      "steps_to_reproduce": "1. Navigate to workspace Settings. 2. Inspect the Workspace Name input — no <label> element associated. 3. Screen reader reads the input without naming it.",
+      "related_task": "accessibility-suite"
+    },
+    {
+      "severity": "P1",
+      "page": "All workspace pages (sidebar footer)",
+      "description": "An SVG-only submit button at the bottom-left of the sidebar (31x28px, top:894 left:8) has no accessible name — no text content, no aria-label, no title. WCAG 4.1.2. Button purpose is unclear even visually without a tooltip.",
+      "steps_to_reproduce": "1. Navigate to any workspace page. 2. Inspect the bottom-left sidebar button. 3. No aria-label, no title, type=submit with only an SVG child.",
+      "related_task": "accessibility-suite"
+    },
+    {
+      "severity": "P2",
+      "page": "All pages",
+      "description": "All pages share the same generic <title> 'Stride — Process Mapping & Continuous Improvement'. WCAG 2.4.2 (Page Titled) requires each page to have a title that describes its topic or purpose. Users relying on browser tabs, history, or screen readers cannot distinguish pages.",
+      "steps_to_reproduce": "1. Open multiple Stride pages (canvas, list, settings, teams) in separate tabs. 2. All tabs show identical title text.",
+      "related_task": "accessibility-suite"
+    },
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/[tabId] (canvas)",
+      "description": "Canvas pages have no h1 element. The workspace canvas view has zero h1 elements in the DOM. WCAG 1.3.1 requires a logical heading structure; the h1 communicates the page's primary purpose to screen readers.",
+      "steps_to_reproduce": "1. Navigate to canvas tab. 2. Run document.querySelectorAll('h1').length — returns 0.",
+      "related_task": "accessibility-suite"
+    },
+    {
+      "severity": "P2",
+      "page": "/workspaces",
+      "description": "The /workspaces page has no <main> or role='main' landmark, and no <nav> or role='navigation' landmark. WCAG best practice (WCAG 1.3.6). Landmark regions allow screen reader users to jump directly to content.",
+      "steps_to_reproduce": "1. Navigate to /workspaces. 2. Run !!document.querySelector('main, [role=main]') — returns false.",
+      "related_task": "accessibility-suite"
+    },
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/list",
+      "description": "The steps data table has no accessible name (no <caption>, aria-label, or aria-labelledby). Screen readers announce it as an unlabeled table. WCAG best practice for tables with meaningful data.",
+      "steps_to_reproduce": "1. Navigate to /list. 2. Inspect <table> element — no caption, aria-label, or aria-labelledby attribute.",
+      "related_task": "accessibility-suite"
+    }
+  ],
+
+  "improvements_found": [
+    {
+      "category": "accessibility",
+      "page": "All workspace pages (sidebar)",
+      "observation": "Sidebar navigation links use tooltips (likely via CSS :hover) but have no aria-label. Adding aria-label matching the tooltip text would address both the WCAG violation and improve the experience for keyboard-only users who never see hover tooltips.",
+      "design_principle": "Nielsen H6: Recognition rather than recall — names/labels prevent users from having to remember icon meanings",
+      "suggested_approach": "Add aria-label to each sidebar link matching its destination name (e.g., aria-label='Canvas', aria-label='Step List', etc.)"
+    },
+    {
+      "category": "accessibility",
+      "page": "All pages",
+      "observation": "Page titles are all identical. Even a simple pattern like '[Page Name] — My Workspace — Stride' would satisfy WCAG 2.4.2 and dramatically improve usability for users with many tabs open.",
+      "design_principle": "Nielsen H1: Visibility of system status — users should always know where they are",
+      "suggested_approach": "In each page's server component or layout, set document title dynamically to include workspace name + view name"
+    },
+    {
+      "category": "accessibility",
+      "page": "/w/[workspaceId]/settings",
+      "observation": "The workspace name input lacks a <label> element. The visible text 'Workspace Name' is rendered as a generic div. Wrapping it in a <label> or adding aria-labelledby takes one line and fixes the WCAG violation.",
+      "design_principle": "WCAG 1.3.1 Info and Relationships",
+      "suggested_approach": "Use htmlFor on a <label> element pointing to the input's id, or add aria-label='Workspace name' directly to the input"
+    },
+    {
+      "category": "usability",
+      "page": "All workspace pages (sidebar footer)",
+      "observation": "The icon-only submit button in the sidebar footer (bottom-left) has no tooltip, no title, and is type='submit' which is unusual for a navigation context. Its purpose is not immediately clear. If it's a form submission trigger it should be explicitly labeled.",
+      "design_principle": "Nielsen H6: Recognition rather than recall",
+      "suggested_approach": "Add aria-label and title attribute clarifying the button's action; confirm whether type='submit' is intentional"
+    }
+  ],
+
+  "actions_used": 35,
+  "action_budget": 40
+}

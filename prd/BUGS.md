@@ -214,3 +214,52 @@
   - **What:** AI Insights checkbox is enabled (checked:true, disabled:false) even when OPENROUTER_API_KEY is not configured and no AI analysis has run. The `hasAiInsights` check uses `!!(workspace.settings?.last_analysis_at)` but `workspace.settings` may be unexpectedly truthy or `last_analysis_at` may have a default value.
   - **Steps to reproduce:** 1. Navigate to /w/[workspaceId]/[tabId] on a workspace with no AI analysis. 2. Click Export PDF. 3. Observe AI Insights is enabled when it should be disabled.
   - **Suggested fix:** Investigate `workspace.settings` shape — confirm `last_analysis_at` is null/undefined when AI analysis hasn't been run. May need stricter check or different field.
+
+- [ ] #BUG-045 16 icon-only sidebar navigation links have no accessible name (P1) — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Where:** `src/components/layout/sidebar.tsx` — all navigation links
+  - **What:** All 16 sidebar <nav> links use only SVG icons with no text content, no aria-label, and no aria-labelledby. Screen reader users cannot determine the destination of any sidebar link. WCAG 4.1.2 (Name, Role, Value).
+  - **Steps to reproduce:** 1. Navigate to any workspace page. 2. Use a screen reader and Tab through sidebar links. 3. All links announce as 'link' with no destination name.
+  - **Suggested fix:** Add `aria-label` to each sidebar link matching its destination name (e.g., `aria-label="Canvas"`, `aria-label="Step List"`).
+
+- [ ] #BUG-046 Workspace name text input has no programmatic label (P1) — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — workspace name input
+  - **What:** The workspace name input has a visible label text ('Workspace Name') rendered as a generic element but no `<label for=...>`, `aria-label`, or `aria-labelledby` association. WCAG 1.3.1 (Info and Relationships).
+  - **Steps to reproduce:** 1. Navigate to workspace Settings. 2. Inspect the Workspace Name input — no `<label>` element associated.
+  - **Suggested fix:** Use `htmlFor` on a `<label>` element pointing to the input's id, or add `aria-label="Workspace name"` directly to the input.
+
+- [ ] #BUG-047 Sidebar footer SVG submit button has no accessible name (P1) — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Where:** `src/components/layout/sidebar.tsx` — bottom-left footer button (31x28px)
+  - **What:** An SVG-only submit button at the bottom-left of the sidebar has no text content, no `aria-label`, no `title`. WCAG 4.1.2. Button purpose unclear even visually without a tooltip.
+  - **Steps to reproduce:** 1. Navigate to any workspace page. 2. Inspect the bottom-left sidebar button — no aria-label, no title, type=submit with only an SVG child.
+  - **Suggested fix:** Add `aria-label` and `title` attribute clarifying the button's action. Confirm whether `type="submit"` is intentional.
+
+- [ ] #BUG-048 All pages share identical title — WCAG 2.4.2 violation (P2) — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Where:** All pages — `<title>` element
+  - **What:** All pages share the same generic `<title>` 'Stride — Process Mapping & Continuous Improvement'. WCAG 2.4.2 (Page Titled) requires each page to have a title that describes its topic or purpose.
+  - **Steps to reproduce:** 1. Open multiple Stride pages (canvas, list, settings, teams) in separate tabs. 2. All tabs show identical title text.
+  - **Suggested fix:** Set document title dynamically to include workspace name + view name (e.g., '[Page Name] — My Workspace — Stride').
+
+- [ ] #BUG-049 Canvas page has no h1 element — WCAG 1.3.1 violation (P2) — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`
+  - **What:** Canvas pages have zero h1 elements in the DOM. WCAG 1.3.1 requires a logical heading structure.
+  - **Steps to reproduce:** 1. Navigate to canvas tab. 2. Run `document.querySelectorAll('h1').length` — returns 0.
+  - **Suggested fix:** Add `<h1 className="sr-only">[Workspace Name]</h1>` as first child of the canvas container, matching BUG-037 pattern.
+
+- [ ] #BUG-050 /workspaces page has no main or nav landmarks (P2) — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Where:** `src/app/(app)/workspaces/` — workspace list page
+  - **What:** The /workspaces page has no `<main>` or `role="main"` landmark, and no `<nav>` or `role="navigation"` landmark. WCAG 1.3.6 best practice.
+  - **Steps to reproduce:** 1. Navigate to /workspaces. 2. Run `!!document.querySelector('main, [role=main]')` — returns false.
+  - **Suggested fix:** Wrap main content in `<main>`, add `<nav>` for navigation links.
+
+- [ ] #BUG-051 Steps data table has no accessible name (P2) — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Where:** `src/app/(app)/w/[workspaceId]/list/step-list-view.tsx` — data table
+  - **What:** The steps data table has no `<caption>`, `aria-label`, or `aria-labelledby`. Screen readers announce it as an unlabeled table.
+  - **Steps to reproduce:** 1. Navigate to /list. 2. Inspect `<table>` element — no caption, aria-label, or aria-labelledby attribute.
+  - **Suggested fix:** Add `aria-label="Steps"` or a `<caption>` element to the table.

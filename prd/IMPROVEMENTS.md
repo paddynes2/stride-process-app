@@ -778,5 +778,37 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show a small info note under the preset buttons when a preset was applied but some sections were masked, e.g. '3 sections unavailable — add data to unlock them'.
 
+- [ ] #IMP-107 Add aria-label to sidebar nav links matching tooltip text — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Category:** Accessibility
+  - **Where:** `src/components/layout/sidebar.tsx` — all navigation links
+  - **What:** Sidebar navigation links use tooltips (likely via CSS :hover) but have no aria-label. Adding aria-label matching the tooltip text would address WCAG violation (BUG-045) and improve the experience for keyboard-only users who never see hover tooltips.
+  - **Design principle:** Nielsen H6: Recognition rather than recall — names/labels prevent users from having to remember icon meanings
+  - **Suggested fix:** Add `aria-label` to each sidebar link matching its destination name (e.g., `aria-label="Canvas"`, `aria-label="Step List"`, etc.)
+
+- [ ] #IMP-108 Dynamic page titles pattern — [Page Name] — [Workspace] — Stride — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Category:** Accessibility
+  - **Where:** All pages — `<title>` element
+  - **What:** Page titles are all identical. Even a simple pattern like '[Page Name] — My Workspace — Stride' would satisfy WCAG 2.4.2 (BUG-048) and dramatically improve usability for users with many tabs open.
+  - **Design principle:** Nielsen H1: Visibility of system status — users should always know where they are
+  - **Suggested fix:** In each page's server component or layout, set document title dynamically to include workspace name + view name.
+
+- [ ] #IMP-109 Wrap workspace name visible label text in label element — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Category:** Accessibility
+  - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx` — workspace name input
+  - **What:** The workspace name input lacks a `<label>` element. The visible text 'Workspace Name' is rendered as a generic div. Wrapping it in a `<label>` or adding `aria-labelledby` takes one line and fixes the WCAG violation (BUG-046).
+  - **Design principle:** WCAG 1.3.1 Info and Relationships
+  - **Suggested fix:** Use `htmlFor` on a `<label>` element pointing to the input's id, or add `aria-label="Workspace name"` directly to the input.
+
+- [ ] #IMP-110 Add aria-label and title to sidebar footer button — Attempts: 0
+  - **Found:** Iteration 131 (accessibility audit)
+  - **Category:** Usability
+  - **Where:** `src/components/layout/sidebar.tsx` — sidebar footer button
+  - **What:** The icon-only submit button in the sidebar footer (bottom-left) has no tooltip, no title, and is `type="submit"` which is unusual for a navigation context. Its purpose is not immediately clear. If it's a form submission trigger it should be explicitly labeled.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Add `aria-label` and `title` attribute clarifying the button's action; confirm whether `type="submit"` is intentional.
+
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

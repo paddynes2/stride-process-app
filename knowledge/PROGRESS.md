@@ -2407,3 +2407,45 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed, all merged cleanly, all acceptance criteria passed.
 - Observations: 2 (1 bug + 1 improvement)
 **Notes:** IMP-105 resolves BUG-043 (tooltip infrastructure was unreachable with static available:true). Acceptance tester confirmed: 4 sections correctly disabled (Improvements, Perspective Comparison, Prioritization Matrix, Tool Landscape). Full Audit preset masking works (unavailable sections stay false). BUG-044 needs investigation — may be workspace.settings shape issue. Accessibility cadence deferred from iter 130 → 131.
+
+## Iteration 131 — 2026-03-05 19:00
+**Tasks:**
+- Regression suite (18/18 PASS) — Playwright browser
+- Accessibility audit (1/5 PASS, 4/5 FAIL) — Playwright browser
+**Source:** EXECUTION_PLAN.json (testing_only mode)
+**Mode:** testing_only
+**Result:** completed
+**Changes:** Documentation only (testing iteration — no code changes)
+- knowledge/STATUS.md (updated handoff)
+- knowledge/PROGRESS.md (this entry)
+- knowledge/METRICS.jsonl (appended)
+- testing/RESULTS.md (updated with iter 131 results)
+- prd/BUGS.md (added BUG-045 through BUG-051)
+- prd/IMPROVEMENTS.md (added IMP-107 through IMP-110)
+**Verification:**
+- Type check: pass (POST_MERGE_CHECK: PASS)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A (testing-only iteration)
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (Playwright regression 18/18 + accessibility audit)
+- Canary test: skipped (no code changes this iteration)
+**Bugs found:** 7
+- BUG-045 (P1): 16 icon-only sidebar nav links missing aria-labels (WCAG 4.1.2)
+- BUG-046 (P1): Workspace name input in settings has no programmatic label (WCAG 1.3.1)
+- BUG-047 (P1): Sidebar footer SVG submit button has no accessible name (WCAG 4.1.2)
+- BUG-048 (P2): All pages share identical title — WCAG 2.4.2 violation
+- BUG-049 (P2): Canvas page has no h1 element — WCAG 1.3.1 violation
+- BUG-050 (P2): /workspaces page has no <main> or <nav> landmarks
+- BUG-051 (P2): Steps data table has no accessible name (no caption/aria-label)
+**Improvements found:** 4
+- IMP-107: Add aria-label to sidebar nav links matching tooltip text
+- IMP-108: Dynamic page titles pattern — [Page Name] — [Workspace] — Stride
+- IMP-109: Wrap workspace name visible label text in <label> element
+- IMP-110: Add aria-label and title to sidebar footer button
+**Self-score:**
+- Code quality: N/A — no code changes
+- Test coverage: 5 — 23/23 regression+accessibility checks via Playwright, comprehensive coverage of all pages
+- Confidence: 5 — regression fully green, accessibility findings are genuine WCAG violations
+- Efficiency: 5 — single tester covered both suites in 35/40 actions
+- Observations: 11 (7 bugs + 4 improvements)
+**Notes:** Accessibility cadence resolved (was deferred from iter 130, overdue since iter 112 — 19 iterations). Regression suite confirms all core features intact after IMP-105/IMP-103/IMP-090 changes. step-tools 500 confirmed pre-existing (BUG-035). 7 accessibility bugs are systemic (sidebar-wide, app-wide page titles) — suggest batching IMP-107/IMP-108/IMP-109/IMP-110 as a single accessibility sweep task.

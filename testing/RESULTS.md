@@ -1,13 +1,13 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 129
+- **Iteration:** 131
 - **Date:** 2026-03-05
-- **Suite:** Acceptance (BUG-042, IMP-100, IMP-094)
-- **Method:** Playwright browser (acceptance) + BUILD_RESULT verification
-- **Result:** **Acceptance 9/11 PASS (2 FAIL: IMP-094 tooltips unreachable — available always true)**
-- **Bugs found:** 1 — BUG-043 (IMP-094 tooltip infrastructure unreachable)
-- **Improvements found:** 1 — IMP-105 (dynamic section availability)
+- **Suite:** Regression + Accessibility (testing-only iteration)
+- **Method:** Playwright browser
+- **Result:** **Regression 18/18 PASS, Accessibility 1/5 PASS (4 FAIL)**
+- **Bugs found:** 7 — BUG-045 through BUG-051 (accessibility violations)
+- **Improvements found:** 4 — IMP-107 through IMP-110 (accessibility fixes)
 
 ## Suite Results
 
@@ -35,7 +35,8 @@
 - Previous: Iteration 99 (2026-03-02) — 16/16 PASS (FEAT-052 DI 10, BUG-020 4, IMP-029 2 — static)
 
 ### Regression
-- Last run: Iteration 128 (2026-03-05) — 7/8 PASS, 0 skip (Phase 3b testing gate: tsc 0 errors, lint 1 pre-existing warning, FEAT-040 through FEAT-043 verified, full regression baseline pass, 1 FAIL: cost chain PDF — BUG-042; static analysis + tsc + lint, Playwright unavailable for regression due to CDP conflict; 1 a11y issue pre-existing BUG-023)
+- Last run: Iteration 131 (2026-03-05) — 18/18 PASS (Playwright browser on localhost:3000; 8 pages checked: /workspaces, canvas workflow, canvas journey, /list, /gap-analysis, /compare, /settings, /teams; 3 console errors all pre-existing BUG-035 step-tools 500; PDF+PNG export verified)
+- Previous: Iteration 128 (2026-03-05) — 7/8 PASS, 0 skip (Phase 3b testing gate: tsc 0 errors, lint 1 pre-existing warning, FEAT-040 through FEAT-043 verified, full regression baseline pass, 1 FAIL: cost chain PDF — BUG-042; static analysis + tsc + lint, Playwright unavailable for regression due to CDP conflict; 1 a11y issue pre-existing BUG-023)
 - Previous: Iteration 120 (2026-03-05) — 16/20 PASS, 0 skip (full regression + performance: Playwright browser on localhost, 9 pages checked, 4 console errors, 2 network errors, 1 accessibility issue, 0 layout shifts; 2 P1 bugs, 2 P2 bugs, 4 improvements found)
 - Previous: Iteration 112 (2026-03-04) — 27/28 PASS, 1 skip (full regression: Playwright browser on localhost, 13 pages checked, 2 console errors, 4 network errors, 0 accessibility violations; skip: journey canvas — no journey tab)
 - Previous: Iteration 109 (2026-03-03) — 19/19 PASS, 2 skip (regression-baseline hybrid: browser on production + static analysis for iter-109 changes, 7 pages checked, 0 console errors, 8 regression checks PASS)
@@ -81,7 +82,8 @@
 - Method: Deep code review (3 parallel agents)
 
 ### Accessibility
-- Last run: Iteration 112 (2026-03-04) — 0 violations (static audit via __auditAccessibility() on canvas + activity pages; static code review of Phase 3a components)
+- Last run: Iteration 131 (2026-03-05) — 1/5 PASS, 4/5 FAIL (Playwright browser; /workspaces 0 violations ✓; canvas 2 violations ✗ [button-no-label, no h1]; settings 2 violations ✗ [button-no-label, input-no-label]; page title uniqueness FAIL; step list table labeling FAIL. 7 new bugs: BUG-045-051. 4 new improvements: IMP-107-110.)
+- Previous: Iteration 112 (2026-03-04) — 0 violations (static audit via __auditAccessibility() on canvas + activity pages; static code review of Phase 3a components)
 - Previous: BUG-002 through BUG-009 fixed in iteration 21 (not re-audited with RALPH until now)
 
 ### Performance
