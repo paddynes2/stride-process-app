@@ -1346,7 +1346,14 @@ export function renderTableOfContents(pdf: jsPDF, entries: TocEntry[]): void {
   pdf.setFontSize(9);
 
   for (const entry of entries) {
-    if (y > pageHeight - margin - 8) break;
+    if (y > pageHeight - margin - 8) {
+      pdf.addPage("a4", "landscape");
+      pdf.setFillColor(10, 10, 11);
+      pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      y = margin;
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+    }
 
     const pageStr = `${entry.page}`;
 
