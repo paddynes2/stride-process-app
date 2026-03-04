@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { CanvasView } from "./canvas-view";
 import { JourneyCanvasView } from "./journey-canvas-view";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ tabId: string }>;
+}): Promise<Metadata> {
+  const { tabId } = await params;
+  const supabase = await createClient();
+  const { data: tab } = await supabase
+    .from("tabs")
+    .select("name")
+    .eq("id", tabId)
+    .single();
+  return { title: tab?.name ?? "Canvas" };
+}
 
 export default async function TabPage({
   params,

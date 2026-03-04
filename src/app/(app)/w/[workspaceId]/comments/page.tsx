@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { CommentsView } from "./comments-view";
 import type { Comment } from "@/types/database";
+
+export const metadata: Metadata = { title: "Comments" };
 
 export default async function CommentsPage({
   params,

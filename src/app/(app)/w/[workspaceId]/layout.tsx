@@ -1,6 +1,28 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkspaceShell } from "./workspace-shell";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ workspaceId: string }>;
+}): Promise<Metadata> {
+  const { workspaceId } = await params;
+  const supabase = await createClient();
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("name")
+    .eq("id", workspaceId)
+    .single();
+  const workspaceName = workspace?.name ?? "Workspace";
+  return {
+    title: {
+      template: `%s — ${workspaceName} — Stride`,
+      default: `${workspaceName} — Stride`,
+    },
+  };
+}
 
 export default async function WorkspaceLayout({
   children,

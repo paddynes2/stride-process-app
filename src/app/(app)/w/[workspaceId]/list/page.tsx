@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StepListView } from "./step-list-view";
+
+export const metadata: Metadata = { title: "Step List" };
 
 export default async function ListPage({
   params,
