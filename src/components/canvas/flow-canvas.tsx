@@ -23,6 +23,22 @@ import { Plus, Square, Thermometer, FileDown, ImageDown, Loader2 } from "lucide-
 import { Button } from "@/components/ui/button";
 import { ExportPdfDialog } from "@/components/panels/export-pdf-dialog";
 import type { ExportConfig } from "@/components/panels/export-pdf-dialog";
+
+// Default availability: all sections enabled (used when sectionAvailability prop is not provided)
+const ALL_AVAILABLE: Record<keyof ExportConfig, boolean> = {
+  canvasSnapshot: true,
+  dataTable: true,
+  gapAnalysis: true,
+  costAnalysis: true,
+  executiveSummary: true,
+  journeyMap: true,
+  journeySentiment: true,
+  perspectiveComparison: true,
+  prioritizationMatrix: true,
+  toolLandscape: true,
+  improvements: true,
+  aiInsights: true,
+};
 import { StepNode } from "./step-node";
 import { SectionNode } from "./section-node";
 import {
@@ -67,6 +83,7 @@ interface FlowCanvasProps {
   onConnectionDelete: (id: string) => void;
   onExportPdf?: (canvasElement: HTMLElement, config: ExportConfig) => Promise<void> | void;
   onExportPng?: (canvasElement: HTMLElement) => Promise<void>;
+  sectionAvailability?: Record<keyof ExportConfig, boolean>;
 }
 
 function computeSectionMaturity(sectionId: string, steps: Step[]): { avg: number | null; avgTarget: number | null } {
@@ -187,6 +204,7 @@ export function FlowCanvas({
   onConnectionDelete,
   onExportPdf,
   onExportPng,
+  sectionAvailability,
 }: FlowCanvasProps) {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const [heatMapMode, setHeatMapMode] = React.useState(false);
@@ -514,6 +532,7 @@ export function FlowCanvas({
         onOpenChange={(open) => { if (!exporting) setShowExportDialog(open); }}
         onExport={handleExportWithConfig}
         exporting={exporting}
+        availability={sectionAvailability ?? ALL_AVAILABLE}
       />
     )}
     </div>
