@@ -446,13 +446,13 @@
   - **Design principle:** Code maintainability — consistent documentation references across files
   - **Suggested fix:** Align comment to reference 'BUG-023' consistently across all panels.
 
-- [ ] #IMP-063 AI analysis rate-limit state has no visual countdown timer — Attempts: 0
+- [x] #IMP-065 AI analysis rate-limit state has no visual countdown timer — Attempts: 1 — DONE iteration 111, 2026-03-04
   - **Found:** Iteration 110 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx`
   - **What:** Rate-limited state shows "Try again in about N minutes" but no countdown — user must manually refresh or guess when to retry.
   - **Design principle:** Nielsen H1: Visibility of system status
-  - **Suggested fix:** Add client-side countdown timer that decrements from retryAfterSeconds to 0 and auto-enables Regenerate button.
+  - **Fix applied:** Added formatCountdown() helper, countdown state, useEffect with setInterval (1s), auto-transitions to idle when countdown reaches 0. Display format: "Try again in M:SS". Regenerate button disabled during rate_limited state. Previously numbered IMP-063 (duplicate — renumbered to IMP-065).
 
 - [ ] #IMP-064 AI analysis not-configured message targets developers only, not SaaS users — Attempts: 0
   - **Found:** Iteration 110 (acceptance tester)
@@ -461,6 +461,30 @@
   - **What:** The not_configured state instructs users to "redeploy" the app, which is appropriate for self-hosted users but not SaaS users who may not have environment variable access.
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Distinguish self-hosted from cloud-hosted messaging, or link to documentation about configuring AI features.
+
+- [ ] #IMP-066 Gap analysis rate-limited state uses static minutes display instead of live countdown — Attempts: 0
+  - **Found:** Iteration 111 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
+  - **What:** Rate-limited state in gap analysis shows static "Try again in about X minutes" while ai-analysis shows a live countdown (IMP-065). Inconsistent feedback — users on gap analysis page don't know when to retry.
+  - **Design principle:** Nielsen H1: Visibility of system status — consistent patterns across features
+  - **Suggested fix:** Apply the same IMP-065 countdown timer pattern to the gap-narrative rate_limited state.
+
+- [ ] #IMP-067 AI Suggestions button enabled with no steps in workspace — Attempts: 0
+  - **Found:** Iteration 111 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
+  - **What:** The "AI Suggestions" button is always enabled even when workspace has no steps. Clicking returns empty or unhelpful response, wasting the 5-minute rate-limit window.
+  - **Design principle:** Nielsen H5: Error Prevention
+  - **Suggested fix:** Disable button when workspace has no steps (add hasSteps prop from page.tsx, same pattern as ai-analysis-view).
+
+- [ ] #IMP-068 Add as Improvement button lacks visual confirmation feedback — Attempts: 0
+  - **Found:** Iteration 111 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
+  - **What:** After "Add as Improvement" is clicked, there is no visual confirmation. The improvement appears silently in the list below the panel, which may be missed if panel is expanded.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Show brief inline confirmation — change button text to "Added" with checkmark for 2 seconds (same Copy button pattern in gap-analysis-view).
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

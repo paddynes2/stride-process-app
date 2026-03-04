@@ -102,3 +102,10 @@
   - **Where:** `knowledge/handoffs/BUILD_RESULT_2.json`
   - **What:** BUILD_RESULT_2.json has `iteration: 54` but current plan is iteration 108. Pipeline slot 2 builder wrote stale iteration number. Code change (Delete Perspective label) is correct but tracking metadata is wrong. Can cause confusion when correlating build results to iterations.
   - **Impact:** Pipeline metadata only — no user-facing impact.
+
+- [ ] #BUG-027 Gap analysis Generate Summary button hidden when no gap data (P2) — Attempts: 0
+  - **Found:** Iteration 111 (acceptance tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx` — `{hasGapData && (...)}` block
+  - **What:** The entire AI narrative section (including "Generate Summary" button) is hidden when hasGapData is false. A new or empty workspace gives no indication that the AI narrative feature exists. The spec says the button should be "above the table" without specifying a conditional.
+  - **Steps to reproduce:** Create a new workspace → Navigate to Gap Analysis → Observe: no "Generate Summary" button visible.
+  - **Suggested fix:** Show the button in a muted/disabled state with hint text like "Score steps to enable AI narrative" when no gap data exists.

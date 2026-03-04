@@ -134,30 +134,30 @@
 - [x] Rate limit: 1 analysis per workspace per 5 minutes (check cached timestamp) — DONE iteration 110
 **Notes:** NOT generic advice. Prompt is grounded in real data. Temperature 0.3, max_tokens 4096. Do NOT install new deps — use native fetch(). Uses OpenRouter (OpenAI-compatible API format). Request body: `{ model: "deepseek/deepseek-chat-v3-0324", messages: [...], temperature: 0.3, max_tokens: 4096 }`. Response: `response.choices[0].message.content`. If OPENROUTER_API_KEY not set, UI shows setup instructions gracefully.
 
-### #FEAT-037 AI gap narrative generator
+### #FEAT-037 AI gap narrative generator — DONE iteration 111, 2026-03-04
 **Phase:** 3a
 **Priority:** P2 (nice to have)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] API route: POST `/api/v1/ai/gap-narrative` — returns professional consulting narrative (2-4 paragraphs)
-- [ ] Prompt includes actual gap data: steps with current vs target maturity, section names, gap sizes
-- [ ] "Generate Summary" button on gap analysis page, above the table
-- [ ] Narrative displayed in styled card with copy-to-clipboard button
-- [ ] "Regenerate" button, loading state. Cache in localStorage.
+- [x] API route: POST `/api/v1/ai/gap-narrative` — returns professional consulting narrative (2-4 paragraphs) — DONE iteration 111
+- [x] Prompt includes actual gap data: steps with current vs target maturity, section names, gap sizes — DONE iteration 111
+- [x] "Generate Summary" button on gap analysis page, above the table — DONE iteration 111
+- [x] Narrative displayed in styled card with copy-to-clipboard button — DONE iteration 111
+- [x] "Regenerate" button, loading state. Cache in localStorage. — DONE iteration 111
 **Notes:** Consultants need gap analysis summaries for client reports. AI generates first draft. Must reference actual step/section names and maturity numbers. Same OpenRouter API pattern as FEAT-036 (deepseek/deepseek-chat-v3-0324 via `https://openrouter.ai/api/v1/chat/completions`).
 
-### #FEAT-038 AI improvement suggestions
+### #FEAT-038 AI improvement suggestions — DONE iteration 111, 2026-03-04
 **Phase:** 3a
 **Priority:** P2 (nice to have)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] API route: POST `/api/v1/ai/suggest-improvements` — returns array of suggestions
-- [ ] Each suggestion: title, description, affected_step_ids, estimated_impact, category (process/technology/people/governance)
-- [ ] "AI Suggestions" button on Improvements page (FEAT-035) — generates and shows suggestions
-- [ ] Each suggestion has "Add as Improvement" button that pre-fills the improvement idea dialog
-- [ ] Loading state, error handling (same pattern as FEAT-036)
+- [x] API route: POST `/api/v1/ai/suggest-improvements` — returns array of suggestions — DONE iteration 111
+- [x] Each suggestion: title, description, affected_step_ids, estimated_impact, category (process/technology/people/governance) — DONE iteration 111
+- [x] "AI Suggestions" button on Improvements page (FEAT-035) — generates and shows suggestions — DONE iteration 111
+- [x] Each suggestion has "Add as Improvement" button that pre-fills the improvement idea dialog — DONE iteration 111
+- [x] Loading state, error handling (same pattern as FEAT-036) — DONE iteration 111
 **Notes:** Depends on FEAT-035 (improvement_ideas table). Bridges AI analysis and improvement tracker. Suggestions must be specific: "Automate 'Manual Data Entry' (45min × 20/month = $1,500/month)" not "improve your processes." Same OpenRouter API pattern as FEAT-036.
 
 ### #FEAT-039 Phase 3a testing gate

@@ -87,6 +87,8 @@ npx supabase db push     # Push migrations
 - `activity/route.ts` — GET (workspace_id required, optional filters: user_id, action, entity_type, from/to, limit/offset). Joins users table via FK for email display.
 - `workspaces/[id]/clone/route.ts` — POST (deep clone workspace via clone_workspace RPC)
 - `ai/analyze-process/route.ts` — POST (OpenRouter/DeepSeek AI analysis: auth, workspace RLS, 5-min rate limit via settings.last_analysis_at, parallel steps+sections fetch, structured prompt, returns AIAnalysisResult, caches in workspace settings JSONB, 503 if no API key)
+- `ai/gap-narrative/route.ts` — POST (OpenRouter/DeepSeek prose narrative: same auth/RLS/rate-limit pattern but uses last_gap_narrative_at, NO response_format json_object — returns natural text, groups gap steps by section with current/target/gap data, localStorage cached client-side)
+- `ai/suggest-improvements/route.ts` — POST (OpenRouter/DeepSeek structured JSON: uses response_format json_object, returns { suggestions: AISuggestion[] }, rate-limit via last_suggestions_at, includes step metrics like time_minutes/frequency_per_month in prompt)
 - `public/shares/[shareId]/route.ts` — GET (unauthenticated)
 
 ### Components

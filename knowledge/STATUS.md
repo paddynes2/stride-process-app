@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 110
-- **Date:** 2026-03-04 12:30
+- **Iteration:** 111
+- **Date:** 2026-03-04 14:30
 - **Phase:** Phase 3a: Analysis Intelligence — ACTIVE
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-036 [2/2] AI analysis UI page, #IMP-058 improvements CTA link + aria-pressed, #IMP-043 runbook creator email
+- **Last task(s):** #FEAT-037 AI gap narrative generator (slot 1), #FEAT-038 AI improvement suggestions (slot 2), #IMP-065 AI countdown timer (slot 3)
 - **Result:** completed
-- **Next task:** #FEAT-037 AI gap narrative generator or remaining Phase 3a features (#FEAT-038 AI improvement suggestions)
-- **Blockers:** Migrations 014-022 not pushed — requires human action (`npx supabase db push`). OPENROUTER_API_KEY not configured — AI analysis returns 503 until key is added to .env.local and Vercel.
+- **Next task:** #FEAT-039 Phase 3a testing gate (full regression + all new Phase 3a features)
+- **Blockers:** Migrations 014-022 not pushed — requires human action (`npx supabase db push`). OPENROUTER_API_KEY not configured — AI features return 503 until key is added to .env.local and Vercel.
 
 ## Context
 
-Iteration 110 completed all 3 planned tasks across 3 builder slots. Slot 1 built the AI analysis UI page: new route at `/w/[workspaceId]/ai-analysis` with `page.tsx` (server, fetches workspace settings + steps) and `ai-analysis-view.tsx` (client, 307 lines). Four categorized insight sections (bottlenecks, redundancies, automation candidates, maturity recommendations), severity badges (high/medium/low), step links navigating to correct canvas tab, cached results on page load, Regenerate button, loading/error/empty/rate-limit/not-configured states. Sidebar nav link added (Sparkles icon), workspace-shell exclusion updated. Slot 2 added "Go to Canvas" CTA in improvements empty state + aria-pressed on filter buttons. Slot 3 changed runbook creator display from truncated UUID to email via users table join. Reviewer fixed tester-found bug: improvements/page.tsx was not passing tabs prop (link was dead code).
+Iteration 111 completed all 3 tasks across 3 parallel builder slots. FEAT-037 added AI gap narrative generator: new API route at `/api/v1/ai/gap-narrative` (OpenRouter/DeepSeek, prose output, no JSON response_format), "Generate Summary" button on gap analysis page above the table, copy-to-clipboard, localStorage caching, all error states. FEAT-038 added AI improvement suggestions: new API route at `/api/v1/ai/suggest-improvements` (structured JSON response), "AI Suggestions" button on improvements page with collapsible panel, "Add as Improvement" one-click action. IMP-065 added live countdown timer to AI analysis rate-limited state (formatCountdown, setInterval, auto-transition to idle at 0). After this iteration, only FEAT-039 (Phase 3a testing gate) remains before Phase 3a is complete.
 
 ## Dev Server
 
@@ -23,7 +23,8 @@ Iteration 110 completed all 3 planned tasks across 3 builder slots. Slot 1 built
 
 - **CRITICAL:** Migrations 014-022 not pushed to remote DB — `npx supabase db push` required (human action).
 - **CRITICAL:** OPENROUTER_API_KEY not set — AI analysis route returns 503 until configured in .env.local (local dev) and Vercel (production).
-- **OVERDUE:** Accessibility audit — 84+ iterations since last audit. Schedule static a11y audit at next testing_only iteration.
+- **OVERDUE:** Accessibility audit — 85+ iterations since last audit. Schedule static a11y audit at next testing_only iteration.
+- **BUG-027:** Gap analysis Generate Summary button hidden when no gap data — new workspace has no path to discover feature (P2).
 - Production (origin/main) is behind ralph/init-stride by 60+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)

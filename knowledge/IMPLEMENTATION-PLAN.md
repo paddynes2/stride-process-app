@@ -78,8 +78,8 @@ Core consulting insight features:
 - [x] #FEAT-036 AI process analysis (OpenRouter/DeepSeek, structured bottleneck/redundancy/automation analysis) — DONE iteration 110
   - [x] [1/2] Backend: API route, types, client wrapper, rate limit, settings cache — DONE iteration 109
   - [x] [2/2] UI: AI analysis page with categorized result cards, regenerate button, loading/error states — DONE iteration 110
-- [ ] #FEAT-037 AI gap narrative generator (consulting-grade summary text)
-- [ ] #FEAT-038 AI improvement suggestions (bridges AI analysis → improvement tracker)
+- [x] #FEAT-037 AI gap narrative generator (consulting-grade summary text) — DONE iteration 111
+- [x] #FEAT-038 AI improvement suggestions (bridges AI analysis → improvement tracker) — DONE iteration 111
 - [ ] #FEAT-039 Phase 3a testing gate (full regression + new features)
 
 ## Phase 3b: Tools Canvas + Enhanced Export — DEFERRED (per human feedback — Phase 4 prioritized)
@@ -173,3 +173,4 @@ Deferred indefinitely:
 - [2026-03-03] Iteration 108: COMPLETED — #FEAT-035 [2/2] UI (improvement ideas page, detail panel dialogs, sidebar badge). #IMP-055 done (Delete Perspective label). #IMP-053 done (prioritization empty state CTA). FEAT-035 fully complete. All 3 slots clean. 1 new pipeline bug (BUG-026). 7 new improvements (IMP-057-063). Next: FEAT-036 AI process analysis.
 - [2026-03-03] Iteration 109: COMPLETED — #FEAT-036 [1/2] AI analysis backend (OpenRouter route, types, client wrapper). #IMP-057 done (improvement delete button). #IMP-062 done (prioritization canvas link). All 3 slots clean, zero merge failures. Reviewer added aria-label accessibility fix. Next: FEAT-036 [2/2] AI analysis UI page.
 - [2026-03-04] Iteration 110: COMPLETED — #FEAT-036 [2/2] AI analysis UI page (4 categories, severity badges, step links, cached results, regenerate, all error states). #IMP-058 done (improvements CTA + aria-pressed). #IMP-043 done (runbook creator email). Reviewer fixed tester-found bug: page.tsx missing tabs prop for IMP-058. FEAT-036 now fully complete. 2 new improvements (IMP-063, IMP-064). Next: FEAT-037 AI gap narrative or FEAT-038 AI improvement suggestions.
+- [2026-03-04] Iteration 111: COMPLETED — #FEAT-037 AI gap narrative generator (consulting-grade summary for gap analysis). #FEAT-038 AI improvement suggestions (bridges AI → improvement tracker). #IMP-065 countdown timer (renumbered from duplicate IMP-063). All 3 slots clean, zero merge failures. 1 new bug (BUG-027), 3 new improvements (IMP-066-068). Only FEAT-039 (testing gate) remains in Phase 3a.

@@ -1,18 +1,18 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 110
+- **Iteration:** 111
 - **Date:** 2026-03-04
-- **Suite:** acceptance (FEAT-036 [2/2] + IMP-058 + IMP-043)
-- **Method:** Static code analysis (Playwright unavailable — auth credentials unknown)
-- **Result:** **17/19 PASS, 2 FAIL** — IMP-058 2 criteria failed (page.tsx missing tabs prop — fixed by reviewer)
-- **Bugs found:** 1 (P2: improvements page.tsx missing tabs prop — fixed by reviewer)
-- **Improvements found:** 2 (rate-limit countdown timer, SaaS vs self-hosted instructions)
+- **Suite:** acceptance (FEAT-037 + FEAT-038 + IMP-065)
+- **Method:** Static code analysis (Playwright unavailable)
+- **Result:** **16/16 PASS** — All acceptance criteria verified
+- **Bugs found:** 1 (P2: BUG-027 — Generate Summary button hidden when no gap data)
+- **Improvements found:** 3 (IMP-066 gap analysis countdown, IMP-067 AI Suggestions no-steps guard, IMP-068 Add as Improvement feedback)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 110 (2026-03-04) — 17/19 PASS (FEAT-036 [2/2] 13/13, IMP-058 2/4 fail then fixed by reviewer, IMP-043 4/4 — static code analysis, Playwright unavailable)
+- Last run: Iteration 111 (2026-03-04) — 16/16 PASS (FEAT-037 7/7, FEAT-038 5/5, IMP-065 4/4 — static code analysis, Playwright unavailable)
 - Previous: Iteration 109 (2026-03-03) — 24/24 PASS (FEAT-036 [1/2] 14/14, IMP-057 7/7, IMP-062 3/3 — static code analysis, Playwright unavailable)
 - Previous: Iteration 107 (2026-03-03) — 19/19 PASS (FEAT-035 11/11, BUG-025 5/5, IMP-052 4/4 — static code analysis, Playwright unavailable)
 - Previous: Iteration 106 (2026-03-02) — 19/20 PASS (FEAT-034 [2/2] 11/11, IMP-050 4/4, IMP-051 4/5 — static analysis + production comparison; 1 fail pre-existing)
