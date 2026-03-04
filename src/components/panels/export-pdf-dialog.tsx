@@ -74,10 +74,19 @@ const GAP_REPORT_CONFIG: ExportConfig = {
   aiInsights: false,
 };
 
+// Mask a preset config with availability: unavailable sections are forced to false
+function maskWithAvailability(
+  config: ExportConfig,
+  availability: Record<keyof ExportConfig, boolean>
+): ExportConfig {
+  return Object.fromEntries(
+    (Object.keys(config) as (keyof ExportConfig)[]).map((k) => [k, config[k] && availability[k]])
+  ) as unknown as ExportConfig;
+}
+
 interface SectionDef {
   key: keyof ExportConfig;
   label: string;
-  available: boolean;
   disabledTooltip?: string;
 }
 
@@ -85,33 +94,33 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
   {
     group: "Canvas",
     sections: [
-      { key: "canvasSnapshot", label: "Canvas Snapshot", available: true },
+      { key: "canvasSnapshot", label: "Canvas Snapshot" },
     ],
   },
   {
     group: "Process Data",
     sections: [
-      { key: "dataTable", label: "Data Table", available: true },
-      { key: "gapAnalysis", label: "Gap Analysis", available: true, disabledTooltip: "Requires steps with maturity scores" },
-      { key: "costAnalysis", label: "Cost Analysis", available: true, disabledTooltip: "Requires steps with cost data" },
+      { key: "dataTable", label: "Data Table" },
+      { key: "gapAnalysis", label: "Gap Analysis", disabledTooltip: "Requires steps with maturity scores" },
+      { key: "costAnalysis", label: "Cost Analysis", disabledTooltip: "Requires steps with cost data" },
     ],
   },
   {
     group: "Insights",
     sections: [
-      { key: "executiveSummary", label: "Executive Summary", available: true },
-      { key: "improvements", label: "Improvements", available: true, disabledTooltip: "Requires improvement ideas" },
-      { key: "aiInsights", label: "AI Insights", available: true, disabledTooltip: "Requires AI analysis to be run" },
+      { key: "executiveSummary", label: "Executive Summary" },
+      { key: "improvements", label: "Improvements", disabledTooltip: "Requires improvement ideas" },
+      { key: "aiInsights", label: "AI Insights", disabledTooltip: "Requires AI analysis to be run" },
     ],
   },
   {
     group: "Journey & Perspectives",
     sections: [
-      { key: "journeyMap", label: "Journey Map", available: true, disabledTooltip: "Add a journey tab to enable" },
-      { key: "journeySentiment", label: "Journey Sentiment", available: true, disabledTooltip: "Add a journey tab to enable" },
-      { key: "perspectiveComparison", label: "Perspective Comparison", available: true, disabledTooltip: "Requires perspectives" },
-      { key: "prioritizationMatrix", label: "Prioritization Matrix", available: true, disabledTooltip: "Requires prioritization scores" },
-      { key: "toolLandscape", label: "Tool Landscape", available: true, disabledTooltip: "Requires tools to be added" },
+      { key: "journeyMap", label: "Journey Map", disabledTooltip: "Add a journey tab to enable" },
+      { key: "journeySentiment", label: "Journey Sentiment", disabledTooltip: "Add a journey tab to enable" },
+      { key: "perspectiveComparison", label: "Perspective Comparison", disabledTooltip: "Requires perspectives" },
+      { key: "prioritizationMatrix", label: "Prioritization Matrix", disabledTooltip: "Requires prioritization scores" },
+      { key: "toolLandscape", label: "Tool Landscape", disabledTooltip: "Requires tools to be added" },
     ],
   },
 ];
@@ -123,6 +132,7 @@ interface ExportPdfDialogProps {
   onOpenChange: (open: boolean) => void;
   onExport: (config: ExportConfig) => void;
   exporting?: boolean;
+  availability: Record<keyof ExportConfig, boolean>;
 }
 
 export function ExportPdfDialog({
@@ -130,23 +140,38 @@ export function ExportPdfDialog({
   onOpenChange,
   onExport,
   exporting = false,
+  availability,
 }: ExportPdfDialogProps) {
-  const [config, setConfig] = React.useState<ExportConfig>(FULL_AUDIT_CONFIG);
+  const [config, setConfig] = React.useState<ExportConfig>(() =>
+    maskWithAvailability(FULL_AUDIT_CONFIG, availability)
+  );
   const [activePreset, setActivePreset] = React.useState<Preset>("full");
+
+  // Track previous open state to only reset on false→true transition
+  const prevOpenRef = React.useRef(false);
+
+  // Reset to full preset (masked with current availability) each time the dialog opens
+  React.useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setConfig(maskWithAvailability(FULL_AUDIT_CONFIG, availability));
+      setActivePreset("full");
+    }
+    prevOpenRef.current = open;
+  }, [open, availability]);
 
   const handlePreset = (preset: Preset) => {
     setActivePreset(preset);
     if (preset === "full") {
-      setConfig(FULL_AUDIT_CONFIG);
+      setConfig(maskWithAvailability(FULL_AUDIT_CONFIG, availability));
     } else if (preset === "executive") {
-      setConfig(EXECUTIVE_SUMMARY_CONFIG);
+      setConfig(maskWithAvailability(EXECUTIVE_SUMMARY_CONFIG, availability));
     } else if (preset === "gap") {
-      setConfig(GAP_REPORT_CONFIG);
+      setConfig(maskWithAvailability(GAP_REPORT_CONFIG, availability));
     }
   };
 
-  const handleToggle = (key: keyof ExportConfig, available: boolean) => {
-    if (!available) return;
+  const handleToggle = (key: keyof ExportConfig) => {
+    if (!availability[key]) return;
     setActivePreset("custom");
     setConfig((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -204,29 +229,32 @@ export function ExportPdfDialog({
                 {group}
               </p>
               <div className="space-y-0.5">
-                {sections.map(({ key, label, available, disabledTooltip }) => (
-                  <label
-                    key={key}
-                    title={!available ? disabledTooltip : undefined}
-                    className={cn(
-                      "flex items-center gap-2.5 px-2 py-1.5 rounded-[var(--radius-sm)]",
-                      available
-                        ? "cursor-pointer hover:bg-[var(--bg-surface-secondary)]"
-                        : "opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={available ? config[key] : false}
-                      onChange={() => handleToggle(key, available)}
-                      disabled={!available}
-                      className="w-3.5 h-3.5 accent-[var(--accent-blue)] shrink-0"
-                    />
-                    <span className="text-[13px] text-[var(--text-primary)] flex-1">
-                      {label}
-                    </span>
-                  </label>
-                ))}
+                {sections.map(({ key, label, disabledTooltip }) => {
+                  const available = availability[key];
+                  return (
+                    <label
+                      key={key}
+                      title={!available ? disabledTooltip : undefined}
+                      className={cn(
+                        "flex items-center gap-2.5 px-2 py-1.5 rounded-[var(--radius-sm)]",
+                        available
+                          ? "cursor-pointer hover:bg-[var(--bg-surface-secondary)]"
+                          : "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={available && config[key]}
+                        onChange={() => handleToggle(key)}
+                        disabled={!available}
+                        className="w-3.5 h-3.5 accent-[var(--accent-blue)] shrink-0"
+                      />
+                      <span className="text-[13px] text-[var(--text-primary)] flex-1">
+                        {label}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
           ))}

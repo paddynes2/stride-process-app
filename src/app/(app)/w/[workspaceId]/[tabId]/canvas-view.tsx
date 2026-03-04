@@ -111,7 +111,7 @@ export function CanvasView({
     setConnections((prev) => prev.filter((c) => c.id !== connectionId));
   };
 
-  const { workspace, activePerspective } = useWorkspace();
+  const { workspace, tabs, perspectives, activePerspective } = useWorkspace();
   const { handleExportPng } = useCanvasExport({
     workspaceName: workspace.name,
     sections,
@@ -291,6 +291,49 @@ export function CanvasView({
     }
     return map;
   }, [coloringRules, steps]);
+
+  // Availability flags for export dialog sections
+  const [hasTools, setHasTools] = React.useState(false);
+  const [hasImprovements, setHasImprovements] = React.useState(false);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchTools(workspaceId)
+      .then((tools) => { if (!cancelled) setHasTools(tools.length > 0); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspaceId]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchImprovementIdeas(workspaceId)
+      .then((ideas) => { if (!cancelled) setHasImprovements(ideas.length > 0); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspaceId]);
+
+  const sectionAvailability = React.useMemo(() => {
+    const hasJourneyTab = tabs.some((t) => t.canvas_type === "journey");
+    const hasAiInsights = !!(workspace.settings?.last_analysis_at);
+    const hasPerspectives = perspectives.length > 0;
+    const hasPrioritizationScores = steps.some(
+      (s) => s.effort_score != null || s.impact_score != null
+    );
+    return {
+      canvasSnapshot: true,
+      dataTable: true,
+      gapAnalysis: true,
+      costAnalysis: true,
+      executiveSummary: true,
+      journeyMap: hasJourneyTab,
+      journeySentiment: hasJourneyTab,
+      perspectiveComparison: hasPerspectives,
+      prioritizationMatrix: hasPrioritizationScores,
+      toolLandscape: hasTools,
+      improvements: hasImprovements,
+      aiInsights: hasAiInsights,
+    };
+  }, [tabs, perspectives, steps, workspace.settings, hasTools, hasImprovements]);
 
   // Enhanced PDF export handler — orchestrates base + new sections
   const handleEnhancedExportPdf = React.useCallback(
@@ -515,6 +558,7 @@ export function CanvasView({
             onConnectionDelete={handleConnectionDelete}
             onExportPdf={handleEnhancedExportPdf}
             onExportPng={handleExportPng}
+            sectionAvailability={sectionAvailability}
           />
 
           {/* Coloring rules + Templates buttons — top-right overlay */}
