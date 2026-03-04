@@ -98,7 +98,7 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
   {
     group: "Insights",
     sections: [
-      { key: "executiveSummary", label: "Executive Summary", available: false },
+      { key: "executiveSummary", label: "Executive Summary", available: true },
       { key: "improvements", label: "Improvements", available: false },
       { key: "aiInsights", label: "AI Insights", available: false },
     ],
@@ -106,9 +106,9 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
   {
     group: "Journey & Perspectives",
     sections: [
-      { key: "journeyMap", label: "Journey Map", available: false },
-      { key: "journeySentiment", label: "Journey Sentiment", available: false },
-      { key: "perspectiveComparison", label: "Perspective Comparison", available: false },
+      { key: "journeyMap", label: "Journey Map", available: true },
+      { key: "journeySentiment", label: "Journey Sentiment", available: true },
+      { key: "perspectiveComparison", label: "Perspective Comparison", available: true },
       { key: "prioritizationMatrix", label: "Prioritization Matrix", available: false },
       { key: "toolLandscape", label: "Tool Landscape", available: false },
     ],
