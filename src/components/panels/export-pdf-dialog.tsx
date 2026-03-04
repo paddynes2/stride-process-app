@@ -99,8 +99,8 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
     group: "Insights",
     sections: [
       { key: "executiveSummary", label: "Executive Summary", available: true },
-      { key: "improvements", label: "Improvements", available: false },
-      { key: "aiInsights", label: "AI Insights", available: false },
+      { key: "improvements", label: "Improvements", available: true },
+      { key: "aiInsights", label: "AI Insights", available: true },
     ],
   },
   {
@@ -109,8 +109,8 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
       { key: "journeyMap", label: "Journey Map", available: true },
       { key: "journeySentiment", label: "Journey Sentiment", available: true },
       { key: "perspectiveComparison", label: "Perspective Comparison", available: true },
-      { key: "prioritizationMatrix", label: "Prioritization Matrix", available: false },
-      { key: "toolLandscape", label: "Tool Landscape", available: false },
+      { key: "prioritizationMatrix", label: "Prioritization Matrix", available: true },
+      { key: "toolLandscape", label: "Tool Landscape", available: true },
     ],
   },
 ];
@@ -215,7 +215,7 @@ export function ExportPdfDialog({
                   >
                     <input
                       type="checkbox"
-                      checked={config[key]}
+                      checked={available ? config[key] : false}
                       onChange={() => handleToggle(key, available)}
                       disabled={!available}
                       className="w-3.5 h-3.5 accent-[var(--accent-blue)] shrink-0"

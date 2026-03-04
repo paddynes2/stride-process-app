@@ -296,7 +296,7 @@ export function CanvasView({
   const handleEnhancedExportPdf = React.useCallback(
     async (canvasElement: HTMLElement, config: ExportConfig) => {
       try {
-        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison, renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights }] = await Promise.all([
+        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison, renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights, renderTableOfContents }] = await Promise.all([
           import("@/lib/export/pdf"),
           import("@/lib/export/enhanced-pdf-sections"),
         ]);
@@ -331,7 +331,7 @@ export function CanvasView({
         }
 
         // Build base PDF without footer (skipFooter=true)
-        const pdf = await createWorkspacePdf(
+        const { pdf, sections: basePdfSections } = await createWorkspacePdf(
           {
             workspaceName: workspace.name,
             sections,
@@ -343,9 +343,14 @@ export function CanvasView({
           true,
         );
 
+        // Collect TOC entries (base sections + enhanced sections)
+        const tocEntries = [...basePdfSections];
+
         // Executive Summary
         if (config.executiveSummary) {
+          const sectionPage = pdf.getNumberOfPages() + 1;
           renderExecutiveSummary(pdf, { sections, steps, stepRoles });
+          tocEntries.push({ name: "Executive Summary", page: sectionPage });
         }
 
         // Journey Map and/or Journey Sentiment — fetch data once for both
@@ -362,10 +367,14 @@ export function CanvasView({
           const stages = stagesResult.data ?? [];
 
           if (config.journeyMap) {
+            const sectionPage = pdf.getNumberOfPages() + 1;
             await renderJourneyMap(pdf, { stages, touchpoints, canvasElement: null });
+            tocEntries.push({ name: "Journey Map", page: sectionPage });
           }
           if (config.journeySentiment) {
+            const sectionPage = pdf.getNumberOfPages() + 1;
             renderJourneySentiment(pdf, { stages, touchpoints });
+            tocEntries.push({ name: "Journey Sentiment", page: sectionPage });
           }
         }
 
@@ -376,44 +385,72 @@ export function CanvasView({
             perspectives.length > 0
               ? (await Promise.all(perspectives.map((p) => fetchAnnotations(p.id)))).flat()
               : [];
-          renderPerspectiveComparison(pdf, {
-            perspectives,
-            annotations: allAnnotations,
-            steps,
-            sections,
-          });
+          if (perspectives.length > 0) {
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderPerspectiveComparison(pdf, {
+              perspectives,
+              annotations: allAnnotations,
+              steps,
+              sections,
+            });
+            tocEntries.push({ name: "Perspective Comparison", page: sectionPage });
+          } else {
+            renderPerspectiveComparison(pdf, {
+              perspectives,
+              annotations: allAnnotations,
+              steps,
+              sections,
+            });
+          }
         }
 
         // Prioritization Matrix
         if (config.prioritizationMatrix) {
+          const sectionPage = pdf.getNumberOfPages() + 1;
           renderPrioritizationMatrix(pdf, { steps, sections });
+          tocEntries.push({ name: "Prioritization Matrix", page: sectionPage });
         }
 
         // Tool Landscape
         if (config.toolLandscape) {
           const tools = await fetchTools(workspaceId);
+          const sectionPage = pdf.getNumberOfPages() + 1;
           renderToolLandscape(pdf, { tools });
+          tocEntries.push({ name: "Tool Landscape", page: sectionPage });
         }
 
         // Improvements
         if (config.improvements) {
           const ideas = await fetchImprovementIdeas(workspaceId);
+          const sectionPage = pdf.getNumberOfPages() + 1;
           renderImprovements(pdf, { ideas });
+          tocEntries.push({ name: "Improvements", page: sectionPage });
         }
 
         // AI Insights — cached in workspace.settings.last_analysis
         if (config.aiInsights) {
           const analysis = workspace.settings.last_analysis as AIAnalysisResult | undefined;
           if (analysis) {
+            const sectionPage = pdf.getNumberOfPages() + 1;
             renderAIInsights(pdf, { analysis });
+            tocEntries.push({ name: "AI Insights", page: sectionPage });
           }
         }
 
-        // Add footer to all pages (base + enhanced)
+        // Table of Contents — render last, move to page 2
+        // All current section pages (at 2+) will shift to 3+ when TOC is inserted at 2
+        if (tocEntries.length > 0) {
+          const adjustedEntries = tocEntries.map((e) => ({ name: e.name, page: e.page + 1 }));
+          renderTableOfContents(pdf, adjustedEntries);
+          const tocPage = pdf.getNumberOfPages();
+          pdf.movePage(tocPage, 2);
+        }
+
+        // Add footer to all pages except title page (page 1)
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
         const totalPages = pdf.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = 2; i <= totalPages; i++) {
           pdf.setPage(i);
           pdf.setFontSize(7);
           pdf.setTextColor(255, 255, 255, 50);
