@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { updateImprovementIdea, deleteImprovementIdea } from "@/lib/api/client";
 import { toastError } from "@/lib/api/toast-helpers";
-import type { ImprovementIdea, ImprovementStatus, ImprovementPriority } from "@/types/database";
+import type { ImprovementIdea, ImprovementStatus, ImprovementPriority, Tab } from "@/types/database";
 
 const STATUS_CONFIG: Record<ImprovementStatus, { label: string; className: string }> = {
   proposed: { label: "Proposed", className: "bg-[var(--bg-surface-secondary)] text-[var(--text-secondary)]" },
@@ -40,9 +40,10 @@ interface ImprovementsViewProps {
   entityNames: Record<string, string>;
   workspaceId: string;
   entityTabMap: Record<string, string>;
+  tabs?: Pick<Tab, "id" | "canvas_type">[];
 }
 
-export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entityTabMap }: ImprovementsViewProps) {
+export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entityTabMap, tabs = [] }: ImprovementsViewProps) {
   const [ideas, setIdeas] = React.useState<ImprovementIdea[]>(initialIdeas);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("all");
   const [priorityFilter, setPriorityFilter] = React.useState<PriorityFilter>("all");
@@ -92,6 +93,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
       <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[var(--border-subtle)] overflow-x-auto shrink-0">
         <button
           onClick={() => setStatusFilter("all")}
+          aria-pressed={statusFilter === "all"}
           className={cn(
             "px-3 py-1 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors whitespace-nowrap",
             statusFilter === "all"
@@ -105,6 +107,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
+            aria-pressed={statusFilter === status}
             className={cn(
               "px-3 py-1 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors whitespace-nowrap",
               statusFilter === status
@@ -142,9 +145,19 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
                 : "No ideas match the current filters"}
             </p>
             {statusFilter === "all" && priorityFilter === "all" && (
-              <p className="text-[12px] text-[var(--text-tertiary)] mt-1">
-                Add improvements from step, section, or touchpoint detail panels.
-              </p>
+              <>
+                <p className="text-[12px] text-[var(--text-tertiary)] mt-1">
+                  Add improvements from step, section, or touchpoint detail panels.
+                </p>
+                {tabs.length > 0 && (
+                  <Link
+                    href={`/w/${workspaceId}/${(tabs.find((t) => t.canvas_type === "process") ?? tabs[0]).id}`}
+                    className="text-[var(--accent-blue)] hover:underline text-[12px] mt-2"
+                  >
+                    Go to Canvas
+                  </Link>
+                )}
+              </>
             )}
           </div>
         ) : (
