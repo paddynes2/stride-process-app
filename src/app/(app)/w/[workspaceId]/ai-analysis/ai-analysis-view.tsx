@@ -198,6 +198,7 @@ export function AIAnalysisView({
           <button
             onClick={handleRegenerate}
             disabled={isLoading || !hasSteps || state.type === "rate_limited"}
+            title={!hasSteps ? "Add steps to the canvas before running AI analysis" : undefined}
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors",
               isLoading || !hasSteps || state.type === "rate_limited"
