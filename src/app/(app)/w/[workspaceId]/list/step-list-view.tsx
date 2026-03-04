@@ -168,7 +168,7 @@ export function StepListView({ workspaceId, steps, sections, tabs }: StepListVie
 
             {/* Table */}
             <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] overflow-hidden">
-              <table className="w-full">
+              <table className="w-full" aria-label="Steps">
                 <thead>
                   <tr className="bg-[var(--bg-surface)]">
                     <SortHeader label="Name" field="name" current={sortField} dir={sortDir} onSort={toggleSort} />

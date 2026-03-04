@@ -180,8 +180,8 @@ export default function SettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[12px] font-medium text-[var(--text-secondary)]">Workspace Name</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} required />
+          <label htmlFor="workspace-name" className="text-[12px] font-medium text-[var(--text-secondary)]">Workspace Name</label>
+          <Input id="workspace-name" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <Button type="submit" loading={saving}>Save Changes</Button>
       </form>

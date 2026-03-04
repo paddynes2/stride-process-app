@@ -21,5 +21,5 @@ export default async function WorkspacesPage() {
     .in("organization_id", orgIds.length > 0 ? orgIds : ["00000000-0000-0000-0000-000000000000"])
     .order("created_at", { ascending: false });
 
-  return <WorkspaceList workspaces={workspaces ?? []} />;
+  return <main><WorkspaceList workspaces={workspaces ?? []} /></main>;
 }
