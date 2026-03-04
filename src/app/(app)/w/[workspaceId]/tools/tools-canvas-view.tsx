@@ -340,19 +340,27 @@ export function ToolsCanvasView({
 
   const handleAddToolSection = React.useCallback(async () => {
     try {
+      const SECTION_WIDTH = 400;
+      const SECTION_HEIGHT = 300;
+      const SECTION_GAP = 50;
+      const newX = 50;
+      const newY =
+        toolSections.length > 0
+          ? Math.max(...toolSections.map((s) => s.position_y + s.height)) + SECTION_GAP
+          : 50;
       const ts = await createToolSection({
         workspace_id: workspaceId,
         name: "New Group",
-        position_x: 50 + Math.random() * 200,
-        position_y: 50 + Math.random() * 200,
-        width: 400,
-        height: 300,
+        position_x: newX,
+        position_y: newY,
+        width: SECTION_WIDTH,
+        height: SECTION_HEIGHT,
       });
       setToolSections((prev) => [...prev, ts]);
     } catch {
       // silent
     }
-  }, [workspaceId]);
+  }, [workspaceId, toolSections]);
 
   const handleToolUpdate = React.useCallback((updated: Tool) => {
     setTools((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
