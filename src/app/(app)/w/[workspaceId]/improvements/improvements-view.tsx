@@ -95,10 +95,12 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("all");
   const [priorityFilter, setPriorityFilter] = React.useState<PriorityFilter>("all");
   const [suggestionsState, setSuggestionsState] = React.useState<SuggestionsState>({ type: "idle" });
-  const [lastGeneratedAt, setLastGeneratedAt] = React.useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(`stride:ai-suggestions:${workspaceId}:generated-at`);
-  });
+  const [lastGeneratedAt, setLastGeneratedAt] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const stored = localStorage.getItem(`stride:ai-suggestions:${workspaceId}:generated-at`);
+    if (stored) setLastGeneratedAt(stored);
+  }, [workspaceId]);
   const [isPanelOpen, setIsPanelOpen] = React.useState(false);
   const [addedIndices, setAddedIndices] = React.useState<Set<number>>(new Set());
 
@@ -188,7 +190,7 @@ export function ImprovementsView({ initialIdeas, entityNames, workspaceId, entit
           </div>
           <div className="flex items-center gap-2">
             {lastGeneratedAt && !isLoading && (
-              <span className="text-[11px] text-white/30">
+              <span className="text-[11px] text-white/30" title={lastGeneratedAt}>
                 Last generated {formatTimeAgo(lastGeneratedAt)}
               </span>
             )}
