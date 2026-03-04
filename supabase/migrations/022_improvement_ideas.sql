@@ -9,7 +9,7 @@ CREATE TYPE improvement_status AS ENUM ('proposed', 'approved', 'in_progress', '
 CREATE TYPE improvement_priority AS ENUM ('low', 'medium', 'high', 'critical');
 
 CREATE TABLE improvement_ideas (
-  id                   UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id         UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
   title                TEXT NOT NULL,
   description          TEXT,

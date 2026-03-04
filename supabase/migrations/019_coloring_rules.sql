@@ -6,7 +6,7 @@
 CREATE TYPE criteria_type AS ENUM ('status', 'executor', 'step_type', 'has_role', 'maturity_below', 'maturity_above');
 
 CREATE TABLE coloring_rules (
-  id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id   UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
   name           TEXT NOT NULL,
   color          TEXT NOT NULL,
