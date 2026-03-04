@@ -26,7 +26,7 @@ npx supabase db push     # Push migrations
 ```
 
 ## Key Files
-<!-- Updated: iter-55, 2026-02-26 -->
+<!-- Updated: iter-110, 2026-03-04 -->
 
 ### App Routes
 | Route | File | Purpose |
@@ -51,7 +51,8 @@ npx supabase db push     # Push migrations
 | `/w/.../activity` | `src/app/(app)/w/[workspaceId]/activity/page.tsx` | Activity log (chronological feed, action type filter tabs, entity links, relative timestamps, Load More pagination) |
 | `/w/.../perspectives/compare` | `src/app/(app)/w/[workspaceId]/perspectives/compare/page.tsx` | Perspective comparison (dual dropdowns, divergence table, summary stats, element navigation, PDF export) |
 | `/w/.../prioritization` | `src/app/(app)/w/[workspaceId]/prioritization/page.tsx` | Prioritization matrix (effort/impact quadrant chart, CSS positioning, Radix Tooltips, tab/section filters, click-to-navigate) |
-| `/w/.../improvements` | `src/app/(app)/w/[workspaceId]/improvements/page.tsx` | Improvement ideas (status tabs, priority filter, inline status change dropdown, linked entity links, sidebar badge) |
+| `/w/.../improvements` | `src/app/(app)/w/[workspaceId]/improvements/page.tsx` | Improvement ideas (status tabs, priority filter, inline status change dropdown, linked entity links, sidebar badge, Go to Canvas CTA) |
+| `/w/.../ai-analysis` | `src/app/(app)/w/[workspaceId]/ai-analysis/page.tsx` | AI analysis (cached results, 4 insight categories, severity badges, step links, regenerate, error/rate-limit states) |
 | `/w/.../settings` | `src/app/(app)/w/[workspaceId]/settings/page.tsx` | Workspace settings (clone dialog, delete dialog, perspective delete dialog — all Radix) |
 | `/public/[shareId]` | `src/app/public/[shareId]/page.tsx` | Public share view |
 

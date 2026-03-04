@@ -26,6 +26,8 @@
 
 - **OpenRouter API pattern (FEAT-036):** Uses OpenAI-compatible format: `{ model: "deepseek/deepseek-chat-v3-0324", messages: [...], response_format: { type: "json_object" } }`. Response: `choices[0].message.content` is a JSON string to parse. Server-only `OPENROUTER_API_KEY` (no NEXT_PUBLIC_ prefix). Rate limit via workspace settings JSONB (spread to preserve other keys). Cache: `{ ...settings, last_analysis: result, last_analysis_at: isoDate }`.
 
+- **Optional prop + page.tsx wiring gap:** When a builder adds an optional prop to a view component (e.g., `tabs?: Tab[]` with default `[]`) but the corresponding `page.tsx` doesn't pass it, the feature compiles but is silently dead code. Tester caught this for IMP-058 (Go to Canvas link never shown). Builders must update BOTH the view component AND page.tsx when adding data-dependent UI.
+
 ## Environment
 
 - **Playwright MCP unavailable — not a dev server issue:** Playwright MCP has been unavailable since iteration 56. In Phase 0 (Preflight) step 3, if Playwright can't navigate, this is a TOOL LIMITATION, not a dev server outage. Do NOT write "DEV SERVER DOWN" to SIGNAL. Instead: verify the dev server is running via `curl http://localhost:3000` or `lsof -i :3000`, note "Playwright MCP unavailable" in STATUS.md warnings, and continue. The dev server is likely fine.

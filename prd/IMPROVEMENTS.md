@@ -294,13 +294,11 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/settings/page.tsx`
   - **Fix applied:** Injected workspace.name into DialogDescription and body paragraph using JSX &quot; entities. Both now read 'A full copy of "{workspace.name}" will be created...'
 
-- [ ] #IMP-043 Runbook detail shows truncated UUID instead of creator email — Attempts: 0
+- [x] #IMP-043 Runbook detail shows truncated UUID instead of creator email — Attempts: 1 — DONE iteration 110, 2026-03-04
   - **Found:** Iteration 103 (regression tester)
   - **Category:** Usability
-  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx` ~line 130
-  - **What:** Runbook detail shows created_by as truncated UUID (first 8 chars). Users cannot identify creator.
-  - **Design principle:** Nielsen H6: Recognition rather than recall
-  - **Suggested fix:** Join users table on created_by field and display email/name (same pattern as activity log).
+  - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
+  - **Fix applied:** page.tsx joins users table via `users!runbooks_created_by_fkey(email)`. runbook-view.tsx shows `runbook.users?.email ?? '[Deleted User]'`. PATCH state updates preserve users field via functional setState.
 
 - [ ] #IMP-044 Comments view lacks pagination (single fetch) — Attempts: 0
   - **Found:** Iteration 103 (regression tester)
@@ -406,21 +404,17 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
   - **Fix applied:** Added Trash2 icon button after priority badge with window.confirm + deleteImprovementIdea + state removal + toastError. Styled text-[var(--text-tertiary)] hover:text-[#EF4444]. Reviewer added aria-label='Delete improvement idea'.
 
-- [ ] #IMP-058 Improvements page empty state has no CTA to navigate to canvas — Attempts: 0
+- [x] #IMP-058 Improvements page empty state has no CTA to navigate to canvas — Attempts: 1 — DONE iteration 110, 2026-03-04
   - **Found:** Iteration 108 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
-  - **What:** When workspace has no improvement ideas, only shows text hint. No direct link to get started.
-  - **Design principle:** Nielsen H6: Recognition rather than recall — guide users to where they can take action
-  - **Suggested fix:** Add a 'Go to Canvas' link in the improvements page empty state (same pattern as IMP-053 in prioritization-view.tsx).
+  - **Fix applied:** Added optional tabs prop + "Go to Canvas" link in empty state targeting first process-type tab. page.tsx updated by reviewer to pass tabs prop (builder omitted this, caught by tester).
 
-- [ ] #IMP-059 Status filter buttons missing aria-pressed on ImprovementsView — Attempts: 0
+- [x] #IMP-059 Status filter buttons missing aria-pressed on ImprovementsView — Attempts: 1 — DONE iteration 110, 2026-03-04
   - **Found:** Iteration 108 (acceptance tester)
   - **Category:** Accessibility
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
-  - **What:** Status filter buttons use plain `<button>` without `aria-pressed` to indicate active state. Screen readers cannot determine the selected filter.
-  - **Design principle:** WCAG 4.1.2: Name, Role, Value — interactive components must convey state
-  - **Suggested fix:** Add `aria-pressed={statusFilter === status}` to each filter button.
+  - **Fix applied:** Added `aria-pressed={statusFilter === "all"}` on All button and `aria-pressed={statusFilter === status}` on each status filter button.
 
 - [ ] #IMP-060 Sidebar improvements badge count stale after adding from detail panel — Attempts: 0
   - **Found:** Iteration 108 (regression tester)
@@ -451,6 +445,22 @@
   - **What:** Comment at line 11 references 'BUG-024' but other panels reference this as the 'BUG-023 pattern'. Implementation is correct (using DialogPrimitive.Title) but the bug number is inconsistent.
   - **Design principle:** Code maintainability — consistent documentation references across files
   - **Suggested fix:** Align comment to reference 'BUG-023' consistently across all panels.
+
+- [ ] #IMP-063 AI analysis rate-limit state has no visual countdown timer — Attempts: 0
+  - **Found:** Iteration 110 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx`
+  - **What:** Rate-limited state shows "Try again in about N minutes" but no countdown — user must manually refresh or guess when to retry.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Add client-side countdown timer that decrements from retryAfterSeconds to 0 and auto-enables Regenerate button.
+
+- [ ] #IMP-064 AI analysis not-configured message targets developers only, not SaaS users — Attempts: 0
+  - **Found:** Iteration 110 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx`
+  - **What:** The not_configured state instructs users to "redeploy" the app, which is appropriate for self-hosted users but not SaaS users who may not have environment variable access.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Distinguish self-hosted from cloud-hosted messaging, or link to documentation about configuring AI features.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

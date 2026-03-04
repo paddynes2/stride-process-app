@@ -116,8 +116,8 @@
 ### #FEAT-036 AI process analysis
 **Phase:** 3a
 **Priority:** P1 (important)
-**Attempts:** 1
-**Status:** in_progress — [1/2] backend DONE iteration 109, [2/2] UI pending
+**Attempts:** 2
+**Status:** DONE — [1/2] backend iteration 109, [2/2] UI iteration 110
 **Acceptance criteria:**
 - [x] API route: POST `/api/v1/ai/analyze-process` — accepts workspace_id, returns structured JSON analysis — DONE iteration 109
 - [x] Server-side call to OpenRouter API via fetch() to `https://openrouter.ai/api/v1/chat/completions`. Model: `deepseek/deepseek-chat-v3-0324`. Requires `OPENROUTER_API_KEY` in .env.local. Auth header: `Authorization: Bearer ${process.env.OPENROUTER_API_KEY}` — DONE iteration 109
@@ -127,11 +127,11 @@
   interface AIAnalysisResult { bottlenecks: AIInsight[]; redundancies: AIInsight[]; automation_candidates: AIInsight[]; maturity_recommendations: AIInsight[]; }
   interface AIInsight { title: string; description: string; severity: 'high' | 'medium' | 'low'; affected_step_ids: string[]; }
   ```
-- [ ] "AI Analysis" page at `/w/[workspaceId]/ai-analysis` — categorized result cards with severity indicators
-- [ ] Each recommendation links back to source step(s)
-- [ ] "Regenerate" button, loading state (5-15 seconds). Cache via PATCH to workspace settings JSONB: `{ settings: { last_analysis: AIAnalysisResult, last_analysis_at: string } }`. Merge into existing settings, don't overwrite. Workspace PATCH route must support partial `settings` JSONB merge if it doesn't already.
-- [ ] Error handling: missing API key → setup instructions, API failure → retry with error message
-- [ ] Rate limit: 1 analysis per workspace per 5 minutes (check cached timestamp)
+- [x] "AI Analysis" page at `/w/[workspaceId]/ai-analysis` — categorized result cards with severity indicators — DONE iteration 110
+- [x] Each recommendation links back to source step(s) — DONE iteration 110
+- [x] "Regenerate" button, loading state (5-15 seconds). Cache via PATCH to workspace settings JSONB: `{ settings: { last_analysis: AIAnalysisResult, last_analysis_at: string } }`. Merge into existing settings, don't overwrite. Workspace PATCH route must support partial `settings` JSONB merge if it doesn't already. — DONE iteration 110
+- [x] Error handling: missing API key → setup instructions, API failure → retry with error message — DONE iteration 110
+- [x] Rate limit: 1 analysis per workspace per 5 minutes (check cached timestamp) — DONE iteration 110
 **Notes:** NOT generic advice. Prompt is grounded in real data. Temperature 0.3, max_tokens 4096. Do NOT install new deps — use native fetch(). Uses OpenRouter (OpenAI-compatible API format). Request body: `{ model: "deepseek/deepseek-chat-v3-0324", messages: [...], temperature: 0.3, max_tokens: 4096 }`. Response: `response.choices[0].message.content`. If OPENROUTER_API_KEY not set, UI shows setup instructions gracefully.
 
 ### #FEAT-037 AI gap narrative generator

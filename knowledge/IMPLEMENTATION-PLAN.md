@@ -75,9 +75,9 @@ Core consulting insight features:
 - [x] #FEAT-033 Perspective comparison view — DONE iteration 104
 - [x] #FEAT-034 Prioritization matrix (effort/impact scoring + quadrant chart) — [1/2] data layer DONE iteration 105, [2/2] UI DONE iteration 106
 - [x] #FEAT-035 Improvement ideas tracker — [1/2] data layer DONE iteration 107, [2/2] UI DONE iteration 108
-- [ ] #FEAT-036 AI process analysis (OpenRouter/DeepSeek, structured bottleneck/redundancy/automation analysis)
+- [x] #FEAT-036 AI process analysis (OpenRouter/DeepSeek, structured bottleneck/redundancy/automation analysis) — DONE iteration 110
   - [x] [1/2] Backend: API route, types, client wrapper, rate limit, settings cache — DONE iteration 109
-  - [ ] [2/2] UI: AI analysis page with categorized result cards, regenerate button, loading/error states
+  - [x] [2/2] UI: AI analysis page with categorized result cards, regenerate button, loading/error states — DONE iteration 110
 - [ ] #FEAT-037 AI gap narrative generator (consulting-grade summary text)
 - [ ] #FEAT-038 AI improvement suggestions (bridges AI analysis → improvement tracker)
 - [ ] #FEAT-039 Phase 3a testing gate (full regression + new features)
@@ -172,3 +172,4 @@ Deferred indefinitely:
 - [2026-03-02] Iteration 105: COMPLETED — #FEAT-034 [1/2] data layer (migration 021, types, PATCH routes). #IMP-042 clone dialog name. #IMP-046 runbook progress text. All 3 slots clean. 2 new improvements (IMP-050, IMP-051). Next: FEAT-034 [2/2] UI (detail panel selectors + quadrant chart page).
 - [2026-03-03] Iteration 108: COMPLETED — #FEAT-035 [2/2] UI (improvement ideas page, detail panel dialogs, sidebar badge). #IMP-055 done (Delete Perspective label). #IMP-053 done (prioritization empty state CTA). FEAT-035 fully complete. All 3 slots clean. 1 new pipeline bug (BUG-026). 7 new improvements (IMP-057-063). Next: FEAT-036 AI process analysis.
 - [2026-03-03] Iteration 109: COMPLETED — #FEAT-036 [1/2] AI analysis backend (OpenRouter route, types, client wrapper). #IMP-057 done (improvement delete button). #IMP-062 done (prioritization canvas link). All 3 slots clean, zero merge failures. Reviewer added aria-label accessibility fix. Next: FEAT-036 [2/2] AI analysis UI page.
+- [2026-03-04] Iteration 110: COMPLETED — #FEAT-036 [2/2] AI analysis UI page (4 categories, severity badges, step links, cached results, regenerate, all error states). #IMP-058 done (improvements CTA + aria-pressed). #IMP-043 done (runbook creator email). Reviewer fixed tester-found bug: page.tsx missing tabs prop for IMP-058. FEAT-036 now fully complete. 2 new improvements (IMP-063, IMP-064). Next: FEAT-037 AI gap narrative or FEAT-038 AI improvement suggestions.
