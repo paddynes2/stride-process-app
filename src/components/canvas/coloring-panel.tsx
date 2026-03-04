@@ -184,6 +184,7 @@ export function ColoringPanel({ workspaceId, rules, onRulesChange }: ColoringPan
                     value={HEX_REGEX.test(editForm.color) ? editForm.color : "#14B8A6"}
                     onChange={(e) => setEditForm((f) => ({ ...f, color: e.target.value }))}
                     className="h-7 w-8 rounded border border-[var(--border-subtle)] bg-transparent cursor-pointer p-0.5 flex-shrink-0"
+                    aria-label="Rule color picker"
                   />
                   <input
                     type="text"
@@ -191,6 +192,7 @@ export function ColoringPanel({ workspaceId, rules, onRulesChange }: ColoringPan
                     onChange={(e) => setEditForm((f) => ({ ...f, color: e.target.value }))}
                     className="flex-1 bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] px-2 py-1 text-[12px] text-[var(--text-primary)] font-mono outline-none focus:border-[var(--accent-blue)]"
                     placeholder="#14B8A6"
+                    aria-label="Rule color hex value"
                   />
                 </div>
                 <select
@@ -305,6 +307,7 @@ export function ColoringPanel({ workspaceId, rules, onRulesChange }: ColoringPan
             value={HEX_REGEX.test(addForm.color) ? addForm.color : "#14B8A6"}
             onChange={(e) => setAddForm((f) => ({ ...f, color: e.target.value }))}
             className="h-7 w-8 rounded border border-[var(--border-subtle)] bg-transparent cursor-pointer p-0.5 flex-shrink-0"
+            aria-label="Rule color picker"
           />
           <input
             type="text"
@@ -312,6 +315,7 @@ export function ColoringPanel({ workspaceId, rules, onRulesChange }: ColoringPan
             onChange={(e) => setAddForm((f) => ({ ...f, color: e.target.value }))}
             className="flex-1 bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] px-2 py-1 text-[12px] text-[var(--text-primary)] font-mono outline-none focus:border-[var(--accent-blue)]"
             placeholder="#14B8A6"
+            aria-label="Rule color hex value"
           />
         </div>
         <select
