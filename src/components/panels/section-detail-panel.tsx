@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-// NOTE (BUG-024): The custom DialogTitle in ui/dialog.tsx wraps a plain <h2> (not
+// NOTE (BUG-023): The custom DialogTitle in ui/dialog.tsx wraps a plain <h2> (not
 // DialogPrimitive.Title), so Radix cannot register it for a11y. We import
 // DialogPrimitive.Title directly here to fix the console.error in this dialog.
 import {
