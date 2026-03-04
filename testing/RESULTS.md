@@ -1,18 +1,19 @@
 # Test Results — Stride
 
 ## Last Run Summary
-- **Iteration:** 118
-- **Date:** 2026-03-04
-- **Suite:** Acceptance (iteration 118 tasks)
+- **Iteration:** 119
+- **Date:** 2026-03-05
+- **Suite:** Acceptance (iteration 119 tasks)
 - **Method:** Playwright browser + static code analysis
-- **Result:** **Acceptance 18/18 PASS** + Quality gate PASS
-- **Bugs found:** 0
-- **Improvements found:** 2 (IMP-084 tool link to Tools page, IMP-085 section panel click behavior)
+- **Result:** **Acceptance 14/15 PASS** (1 fail: Cancelled row hidden) + Quality gate: 2 console errors, 2 network errors
+- **Bugs found:** 3 (BUG-031 Cancelled row, BUG-032 step-tools 500, BUG-033 tab bar refresh)
+- **Improvements found:** 2 (IMP-086 analysis toggle indicator, IMP-087 null frequency sorting)
 
 ## Suite Results
 
 ### Acceptance
-- Last run: Iteration 118 (2026-03-04) — 18/18 PASS (FEAT-041 [3/3] 8/8, IMP-081 5/5, IMP-083 5/5 — Playwright browser + static code analysis)
+- Last run: Iteration 119 (2026-03-05) — 14/15 PASS (FEAT-042 7/8 [1 fail: Cancelled row], IMP-084 3/3, IMP-082 4/4 — Playwright browser + static code analysis)
+- Previous: Iteration 118 (2026-03-04) — 18/18 PASS (FEAT-041 [3/3] 8/8, IMP-081 5/5, IMP-083 5/5 — Playwright browser + static code analysis)
 - Previous: Iteration 115 (2026-03-04) — 14/14 PASS (FEAT-040 [1/3] 8/8, IMP-075 3/3, BUG-030 3/3 — Playwright browser + static code analysis)
 - Previous: Iteration 114 (2026-03-04) — 18/18 PASS (IMP-073 6/6, IMP-067+IMP-070+IMP-074 7/7, IMP-064 5/5 — Playwright browser + static code analysis)
 - Previous: Iteration 113 (2026-03-04) — 10/10 PASS (BUG-027 6/6, IMP-069 2/2, IMP-071+IMP-068 2/2 — Playwright browser + static code analysis)

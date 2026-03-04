@@ -1,1 +1,1 @@
-CONTINUE: #FEAT-042 Tool overlap and gap analysis — client-side computation: overlapping tools, unused tools, coverage gaps, total tool spend summary
+CONTINUE: #BUG-031 Fix Cancelled row in Tool Analysis Spend Summary (always show, not conditional), then #FEAT-043 Enhanced PDF export or remaining bugs/improvements

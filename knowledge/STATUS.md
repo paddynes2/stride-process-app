@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 118
-- **Date:** 2026-03-04 23:45
-- **Phase:** Phase 3b — Tools Canvas + Enhanced Export. FEAT-041 fully complete (all 3 sub-tasks done). Next: FEAT-042.
+- **Iteration:** 119
+- **Date:** 2026-03-05 00:15
+- **Phase:** Phase 3b — Tools Canvas + Enhanced Export. FEAT-042 complete. Next: FEAT-043 or bugs/improvements.
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-041 [3/3] step-tool assignment UI + cost integration (slot 1), #IMP-081 tool status optimistic update (slot 2), #IMP-083 section tool count (slot 3, pre-existing)
+- **Last task(s):** #FEAT-042 Tool overlap and gap analysis (slot 1), #IMP-084 Go to Tools link in step-detail-panel (slot 2), #IMP-082 Compare view CTA (slot 3, pre-existing)
 - **Result:** completed
-- **Next task:** #FEAT-042 Tool overlap and gap analysis (client-side computation) or next priority improvements/bugs
+- **Next task:** #BUG-031 (Cancelled row missing in Tool Analysis Spend Summary) or #FEAT-043 Enhanced PDF export
 - **Blockers:** OPENROUTER_API_KEY not configured — AI features return 503 until key is added to .env.local and Vercel.
 
 ## Context
 
-Iteration 118 completed 3 tasks across 3 builder slots. Slot 1 added "Assigned Tools" section to `step-detail-panel.tsx` (140 lines added) — dropdown selector using existing `fetchTools`/`createStepTool`/`deleteStepTool` wrappers, badges with cost display, and refactored cost block showing labor + tool + total. Slot 2 added optimistic update to tool status dropdown in `tool-detail-panel.tsx` (14 lines). Slot 3 verified #IMP-083 was already implemented (no code changes). FEAT-041 is now fully complete (all 3 sub-tasks: [1/3] detail panels iter 117, [2/3] data layer iter 117, [3/3] step assignment UI iter 118). Acceptance tester validated all 18 criteria PASS.
+Iteration 119 completed 3 tasks across 3 builder slots. Slot 1 created `tool-analysis-view.tsx` (326 lines) with 4 analysis cards: Spend Summary, Overlapping Tools, Unused Tools, Coverage Gaps. Modified `tools-canvas-view.tsx` to add Analysis/Canvas toggle button in sidebar header and conditional rendering. Modified `page.tsx` to fetch steps + step_tools data. Slot 2 added "Go to Tools →" link in `step-detail-panel.tsx` when workspace has no tools. Slot 3 verified #IMP-082 was already implemented (no code changes needed). Acceptance tester found 3 bugs: Cancelled status row missing in Spend Summary (BUG-031), step-tools API 500 on panel open (BUG-032), journey tab not appearing in tab bar after creation from Compare view (BUG-033).
 
 ## Dev Server
 
@@ -26,4 +26,5 @@ Iteration 118 completed 3 tasks across 3 builder slots. Slot 1 added "Assigned T
 - Production (origin/main) is behind ralph/init-stride by 70+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
-- step-detail-panel.tsx ~770 lines — exceeding complexity threshold (was ~630)
+- step-detail-panel.tsx ~770 lines — exceeding complexity threshold
+- BUG-032: step-tools API returns 500 when step detail panel opens (pre-existing, may affect tool assignment UX)

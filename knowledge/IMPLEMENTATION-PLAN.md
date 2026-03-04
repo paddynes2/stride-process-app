@@ -87,7 +87,7 @@ Core consulting insight features:
 
 - [x] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape) — [1/3] data layer DONE iteration 115, [2/3] canvas UI DONE iteration 116, [3/3] detail panels DONE iteration 117
 - [x] #FEAT-041 Tool detail panel + step-tool assignment (junction table, cost integration) — [1/3] detail panels DONE iteration 117, [2/3] data layer DONE iteration 117, [3/3] step assignment UI + cost integration DONE iteration 118
-- [ ] #FEAT-042 Tool overlap and gap analysis (client-side computation)
+- [x] #FEAT-042 Tool overlap and gap analysis (client-side computation) — DONE iteration 119
 - [ ] #FEAT-043 Enhanced PDF export — multi-section report (4 sub-tasks)
   - [ ] [1/4] Export dialog UI with section toggles and presets
   - [ ] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison
@@ -181,3 +181,4 @@ Deferred indefinitely:
 - [2026-03-04] Iteration 116: FEAT-040 [2/3] React Flow UI complete (tools-canvas-view.tsx, tool-node.tsx, tool-section-node.tsx). IMP-077 done (gap analysis guidance link). IMP-078 done (workspace date hydration fix). 2 new improvements (IMP-079 label inconsistency, IMP-080 guidance consolidation). Next: FEAT-040 [3/3] detail panel + integration.
 - [2026-03-04] Iteration 117: FEAT-041 [1/3] tool + tool-section detail panels complete. IMP-061 done (optimistic update). IMP-072 done (compare CTA). IMP-079 done (label fix). FEAT-040 fully complete (all 8 acceptance criteria). 3 new improvements (IMP-081-083). Next: FEAT-041 [2/3] step_tools junction.
 - [2026-03-04] Iteration 118: FEAT-041 [3/3] step-tool assignment UI + cost integration completed. IMP-081 done (tool status optimistic update). IMP-083 verified (already implemented). FEAT-041 fully complete. 2 new improvements (IMP-084, IMP-085). Next: FEAT-042 Tool overlap and gap analysis.
+- [2026-03-05] Iteration 119: FEAT-042 Tool overlap and gap analysis completed (tool-analysis-view.tsx 326 lines, 4 analysis cards). IMP-084 done (Go to Tools link). IMP-082 verified pre-existing (from IMP-072 iter 117). 3 new bugs (BUG-031 Cancelled row, BUG-032 step-tools 500, BUG-033 tab bar refresh). 2 new improvements (IMP-086, IMP-087). Next: BUG-031 fix, then FEAT-043 Enhanced PDF export.

@@ -1,17 +1,17 @@
 {
   "schema_version": "1.0",
-  "iteration": 118,
+  "iteration": 119,
   "slot": 2,
-  "task_id": "#IMP-081",
+  "task_id": "#IMP-084",
   "status": "completed",
   "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/components/panels/tool-detail-panel.tsx",
+      "path": "src/components/panels/step-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 14,
-      "lines_removed": 3
+      "lines_added": 62,
+      "lines_removed": 53
     }
   ],
 
@@ -23,9 +23,9 @@
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/panels/tool-detail-panel.tsx"],
+  "staged_files": ["src/components/panels/step-detail-panel.tsx"],
   "ownership_violations": [],
-  "notes": "Added const [status, setStatus] = React.useState(tool.status). Added tool.status to useEffect deps and setStatus(tool.status) in effect body. Added handleStatusChange() with optimistic update (setStatus immediately), updateTool call, and revert+toast on error. Changed select value from tool.status to status and onChange to handleStatusChange.",
+  "notes": "Added 'import Link from next/link'. When allTools.length === 0, Assigned Tools section now shows 'No tools defined yet.' with a Next.js Link to /w/{workspaceId}/tools styled with text-[var(--accent-blue)] hover:underline. When allTools.length > 0, existing dropdown behavior is unchanged. Removed the now-unreachable 'No tools — create tools first' DropdownMenuLabel (dropdown only renders when allTools.length > 0).",
 
   "failure_details": null
 }

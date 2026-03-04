@@ -209,19 +209,19 @@
 - [ ] For annual tools use monthly equivalent (÷12), one-time tools excluded from recurring cost — N/A (Tool type only has cost_per_month, no cost_type/renewal_date fields)
 **Notes:** [1/3] detail panels iter 117, [2/3] data layer (migration 024, types, API, client wrappers, Step Usage section) iter 117, [3/3] step assignment UI + cost integration iter 118. Cost_type/renewal_date criterion not applicable — Tool model uses cost_per_month only (simpler design).
 
-### #FEAT-042 Tool overlap and gap analysis
+### #FEAT-042 Tool overlap and gap analysis — DONE iteration 119, 2026-03-05
 **Phase:** 3b
 **Priority:** P1 (important)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** done
 **Acceptance criteria:**
-- [ ] "Tool Analysis" section on tools page (tab or button)
-- [ ] "Overlapping Tools" card: steps served by 2+ tools with combined cost
-- [ ] "Unused Tools" card: tools with zero step assignments
-- [ ] "Coverage Gaps" card: steps with no tool, sorted by frequency descending
-- [ ] Total tool spend summary (monthly, annual, by status)
-- [ ] Click step/tool name → navigate to element
-**Notes:** Client-side computation from tools + step_tools + steps data. Standard consulting deliverable: "you're paying for 3 redundant tools."
+- [x] "Tool Analysis" section on tools page (tab or button) — BarChart3 toggle in sidebar header
+- [x] "Overlapping Tools" card: steps served by 2+ tools with combined cost
+- [x] "Unused Tools" card: tools with zero step assignments
+- [x] "Coverage Gaps" card: steps with no tool, sorted by frequency descending
+- [~] Total tool spend summary (monthly, annual, by status) — Active + Considering shown; Cancelled conditionally hidden (BUG-031)
+- [x] Click step/tool name → navigate to element
+**Notes:** Client-side computation from tools + step_tools + steps data. Created tool-analysis-view.tsx (326 lines). BUG-031: Cancelled status row hidden when 0 — needs unconditional display.
 
 ### #FEAT-043 Enhanced PDF export — multi-section report
 **Phase:** 3b

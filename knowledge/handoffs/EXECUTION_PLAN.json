@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 118,
-  "date": "2026-03-04T23:30:00Z",
+  "iteration": 119,
+  "date": "2026-03-04T23:55:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "3969546859a833f8187d375c2a8cf7710a3b130b",
+    "last_commit_hash": "7913009",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,8 +13,8 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-041 [3/3]",
-      "description": "Step detail panel 'Tools' section (dropdown selector + badges, same pattern as role assignment) + tool cost integration into step cost computation",
+      "id": "#FEAT-042",
+      "description": "Tool overlap and gap analysis — client-side computation: overlapping tools, unused tools, coverage gaps, total tool spend summary. Add 'Tool Analysis' section/toggle to tools page with 4 analysis cards.",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
@@ -22,146 +22,149 @@
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "Step detail panel has 'Assigned Tools' section below 'Assigned Roles' section",
-        "Dropdown selector lists all workspace tools (fetched via fetchTools), excluding already-assigned tools",
-        "Assigned tools shown as badges with X remove button (matching role assignment pattern exactly)",
-        "Clicking add assigns tool via createStepTool, clicking X removes via deleteStepTool",
-        "Tool badges show tool name and optionally cost_per_month",
-        "Cost computation section (lines 384-404) shows tool cost contribution: sum of assigned tools' cost_per_month",
-        "Total step monthly cost = labor cost + tool cost (displayed separately)",
-        "TypeScript clean (npx tsc --noEmit passes)"
+        "'Tool Analysis' section on tools page accessible via button or tab toggle",
+        "'Overlapping Tools' card: lists steps served by 2+ tools with combined monthly cost for those tools",
+        "'Unused Tools' card: lists tools with zero step_tools assignments",
+        "'Coverage Gaps' card: lists steps with no tool assigned, sorted by frequency_per_month descending",
+        "Total tool spend summary: monthly total, annual total, breakdown by status (active/considering/cancelled)",
+        "Click step name → navigate to step's canvas tab (requires section_id → tab lookup)",
+        "Click tool name → select that tool on the tools canvas (or scroll to it)",
+        "All data computed client-side from tools + steps + step_tools arrays — no new API endpoints needed"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx",
+        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
+        "src/app/(app)/w/[workspaceId]/tools/page.tsx"
+      ],
+      "files_read_only": [
+        "src/lib/api/client.ts",
+        "src/types/database.ts",
+        "src/types/canvas.ts",
+        "src/components/panels/tool-detail-panel.tsx",
+        "src/app/api/v1/step-tools/route.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
+          "src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx",
+          "src/app/(app)/w/[workspaceId]/dashboard/dashboard-view.tsx"
+        ],
+        "patterns_to_follow": [
+          "page.tsx server component fetches data via Supabase, passes to client view component",
+          "Analysis cards use bg-surface-secondary rounded-md p-4 with white/90 headers and white/55 body text",
+          "Step/tool navigation: useRouter().push(`/w/${workspaceId}/${tabId}`) for steps, tool selection via local state for tools",
+          "Existing tools page.tsx fetches tools + toolSections — add steps + step_tools queries in parallel Promise.all",
+          "step_tools has no workspace_id column — fetch via .in('tool_id', toolIds) where toolIds come from already-fetched tools",
+          "Steps need: id, name, section_id, frequency_per_month — section_id used to find tab via sections table"
+        ],
+        "learnings_relevant": [
+          "apiFetch unwraps envelope — returns T directly",
+          "Server/API query mismatch — update both page.tsx and any API routes if adding joins",
+          "Canvas null guards — (arr ?? []).filter(Boolean) before .map()"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/tools"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Data fetching approach: page.tsx should add two more queries to the existing Promise.all — (1) steps with select('id, name, section_id, frequency_per_month') filtered by workspace_id, (2) step_tools via .in('tool_id', toolIds) after tools are fetched (may need sequential instead of parallel for this one, or use a Supabase inner join: step_tools.select('id, step_id, tool_id, steps!inner(workspace_id)').eq('steps.workspace_id', workspaceId)). Pass steps and stepTools as new props to ToolsCanvasView. Create tool-analysis-view.tsx as a separate component rendered conditionally via a toggle button (e.g. BarChart3 icon). For step navigation, also fetch sections (id, tab_id) to map section_id → tab_id. Total spend summary should match the existing sidebar summary pattern in tools-canvas-view.tsx."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-084",
+      "description": "Add 'Go to Tools' link in step-detail-panel Assigned Tools section when workspace has no tools",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "When no tools exist in workspace, Assigned Tools section shows 'No tools yet' with link to /w/{workspaceId}/tools",
+        "Link uses router.push or Next.js Link component",
+        "When tools exist but none assigned to step, shows existing empty dropdown behavior (no change)"
       ],
       "files_owned": [
         "src/components/panels/step-detail-panel.tsx"
       ],
       "files_read_only": [
         "src/lib/api/client.ts",
-        "src/types/database.ts",
-        "src/components/panels/tool-detail-panel.tsx"
-      ],
-      "context": {
-        "similar_files": [
-          "src/components/panels/tool-detail-panel.tsx (Step Usage section pattern, lines 246-263)",
-          "src/components/panels/step-detail-panel.tsx (Assigned Roles section, lines 282-340 — EXACT pattern to follow)"
-        ],
-        "patterns_to_follow": [
-          "Role assignment pattern: fetchStepRoles → state → assignedRoleIds Set → dropdown exclude assigned → createStepRole/deleteStepRole → update state",
-          "Tool fetch: fetchStepToolsByStep(step.id) for assigned, fetchTools(workspaceId) for dropdown options",
-          "Client wrappers already exist: fetchStepToolsByStep, createStepTool, deleteStepTool (client.ts lines 361-379)",
-          "StepToolWithTool type: StepTool & { tool: Pick<Tool, 'id' | 'name' | 'cost_per_month'> }",
-          "Cost section lines 384-404: monthly labor cost from roles. Add tool cost below: sum stepTools.map(st => st.tool.cost_per_month ?? 0)"
-        ],
-        "learnings_relevant": [
-          "React 19 useRef requires initial value: useRef(undefined) not bare useRef()",
-          "apiFetch unwraps envelope — client functions return T directly",
-          "Never sort prop arrays directly — use [...arr].sort()"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] (canvas view with step detail panel)"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "IMPORTANT: FEAT-041 [2/3] was already completed in iteration 117 — migration 024_step_tools.sql, StepTool type, API routes (step-tools/route.ts + [id]/route.ts), client wrappers (fetchStepToolsByStep, createStepTool, deleteStepTool, StepToolWithTool), and 'Step Usage' section in tool-detail-panel.tsx ALL EXIST. Do NOT recreate any of these. This task ONLY adds the 'Assigned Tools' section to step-detail-panel.tsx + cost integration. The Tool type only has cost_per_month (no cost_type/renewal_date fields). Use cost_per_month as-is for cost integration. Also need to fetch all workspace tools for the dropdown — check client.ts for fetchTools function. Icon suggestion: Wrench from lucide-react."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-081",
-      "description": "Tool status dropdown optimistic update — add local status state initialized from tool.status, update immediately on change, revert on API error",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Status dropdown uses local state instead of tool.status prop directly",
-        "Local state resets when tool.id changes (useEffect pattern matching name/category/vendor/url/costPerMonth)",
-        "Dropdown change updates local state immediately (optimistic)",
-        "On API error, reverts local state to previous value and shows toast error",
-        "TypeScript clean"
-      ],
-      "files_owned": [
-        "src/components/panels/tool-detail-panel.tsx"
-      ],
-      "files_read_only": [],
-      "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx (IMP-061 optimistic update pattern)"
-        ],
-        "patterns_to_follow": [
-          "Existing tool-detail-panel already uses local state for name/category/vendor/url/costPerMonth with useEffect reset on tool.id change (lines 47-70). Add status to same pattern.",
-          "Status dropdown currently at line 170: value={tool.status} — change to value={status} with local state"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/tools (tools canvas with tool detail panel)"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Small change. Add const [status, setStatus] = React.useState(tool.status) at line ~47. Add tool.status to the useEffect deps at line 64-70 with setStatus(tool.status). Change select value from tool.status to status. On change, setStatus immediately then call handleFieldUpdate. On error in handleFieldUpdate, revert. Note: handleFieldUpdate currently doesn't distinguish success/failure for the caller — may need to restructure the status change to handle error case inline (try/catch around updateTool with revert in catch)."
-    },
-    {
-      "slot": 3,
-      "id": "#IMP-083",
-      "description": "Tool section detail panel — show count of tools in the selected section as a read-only summary",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Tool section detail panel shows 'N tools' count in header area or below name field",
-        "Count is passed as optional toolCount prop from tools-canvas-view.tsx",
-        "tools-canvas-view.tsx computes count from tools array filtered by tool_section_id",
-        "Count updates when tools are added/removed from the section",
-        "TypeScript clean"
-      ],
-      "files_owned": [
-        "src/components/panels/tool-section-detail-panel.tsx",
-        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
-      ],
-      "files_read_only": [
         "src/types/database.ts"
       ],
       "context": {
         "similar_files": [
-          "src/components/panels/section-detail-panel.tsx (section panels show task rollup — similar concept)"
+          "src/components/panels/tool-detail-panel.tsx"
         ],
         "patterns_to_follow": [
-          "tool-section-detail-panel.tsx is 143 lines — add optional toolCount?: number prop",
-          "tools-canvas-view.tsx already has tools state array — filter by tool_section_id matching selected section"
+          "Existing 'Go to Canvas' link pattern in improvements-view.tsx",
+          "text-accent-blue hover:underline for internal navigation links"
         ],
         "learnings_relevant": [],
         "affected_urls": [
-          "/w/[workspaceId]/tools (tools canvas)"
+          "/w/[workspaceId]/[tabId] (step detail panel)"
         ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Small change. In tools-canvas-view.tsx, when rendering ToolSectionDetailPanel, compute toolCount = tools.filter(t => t.tool_section_id === selectedSection.id).length and pass as prop. In tool-section-detail-panel.tsx, add optional toolCount prop and display below name or in header as muted text like '3 tools' or '0 tools'."
+      "special_instructions": "step-detail-panel.tsx already fetches tools for the dropdown (fetchTools). When the tools list is empty (length 0), show a text like 'No tools defined yet.' with a link 'Go to Tools →' that navigates to /w/{workspaceId}/tools. Use useWorkspace() or useParams() for workspaceId."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-082",
+      "description": "Compare view CTA should create both process and journey tabs, not just journey",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Compare view 'Go to Canvas' CTA creates the correct tab type based on context or offers both options",
+        "If comparison is between perspectives on process entities, creates process tab",
+        "If comparison is between perspectives on journey entities, creates journey tab",
+        "Navigation goes to the newly created tab"
+      ],
+      "files_owned": [
+        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx"
+      ],
+      "files_read_only": [
+        "src/lib/api/client.ts",
+        "src/types/database.ts"
+      ],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
+        ],
+        "patterns_to_follow": [
+          "createTab() accepts canvas_type: 'process' | 'journey'",
+          "Existing CTA button style: bg-accent-blue text-white rounded-md px-4 py-2"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/compare"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Read the current CTA implementation in compare-view.tsx (added in IMP-072, iteration 117). It likely calls createTab with canvas_type 'journey' only. Fix: if workspace already has tabs, navigate to an existing one. If creating new, check whether the comparison data contains process entities (steps/sections) or journey entities (touchpoints/stages) and create the appropriate tab type. If both, default to process tab or show two buttons."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts"],
     "owner": null,
-    "note": "database.ts and client.ts are read-only for all slots. No new types or client wrappers needed — all step_tools infrastructure already exists."
+    "note": "No shared file modifications needed. All 3 tasks touch non-overlapping files."
   },
-  "merge_order": ["#FEAT-041 [3/3]", "#IMP-081", "#IMP-083"],
+  "merge_order": ["#FEAT-042", "#IMP-084", "#IMP-082"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Risk score 2, last regression at iter 112 (6 ago, within 8-iter cadence). No cadence trigger.",
+    "regression_reason": "Last regression iteration 112 (7 iters ago, threshold 8). Will be due next iteration (120).",
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "FEAT-041 [2/3] already complete — migration 024, types, API routes, client wrappers, Step Usage section all built in iteration 117. STATUS.md and IMPLEMENTATION-PLAN.md need update to mark [2/3] done.",
-      "Migration 024 (step_tools) needs to be pushed to remote Supabase DB (npx supabase db push) — same pattern as BUG-022/028/029."
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-118, 2026-03-04 — FEAT-041 complete, step-tool assignment + cost integration -->
+<!-- Updated: iter-119, 2026-03-05 — FEAT-042 complete, tool analysis view + Go to Tools link -->
 
 ## Project
 

@@ -125,3 +125,24 @@
   - **What:** Server renders date as '2026/03/04' but client locale formats it as '3/4/2026'. React detects the mismatch and regenerates the subtree on the client. Appears as a console error on every page load with existing analysis results.
   - **Steps to reproduce:** 1. Navigate to /ai-analysis with existing analysis results. 2. Open browser console. 3. Observe hydration mismatch warning on date display.
   - **Suggested fix:** Use a consistent date format (e.g., `toISOString().slice(0, 10)` or `Intl.DateTimeFormat` with explicit locale) that produces the same output on server and client.
+
+- [ ] #BUG-031 Spend Summary missing Cancelled status breakdown row (P2) — Attempts: 0
+  - **Found:** Iteration 119 (acceptance tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Spend Summary card
+  - **What:** Spend Summary shows Active and Considering status rows but the Cancelled row is conditionally rendered only when `spendByStatus.cancelled > 0`. Acceptance criterion #FEAT-042 requires all three status breakdowns (active/considering/cancelled) to always be visible.
+  - **Steps to reproduce:** 1. Navigate to /w/{workspaceId}/tools. 2. Click 'Analysis' toggle. 3. Observe Spend Summary — only Active and Considering visible, no Cancelled row.
+  - **Suggested fix:** Remove the `{spendByStatus.cancelled > 0 && (...)}` conditional wrapper around the Cancelled row. Show it unconditionally like Active and Considering.
+
+- [ ] #BUG-032 step-tools API returns HTTP 500 when step detail panel opens (P2) — Attempts: 0
+  - **Found:** Iteration 119 (acceptance tester)
+  - **Where:** `src/app/api/v1/step-tools` route, triggered by step-detail-panel.tsx
+  - **What:** GET /api/v1/step-tools?step_id={id} returns 500 twice (duplicate requests, likely StrictMode double-invoke). Causes step tool assignments to fail silently — panel shows no assigned tools even if any exist.
+  - **Steps to reproduce:** 1. Navigate to a canvas tab. 2. Click any step node. 3. Observe network: /api/v1/step-tools?step_id={id} returns 500.
+  - **Suggested fix:** Investigate step-tools API route handler — likely missing step_tools table (migration 024 not pushed) or query error.
+
+- [ ] #BUG-033 Journey tab not in tab bar after creation from Compare view CTA (P2) — Attempts: 0
+  - **Found:** Iteration 119 (acceptance tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx` + workspace-shell.tsx tab bar
+  - **What:** After clicking 'Create Journey Tab' in Compare view, URL navigates to the new tab's ID but the tab bar still only shows the original process tab. Workspace context may not be re-fetching tabs after creation.
+  - **Steps to reproduce:** 1. Navigate to /w/{workspaceId}/compare with only a process tab. 2. Click 'Create Journey Tab'. 3. Observe tab bar — new journey tab not shown.
+  - **Suggested fix:** After createTab(), call the workspace context refresh/invalidation method to re-fetch tabs list, or use router.refresh().

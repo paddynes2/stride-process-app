@@ -1,16 +1,16 @@
 {
   "schema_version": "1.0",
-  "iteration": 118,
+  "iteration": 119,
   "slot": 3,
-  "task_id": "#IMP-083",
+  "task_id": "#IMP-082",
   "status": "completed",
-  "duration_seconds": 45,
+  "duration_seconds": 120,
 
   "files_changed": [],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "skipped", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unused import — documented acceptable in LEARNINGS.md)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
@@ -18,7 +18,7 @@
   "dependencies_added": [],
   "staged_files": [],
   "ownership_violations": [],
-  "notes": "Task already fully implemented in the worktree baseline. tool-section-detail-panel.tsx already has toolCount?: number prop (line 34) with default 0, displays it as 'N tool(s) in this section' below the name field (line 101). tools-canvas-view.tsx already computes selectedSectionToolCount via Object.values(toolSectionMap).filter(sId => sId === selectedSectionId).length (lines 377-379) and passes toolCount={selectedSectionToolCount} to ToolSectionDetailPanel (line 489). Note: Tool type has no tool_section_id field — section membership is tracked via spatial containment in toolSectionMap, which is kept in sync on drag. TypeScript clean (npx tsc --noEmit passes with zero errors). No files modified, nothing to stage.",
+  "notes": "Task IMP-082 was already fully implemented by IMP-072 (iteration 117). compare-view.tsx contains both handleCreateJourneyTab and handleCreateProcessTab handlers with correct canvas_type values ('journey' and 'process' respectively). The empty state conditionally shows 'Create Process Tab' when processTab===null and 'Create Journey Tab' when journeyTab===null. When both are null, both buttons are shown. Navigation goes to the newly created tab in both handlers via router.push. All 4 acceptance criteria are satisfied by the current implementation. TypeScript passes (0 errors). Lint passes (0 errors, 1 pre-existing warning in unrelated file). No code changes were required.",
 
   "failure_details": null
 }

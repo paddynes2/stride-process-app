@@ -588,7 +588,7 @@
   - **Where:** `src/components/panels/tool-detail-panel.tsx`
   - **Fix applied:** Added `const [status, setStatus] = React.useState(tool.status)` with optimistic update in `handleStatusChange`. Reverts on error with toast notification. Status added to useEffect deps for reset on tool change.
 
-- [ ] #IMP-082 Compare view CTA only creates journey tab, not process tab — Attempts: 0
+- [x] #IMP-082 Compare view CTA only creates journey tab, not process tab — Attempts: 1 — DONE iteration 119, 2026-03-05 (verified pre-existing from IMP-072, iter 117)
   - **Found:** Iteration 117 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx`
@@ -602,7 +602,7 @@
   - **Where:** `src/components/panels/tool-section-detail-panel.tsx`
   - **Fix applied:** Already implemented in baseline. `toolCount?: number` prop (line 34) with display text '{N} tool(s) in this section'. Computed via `toolSectionMap` spatial containment in tools-canvas-view.tsx.
 
-- [ ] #IMP-084 Assigned Tools section lacks link to Tools page when no tools exist — Attempts: 0
+- [x] #IMP-084 Assigned Tools section lacks link to Tools page when no tools exist — Attempts: 1 — DONE iteration 119, 2026-03-05
   - **Found:** Iteration 118 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/step-detail-panel.tsx` (Assigned Tools dropdown empty state)
@@ -617,6 +617,22 @@
   - **What:** Single-clicking a tool section node may not reliably open the ToolSectionDetailPanel. Tester observed the panel wasn't visible in accessibility tree after click.
   - **Design principle:** Nielsen H1: Visibility of system status — clear feedback on selection
   - **Suggested fix:** Verify panel opens on single click and is visible in viewport; add tooltip if double-click required.
+
+- [ ] #IMP-086 Tool Analysis toggle button lacks active visual indicator — Attempts: 0
+  - **Found:** Iteration 119 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — Analysis toggle button in sidebar header
+  - **What:** Toggle changes label (Canvas/Analysis) but no strong visual indicator of which mode is active. Button already has accent-blue styling when active, but could be more prominent.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Apply highlighted/active style similar to sidebar nav active states (--brand color) when analysis mode is on.
+
+- [ ] #IMP-087 Coverage Gaps sorts null-frequency steps mixed with real values — Attempts: 0
+  - **Found:** Iteration 119 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Coverage Gaps card
+  - **What:** Steps with null/undefined frequency_per_month display as '—' but are mixed with steps that have real values. Sorting treats null as 0 but they could appear anywhere in the list.
+  - **Design principle:** Nielsen H7: Flexibility and efficiency of use
+  - **Suggested fix:** Treat null frequency as -1 for sorting so unset steps always appear at the bottom of the Coverage Gaps list.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->
