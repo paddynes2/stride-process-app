@@ -626,7 +626,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Apply highlighted/active style similar to sidebar nav active states (--brand color) when analysis mode is on.
 
-- [ ] #IMP-087 Coverage Gaps sorts null-frequency steps mixed with real values — Attempts: 0
+- [x] #IMP-087 Coverage Gaps sorts null-frequency steps mixed with real values — DONE (iteration 123, 2026-03-05) — Attempts: 1
   - **Found:** Iteration 119 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Coverage Gaps card
@@ -674,7 +674,7 @@
   - **Design principle:** Nielsen H6: Recognition over recall — grouping related values reduces cognitive load
   - **Suggested fix:** Add a small 'By Status' label above the Active/Considering/Cancelled rows.
 
-- [ ] #IMP-093 Step Details "No tools defined yet" copy misleading — Attempts: 0
+- [x] #IMP-093 Step Details "No tools defined yet" copy misleading — DONE (iteration 123, 2026-03-05) — Attempts: 1
   - **Found:** Iteration 121 (acceptance tester)
   - **Category:** Usability
   - **Where:** Step detail panel — tools section empty state

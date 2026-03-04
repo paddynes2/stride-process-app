@@ -1,19 +1,17 @@
 ## Handoff
 
-- **Iteration:** 122
-- **Date:** 2026-03-05 03:30
-- **Phase:** Phase 3b — Tools Canvas + Enhanced Export. Fixing P2 bugs.
+- **Iteration:** 123
+- **Date:** 2026-03-05 04:15
+- **Phase:** Phase 3b — Tools Canvas + Enhanced Export. Fixing P2 bugs and improvements.
 - **Branch:** ralph/init-stride
-- **Last task(s):** #BUG-033 (journey tab not in tab bar — completed), #BUG-037 (tools heading hierarchy — completed), #BUG-036 (Radix hydration mismatch — not merged)
-- **Result:** partial
-- **Next task:** #BUG-036 (Radix hydration mismatch — retry, slot 3 not merged), then remaining P2 bugs
+- **Last task(s):** #BUG-036 (Radix hydration mismatch — completed), #IMP-087 (Coverage Gaps null sort — completed), #IMP-093 (step tools copy — completed)
+- **Result:** completed
+- **Next task:** Remaining P2 bugs (BUG-032, BUG-035 blocked on Supabase CLI), then Phase 3b improvements
 - **Blockers:** BUG-035 + BUG-032 blocked on Supabase CLI authentication — `npx supabase login` required before migration 024 can be pushed.
 
 ## Context
 
-Iteration 122 targeted 3 P2 bugs in parallel. BUG-033 fixed in compare-view.tsx — added `refreshTabs()` call after `createTab()` so new tabs appear in tab bar immediately. BUG-037 fixed in tools-canvas-view.tsx — added sr-only h1 for WCAG heading hierarchy. BUG-036 (header.tsx suppressHydrationWarning) was built successfully but slot 3 was not merged by the pipeline. The fix needs to be retried.
-
-BUG-035 (P1) and BUG-032 (P2) share root cause: migration 024 (step_tools) not pushed. Both blocked until manual `npx supabase login` → `npx supabase db push`.
+Iteration 123 fixed 3 small tasks in parallel. BUG-036: header.tsx PerspectiveSwitcher now always renders in React tree (CSS hidden when empty) to prevent Radix ID counter divergence causing hydration mismatch. IMP-087: tool-analysis-view.tsx Coverage Gaps sort uses `?? -Infinity` instead of `?? 0` so null-frequency steps sort to bottom. IMP-093: step-detail-panel.tsx empty state copy changed from "No tools defined yet" / "Go to Tools →" to "No tools assigned." / "Assign from Tools page →".
 
 ## Dev Server
 

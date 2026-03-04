@@ -156,7 +156,7 @@
   - **Suggested fix:** Verify step_tools migration exists. Run `npx supabase db push` to apply. If migration doesn't exist, create it with step_tools junction table (step_id FK, tool_id FK, RLS, indexes).
   - **Note:** May be the same root cause as BUG-032 but confirmed independently by regression tester with P1 severity upgrade.
 
-- [ ] #BUG-036 Radix hydration mismatch on gap-analysis and tools pages (P2) — Attempts: 1
+- [x] #BUG-036 Radix hydration mismatch on gap-analysis and tools pages (P2) — DONE (iteration 123, 2026-03-05) — Attempts: 2
   - **Found:** Iteration 120 (regression tester — Playwright browser)
   - **Where:** `src/components/layout/header.tsx` (User Menu DropdownMenuTrigger)
   - **What:** Radix UI DropdownMenuTrigger generates different IDs on server vs client: server renders 'radix-_R_9knebn9erlb_', client expects 'radix-_R_16knebn9erlb_'. The ID counter offset (9 vs 16) suggests gap-analysis and tools pages render more Radix components on client than server. Causes aria-controls mismatch.
