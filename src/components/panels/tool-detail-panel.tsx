@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { updateTool, deleteTool as apiDeleteTool, fetchStepToolsByTool } from "@/lib/api/client";
 import type { StepToolWithStep } from "@/lib/api/client";
-import type { Tool, ToolStatus } from "@/types/database";
+import type { Tool, ToolStatus, Step } from "@/types/database";
+import { useWorkspace } from "@/lib/context/workspace-context";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
 
@@ -44,6 +46,8 @@ interface ToolDetailPanelProps {
 }
 
 export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetailPanelProps) {
+  const router = useRouter();
+  const { workspace } = useWorkspace();
   const [name, setName] = React.useState(tool.name);
   const [status, setStatus] = React.useState(tool.status);
   const [category, setCategory] = React.useState(tool.category ?? "");
@@ -53,6 +57,7 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
     tool.cost_per_month != null ? String(tool.cost_per_month) : ""
   );
   const [stepTools, setStepTools] = React.useState<StepToolWithStep[]>([]);
+  const [stepTabMap, setStepTabMap] = React.useState<Record<string, string>>({});
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
 
@@ -80,6 +85,21 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
     });
     return () => { cancelled = true; };
   }, [tool.id]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/v1/steps?workspace_id=${workspace.id}`)
+      .then((res) => res.json())
+      .then((json: { data: Step[] | null }) => {
+        if (!cancelled && json.data) {
+          const map: Record<string, string> = {};
+          for (const s of json.data) map[s.id] = s.tab_id;
+          setStepTabMap(map);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [workspace.id]);
 
   const handleFieldUpdate = async (field: string, value: unknown) => {
     try {
@@ -265,13 +285,25 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
             <p className="text-[12px] text-[var(--text-tertiary)] italic">No steps linked to this tool.</p>
           ) : (
             <ul className="space-y-1">
-              {stepTools.map((st) => (
-                <li key={st.id}>
-                  <span className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-default">
-                    {st.step.name}
-                  </span>
-                </li>
-              ))}
+              {stepTools.map((st) => {
+                const tabId = stepTabMap[st.step.id];
+                return (
+                  <li key={st.id}>
+                    {tabId ? (
+                      <button
+                        onClick={() => router.push(`/w/${workspace.id}/${tabId}`)}
+                        className="text-[12px] text-[var(--accent-blue)] hover:underline text-left cursor-pointer"
+                      >
+                        {st.step.name}
+                      </button>
+                    ) : (
+                      <span className="text-[12px] text-[var(--text-secondary)]">
+                        {st.step.name}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
