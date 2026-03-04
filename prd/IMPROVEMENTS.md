@@ -582,13 +582,11 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Combine into: "Open the canvas to set maturity scores on steps to enable AI narrative →" as a single linked message.
 
-- [ ] #IMP-081 Tool status dropdown lacks optimistic update — Attempts: 0
+- [x] #IMP-081 Tool status dropdown lacks optimistic update — DONE iteration 118, 2026-03-04
   - **Found:** Iteration 117 (regression tester)
   - **Category:** Usability
-  - **Where:** `src/components/panels/tool-detail-panel.tsx` (line 159)
-  - **What:** Status dropdown uses `value={tool.status}` from prop instead of local state. Status change has no optimistic update — UI only reflects new status after API round-trip. Other fields (name, category, vendor, url) use local state with debounce for immediate feedback.
-  - **Design principle:** Nielsen H1: Visibility of system status — users should see result of action immediately
-  - **Suggested fix:** Add local `status` state initialized from `tool.status`, reset in useEffect when `tool.id` changes, update optimistically on dropdown change.
+  - **Where:** `src/components/panels/tool-detail-panel.tsx`
+  - **Fix applied:** Added `const [status, setStatus] = React.useState(tool.status)` with optimistic update in `handleStatusChange`. Reverts on error with toast notification. Status added to useEffect deps for reset on tool change.
 
 - [ ] #IMP-082 Compare view CTA only creates journey tab, not process tab — Attempts: 0
   - **Found:** Iteration 117 (regression tester)
@@ -598,13 +596,27 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall — guide users with CTAs for all required actions
   - **Suggested fix:** Show a second "Create Process Tab" button when processTab is also null, or update copy to acknowledge only journey will be created.
 
-- [ ] #IMP-083 Tool section detail panel lacks tool count display — Attempts: 0
+- [x] #IMP-083 Tool section detail panel lacks tool count display — DONE iteration 118, 2026-03-04
   - **Found:** Iteration 117 (regression tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/tool-section-detail-panel.tsx`
-  - **What:** No visual indicator of how many tools are in the selected section. This info is available client-side from the tools array and toolSectionMap.
-  - **Design principle:** Nielsen H7: Flexibility and efficiency of use — expert users benefit from contextual summary
-  - **Suggested fix:** Add a read-only "Tools in section" count to the panel header, passed via an optional `toolCount` prop.
+  - **Fix applied:** Already implemented in baseline. `toolCount?: number` prop (line 34) with display text '{N} tool(s) in this section'. Computed via `toolSectionMap` spatial containment in tools-canvas-view.tsx.
+
+- [ ] #IMP-084 Assigned Tools section lacks link to Tools page when no tools exist — Attempts: 0
+  - **Found:** Iteration 118 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/step-detail-panel.tsx` (Assigned Tools dropdown empty state)
+  - **What:** When workspace has no tools, dropdown label says "No tools — create tools first" but doesn't link to the Tools page. User must navigate manually.
+  - **Design principle:** Nielsen H6: Recognition rather than recall — user shouldn't need to remember where to create tools
+  - **Suggested fix:** Replace static label with a link: "No tools yet — go to Tools to create some" with navigation to `/w/{workspaceId}/tools`.
+
+- [ ] #IMP-085 Tool section panel click behavior may require investigation — Attempts: 0
+  - **Found:** Iteration 118 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx`
+  - **What:** Single-clicking a tool section node may not reliably open the ToolSectionDetailPanel. Tester observed the panel wasn't visible in accessibility tree after click.
+  - **Design principle:** Nielsen H1: Visibility of system status — clear feedback on selection
+  - **Suggested fix:** Verify panel opens on single click and is visible in viewport; add tooltip if double-click required.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

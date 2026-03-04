@@ -1,1 +1,1 @@
-CONTINUE: #FEAT-040 [3/3] Tools canvas detail panel — add tool editing sidebar (click tool node to edit name/status/cost/URL/description), delete tool/section, rename section inline, then FEAT-041 tool-step assignments
+CONTINUE: #FEAT-042 Tool overlap and gap analysis — client-side computation: overlapping tools, unused tools, coverage gaps, total tool spend summary

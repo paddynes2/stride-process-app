@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 117,
-  "date": "2026-03-04T22:30:00Z",
+  "iteration": 118,
+  "date": "2026-03-04T23:30:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "b4ce964e3ee50314ad9f8ca8d30d6794fcab28e7",
+    "last_commit_hash": "3969546859a833f8187d375c2a8cf7710a3b130b",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,8 +13,8 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-041",
-      "description": "Tool detail panel + tool section detail panel — click tool/section node on canvas to show right-sidebar editing panel with all existing editable fields, debounced persistence, delete with Radix confirmation dialog. Also fix IMP-079 label inconsistency.",
+      "id": "#FEAT-041 [3/3]",
+      "description": "Step detail panel 'Tools' section (dropdown selector + badges, same pattern as role assignment) + tool cost integration into step cost computation",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
@@ -22,146 +22,146 @@
       "attempts": 1,
       "risk_score": 2,
       "acceptance_criteria": [
-        "Click tool node on canvas → right sidebar detail panel with editable fields: name (text input), description (rich text via dynamic TipTap import), category (text input), vendor (text input), url (text input), cost_per_month (number input), status (dropdown: active/considering/cancelled)",
-        "Field changes persist on blur/change with 500ms debounce via PATCH /api/v1/tools/[id] — use updateTool from client.ts",
-        "Delete tool via Radix Dialog confirmation → DELETE /api/v1/tools/[id] → remove node from canvas state",
-        "Click tool section node → right sidebar detail panel with editable fields: name (text input), description (rich text via dynamic TipTap import)",
-        "Delete tool section via Radix Dialog confirmation → DELETE /api/v1/tool-sections/[id] → remove node from canvas state",
-        "Detail panel replaces summary sidebar when a node is selected; summary sidebar returns when no selection active (pane click clears selection, close button clears selection)",
-        "Fix IMP-079: empty state secondary button label changed from 'Add Group' to 'Add Tool Section'"
+        "Step detail panel has 'Assigned Tools' section below 'Assigned Roles' section",
+        "Dropdown selector lists all workspace tools (fetched via fetchTools), excluding already-assigned tools",
+        "Assigned tools shown as badges with X remove button (matching role assignment pattern exactly)",
+        "Clicking add assigns tool via createStepTool, clicking X removes via deleteStepTool",
+        "Tool badges show tool name and optionally cost_per_month",
+        "Cost computation section (lines 384-404) shows tool cost contribution: sum of assigned tools' cost_per_month",
+        "Total step monthly cost = labor cost + tool cost (displayed separately)",
+        "TypeScript clean (npx tsc --noEmit passes)"
       ],
       "files_owned": [
-        "src/components/panels/tool-detail-panel.tsx",
+        "src/components/panels/step-detail-panel.tsx"
+      ],
+      "files_read_only": [
+        "src/lib/api/client.ts",
+        "src/types/database.ts",
+        "src/components/panels/tool-detail-panel.tsx"
+      ],
+      "context": {
+        "similar_files": [
+          "src/components/panels/tool-detail-panel.tsx (Step Usage section pattern, lines 246-263)",
+          "src/components/panels/step-detail-panel.tsx (Assigned Roles section, lines 282-340 — EXACT pattern to follow)"
+        ],
+        "patterns_to_follow": [
+          "Role assignment pattern: fetchStepRoles → state → assignedRoleIds Set → dropdown exclude assigned → createStepRole/deleteStepRole → update state",
+          "Tool fetch: fetchStepToolsByStep(step.id) for assigned, fetchTools(workspaceId) for dropdown options",
+          "Client wrappers already exist: fetchStepToolsByStep, createStepTool, deleteStepTool (client.ts lines 361-379)",
+          "StepToolWithTool type: StepTool & { tool: Pick<Tool, 'id' | 'name' | 'cost_per_month'> }",
+          "Cost section lines 384-404: monthly labor cost from roles. Add tool cost below: sum stepTools.map(st => st.tool.cost_per_month ?? 0)"
+        ],
+        "learnings_relevant": [
+          "React 19 useRef requires initial value: useRef(undefined) not bare useRef()",
+          "apiFetch unwraps envelope — client functions return T directly",
+          "Never sort prop arrays directly — use [...arr].sort()"
+        ],
+        "affected_urls": [
+          "/w/[workspaceId]/[tabId] (canvas view with step detail panel)"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "IMPORTANT: FEAT-041 [2/3] was already completed in iteration 117 — migration 024_step_tools.sql, StepTool type, API routes (step-tools/route.ts + [id]/route.ts), client wrappers (fetchStepToolsByStep, createStepTool, deleteStepTool, StepToolWithTool), and 'Step Usage' section in tool-detail-panel.tsx ALL EXIST. Do NOT recreate any of these. This task ONLY adds the 'Assigned Tools' section to step-detail-panel.tsx + cost integration. The Tool type only has cost_per_month (no cost_type/renewal_date fields). Use cost_per_month as-is for cost integration. Also need to fetch all workspace tools for the dropdown — check client.ts for fetchTools function. Icon suggestion: Wrench from lucide-react."
+    },
+    {
+      "slot": 2,
+      "id": "#IMP-081",
+      "description": "Tool status dropdown optimistic update — add local status state initialized from tool.status, update immediately on change, revert on API error",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Status dropdown uses local state instead of tool.status prop directly",
+        "Local state resets when tool.id changes (useEffect pattern matching name/category/vendor/url/costPerMonth)",
+        "Dropdown change updates local state immediately (optimistic)",
+        "On API error, reverts local state to previous value and shows toast error",
+        "TypeScript clean"
+      ],
+      "files_owned": [
+        "src/components/panels/tool-detail-panel.tsx"
+      ],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx (IMP-061 optimistic update pattern)"
+        ],
+        "patterns_to_follow": [
+          "Existing tool-detail-panel already uses local state for name/category/vendor/url/costPerMonth with useEffect reset on tool.id change (lines 47-70). Add status to same pattern.",
+          "Status dropdown currently at line 170: value={tool.status} — change to value={status} with local state"
+        ],
+        "learnings_relevant": [],
+        "affected_urls": [
+          "/w/[workspaceId]/tools (tools canvas with tool detail panel)"
+        ]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Small change. Add const [status, setStatus] = React.useState(tool.status) at line ~47. Add tool.status to the useEffect deps at line 64-70 with setStatus(tool.status). Change select value from tool.status to status. On change, setStatus immediately then call handleFieldUpdate. On error in handleFieldUpdate, revert. Note: handleFieldUpdate currently doesn't distinguish success/failure for the caller — may need to restructure the status change to handle error case inline (try/catch around updateTool with revert in catch)."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-083",
+      "description": "Tool section detail panel — show count of tools in the selected section as a read-only summary",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "Tool section detail panel shows 'N tools' count in header area or below name field",
+        "Count is passed as optional toolCount prop from tools-canvas-view.tsx",
+        "tools-canvas-view.tsx computes count from tools array filtered by tool_section_id",
+        "Count updates when tools are added/removed from the section",
+        "TypeScript clean"
+      ],
+      "files_owned": [
         "src/components/panels/tool-section-detail-panel.tsx",
         "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
       ],
       "files_read_only": [
-        "src/components/panels/stage-detail-panel.tsx",
-        "src/components/panels/step-detail-panel.tsx",
-        "src/types/database.ts",
-        "src/types/canvas.ts",
-        "src/lib/api/client.ts",
-        "src/components/canvas/tool-node.tsx",
-        "src/components/canvas/tool-section-node.tsx",
-        "src/components/ui/button.tsx",
-        "src/components/ui/dialog.tsx"
-      ],
-      "context": {
-        "similar_files": [
-          "src/components/panels/stage-detail-panel.tsx (183 lines — simpler pattern, good model for tool-section-detail-panel)",
-          "src/components/panels/step-detail-panel.tsx (629 lines — full pattern with all features, good model for tool-detail-panel structure)"
-        ],
-        "patterns_to_follow": [
-          "Debounced field updates via setTimeout refs — see stage-detail-panel.tsx nameTimeoutRef pattern",
-          "Dynamic import for RichTextEditor: const RichTextEditor = dynamic(() => import('./rich-text-editor'), { ssr: false })",
-          "handleFieldUpdate(field, value) async wrapper: calls API → onUpdate(updated) → catches with toastError",
-          "useEffect sync when entity.id changes to reset local state and handle node re-selection",
-          "Radix Dialog for delete confirmation — import DialogPrimitive from @radix-ui/react-dialog for Title (BUG-023 pattern)",
-          "React 19 useRef(null) — always provide initial value"
-        ],
-        "learnings_relevant": [
-          "TipTap SSR crash: TipTap editor must be lazy-loaded via dynamic() import",
-          "React 19 useRef: requires initial value useRef(null) not bare useRef()",
-          "apiFetch unwraps envelope: returns T directly — do NOT add nested property access",
-          "Custom DialogTitle wraps <h2> not DialogPrimitive.Title — use DialogPrimitive.Title directly (BUG-023)"
-        ],
-        "affected_urls": ["/w/[workspaceId]/tools"]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "IMPORTANT ARCHITECTURE NOTES:\n1. tools-canvas-view.tsx already has selectedToolId/selectedSectionId state (lines 126-131) and handleNodeClick/handlePaneClick (lines 278-294). The canvas selection is ALREADY WIRED — you just need to add conditional panel rendering.\n2. Lines 342-518: summary sidebar renders when nothingSelected (neither tool nor section selected). Add tool detail panel when selectedToolId is set, tool section detail panel when selectedSectionId is set. These are mutually exclusive with the summary sidebar.\n3. Tool type has fields: name, description, category, vendor, url, cost_per_month (number), status ('active'|'considering'|'cancelled'), position_x, position_y. Detail panel edits all EXCEPT position fields.\n4. ToolSection type has fields: name, description, position_x, position_y, width, height. Detail panel edits name and description only.\n5. API wrappers exist: updateTool(id, data), deleteTool(id), updateToolSection(id, data), deleteToolSection(id) — all in src/lib/api/client.ts.\n6. When a tool/section is deleted, update local React Flow nodes state to remove the node. Use setNodes(prev => prev.filter(n => n.id !== deletedId)) pattern.\n7. When a tool/section is updated via the panel, update the matching node's data in React Flow state: setNodes(prev => prev.map(n => n.id === updatedId ? { ...n, data: { ...n.data, tool: updatedTool } } : n)).\n8. For IMP-079: search for 'Add Group' in tools-canvas-view.tsx and replace with 'Add Tool Section'.\n9. Use DialogPrimitive.Title (not the custom ui/dialog.tsx DialogTitle) for accessibility (BUG-023 pattern)."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-061",
-      "description": "Improvement status change optimistic update — apply visual state change immediately, revert on API failure with error toast",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3a: Analysis Intelligence",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Status dropdown change updates local ideas state immediately via setIdeas(prev => prev.map(...))",
-        "If API call (updateImprovementIdea) fails, revert to previous ideas state and show error toast"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
-      ],
-      "files_read_only": [
-        "src/lib/api/client.ts",
-        "src/types/database.ts"
-      ],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "Optimistic update: const prevIdeas = ideas; setIdeas(optimistic); try { await api() } catch { setIdeas(prevIdeas); toastError(...) }",
-          "BUG-017 optimistic rollback pattern — save previous state BEFORE mutation"
-        ],
-        "learnings_relevant": [
-          "React state immutability: use [...arr].map() not direct mutation"
-        ],
-        "affected_urls": ["/w/[workspaceId]/improvements"]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "In handleStatusChange (around lines 58-65): 1) Save prev state: const prevIdeas = [...ideas]. 2) Optimistic update: setIdeas(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i)). 3) Wrap API call in try/catch. 4) On error: setIdeas(prevIdeas) + toastError('Failed to update status'). Import toastError from '@/lib/api/toast-helpers' if not already imported."
-    },
-    {
-      "slot": 3,
-      "id": "#IMP-072",
-      "description": "Compare view empty state CTA button to create journey tab — replace passive text with actionable button",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 2a: Journey Canvas",
-      "complexity": "S",
-      "attempts": 1,
-      "risk_score": 0,
-      "acceptance_criteria": [
-        "Empty state (when no journey tabs exist) includes a visible CTA button styled with the Button component",
-        "Button creates a new journey tab via createTab API (with canvas_type='journey', workspace_id) and navigates to it on success"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/compare/compare-view.tsx"
-      ],
-      "files_read_only": [
-        "src/lib/api/client.ts",
-        "src/lib/context/workspace-context.tsx",
         "src/types/database.ts"
       ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx (has similar empty state patterns with CTA buttons)"
+          "src/components/panels/section-detail-panel.tsx (section panels show task rollup — similar concept)"
         ],
         "patterns_to_follow": [
-          "useWorkspace() hook for workspace.id and tabs list",
-          "createTab(data) from lib/api/client.ts",
-          "useRouter() from next/navigation for navigation after creation",
-          "Button component from ui/button"
+          "tool-section-detail-panel.tsx is 143 lines — add optional toolCount?: number prop",
+          "tools-canvas-view.tsx already has tools state array — filter by tool_section_id matching selected section"
         ],
         "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/compare"]
+        "affected_urls": [
+          "/w/[workspaceId]/tools (tools canvas)"
+        ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Read compare-view.tsx to understand the current empty state text and structure. Add a Button component that calls createTab with { workspace_id, name: 'Journey', canvas_type: 'journey' }. On success, use router.push to navigate to the new tab: /w/${workspaceId}/${newTab.id}. Handle loading state on the button. Wrap the createTab call in try/catch with toastError on failure."
+      "special_instructions": "Small change. In tools-canvas-view.tsx, when rendering ToolSectionDetailPanel, compute toolCount = tools.filter(t => t.tool_section_id === selectedSection.id).length and pass as prop. In tool-section-detail-panel.tsx, add optional toolCount prop and display below name or in header as muted text like '3 tools' or '0 tools'."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts", "src/lib/api/client.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/lib/api/client.ts"],
     "owner": null,
-    "note": "No shared file modifications needed. All API wrappers and types for tools already exist from FEAT-040 [1/3] (iteration 115)."
+    "note": "database.ts and client.ts are read-only for all slots. No new types or client wrappers needed — all step_tools infrastructure already exists."
   },
-  "merge_order": ["#FEAT-041", "#IMP-061", "#IMP-072"],
+  "merge_order": ["#FEAT-041 [3/3]", "#IMP-081", "#IMP-083"],
   "testing_plan": {
     "run_acceptance": true,
-    "run_regression": true,
-    "regression_reason": "Risk score 4 from iteration 116 (7 files changed, shared canvas.ts types modified). Last regression: iteration 112 (5 iterations ago).",
-    "suites_to_run": ["acceptance", "regression"],
+    "run_regression": false,
+    "regression_reason": "Risk score 2, last regression at iter 112 (6 ago, within 8-iter cadence). No cadence trigger.",
+    "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": [
+      "FEAT-041 [2/3] already complete — migration 024, types, API routes, client wrappers, Step Usage section all built in iteration 117. STATUS.md and IMPLEMENTATION-PLAN.md need update to mark [2/3] done.",
+      "Migration 024 (step_tools) needs to be pushed to remote Supabase DB (npx supabase db push) — same pattern as BUG-022/028/029."
+    ],
     "diagnoses_written": false,
     "signal_override": null
   }

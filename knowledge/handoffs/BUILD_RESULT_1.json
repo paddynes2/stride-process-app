@@ -1,47 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 117,
+  "iteration": 118,
   "slot": 1,
-  "task_id": "#FEAT-041",
+  "task_id": "#FEAT-041 [3/3]",
   "status": "completed",
-  "duration_seconds": 480,
+  "duration_seconds": 180,
 
   "files_changed": [
     {
-      "path": "src/components/panels/tool-detail-panel.tsx",
-      "action": "created",
-      "lines_added": 262,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/components/panels/tool-section-detail-panel.tsx",
-      "action": "created",
-      "lines_added": 143,
-      "lines_removed": 0
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
+      "path": "src/components/panels/step-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 66,
-      "lines_removed": 1
+      "lines_added": 140,
+      "lines_removed": 12
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (documented in LEARNINGS.md), 0 errors, 0 new warnings in changed files" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (documented in LEARNINGS.md), 0 errors, 0 new warnings" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [
-    "src/components/panels/tool-detail-panel.tsx",
-    "src/components/panels/tool-section-detail-panel.tsx",
-    "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
-  ],
+  "staged_files": ["src/components/panels/step-detail-panel.tsx"],
   "ownership_violations": [],
-  "notes": "Implemented ToolDetailPanel (name, status dropdown, category, vendor, url, cost_per_month, description via dynamic TipTap) and ToolSectionDetailPanel (name, description via dynamic TipTap). Both panels use 500ms debounced field updates, Radix Dialog delete confirmation with DialogPrimitive.Title (BUG-023 pattern), and onUpdate/onDelete/onClose callbacks. tools-canvas-view.tsx wired: selectedTool/selectedSection derived from existing selection state, four handlers (handleToolUpdate, handleToolDelete, handleToolSectionUpdate, handleToolSectionDelete) update source-of-truth arrays and the existing useEffect rebuilds React Flow nodes. Panels are mutually exclusive with the summary sidebar via the existing nothingSelected condition. Fixed IMP-079: empty state secondary button label changed from 'Add Group' to 'Add Tool Section'.",
+  "notes": "Added 'Assigned Tools' section below 'Assigned Roles' section using identical DropdownMenu + badge pattern. fetchStepToolsByStep(step.id) loads assigned tools; fetchTools(workspaceId) populates dropdown (excludes already-assigned via assignedToolIds Set). Tool badges show name and cost_per_month if set, with X remove button. createStepTool/deleteStepTool handlers update local state. Cost section refactored to show labor cost and tool cost as separate line items with a total row. Cost block now renders when only tool costs exist (no time/frequency required). Wrench icon from lucide-react; Tool type from database.ts; StepToolWithTool from client.ts.",
 
   "failure_details": null
 }

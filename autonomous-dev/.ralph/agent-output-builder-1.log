@@ -1,8 +1,21 @@
-**Build complete.** Summary:
+Done. Here's a summary of what was implemented:
 
-**Files created/modified (3):**
-- `src/components/panels/tool-detail-panel.tsx` — NEW: full detail panel with name, status dropdown (active/considering/cancelled), category, vendor, url, cost_per_month, and description (dynamic TipTap). 500ms debounced persistence via `updateTool`. Radix Dialog delete confirmation with `DialogPrimitive.Title` (BUG-023 pattern).
-- `src/components/panels/tool-section-detail-panel.tsx` — NEW: section detail panel with name and description (dynamic TipTap). 500ms debounced persistence via `updateToolSection`. Same delete confirmation pattern.
-- `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — MODIFIED: added imports for both panels; added `handleToolUpdate/Delete/SectionUpdate/SectionDelete` handlers that update source-of-truth state arrays (triggering existing useEffect to rebuild React Flow nodes); added `selectedTool`/`selectedSection` derived vars; added conditional panel rendering (mutually exclusive with summary sidebar); fixed IMP-079 (`Add Group` → `Add Tool Section`).
+**Task: #FEAT-041 [3/3] — Assigned Tools section + cost integration**
 
-**Verification:** typecheck ✓ (clean), lint ✓ (0 errors, 1 pre-existing warning in unmodified file).
+Changes to `src/components/panels/step-detail-panel.tsx`:
+
+1. **Imports**: Added `Wrench` (lucide-react), `fetchStepToolsByStep`, `createStepTool`, `deleteStepTool`, `fetchTools` (client), `StepToolWithTool` (client type), `Tool` (database type)
+
+2. **State**: Added `stepTools: StepToolWithTool[]` and `allTools: Tool[]`
+
+3. **Effects**: Two new useEffects — fetch assigned tools on `step.id` change; fetch all workspace tools on `workspaceId` change
+
+4. **Derived**: `assignedToolIds = new Set(stepTools.map(st => st.tool.id))`
+
+5. **Handlers**: `handleAssignTool` (createStepTool → update state) and `handleRemoveTool` (deleteStepTool → filter state), exact role assignment pattern
+
+6. **"Assigned Tools" UI section**: Inserted between Assigned Roles and the separator. Dropdown lists all workspace tools (excluded assigned), badges show name + `cost_per_month`, X removes
+
+7. **Cost section**: Refactored IIFE to show labor cost and tool cost as separate lines, total row when either exists. Block now renders even without time/frequency if tools have costs
+
+**Verification**: TypeScript clean (`npx tsc --noEmit` — no output), lint passes (0 errors, 1 pre-existing warning)

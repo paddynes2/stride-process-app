@@ -1997,3 +1997,29 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 slots completed, zero merge failures, zero reviewer fixes needed.
 - Observations: 3 (tool status optimistic update, compare dual-CTA, section tool count)
 **Notes:** FEAT-041 [1/3] complete. Detail panels wired into tools-canvas-view with selection-based rendering. Next: FEAT-041 [2/3] step_tools junction table + "Step Usage" section.
+
+## Iteration 118 — 2026-03-04 23:45
+**Tasks:**
+- #FEAT-041 [3/3] Step detail panel 'Assigned Tools' section + tool cost integration — slot 1 — completed
+- #IMP-081 Tool status dropdown optimistic update — slot 2 — completed
+- #IMP-083 Tool section detail panel tool count display — slot 3 — completed (pre-existing)
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:** src/components/panels/step-detail-panel.tsx (modified, +140/-12), src/components/panels/tool-detail-panel.tsx (modified, +14/-3)
+**Verification:**
+- Type check: pass (0 errors, all 3 slots)
+- Lint: pass (0 errors, 1 pre-existing warning flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite)
+- Browser test: pass (acceptance tester Playwright — 2 pages checked, 0 console errors, 0 network errors)
+- Canary test: pass (quality gate: 0 console errors, 0 network errors, 0 accessibility issues)
+**Bugs found:** None
+**Improvements found:** 2 (tester observations — tool link to Tools page, section panel click behavior)
+**Self-score:**
+- Code quality: 5 — Clean implementation following established role-assignment pattern exactly. Cost refactoring well-structured with separate line items.
+- Test coverage: 4 — All 18 acceptance criteria verified PASS. Browser quality gate clean.
+- Confidence: 5 — Pattern-matched from existing role assignment code. All typecheck/lint/POST_MERGE_CHECK pass.
+- Efficiency: 5 — All 3 slots completed, zero merge failures, zero reviewer fixes needed.
+- Observations: 2 (tool link to Tools page suggestion, section panel click behavior)
+**Notes:** FEAT-041 fully complete (all 3 sub-tasks). [2/3] was built alongside [1/3] in iter 117. step-detail-panel.tsx now ~770 lines — approaching refactor threshold.

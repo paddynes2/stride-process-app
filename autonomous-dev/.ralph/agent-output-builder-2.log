@@ -1,11 +1,13 @@
-Done. Here's what was changed:
+Done. Here's a summary of what was implemented for `#IMP-081`:
 
-**`handleStatusChange`** in `improvements-view.tsx` (lines 98-107):
+**Changes to `src/components/panels/tool-detail-panel.tsx`:**
 
-1. `const prevIdeas = [...ideas]` — captures state before mutation
-2. `setIdeas(prev => prev.map(...))` — applies optimistic update immediately
-3. `await updateImprovementIdea(...)` — makes API call
-4. On success: syncs with the server-returned object (catches any server-side field normalization)
-5. On error: `setIdeas(prevIdeas)` reverts + `toastError` shows the failure message
+1. **Added local state:** `const [status, setStatus] = React.useState(tool.status)` alongside other field states at line ~48.
 
-Typecheck and lint both pass. 3 lines added, 0 removed.
+2. **Updated useEffect:** Added `tool.status` to the dependency array and `setStatus(tool.status)` in the effect body — so status resets when the selected tool changes (matching the pattern for name/category/vendor/url/costPerMonth).
+
+3. **Added `handleStatusChange`:** Captures the previous status, updates optimistically via `setStatus(newStatus)`, calls `updateTool` directly with try/catch. On error, reverts to the previous status and calls `toastError`. On success, calls `onUpdate(updated)` to sync parent state.
+
+4. **Wired the select:** Changed `value={tool.status}` → `value={status}` and `onChange` → `handleStatusChange`.
+
+All acceptance criteria met: TypeScript clean (0 errors), lint clean (0 errors, 1 pre-existing unrelated warning).

@@ -1,18 +1,15 @@
-Execution plan written. Summary:
+EXECUTION_PLAN.json written. Here's the summary:
 
-**Iteration 117 — multi_task (3 slots)**
+**Iteration 118 — 3 parallel tasks:**
 
-| Slot | Task | Type | Complexity | Files |
-|------|------|------|------------|-------|
-| 1 | **#FEAT-041 [1/3]** Tool detail panel + tool section detail panel | build | M | tool-detail-panel.tsx (new), tool-section-detail-panel.tsx (new), tools-canvas-view.tsx |
-| 2 | **#IMP-061** Improvement status optimistic update | improve | S | improvements-view.tsx |
-| 3 | **#IMP-072** Compare view empty state CTA button | improve | S | compare-view.tsx |
+| Slot | Task | Type | Complexity | Files Owned |
+|------|------|------|------------|-------------|
+| 1 | **FEAT-041 [3/3]** Step detail panel "Tools" section + cost integration | build | M | step-detail-panel.tsx |
+| 2 | **IMP-081** Tool status dropdown optimistic update | improve | S | tool-detail-panel.tsx |
+| 3 | **IMP-083** Tool section panel tool count display | improve | S | tool-section-detail-panel.tsx, tools-canvas-view.tsx |
 
-**Validation:** Last commit valid, compilation passing, no revert needed.
+**Key finding:** FEAT-041 [2/3] (step_tools junction data layer) was already completed in iteration 117 alongside [1/3]. Migration 024, types, API routes, client wrappers, and "Step Usage" section all exist. STATUS.md updated with this warning.
 
-**Key decisions:**
-- FEAT-040 is complete (all 8 acceptance criteria checked) — reviewer should mark DONE
-- FEAT-041 decomposed into 3 sub-tasks: [1/3] panels with existing fields, [2/3] step_tools junction data layer, [3/3] step detail panel integration + cost
-- Risk score 4 from iter 116 → regression included in testing plan
-- IMP-079 (label fix) bundled into slot 1 since it touches the same file
-- All 3 slots are file-independent (zero overlap)
+**Validation:** tsc clean, last commit valid, no revert needed. Risk score 2 — normal task selection.
+
+**Testing:** Acceptance only. Regression not due (last at iter 112, within 8-iter cadence).

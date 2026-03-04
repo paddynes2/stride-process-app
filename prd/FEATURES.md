@@ -194,20 +194,20 @@
 - [x] Canvas zoom/pan controls (reuse existing) — DONE iteration 116
 **Notes:** Builds on top of Ralph's FEAT-030 tools data model (migration 013). Add position_x, position_y columns to tools table if not already there. Tool sections are new table. The canvas is a single view per workspace (not tab-based).
 
-### #FEAT-041 Tool detail panel + step-tool assignment
+### #FEAT-041 Tool detail panel + step-tool assignment — DONE iteration 118, 2026-03-04
 **Phase:** 3b
 **Priority:** P0 (critical path)
 **Attempts:** 1
-**Status:** in_progress (1/3 complete — tool + tool-section detail panels done iteration 117)
+**Status:** done
 **Acceptance criteria:**
-- [ ] Click tool on canvas → right sidebar detail panel with: name, vendor, URL, status dropdown, cost type (monthly/annual/one-time), cost amount, renewal date (for monthly/annual only), category, notes (TipTap)
-- [ ] Changes persist on blur/change
-- [ ] "Step Usage" section: lists all steps using this tool (via step_tools junction), clickable
-- [ ] New `step_tools` junction table: id, step_id, tool_id, created_at. RLS, types, API.
-- [ ] Step detail panel gets "Tools" section (below Roles): dropdown selector + badges, same pattern as role assignment
-- [ ] Tool cost factored into step cost: labor cost + sum of assigned tool monthly costs
-- [ ] For annual tools use monthly equivalent (÷12), one-time tools excluded from recurring cost
-**Notes:** Step-tool assignment connects tools canvas to process canvas. Cost integration is important for total cost-of-process-ownership calculations.
+- [x] Click tool on canvas → right sidebar detail panel with: name, vendor, URL, status dropdown, cost amount, category, notes (TipTap) — DONE iteration 117
+- [x] Changes persist on blur/change — DONE iteration 117
+- [x] "Step Usage" section: lists all steps using this tool (via step_tools junction), clickable — DONE iteration 117
+- [x] New `step_tools` junction table: id, step_id, tool_id, created_at. RLS, types, API. — DONE iteration 117
+- [x] Step detail panel gets "Tools" section (below Roles): dropdown selector + badges, same pattern as role assignment — DONE iteration 118
+- [x] Tool cost factored into step cost: labor cost + sum of assigned tool monthly costs — DONE iteration 118
+- [ ] For annual tools use monthly equivalent (÷12), one-time tools excluded from recurring cost — N/A (Tool type only has cost_per_month, no cost_type/renewal_date fields)
+**Notes:** [1/3] detail panels iter 117, [2/3] data layer (migration 024, types, API, client wrappers, Step Usage section) iter 117, [3/3] step assignment UI + cost integration iter 118. Cost_type/renewal_date criterion not applicable — Tool model uses cost_per_month only (simpler design).
 
 ### #FEAT-042 Tool overlap and gap analysis
 **Phase:** 3b

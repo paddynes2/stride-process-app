@@ -1,33 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 117,
+  "iteration": 118,
   "slot": 2,
-  "task_id": "#IMP-061",
+  "task_id": "#IMP-081",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
+      "path": "src/components/panels/tool-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 3,
-      "lines_removed": 0
+      "lines_added": 14,
+      "lines_removed": 3
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [
-    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
-  ],
+  "staged_files": ["src/components/panels/tool-detail-panel.tsx"],
   "ownership_violations": [],
-  "notes": "handleStatusChange now saves prevIdeas before the optimistic setIdeas call, updates UI immediately, then on API success syncs with server response. On API failure, reverts to prevIdeas and shows error toast. toastError was already imported.",
+  "notes": "Added const [status, setStatus] = React.useState(tool.status). Added tool.status to useEffect deps and setStatus(tool.status) in effect body. Added handleStatusChange() with optimistic update (setStatus immediately), updateTool call, and revert+toast on error. Changed select value from tool.status to status and onChange to handleStatusChange.",
 
   "failure_details": null
 }
