@@ -56,6 +56,7 @@ export default async function ImprovementsPage({
       workspaceId={workspaceId}
       entityTabMap={entityTabMap}
       tabs={(tabs ?? []).map((t) => ({ id: t.id, canvas_type: t.canvas_type }))}
+      hasSteps={(steps ?? []).length > 0}
     />
   );
 }

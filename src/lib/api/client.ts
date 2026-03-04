@@ -793,6 +793,20 @@ export async function deleteImprovementIdea(id: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// AI Suggestions types
+// ---------------------------------------------------------------------------
+
+export type AISuggestionCategory = "process" | "technology" | "people" | "governance";
+
+export interface AISuggestion {
+  title: string;
+  description: string;
+  affected_step_ids: string[];
+  estimated_impact: string;
+  category: AISuggestionCategory;
+}
+
+// ---------------------------------------------------------------------------
 // AI Analysis
 // ---------------------------------------------------------------------------
 
@@ -806,6 +820,14 @@ export async function analyzeProcess(workspaceId: string): Promise<AIAnalysisRes
 
 export async function generateGapNarrative(workspaceId: string): Promise<string> {
   return apiFetch<string>("/api/v1/ai/gap-narrative", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ workspace_id: workspaceId }),
+  });
+}
+
+export async function fetchAISuggestions(workspaceId: string): Promise<AISuggestion[]> {
+  return apiFetch<AISuggestion[]>("/api/v1/ai/suggest-improvements", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ workspace_id: workspaceId }),
