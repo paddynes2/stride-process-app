@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import type { Node, Edge } from "@xyflow/react";
-import type { Step, Section, Stage, Touchpoint } from "./database";
+import type { Step, Section, Stage, Touchpoint, Tool, ToolSection } from "./database";
 
 // Context providing unresolved top-level comment counts (entityId → count) to canvas nodes.
 // Canvas views (canvas-view, journey-canvas-view) fetch all workspace comments once and
@@ -56,3 +56,17 @@ export type StageNode = Node<StageNodeData, "stage">;
 export type TouchpointNode = Node<TouchpointNodeData, "touchpoint">;
 export type JourneyCanvasNode = StageNode | TouchpointNode;
 export type JourneyCanvasEdge = Edge;
+
+// Custom node data types for React Flow — Tools canvas
+export interface ToolNodeData extends Record<string, unknown> {
+  tool: Tool;
+  selected?: boolean;
+}
+
+export interface ToolSectionNodeData extends Record<string, unknown> {
+  toolSection: ToolSection;
+  onResizeEnd?: (sectionId: string, width: number, height: number) => void;
+}
+
+export type ToolNode = Node<ToolNodeData, "tool">;
+export type ToolSectionNode = Node<ToolSectionNodeData, "tool-section">;
