@@ -1,1 +1,1 @@
-CONTINUE: Enable remaining 4 export sections (improvements, aiInsights, prioritizationMatrix, toolLandscape) to available:true in export-pdf-dialog.tsx, then FEAT-043 [4/4] page numbers + table of contents
+CONTINUE: FEAT-044 Phase 3b testing gate — full regression + acceptance for all Phase 3b features (FEAT-040 through FEAT-043)

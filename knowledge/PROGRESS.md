@@ -2276,3 +2276,35 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 builders completed successfully, all merged cleanly, no conflicts.
 - Observations: 1
 **Notes:** IMP-095 (preset auto-switch to Custom) and IMP-096 (Executive Summary preset config) were already working correctly — no code changes needed. The 4 NEW sections (prioritizationMatrix, toolLandscape, improvements, aiInsights) remain available:false per ownership rules — to be enabled next iteration now that render functions exist.
+
+## Iteration 127 — 2026-03-05 08:30
+**Tasks:**
+- #FEAT-043 [4/4] Enable remaining 4 sections, page numbers, table of contents, IMP-097 fix — slot 1 — completed
+- #IMP-092 Spend Summary 'By Status' sub-label — slot 2 — completed (already done in code)
+- #IMP-063 BUG reference comment fix (BUG-024→BUG-023) — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/components/panels/export-pdf-dialog.tsx (modified — 4 sections flipped available:true, IMP-097 checkbox fix)
+- src/lib/export/pdf.ts (modified — createWorkspacePdf returns {pdf, sections}, PdfSectionEntry type, section page tracking)
+- src/lib/export/enhanced-pdf-sections.ts (modified — +60 lines, renderTableOfContents function with dot leaders)
+- src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (modified — TOC entry collection, renderTableOfContents call, movePage, page number footer loop)
+- src/components/panels/section-detail-panel.tsx (modified — BUG-024→BUG-023 comment)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs: typecheck.status=pass, errors=0)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance tester — 10/10 criteria passed)
+- Canary test: skipped (acceptance tester covered export dialog UI)
+- Post-merge check: PASS
+**Bugs found:** None
+**Improvements found:** 1 (Estimated page count badge next to Export button — visibility of system status)
+**Self-score:**
+- Code quality: 4 — Clean TOC implementation with movePage pattern. Minor code smell: perspective comparison has duplicated render call in if/else branches.
+- Test coverage: 4 — All acceptance criteria verified by tester. PDF output not visually verified (no runtime PDF rendering in test).
+- Confidence: 4 — Solid pattern but TOC page number offsets are tricky — depends on movePage behavior being correct.
+- Efficiency: 5 — All 3 builders completed, all merged cleanly. IMP-092 was already done (no-op builder, correct outcome).
+- Observations: 1
+**Notes:** FEAT-043 is now fully complete (all 4 sub-tasks done). createWorkspacePdf return type is a breaking change for any external callers — exportWorkspacePdf updated to destructure. The TOC renders last then moves to page 2 via pdf.movePage(). All section page numbers adjusted +1 to account for TOC insertion.

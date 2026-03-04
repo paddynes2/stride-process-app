@@ -88,11 +88,11 @@ Core consulting insight features:
 - [x] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape) — [1/3] data layer DONE iteration 115, [2/3] canvas UI DONE iteration 116, [3/3] detail panels DONE iteration 117
 - [x] #FEAT-041 Tool detail panel + step-tool assignment (junction table, cost integration) — [1/3] detail panels DONE iteration 117, [2/3] data layer DONE iteration 117, [3/3] step assignment UI + cost integration DONE iteration 118
 - [x] #FEAT-042 Tool overlap and gap analysis (client-side computation) — DONE iteration 119
-- [ ] #FEAT-043 Enhanced PDF export — multi-section report (4 sub-tasks) — IN PROGRESS
+- [x] #FEAT-043 Enhanced PDF export — multi-section report (4 sub-tasks) — DONE iteration 127
   - [x] [1/4] Export dialog UI with section toggles and presets — DONE iteration 124
   - [x] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison — DONE iteration 125
-  - [ ] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights
-  - [ ] [4/4] Page numbers, table of contents, consistent styling
+  - [x] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights — DONE iteration 126
+  - [x] [4/4] Page numbers, table of contents, consistent styling — DONE iteration 127
 - [ ] #FEAT-044 Phase 3b testing gate
 
 ## Phase 4: The Living Playbook — DONE
@@ -185,3 +185,4 @@ Deferred indefinitely:
 - [2026-03-05] Iteration 120: Testing-only. Regression 16/20 + performance 2/4. Found 2 P1 bugs (BUG-034 step click interception, BUG-035 step-tools 500), 2 P2 bugs (BUG-036 hydration, BUG-037 heading hierarchy), 4 improvements. P1 bugs should be fixed before FEAT-043. Retrospective performed.
 - [2026-03-05] Iteration 121: BUG-034 (P1 step click) fixed — section-node.tsx pointerEvents. BUG-031 (P2 cancelled row) fixed — unconditional render. BUG-035 (P1 migration 024) failed — Supabase CLI unauth. 2 new improvements (IMP-092, IMP-093).
 - [2026-03-05] Iteration 122: BUG-033 (P2 tab bar refresh) fixed — compare-view.tsx refreshTabs(). BUG-037 (P2 heading hierarchy) fixed — sr-only h1. BUG-036 (P2 hydration) built but slot 3 not merged — needs retry. Next: retry BUG-036, then remaining P2 bugs.
+- [2026-03-05] Iteration 127: FEAT-043 [4/4] completed — page numbers, TOC, all sections enabled, IMP-097 fixed. FEAT-043 fully done. IMP-092 verified already done. IMP-063 comment fix. Only FEAT-044 (testing gate) remains in Phase 3b.

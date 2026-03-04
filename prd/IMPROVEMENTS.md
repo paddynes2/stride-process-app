@@ -438,7 +438,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx` (line 169)
   - **Fix applied:** Changed `tabs[0].id` to `(tabs.find(t => t.canvas_type === 'process') ?? tabs[0]).id`. Existing `tabs.length > 0` guard prevents render when empty.
 
-- [ ] #IMP-063 section-detail-panel BUG reference inconsistency (BUG-024 vs BUG-023) — Attempts: 0
+- [x] #IMP-063 section-detail-panel BUG reference inconsistency (BUG-024 vs BUG-023) — Attempts: 1 — DONE iteration 127, 2026-03-05
   - **Found:** Iteration 108 (regression tester)
   - **Category:** Content
   - **Where:** `src/components/panels/section-detail-panel.tsx`
@@ -666,7 +666,7 @@
   - **Design principle:** Regression testing coverage — critical paths need representative test data
   - **Suggested fix:** Seed the test workspace with at least one stage and one touchpoint for regression runs.
 
-- [ ] #IMP-092 Spend Summary lacks visual hierarchy separating totals from status breakdown — Attempts: 0
+- [x] #IMP-092 Spend Summary lacks visual hierarchy separating totals from status breakdown — Attempts: 1 — DONE iteration 127, 2026-03-05 (already implemented in code — border-t + 'By Status' label)
   - **Found:** Iteration 121 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Spend Summary card
@@ -706,13 +706,21 @@
   - **Design principle:** Nielsen H8: Aesthetic and minimalist design — presets should surface only what is relevant to the named use case
   - **Suggested fix:** Set `dataTable: false` and `costAnalysis: false` in EXECUTIVE_SUMMARY_CONFIG.
 
-- [ ] #IMP-097 Coming soon export sections shown as checked+disabled — should be unchecked+disabled — Attempts: 0
+- [x] #IMP-097 Coming soon export sections shown as checked+disabled — should be unchecked+disabled — Attempts: 1 — DONE iteration 127, 2026-03-05 (checked={available ? config[key] : false})
   - **Found:** Iteration 126 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — available:false sections
   - **What:** Sections with available:false render as checked+disabled checkboxes. A checked-but-disabled checkbox implies the feature is included but locked, when it cannot be included at all.
   - **Design principle:** Nielsen H1: Visibility of system status — state should accurately reflect what will happen
   - **Suggested fix:** Render available:false sections as unchecked+disabled, or hide them entirely.
+
+- [ ] #IMP-098 Export PDF dialog lacks estimated page count — Attempts: 0
+  - **Found:** Iteration 127 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/export-pdf-dialog.tsx` — Export button area
+  - **What:** After selecting sections, users have no indication of how many pages the PDF will contain or how long export will take. An estimated page count badge would reduce uncertainty.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Show estimated page count (e.g., '~8 pages') next to the Export button, computed from the number of selected sections.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

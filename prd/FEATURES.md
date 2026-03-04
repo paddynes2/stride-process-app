@@ -226,20 +226,20 @@
 ### #FEAT-043 Enhanced PDF export — multi-section report
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 3
-**Status:** in_progress
+**Attempts:** 4
+**Status:** done
 **Acceptance criteria:**
-- [ ] Export dialog (replaces direct download) with toggleable sections
-- [ ] Sections: Title page, Executive Summary (key metrics), Process Map (existing), Gap Analysis (existing), Cost Analysis (existing), Journey Map (if exists), Journey Sentiment (if exists), Perspective Comparison (if exists), Prioritization Matrix (if exists), Tool Landscape (if tools exist), Improvement Recommendations (if ideas exist), AI Insights (if cached)
-- [ ] Presets: "Full Audit" (all), "Executive Summary" (title + summary + gaps + recs), "Gap Report" (title + gaps + perspectives + recs)
-- [ ] Each section starts on new page, consistent dark-theme styling
-- [ ] Page numbers, table of contents
+- [x] Export dialog (replaces direct download) with toggleable sections
+- [x] Sections: Title page, Executive Summary (key metrics), Process Map (existing), Gap Analysis (existing), Cost Analysis (existing), Journey Map (if exists), Journey Sentiment (if exists), Perspective Comparison (if exists), Prioritization Matrix (if exists), Tool Landscape (if tools exist), Improvement Recommendations (if ideas exist), AI Insights (if cached)
+- [x] Presets: "Full Audit" (all), "Executive Summary" (title + summary + gaps + recs), "Gap Report" (title + gaps + perspectives + recs)
+- [x] Each section starts on new page, consistent dark-theme styling
+- [x] Page numbers, table of contents
 **Notes:** The "crown jewel" — what consultants hand to clients. Builds on existing jspdf/html-to-image infrastructure. One render function per section (modular). FEAT-007's existing export becomes the "Process Map" section.
 **Sub-tasks:**
 - [x] [1/4] Export dialog UI with section toggles and presets — Done iteration 124, 2026-03-05 (pre-existing dialog + canonical type re-export)
 - [x] [2/4] New sections: executive summary, journey map, journey sentiment, perspective comparison — Done iteration 125, 2026-03-05 (render functions built in enhanced-pdf-sections.ts, wired in canvas-view.tsx; NOTE: sections still available:false in dialog — BUG-040)
 - [x] [3/4] New sections: prioritization matrix, tool landscape, improvements, AI insights — Done iteration 126, 2026-03-05 (renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights built + wired; sections remain available:false in dialog — to enable next iteration)
-- [ ] [4/4] Page numbers, table of contents, consistent styling
+- [x] [4/4] Page numbers, table of contents, consistent styling — Done iteration 127, 2026-03-05 (page numbers on pages 2+, TOC with dot leaders via movePage, all sections available:true, IMP-097 checkbox fix)
 
 ### #FEAT-044 Phase 3b testing gate
 **Phase:** 3b
