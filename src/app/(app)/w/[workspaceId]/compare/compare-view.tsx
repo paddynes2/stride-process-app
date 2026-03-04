@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -26,6 +27,9 @@ import { StepNode } from "@/components/canvas/step-node";
 import { SectionNode } from "@/components/canvas/section-node";
 import { StageNode } from "@/components/canvas/stage-node";
 import { TouchpointNode } from "@/components/canvas/touchpoint-node";
+import { Button } from "@/components/ui/button";
+import { createTab } from "@/lib/api/client";
+import { toastError } from "@/lib/api/toast-helpers";
 import type {
   Tab,
   Section,
@@ -260,6 +264,20 @@ export function CompareView({
   const hasBoth = processTab !== null && journeyTab !== null;
   const hasNeither = processTab === null && journeyTab === null;
 
+  const router = useRouter();
+  const [creating, setCreating] = React.useState(false);
+
+  const handleCreateJourneyTab = React.useCallback(async () => {
+    setCreating(true);
+    try {
+      const newTab = await createTab({ workspace_id: workspaceId, name: "Journey", canvas_type: "journey" });
+      router.push(`/w/${workspaceId}/${newTab.id}`);
+    } catch (err) {
+      toastError("Failed to create journey tab", { error: err });
+      setCreating(false);
+    }
+  }, [workspaceId, router]);
+
   const processCanvasRef = React.useRef<HTMLDivElement>(null);
   const journeyCanvasRef = React.useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = React.useState(false);
@@ -327,6 +345,11 @@ export function CompareView({
                 : "Create a process canvas tab to compare the customer journey with your internal operations."}
           </p>
         </div>
+        {journeyTab === null && (
+          <Button onClick={handleCreateJourneyTab} loading={creating}>
+            Create Journey Tab
+          </Button>
+        )}
       </div>
     );
   }
