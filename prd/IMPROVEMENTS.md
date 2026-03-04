@@ -842,7 +842,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Add tooltip: 'Add steps to the canvas before running AI analysis'.
 
-- [ ] #IMP-115 Perspectives comparison table missing aria-label — Attempts: 0
+- [x] #IMP-115 Perspectives comparison table missing aria-label — Attempts: 1 — DONE iteration 135, 2026-03-06 (bundled with BUG-052)
   - **Found:** Iteration 134 (regression tester)
   - **Category:** Accessibility
   - **Where:** `src/app/(app)/w/[workspaceId]/compare/perspectives-compare-view.tsx` — comparison table (~line 388)

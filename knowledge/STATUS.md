@@ -1,19 +1,19 @@
 ## Handoff
 
-- **Iteration:** 134
-- **Date:** 2026-03-05 23:30
+- **Iteration:** 135
+- **Date:** 2026-03-06 00:15
 - **Phase:** Phase 3b — Tools Canvas + Enhanced Export
 - **Branch:** ralph/init-stride
-- **Last task(s):** Testing-only iteration — Phase 3b revalidation (acceptance + regression)
+- **Last task(s):** #BUG-052 (export PDF dialog close aria-label), #BUG-053 (gap analysis table aria-label), #BUG-054 (tool cost breakdown table aria-label)
 - **Result:** completed
-- **Next task:** #FEAT-044 (Phase 3b testing gate) or remaining P2 accessibility bugs (#BUG-052, #BUG-053, #BUG-054)
+- **Next task:** #FEAT-044 (Phase 3b testing gate) — all Phase 3b features + bugs now resolved
 - **Blockers:** BUG-035 + BUG-032 blocked on Supabase CLI authentication — `npx supabase login` required before migration 024 can be pushed.
 
 ## Context
 
-Iteration 134 was a testing-only iteration triggered by risk score 4 from iteration 133 (22 files changed, shared components touched). No source code changes. Acceptance tester verified all Phase 3b features (FEAT-040, 041, 042, 043) and recent bug fixes (BUG-042, 043, 044, 048, 045-051) — all PASSED. Regression tester ran static analysis (Playwright unavailable due to Chrome profile lock) — tsc clean, eslint clean (1 pre-existing warning), all 16 criteria PASSED.
+Iteration 135 fixed 3 P2 accessibility bugs found in iter 134 testing. BUG-052: added aria-label='Close' to shared DialogContent close button in `ui/dialog.tsx` (reviewer fix — builder had inlined the entire DialogContent, reviewer de-duplicated back to shared component). BUG-053: added aria-label='Gap analysis ranking' to `gap-analysis-view.tsx` table. BUG-054: added aria-label='Tool cost breakdown' to `tool-analysis-view.tsx` table. IMP-115 (perspectives comparison table aria-label) was bundled with BUG-052 in slot 1.
 
-3 new P2 accessibility bugs found (BUG-052-054: missing aria-labels on export PDF dialog close button, gap analysis table, tool analysis table). 5 new improvements logged (IMP-112-116). All findings are minor accessibility/polish items — no regressions detected.
+Files touched: `src/components/ui/dialog.tsx`, `src/components/panels/export-pdf-dialog.tsx`, `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`, `src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx`, `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx`.
 
 ## Dev Server
 
@@ -29,4 +29,3 @@ Iteration 134 was a testing-only iteration triggered by risk score 4 from iterat
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - step-detail-panel.tsx ~770 lines — exceeding complexity threshold
-- 3 new P2 a11y bugs from iter 134 testing (BUG-052, 053, 054 — missing aria-labels on tables/buttons)

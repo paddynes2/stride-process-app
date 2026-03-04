@@ -2541,3 +2541,34 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — Testing-only iteration completed cleanly
 - Observations: 8
 **Notes:** Triggered by risk score 4 from iteration 133 (22 files changed). All Phase 3b features (FEAT-040-043) and recent bug fixes (BUG-042-051) revalidated. Regression tester fell back to static analysis (Playwright unavailable — Chrome profile lock). 3 new P2 accessibility bugs and 5 improvements logged. Phase 3b ready for FEAT-044 testing gate.
+
+## Iteration 135 — 2026-03-06 00:15
+**Tasks:**
+- #BUG-052 Export PDF dialog close button aria-label — slot 1 — completed
+- #BUG-053 Gap analysis table aria-label — slot 2 — completed
+- #BUG-054 Tool cost breakdown table aria-label — slot 3 — completed
+**Source:** prd/BUGS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/components/ui/dialog.tsx (added aria-label="Close" to shared DialogContent close button)
+- src/components/panels/export-pdf-dialog.tsx (reverted inline DialogPrimitive.Content back to shared DialogContent — reviewer fix)
+- src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx (aria-label on table)
+- src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx (aria-label on table)
+- src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx (aria-label on table)
+**Verification:**
+- Type check: pass (tsc --noEmit clean after reviewer fix)
+- Lint: pass (eslint clean on changed files)
+- Build: N/A
+- Unit tests: N/A
+- Browser test: skipped (no functional changes)
+- Canary test: skipped (no UI changes — aria-labels only)
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — Minimal changes, reviewer de-duplicated builder's inlined DialogContent
+- Test coverage: 3 — No browser test needed for attribute-only changes
+- Confidence: 5 — Pure attribute additions, zero logic risk
+- Efficiency: 5 — All 3 builders completed cleanly, reviewer fix improved code quality
+- Observations: 1 (builder inlined shared component due to ownership constraints — reviewer fixed)
+**Notes:** IMP-115 (perspectives comparison table aria-label) was bundled with BUG-052 by slot 1 builder.
