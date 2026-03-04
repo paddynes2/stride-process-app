@@ -441,7 +441,7 @@ export function GapAnalysisView({ workspaceId, steps, sections }: GapAnalysisVie
           </div>
         ) : (
           <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] overflow-x-auto">
-            <table className="w-full min-w-[600px]">
+            <table className="w-full min-w-[600px]" aria-label="Gap analysis ranking">
               <thead>
                 <tr className="bg-[var(--bg-surface)]">
                   <GapSortHeader label="Step" field="name" current={sortField} dir={sortDir} onSort={toggleSort} />
