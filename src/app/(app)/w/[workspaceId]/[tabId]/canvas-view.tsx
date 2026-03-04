@@ -12,7 +12,7 @@ import { TaskPanel } from "@/components/panels/task-panel";
 import { ColoringPanel } from "@/components/canvas/coloring-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch, fetchTools, fetchImprovementIdeas } from "@/lib/api/client";
+import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch, fetchStepToolsByStep, fetchTools, fetchImprovementIdeas } from "@/lib/api/client";
 import type { ExportConfig } from "@/components/panels/export-pdf-dialog";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
@@ -307,9 +307,17 @@ export function CanvasView({
         const stepRoles =
           needsRoles && stepIds.length > 0 ? await fetchStepRolesBatch(stepIds) : [];
 
+        // Fetch step tools for cost analysis (parallel fetch, ignore per-step failures)
+        const stepToolsRaw =
+          config.costAnalysis && stepIds.length > 0
+            ? (await Promise.allSettled(stepIds.map((id) => fetchStepToolsByStep(id))))
+                .flatMap((r) => r.status === "fulfilled" ? r.value : [])
+            : [];
+
         // Mask step data for disabled base sections (matches use-canvas-export.ts logic)
         let exportSteps = steps;
         let exportStepRoles = stepRoles;
+        let exportStepTools = stepToolsRaw;
         if (!config.dataTable && !config.gapAnalysis && !config.costAnalysis) {
           exportSteps = [];
         } else {
@@ -322,6 +330,7 @@ export function CanvasView({
           }
           if (!config.costAnalysis) {
             exportStepRoles = [];
+            exportStepTools = [];
             exportSteps = exportSteps.map((s) => ({
               ...s,
               time_minutes: null,
@@ -339,6 +348,7 @@ export function CanvasView({
             connections,
             canvasElement: config.canvasSnapshot ? canvasElement : null,
             stepRoles: exportStepRoles,
+            stepTools: exportStepTools,
           },
           true,
         );
