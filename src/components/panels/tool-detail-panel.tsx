@@ -282,7 +282,7 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
             Step Usage
           </label>
           {stepTools.length === 0 ? (
-            <p className="text-[12px] text-[var(--text-tertiary)] italic">No steps linked to this tool.</p>
+            <p className="text-[12px] text-white/30 italic">No steps linked yet. Open a step on the canvas and assign this tool.</p>
           ) : (
             <ul className="space-y-1">
               {stepTools.map((st) => {
