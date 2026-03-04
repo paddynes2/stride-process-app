@@ -405,6 +405,7 @@ export function ToolsCanvasView({
 
   return (
     <div className="flex h-full">
+      <h1 className="sr-only">Tools</h1>
       {/* Main content: canvas or analysis view */}
       {showAnalysis ? (
         <ToolAnalysisView
