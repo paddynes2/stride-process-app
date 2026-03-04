@@ -37,9 +37,11 @@ function SectionNodeComponent({ data, selected }: NodeProps) {
             ? {
                 backgroundColor: `${maturityColor}08`,
                 borderColor: selected ? undefined : `${maturityColor}40`,
+                pointerEvents: "none",
               }
             : {
                 backgroundColor: selected ? "rgba(59,130,246,0.03)" : "rgba(255,255,255,0.015)",
+                pointerEvents: "none",
               }
         }
       >
@@ -47,7 +49,7 @@ function SectionNodeComponent({ data, selected }: NodeProps) {
         {annotationColor && (
           <div
             className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full border-2 border-[var(--bg-app)]"
-            style={{ backgroundColor: annotationColor }}
+            style={{ backgroundColor: annotationColor, pointerEvents: "auto" }}
             title="Has perspective annotation"
             role="img"
             aria-label="Annotated by perspective"
@@ -55,7 +57,7 @@ function SectionNodeComponent({ data, selected }: NodeProps) {
         )}
 
         {/* Section label */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2" style={{ pointerEvents: "auto" }}>
           <span
             className="text-[11px] font-semibold uppercase tracking-wide flex-1"
             style={{ color: selected ? "var(--accent-blue)" : "var(--text-tertiary)" }}
@@ -82,6 +84,7 @@ function SectionNodeComponent({ data, selected }: NodeProps) {
         {commentCount > 0 && (
           <div
             className="absolute bottom-2 right-2 flex items-center gap-0.5 bg-[var(--bg-surface-active)] rounded px-1 py-0.5"
+            style={{ pointerEvents: "auto" }}
             title={`${commentCount} unresolved comment${commentCount !== 1 ? "s" : ""}`}
           >
             <MessageSquare className="h-2.5 w-2.5 text-[var(--text-tertiary)]" />
