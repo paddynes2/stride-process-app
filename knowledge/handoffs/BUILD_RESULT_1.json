@@ -1,47 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 130,
+  "iteration": 132,
   "slot": 1,
-  "task_id": "#IMP-105",
+  "task_id": "#BUG-045, #BUG-047",
   "status": "completed",
-  "duration_seconds": 420,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/components/panels/export-pdf-dialog.tsx",
+      "path": "src/components/layout/sidebar.tsx",
       "action": "modified",
-      "lines_added": 32,
-      "lines_removed": 20
-    },
-    {
-      "path": "src/components/canvas/flow-canvas.tsx",
-      "action": "modified",
-      "lines_added": 18,
-      "lines_removed": 1
-    },
-    {
-      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
-      "action": "modified",
-      "lines_added": 44,
+      "lines_added": 3,
       "lines_removed": 1
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit — no output (clean)" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning: 'addEdge' unused in flow-canvas.tsx (documented in LEARNINGS.md)" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning (addEdge unused in flow-canvas.tsx), 0 errors" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [
-    "src/components/panels/export-pdf-dialog.tsx",
-    "src/components/canvas/flow-canvas.tsx",
-    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
-  ],
+  "staged_files": ["src/components/layout/sidebar.tsx"],
   "ownership_violations": [],
-  "notes": "export-pdf-dialog.tsx: added maskWithAvailability() helper (casts via unknown to satisfy TS); removed static available field from SectionDef interface and SECTION_GROUPS entries; added availability:Record<keyof ExportConfig,boolean> prop to ExportPdfDialogProps; useEffect resets config on dialog open using prevOpenRef to track false→true transition (avoids spurious resets when availability changes while dialog is open); handlePreset masks preset configs with availability; render uses availability[key] per section. flow-canvas.tsx: added ALL_AVAILABLE default constant; added optional sectionAvailability prop to FlowCanvasProps; passes sectionAvailability ?? ALL_AVAILABLE to ExportPdfDialog. canvas-view.tsx: destructures tabs+perspectives from useWorkspace(); adds hasTools/hasImprovements boolean state fetched via useEffect on mount; computes sectionAvailability useMemo (core 5 always true, conditional 7 from workspace data); passes sectionAvailability to FlowCanvas.",
+  "notes": "Added aria-label='Back to workspaces' to header logo Link (line 103), aria-label={item.label} to all 16 nav Link elements (line 132), and aria-label='All Workspaces' to both the footer Link and its child Button (lines 157-158). Visual rendering unchanged.",
 
   "failure_details": null
 }

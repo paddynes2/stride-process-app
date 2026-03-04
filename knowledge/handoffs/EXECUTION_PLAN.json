@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 130,
-  "date": "2026-03-05T15:00:00Z",
+  "iteration": 132,
+  "date": "2026-03-05T20:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "6c47a8a",
+    "last_commit_hash": "a56f5d9f4887878a3daf56254109103dee1a3d83",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,150 +13,111 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#IMP-105",
-      "description": "Compute export dialog section availability dynamically from workspace data. Currently all SECTION_GROUPS have available:true hardcoded, making IMP-094 tooltip infrastructure unreachable. Accept availability flags as props, compute per-section availability. This also resolves BUG-043.",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "M",
-      "attempts": 1,
-      "risk_score": 2,
-      "acceptance_criteria": [
-        "ExportPdfDialogProps accepts an `availability` record mapping ExportConfig keys to booleans",
-        "SECTION_GROUPS `available` field is replaced with dynamic lookup from the availability prop",
-        "Sections disabled when data is missing: journeyMap/journeySentiment disabled when no journey tab exists, improvements disabled when no improvement ideas, aiInsights disabled when no AI analysis cached, perspectiveComparison disabled when no perspectives, toolLandscape disabled when no tools, prioritizationMatrix disabled when no prioritization scores on steps",
-        "canvasSnapshot, dataTable, gapAnalysis, costAnalysis, executiveSummary always available (core sections)",
-        "Disabled sections show tooltip text (from disabledTooltip) on hover",
-        "Disabled sections are unchecked and cannot be toggled",
-        "FlowCanvas receives and passes availability prop to ExportPdfDialog",
-        "canvas-view.tsx computes availability flags from workspace data (tabs, improvementIdeas, perspectives, tools, steps, workspace.settings)",
-        "Preset configs (Full Audit, Executive Summary, Gap Report) only enable sections that are available — unavailable sections in a preset stay false",
-        "TypeScript compiles with zero errors"
-      ],
-      "files_owned": [
-        "src/components/panels/export-pdf-dialog.tsx",
-        "src/components/canvas/flow-canvas.tsx",
-        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
-      ],
-      "files_read_only": [
-        "src/types/database.ts",
-        "src/lib/context/workspace-context.tsx"
-      ],
-      "context": {
-        "similar_files": [],
-        "patterns_to_follow": [
-          "ExportPdfDialog is rendered inside flow-canvas.tsx (line 512), which receives props from canvas-view.tsx",
-          "canvas-view.tsx already fetches improvementIdeas, tools, steps, sections, and has access to tabs/perspectives via useWorkspace()",
-          "SectionDef interface at export-pdf-dialog.tsx:77 has { key, label, available, disabledTooltip? }",
-          "SECTION_GROUPS at lines 84-117 defines 4 groups with 12 sections total",
-          "FlowCanvasProps at flow-canvas.tsx:44 defines component props — add sectionAvailability prop here",
-          "Preset configs (EXECUTIVE_SUMMARY_CONFIG, FULL_AUDIT_CONFIG, GAP_REPORT_CONFIG) should mask unavailable sections"
-        ],
-        "learnings_relevant": [
-          "Optional prop + page.tsx wiring gap: builders must update BOTH the view component AND the page/parent that passes props"
-        ],
-        "affected_urls": [
-          "/w/[workspaceId]/[tabId] (canvas view with Export PDF button)"
-        ]
-      },
-      "has_ui_changes": true,
-      "has_data_model_changes": false,
-      "special_instructions": "Key implementation detail: ExportPdfDialog should accept a Record<keyof ExportConfig, boolean> prop for availability instead of computing it internally. flow-canvas.tsx passes it through. canvas-view.tsx computes it: hasJourneyTab = tabs.some(t => t.canvas_type === 'journey'), hasImprovements = check if improvementIdeas array has items, hasAiInsights = check workspace.settings?.last_analysis_at, hasPerspectives = perspectives.length > 0, hasTools = tools.length > 0, hasPrioritizationScores = steps.some(s => s.effort_score != null || s.impact_score != null). When a preset is applied, AND its config with availability to prevent enabling unavailable sections."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-103",
-      "description": "Fix PDF Table of Contents truncation when 12+ sections are enabled — add page overflow handling with pdf.addPage() and y reset.",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
+      "id": "#BUG-045, #BUG-047",
+      "description": "Add aria-labels to all 16 sidebar navigation links and the footer button for screen reader accessibility (WCAG 4.1.2). NAV_ITEMS already have `label` field — use it as the `aria-label` on each Link. For the footer 'All Workspaces' link/button, add aria-label='All Workspaces'. Also add aria-label to the header logo Link ('Back to workspaces'). The sidebar collapsed state already hides text labels, making aria-labels essential.",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 1,
       "acceptance_criteria": [
-        "renderTableOfContents() in enhanced-pdf-sections.ts handles overflow by calling pdf.addPage() and resetting y when entries exceed page height",
-        "All 12 sections appear in TOC when all are enabled",
-        "Page number tracking continues correctly after TOC pagination",
-        "TypeScript compiles with zero errors"
+        "All 16 nav Link elements have aria-label matching their label field from NAV_ITEMS",
+        "Footer 'All Workspaces' Button has aria-label='All Workspaces'",
+        "Header logo Link has aria-label (e.g., 'Back to workspaces')",
+        "No TypeScript errors introduced",
+        "Visual rendering unchanged"
       ],
-      "files_owned": [
-        "src/lib/export/enhanced-pdf-sections.ts"
-      ],
-      "files_read_only": [
-        "src/lib/export/pdf.ts"
-      ],
+      "files_owned": ["src/components/layout/sidebar.tsx"],
+      "files_read_only": [],
       "context": {
-        "similar_files": [
-          "src/lib/export/pdf.ts — uses newTablePage() pattern for page overflow"
-        ],
-        "patterns_to_follow": [
-          "Look at newTablePage() in pdf.ts for the existing page overflow pattern",
-          "renderTableOfContents is around line 1349 in enhanced-pdf-sections.ts"
-        ],
-        "learnings_relevant": [],
-        "affected_urls": []
+        "similar_files": [],
+        "patterns_to_follow": ["aria-label pattern already exists on Toggle sidebar button (line 117), color picker in settings (line 558)"],
+        "learnings_relevant": ["Lucide-react no title prop — use aria-label instead"],
+        "affected_urls": ["/w/[workspaceId]/*"]
       },
       "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "Small fix: replace the `break` on y overflow with pdf.addPage() + reset y to top margin. Increment pageNumber. Match existing page overflow patterns in the file."
+      "special_instructions": "NAV_ITEMS array has `label` field — add `aria-label={item.label}` to the Link at line 132. For the bottom Link at line 157, add `aria-label=\"All Workspaces\"`. For the header Link at line 103, add `aria-label=\"Back to workspaces\"`. BUG-047 references a 'footer SVG submit button' — this is actually the 'All Workspaces' button (line 158) which is a Button with LayoutDashboard icon. Add aria-label there."
     },
     {
-      "slot": 3,
-      "id": "#IMP-090",
-      "description": "Fix overlapping NEW GROUP tool section nodes on default canvas — ensure auto-positioned tool sections have non-overlapping coordinates with minimum gap.",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
+      "slot": 2,
+      "id": "#BUG-044, #BUG-049",
+      "description": "Fix AI Insights export section being enabled when no AI analysis has been run (BUG-044), and add sr-only h1 to canvas page (BUG-049). For BUG-044: the check `!!(workspace.settings?.last_analysis_at)` at line 317 may be truthy when settings is an empty object or last_analysis_at is a stale/default value. Add a stricter check: also verify workspace.settings?.last_analysis exists and is non-null. For BUG-049: add `<h1 className=\"sr-only\">[tab name or workspace name]</h1>` as first child of canvas container, matching BUG-037 pattern used in tools-canvas-view.tsx.",
+      "source": "prd/BUGS.md",
+      "type": "fix",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 1,
       "acceptance_criteria": [
-        "New tool section nodes created via Add Tool Section button are positioned with non-overlapping coordinates",
-        "Minimum 50px gap between auto-positioned tool section nodes",
-        "Existing tool section positions are not affected (only new creations)",
-        "TypeScript compiles with zero errors"
+        "AI Insights checkbox is disabled in export dialog when workspace has no AI analysis cached",
+        "AI Insights checkbox is enabled when workspace has a cached analysis (last_analysis is non-null AND last_analysis_at is non-null)",
+        "Canvas page has an h1 element (sr-only) with workspace or tab name",
+        "No TypeScript errors introduced",
+        "Export dialog still works correctly for all other sections"
+      ],
+      "files_owned": ["src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"],
+      "files_read_only": ["src/components/panels/export-pdf-dialog.tsx", "src/types/database.ts"],
+      "context": {
+        "similar_files": ["src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (has sr-only h1 pattern from BUG-037)"],
+        "patterns_to_follow": ["BUG-037 pattern: <h1 className=\"sr-only\">Tools</h1>"],
+        "learnings_relevant": [],
+        "affected_urls": ["/w/[workspaceId]/[tabId]"]
+      },
+      "has_ui_changes": false,
+      "has_data_model_changes": false,
+      "special_instructions": "For BUG-044: Change line 317 from `const hasAiInsights = !!(workspace.settings?.last_analysis_at);` to `const hasAiInsights = !!(workspace.settings?.last_analysis_at && workspace.settings?.last_analysis);` — require both the timestamp AND the cached result to be present. For BUG-049: Add `<h1 className=\"sr-only\">{tab?.name || workspace.name}</h1>` as first child of the outermost container in the return JSX. The `tab` variable should be available from context or props — check what's available."
+    },
+    {
+      "slot": 3,
+      "id": "#BUG-046, #BUG-050, #BUG-051",
+      "description": "Three small accessibility fixes in separate files: (1) BUG-046: Associate workspace name label with input in settings/page.tsx — add htmlFor='workspace-name' to the <label> and id='workspace-name' to the input. (2) BUG-050: Wrap /workspaces page content in <main> landmark. (3) BUG-051: Add aria-label='Steps' to the data table in step-list-view.tsx.",
+      "source": "prd/BUGS.md",
+      "type": "fix",
+      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 1,
+      "acceptance_criteria": [
+        "Settings page workspace name input has a programmatic label association (htmlFor/id or aria-labelledby)",
+        "/workspaces page has a <main> landmark element wrapping content",
+        "Step list table has aria-label='Steps' or a <caption> element",
+        "No TypeScript errors introduced",
+        "Visual rendering unchanged in all three views"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
+        "src/app/(app)/w/[workspaceId]/settings/page.tsx",
+        "src/app/(app)/workspaces/page.tsx",
+        "src/app/(app)/w/[workspaceId]/list/step-list-view.tsx"
       ],
-      "files_read_only": [
-        "src/app/api/v1/tool-sections/route.ts"
-      ],
+      "files_read_only": [],
       "context": {
-        "similar_files": [
-          "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — handleSectionCreate uses viewport center positioning"
-        ],
-        "patterns_to_follow": [
-          "Check existing tool section positions before computing new position",
-          "Use viewport center + offset based on existing section count"
-        ],
+        "similar_files": [],
+        "patterns_to_follow": ["aria-label pattern on table elements", "htmlFor + id pattern for label association"],
         "learnings_relevant": [],
-        "affected_urls": [
-          "/w/[workspaceId]/tools"
-        ]
+        "affected_urls": ["/workspaces", "/w/[workspaceId]/settings", "/w/[workspaceId]/list"]
       },
-      "has_ui_changes": true,
+      "has_ui_changes": false,
       "has_data_model_changes": false,
-      "special_instructions": "Find the handleAddToolSection (or equivalent) function in tools-canvas-view.tsx. Currently likely uses a fixed position. Change to compute position based on existing tool sections count — offset each new one by (count * spacing) to avoid overlap."
+      "special_instructions": "BUG-046: Line 183 of settings/page.tsx has `<label className=\"text-[12px]...\">Workspace Name</label>`. Add `htmlFor=\"workspace-name\"` to the label. Find the corresponding input and add `id=\"workspace-name\"`. BUG-050: In workspaces/page.tsx, wrap the main content area in `<main>`. BUG-051: In step-list-view.tsx, find the `<table>` element and add `aria-label=\"Steps\"`."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts"],
     "owner": null,
-    "note": "No shared file modifications needed"
+    "note": "No shared file modifications needed — all tasks touch independent files"
   },
-  "merge_order": ["#IMP-105", "#IMP-103", "#IMP-090"],
+  "merge_order": ["#BUG-045, #BUG-047", "#BUG-044, #BUG-049", "#BUG-046, #BUG-050, #BUG-051"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": null,
+    "regression_reason": "Regression passed 18/18 last iteration (131). Risk score 1 per slot. No regression trigger.",
     "suites_to_run": ["acceptance"],
-    "cadence_trigger": "accessibility_deferred_to_131"
+    "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [
-      "Accessibility cadence due at iter 130 — deferred to 131 in favor of BUG-043 resolution via IMP-105"
-    ],
+    "warnings_added": [],
     "diagnoses_written": false,
     "signal_override": null
   }

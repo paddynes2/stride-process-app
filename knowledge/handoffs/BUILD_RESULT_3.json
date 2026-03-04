@@ -1,33 +1,47 @@
 {
   "schema_version": "1.0",
-  "iteration": 130,
+  "iteration": 131,
   "slot": 3,
-  "task_id": "#IMP-090",
+  "task_id": "#BUG-046, #BUG-050, #BUG-051",
   "status": "completed",
-  "duration_seconds": 120,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/settings/page.tsx",
       "action": "modified",
-      "lines_added": 17,
-      "lines_removed": 3
+      "lines_added": 1,
+      "lines_removed": 1
+    },
+    {
+      "path": "src/app/(app)/workspaces/page.tsx",
+      "action": "modified",
+      "lines_added": 1,
+      "lines_removed": 1
+    },
+    {
+      "path": "src/app/(app)/w/[workspaceId]/list/step-list-view.tsx",
+      "action": "modified",
+      "lines_added": 1,
+      "lines_removed": 1
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated unused var)" },
+    "lint": { "status": "pass", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx"
+    "src/app/(app)/w/[workspaceId]/settings/page.tsx",
+    "src/app/(app)/workspaces/page.tsx",
+    "src/app/(app)/w/[workspaceId]/list/step-list-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "The existing code already had a Math.max-based Y calculation. The root bug was a race condition: rapid clicks read stale toolSections closure state before React re-renders, causing multiple sections to land at the same Y coordinate. Fix: added nextSectionYRef (useRef<number>(0)) updated immediately before the async createToolSection call. Each click takes Math.max(existingMaxBottom, nextSectionYRef.current) as the base, guaranteeing minimum 50px gap even under rapid clicking. Single-click behavior is unchanged; existing section positions are unaffected.",
+  "notes": "BUG-046: Added htmlFor='workspace-name' to label and id='workspace-name' to Input at settings/page.tsx:183-184. BUG-050: Wrapped WorkspaceList in <main> landmark at workspaces/page.tsx:24. BUG-051: Added aria-label='Steps' to <table> at step-list-view.tsx:171.",
 
   "failure_details": null
 }

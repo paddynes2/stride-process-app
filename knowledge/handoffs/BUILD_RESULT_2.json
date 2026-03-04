@@ -1,31 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 130,
+  "iteration": 132,
   "slot": 2,
-  "task_id": "#IMP-103",
+  "task_id": "#BUG-044, #BUG-049",
   "status": "completed",
   "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/lib/export/enhanced-pdf-sections.ts",
+      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
       "action": "modified",
-      "lines_added": 8,
+      "lines_added": 3,
       "lines_removed": 1
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0" },
-    "lint": { "status": "pass", "errors": 0, "output": "eslint exited 0" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "skipped", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/lib/export/enhanced-pdf-sections.ts"],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
+  ],
   "ownership_violations": [],
-  "notes": "Replaced `break` on TOC y-overflow with pdf.addPage() + dark background fill + y reset to margin + font reapplication. Matches the newTablePage() overflow pattern in pdf.ts. When TOC entries exceed page height (pageHeight - margin - 8), a new landscape A4 page is added and rendering continues from the top margin.",
+  "notes": "BUG-044: Tightened hasAiInsights check at line 318 to require both last_analysis_at AND last_analysis to be non-null. BUG-049: Added `const tab = tabs.find((t) => t.id === tabId)` after useWorkspace() destructure, then added `<h1 className=\"sr-only\">{tab?.name || workspace.name}</h1>` as first child of the flex h-full div, matching the tools-canvas-view.tsx BUG-037 pattern.",
 
   "failure_details": null
 }

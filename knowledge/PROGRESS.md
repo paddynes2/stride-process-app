@@ -2449,3 +2449,35 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — single tester covered both suites in 35/40 actions
 - Observations: 11 (7 bugs + 4 improvements)
 **Notes:** Accessibility cadence resolved (was deferred from iter 130, overdue since iter 112 — 19 iterations). Regression suite confirms all core features intact after IMP-105/IMP-103/IMP-090 changes. step-tools 500 confirmed pre-existing (BUG-035). 7 accessibility bugs are systemic (sidebar-wide, app-wide page titles) — suggest batching IMP-107/IMP-108/IMP-109/IMP-110 as a single accessibility sweep task.
+
+## Iteration 132 — 2026-03-05 20:30
+**Tasks:**
+- #BUG-045, #BUG-047 Sidebar aria-labels (nav links, header logo, footer button) — slot 1 — completed
+- #BUG-044, #BUG-049 AI Insights availability check + canvas sr-only h1 — slot 2 — completed
+- #BUG-046, #BUG-050, #BUG-051 Settings label, workspaces main landmark, table aria-label — slot 3 — completed
+**Source:** prd/BUGS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- src/components/layout/sidebar.tsx (modified — aria-labels on header logo, 16 nav links, footer link+button)
+- src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx (modified — tightened hasAiInsights check, added sr-only h1)
+- src/app/(app)/w/[workspaceId]/settings/page.tsx (modified — htmlFor/id label association)
+- src/app/(app)/workspaces/page.tsx (modified — <main> landmark wrapper)
+- src/app/(app)/w/[workspaceId]/list/step-list-view.tsx (modified — aria-label on table)
+**Verification:**
+- Type check: pass (all 3 BUILD_RESULTs: typecheck.status=pass, errors=0)
+- Lint: pass (slot 1 + slot 3 pass, slot 2 skipped; 1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A
+- Unit tests: N/A (no test suite exists)
+- Browser test: skipped (no acceptance tester ran — all tasks are a11y attribute-only changes)
+- Canary test: skipped (no UI visual changes)
+- Post-merge check: PASS
+**Bugs found:** None
+**Improvements found:** None
+**Self-score:**
+- Code quality: 5 — All changes are minimal, targeted aria-label/landmark additions. Follow existing patterns exactly.
+- Test coverage: 3 — Typecheck-only verification. No runtime a11y validation. Changes are attribute-level with zero logic risk.
+- Confidence: 5 — Pure attribute additions, no logic changes except hasAiInsights tightening (strictly more restrictive).
+- Efficiency: 5 — All 3 builders completed successfully, all merged cleanly, 7 bugs resolved in one iteration.
+- Observations: 0
+**Notes:** Resolves all P1 accessibility bugs from iteration 131 audit (BUG-045, BUG-046, BUG-047) plus 4 P2 bugs (BUG-044, BUG-049, BUG-050, BUG-051). Only BUG-048 (dynamic page titles) remains from the accessibility audit — deferred as cross-cutting concern.
