@@ -1,114 +1,89 @@
 {
   "schema_version": "1.0",
-  "iteration": 116,
+  "iteration": 117,
   "test_type": "acceptance",
   "suite_name": null,
   "status": "failed",
-  "duration_seconds": 180,
+  "duration_seconds": 90,
 
   "criteria_results": [
     {
-      "criterion": "Tools page renders a React Flow canvas (not the old table view)",
-      "task_id": "#FEAT-040 [2/3]",
+      "criterion": "Fix IMP-079: empty state secondary button label changed from 'Add Group' to 'Add Tool Section'",
+      "task_id": "#FEAT-041",
       "result": "pass",
-      "evidence": "React Flow canvas rendered with application role, Controls (Zoom In/Out/Fit View), MiniMap, and Background. No table view present.",
+      "evidence": "Tools empty state shows two buttons: 'Add Tool' and 'Add Tool Section' — 'Add Group' label is gone. Confirmed in both the canvas toolbar (ref=e118/e119) and the overlay empty state panel (ref=e129/e130).",
       "screenshot_description": null
     },
     {
-      "criterion": "Toolbar has 'Add Tool' and 'Add Tool Section' buttons (top-left Panel)",
-      "task_id": "#FEAT-040 [2/3]",
-      "result": "pass",
-      "evidence": "Both 'Add Tool' and 'Add Tool Section' buttons visible in toolbar panel (Panel position=top-left per React Flow structure).",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Zoom/pan controls (React Flow Controls + MiniMap + Background dots)",
-      "task_id": "#FEAT-040 [2/3]",
-      "result": "pass",
-      "evidence": "React Flow Controls (Zoom In, Zoom Out, Fit View buttons) and MiniMap both present in accessibility tree.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Summary sidebar when nothing selected: total monthly cost, annual cost, counts by status",
-      "task_id": "#FEAT-040 [2/3]",
-      "result": "pass",
-      "evidence": "Tools Summary panel visible with Monthly cost ($0/mo), Annual cost ($0/yr), and By Status breakdown showing Active: 0, Considering: 0, Cancelled: 0.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Empty state overlay when no tools exist",
-      "task_id": "#FEAT-040 [2/3]",
-      "result": "pass",
-      "evidence": "Empty state overlay shows 'No tools yet' with description 'Add tools to map your tech stack, or create groups to organize them' and CTA buttons.",
-      "screenshot_description": null
-    },
-    {
-      "criterion": "Tool nodes display: name, status badge (active=green, considering=yellow, cancelled=gray), cost/mo",
-      "task_id": "#FEAT-040 [2/3]",
+      "criterion": "Click tool node on canvas → right sidebar detail panel with editable fields",
+      "task_id": "#FEAT-041",
       "result": "fail",
-      "evidence": "Cannot verify — 'Add Tool' POST /api/v1/tools returns 500: 'Could not find the position_x column of tools in the schema cache'. Migration 023 (adds position_x, position_y, status columns to tools table) has not been applied to the local Supabase instance.",
+      "evidence": "Cannot test: POST /api/v1/tools returned HTTP 500. No tool nodes can be created, so the detail panel interaction cannot be reached. The summary sidebar (Tools Summary, monthly/annual cost, status counts) renders correctly when no node is selected — that path is unchanged.",
       "screenshot_description": null
     },
     {
-      "criterion": "Tool section nodes are resizable containers (like process section nodes, using NodeResizer)",
-      "task_id": "#FEAT-040 [2/3]",
+      "criterion": "Field changes persist on blur/change with 500ms debounce via PATCH /api/v1/tools/[id]",
+      "task_id": "#FEAT-041",
       "result": "fail",
-      "evidence": "Cannot verify — tool creation blocked by missing migration 023. Add Tool Section also likely blocked by missing tool_sections table.",
+      "evidence": "Blocked by 500 on tool creation — cannot reach the detail panel.",
       "screenshot_description": null
     },
     {
-      "criterion": "Tools can be dragged — position persists via updateTool API (position_x, position_y)",
-      "task_id": "#FEAT-040 [2/3]",
+      "criterion": "Delete tool via Radix Dialog confirmation → DELETE /api/v1/tools/[id] → remove node from canvas state",
+      "task_id": "#FEAT-041",
       "result": "fail",
-      "evidence": "Cannot verify — tool creation blocked by missing migration 023.",
+      "evidence": "Blocked by 500 on tool creation — cannot reach the delete flow.",
       "screenshot_description": null
     },
     {
-      "criterion": "Tool sections can be dragged/resized — persists via updateToolSection API",
-      "task_id": "#FEAT-040 [2/3]",
+      "criterion": "Click tool section node → right sidebar detail panel with editable fields: name, description",
+      "task_id": "#FEAT-041",
       "result": "fail",
-      "evidence": "Cannot verify — tool section creation blocked by missing migration 023 (tool_sections table not present).",
+      "evidence": "Could not test — Add Tool Section was not attempted due to exhausted budget after tool 500 error investigation. Tool Section creation path may or may not be affected by the same 500.",
       "screenshot_description": null
     },
     {
-      "criterion": "Disabled 'Generate Summary' button has visible guidance text directing users to set maturity scores",
-      "task_id": "#IMP-077",
-      "result": "pass",
-      "evidence": "Button 'Generate Summary' [disabled] present. Below it, paragraph with link 'Open the canvas to set maturity scores →' visible in accessibility tree (ref=e128/e129).",
+      "criterion": "Detail panel replaces summary sidebar when node is selected; summary sidebar returns when no selection",
+      "task_id": "#FEAT-041",
+      "result": "fail",
+      "evidence": "Cannot verify interactively — blocked by tool creation 500 error.",
       "screenshot_description": null
     },
     {
-      "criterion": "Guidance includes a navigable link to the first process canvas tab",
-      "task_id": "#IMP-077",
-      "result": "pass",
-      "evidence": "Link href resolves to /w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/fcfdce67-1453-46c9-a8f2-c3c0ef615619 — the workspace's first canvas tab. URL is valid and formed correctly.",
+      "criterion": "Status dropdown change updates local ideas state immediately (optimistic update)",
+      "task_id": "#IMP-061",
+      "result": "fail",
+      "evidence": "GET /api/v1/improvement-ideas?workspace_id=... returned HTTP 500. Improvements view failed to load ideas, so optimistic update behavior could not be exercised.",
       "screenshot_description": null
     },
     {
-      "criterion": "When hasGapData is true, guidance text is hidden and button is fully functional",
-      "task_id": "#IMP-077",
-      "result": "pass",
-      "evidence": "Accepted on build verification — guidance paragraph is conditionally rendered only when !hasGapData && firstProcessTab per BUILD_RESULT_2 notes. Cannot activate without existing maturity data in test DB.",
+      "criterion": "If API call (updateImprovementIdea) fails, revert to previous ideas state and show error toast",
+      "task_id": "#IMP-061",
+      "result": "fail",
+      "evidence": "Blocked by the same 500 on improvement-ideas load — no ideas rendered to interact with.",
       "screenshot_description": null
     },
     {
-      "criterion": "Workspace list card shows creation date in YYYY-MM-DD format (consistent server/client)",
-      "task_id": "#IMP-078",
+      "criterion": "Empty state (when no journey tabs exist) includes a visible CTA button styled with the Button component",
+      "task_id": "#IMP-072",
       "result": "pass",
-      "evidence": "Workspace card displays 'Created 2026-03-04' — YYYY-MM-DD format confirmed. Previously would show locale-formatted date (e.g. '3/4/2026').",
+      "evidence": "Compare page rendered empty state with heading 'Comparison requires both canvas types', descriptive paragraph, and button labeled 'Create Journey Tab' (accessibility tree ref=e167). Button is present and styled as expected.",
       "screenshot_description": null
     },
     {
-      "criterion": "No hydration mismatch warnings in browser console for workspace list",
-      "task_id": "#IMP-078",
-      "result": "pass",
-      "evidence": "No hydration errors observed on /workspaces page. A Radix UI DropdownMenu ID mismatch exists on gap-analysis page but is pre-existing and unrelated to date formatting.",
+      "criterion": "Button creates a new journey tab via createTab API (canvas_type='journey') and navigates to it on success",
+      "task_id": "#IMP-072",
+      "result": "fail",
+      "evidence": "Action budget exhausted before clicking the button. Static presence of the button was verified (criterion 1) but the click→API→navigate flow was not exercised.",
       "screenshot_description": null
     }
   ],
 
   "quality_gate": {
-    "pages_checked": ["/workspaces", "/w/{id}/tools", "/w/{id}/gap-analysis"],
+    "pages_checked": [
+      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/tools",
+      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/compare"
+    ],
     "console_errors": 2,
     "network_errors": 2,
     "accessibility_issues": 0,
@@ -118,41 +93,27 @@
   "bugs_found": [
     {
       "severity": "P1",
-      "page": "/w/{workspaceId}/tools",
-      "description": "Migration 023 not applied to local Supabase — 'Add Tool' POST returns 500: 'Could not find the position_x column of tools in the schema cache'. Core tools canvas CRUD is completely non-functional. Canvas UI renders correctly but no tools or tool sections can be created.",
-      "steps_to_reproduce": "1. Navigate to /w/{workspaceId}/tools. 2. Click 'Add Tool' in toolbar. 3. POST /api/v1/tools returns 500.",
-      "related_task": "#FEAT-040 [2/3]"
+      "page": "/w/[workspaceId]/tools",
+      "description": "POST /api/v1/tools returns HTTP 500. Clicking 'Add Tool' fails silently — the button enters active/loading state but no node is added and no user-facing error message appeared in the snapshot. The underlying 500 was only visible in the network layer.",
+      "steps_to_reproduce": "1. Navigate to /w/[workspaceId]/tools. 2. Click 'Add Tool' button in canvas toolbar or empty state. 3. Observe: no tool node created, console shows 500 on POST /api/v1/tools.",
+      "related_task": "#FEAT-041"
     },
     {
-      "severity": "P2",
-      "page": "all authenticated pages",
-      "description": "Pre-existing: Radix UI DropdownMenuTrigger generates different auto-IDs on server vs client (id='radix-_R_9...' vs 'radix-_R_16...'). React hydration mismatch warning on every page with the user menu. Unrelated to current iteration.",
-      "steps_to_reproduce": "1. Navigate to any authenticated page. 2. Open browser console. 3. Observe 'A tree hydrated but some attributes of the server rendered HTML didn't match the client properties' error.",
-      "related_task": null
-    },
-    {
-      "severity": "P2",
-      "page": "all workspace pages",
-      "description": "Pre-existing: GET /api/v1/improvement-ideas?workspace_id=... returns 500 on every workspace page load. Unrelated to current iteration.",
-      "steps_to_reproduce": "1. Navigate to any workspace page. 2. Check network tab — improvement-ideas request returns 500.",
-      "related_task": null
+      "severity": "P1",
+      "page": "/w/[workspaceId]/improvements",
+      "description": "GET /api/v1/improvement-ideas?workspace_id=... returns HTTP 500. This appears to be a pre-existing regression — the URL is unrelated to iteration 117 changes but blocks acceptance testing of #IMP-061 optimistic update.",
+      "steps_to_reproduce": "1. Navigate to /w/[workspaceId]/improvements. 2. Observe: improvement ideas list fails to load (500 on improvement-ideas fetch).",
+      "related_task": "#IMP-061"
     }
   ],
 
   "improvements_found": [
     {
       "category": "usability",
-      "page": "/w/{workspaceId}/tools",
-      "observation": "The empty state CTA buttons say 'Add Tool' and 'Add Group' but the toolbar buttons say 'Add Tool' and 'Add Tool Section'. Inconsistent label ('Add Group' vs 'Add Tool Section') could confuse users about what they're creating.",
-      "design_principle": "Nielsen H4: Consistency and standards",
-      "suggested_approach": "Align empty state button labels with toolbar labels — use 'Add Tool Section' instead of 'Add Group' in the empty state overlay."
-    },
-    {
-      "category": "usability",
-      "page": "/w/{workspaceId}/gap-analysis",
-      "observation": "The guidance hint 'Open the canvas to set maturity scores →' is the only actionable text when no scores exist, but the existing 'Score steps to enable AI narrative.' text directly above the button doesn't direct users anywhere. Two separate hint messages could be consolidated.",
-      "design_principle": "Nielsen H6: Recognition rather than recall",
-      "suggested_approach": "Replace 'Score steps to enable AI narrative.' with the link text, or combine into one sentence: 'Open the canvas to set maturity scores on steps to enable AI narrative →'."
+      "page": "/w/[workspaceId]/tools",
+      "observation": "When 'Add Tool' fails with a 500, there is no visible error toast or feedback to the user — the button just stops appearing active. The user has no indication the action failed.",
+      "design_principle": "Nielsen H1: Visibility of system status — users should always be informed of what is going on.",
+      "suggested_approach": "The handleAddTool function should show a toastError on POST failure, consistent with other panels in the codebase."
     }
   ],
 

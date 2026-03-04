@@ -85,8 +85,8 @@ Core consulting insight features:
 ## Phase 3b: Tools Canvas + Enhanced Export — IN PROGRESS
 **Depends on:** Phase 3a complete ✓ (iteration 112)
 
-- [ ] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape) — [1/3] data layer DONE iteration 115
-- [ ] #FEAT-041 Tool detail panel + step-tool assignment (junction table, cost integration)
+- [x] #FEAT-040 Tools canvas upgrade (React Flow canvas for tools landscape) — [1/3] data layer DONE iteration 115, [2/3] canvas UI DONE iteration 116, [3/3] detail panels DONE iteration 117
+- [ ] #FEAT-041 Tool detail panel + step-tool assignment (junction table, cost integration) — [1/3] tool + tool-section detail panels DONE iteration 117
 - [ ] #FEAT-042 Tool overlap and gap analysis (client-side computation)
 - [ ] #FEAT-043 Enhanced PDF export — multi-section report (4 sub-tasks)
   - [ ] [1/4] Export dialog UI with section toggles and presets
@@ -179,3 +179,4 @@ Deferred indefinitely:
 - [2026-03-04] Iteration 114: Final AI improvement cleanup. IMP-073 done (Regenerate button visible during loading/rate_limited). IMP-067 done (disable AI Suggestions when no steps). IMP-070 done (fetchAISuggestions moved to client.ts). IMP-074 verified already resolved. IMP-064 done (SaaS-friendly not_configured message). 2 new bugs (BUG-030 hydration mismatch P3), 2 new improvements (IMP-075 gap-analysis "redeploy", IMP-076 "last generated" indicator). All Phase 3a improvements cleared. Ready for Phase 3b or remaining improvements.
 - [2026-03-04] Iteration 115: Phase 3b started. FEAT-040 [1/3] data layer complete (migration 023, tool_sections table, tools ALTER, types, API, client wrappers). IMP-075 done (gap-analysis text fix). BUG-030 done (hydration fix). 2 new improvements (IMP-077, IMP-078). Next: FEAT-040 [2/3] React Flow UI.
 - [2026-03-04] Iteration 116: FEAT-040 [2/3] React Flow UI complete (tools-canvas-view.tsx, tool-node.tsx, tool-section-node.tsx). IMP-077 done (gap analysis guidance link). IMP-078 done (workspace date hydration fix). 2 new improvements (IMP-079 label inconsistency, IMP-080 guidance consolidation). Next: FEAT-040 [3/3] detail panel + integration.
+- [2026-03-04] Iteration 117: FEAT-041 [1/3] tool + tool-section detail panels complete. IMP-061 done (optimistic update). IMP-072 done (compare CTA). IMP-079 done (label fix). FEAT-040 fully complete (all 8 acceptance criteria). 3 new improvements (IMP-081-083). Next: FEAT-041 [2/3] step_tools junction.

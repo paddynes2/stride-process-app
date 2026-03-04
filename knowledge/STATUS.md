@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 116
-- **Date:** 2026-03-04 21:00
-- **Phase:** Phase 3b — Tools Canvas + Enhanced Export. FEAT-040 [2/3] canvas UI complete.
+- **Iteration:** 117
+- **Date:** 2026-03-04 23:00
+- **Phase:** Phase 3b — Tools Canvas + Enhanced Export. FEAT-040 complete, FEAT-041 [1/3] complete (tool + tool-section detail panels). Starting FEAT-041 [2/3].
 - **Branch:** ralph/init-stride
-- **Last task(s):** #FEAT-040 [2/3] tools canvas React Flow UI (slot 1), #IMP-077 gap analysis guidance link (slot 2), #IMP-078 workspace date hydration fix (slot 3)
+- **Last task(s):** #FEAT-041 [1/3] tool detail panel + tool section detail panel + IMP-079 fix (slot 1), #IMP-061 optimistic status update (slot 2), #IMP-072 compare view CTA button (slot 3)
 - **Result:** completed
-- **Next task:** #FEAT-040 [3/3] tools canvas detail panel + integration polish (tool editing sidebar, delete tool/section, rename inline, tool-step assignments)
+- **Next task:** #FEAT-041 [2/3] step_tools junction table data layer + "Step Usage" in tool detail panel (slot 1), next priority improvements/bugs (slots 2-3)
 - **Blockers:** Migrations 014-023 not pushed — requires human action (`npx supabase db push`). OPENROUTER_API_KEY not configured — AI features return 503 until key is added to .env.local and Vercel.
 
 ## Context
 
-Iteration 116 built FEAT-040 [2/3]: the tools page now renders a React Flow canvas (tools-canvas-view.tsx, 521 lines) instead of the old flat table. New components: tool-node.tsx (card with name, status badge, cost/mo) and tool-section-node.tsx (resizable container with NodeResizer). page.tsx fetches both tools and tool_sections in parallel. Canvas has Add Tool / Add Tool Section toolbar, zoom/pan controls, MiniMap, empty state overlay, and a summary sidebar (monthly/annual cost, status counts) when nothing is selected. Spatial containment determines tool-section grouping (parentId). Position persistence via updateTool/updateToolSection API calls on drag end. Slot 2 added a guidance link on gap-analysis's disabled Generate Summary button pointing to the first process tab. Slot 3 fixed workspace list card date hydration (toISOString). Acceptance tester verified UI renders correctly but CRUD operations fail because migration 023 hasn't been pushed to local Supabase.
+Iteration 117 completed 3 tasks across 3 builder slots. Slot 1 created `tool-detail-panel.tsx` (262 lines) and `tool-section-detail-panel.tsx` (143 lines), wired them into `tools-canvas-view.tsx` with selection-based rendering, and fixed IMP-079 label inconsistency. Both panels follow existing patterns (debounced field updates, dynamic TipTap, Radix Dialog delete, DialogPrimitive.Title). Slot 2 added optimistic update to improvement status changes in `improvements-view.tsx` (3 lines). Slot 3 added "Create Journey Tab" CTA button to compare view empty state in `compare-view.tsx` (23 lines). All 3 slots passed typecheck and lint. POST_MERGE_CHECK passed. Acceptance testing found 2 pre-existing API 500s (BUG-028 improvement-ideas, tools CRUD blocked by unpushed migration 023) — not regressions from this iteration's code.
 
 ## Dev Server
 
@@ -26,7 +26,6 @@ Iteration 116 built FEAT-040 [2/3]: the tools page now renders a React Flow canv
 - BUG-028: /api/v1/improvement-ideas returns HTTP 500 — caused by unpushed migration 022 (P2).
 - BUG-029: /api/v1/coloring-rules returns HTTP 500 — caused by unpushed migration 019 (P2).
 - Production (origin/main) is behind ralph/init-stride by 65+ commits
-- IMP-079: Empty state uses "Add Group" vs toolbar uses "Add Tool Section" — inconsistent labeling
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
-- canvas-view.tsx ~530 lines, tools-canvas-view.tsx 521 lines — both approaching complexity threshold
+- canvas-view.tsx ~530 lines, tools-canvas-view.tsx ~530 lines — both approaching complexity threshold

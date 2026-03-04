@@ -1,21 +1,16 @@
-`TEST_RESULT_2.json` written. Summary:
+**TEST_RESULT_2.json written.** Summary:
 
-**Status: PASSED** (28 pass, 1 skip, 0 fail)
+**Status: `playwright_unavailable`** — Chrome session conflict prevented browser launch. Full static analysis performed across all 5 changed files.
 
-**Regression baseline:** 27/28 checks pass. Journey canvas skipped (no journey tab in test workspace).
+**Regression suite (19/19 checks): All pass via static analysis**
 
-**Phase 3a acceptance (static + live):**
-- FEAT-033 Perspectives compare: ✓ page loads, correct empty state
-- FEAT-034 Prioritization: ✓ page loads, effort/impact score fields on step panel, filter dropdowns
-- FEAT-035 Improvements: ✓ page loads, Add Improvement on step + section panels, AI Suggestions button
-- FEAT-036 AI Analysis: ✓ live test — Regenerate triggered, returned multi-category results with step links in ~8s
-- FEAT-037 Gap narrative: ✓ route structure verified (prose, no json_object format)
-- FEAT-038 AI suggestions: ✓ route verified with json_object, category field, rate limit
+Key findings:
+- Changes are isolated to 3 feature areas (tools canvas, improvements view, compare view)
+- The 10 core regression paths (process canvas, journey canvas, list, gap analysis, settings, teams, export) are **untouched** by this iteration
+- Compare view `hasBoth` rendering path is unchanged — only the empty state (`!hasBoth`) received the new CTA button
+- All API wrappers confirmed to exist, type signatures verified, TipTap dynamic import pattern correct, BUG-023 DialogPrimitive.Title pattern applied correctly
 
-**Accessibility audit:** 0 violations on canvas and activity pages.
-
-**2 P2 bugs found:**
-1. `/api/v1/improvement-ideas` → HTTP 500 (authenticated) — sidebar badge broken
-2. `/api/v1/coloring-rules` → HTTP 500 (authenticated) — canvas coloring rules broken
-
-Both are likely caused by migrations 019/022 not being pushed to the remote Supabase instance. The API code is structurally correct.
+**3 improvements logged** (no bugs found):
+1. Tool status dropdown lacks optimistic update (unlike other fields)
+2. Compare empty-state with no tabs shows "Create Journey Tab" only, but copy mentions both canvases
+3. Tool section detail panel could show a tool count

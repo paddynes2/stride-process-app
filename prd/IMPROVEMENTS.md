@@ -424,7 +424,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — badge should reflect current state
   - **Suggested fix:** Emit a custom event or use a lightweight context signal from createImprovementIdea success path to trigger badge refetch. Alternatively, refetch on tab focus.
 
-- [ ] #IMP-061 Improvement status change waits for API before visual update — Attempts: 0
+- [x] #IMP-061 Improvement status change waits for API before visual update — Attempts: 1 — DONE iteration 117, 2026-03-04
   - **Found:** Iteration 108 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` (lines 58-65)
@@ -510,7 +510,7 @@
   - **Design principle:** Nielsen H9: Help users recognize, diagnose, recover from errors
   - **Suggested fix:** Default badge count to 0 on fetch error rather than null, so the nav item renders consistently.
 
-- [ ] #IMP-072 Compare view empty state lacks CTA to create journey tab — Attempts: 0
+- [x] #IMP-072 Compare view empty state lacks CTA to create journey tab — Attempts: 1 — DONE iteration 117, 2026-03-04
   - **Found:** Iteration 112 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx`
@@ -566,7 +566,7 @@
   - **Design principle:** Consistency and standards
   - **Suggested fix:** Apply same toISOString().slice(0, 10) fix to the workspace creation date display.
 
-- [ ] #IMP-079 Tools canvas empty state "Add Group" vs toolbar "Add Tool Section" label inconsistency — Attempts: 0
+- [x] #IMP-079 Tools canvas empty state "Add Group" vs toolbar "Add Tool Section" label inconsistency — Attempts: 1 — DONE iteration 117, 2026-03-04
   - **Found:** Iteration 116 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx`
@@ -581,6 +581,30 @@
   - **What:** Two separate hint messages exist when no maturity data: "Score steps to enable AI narrative." (inline) and "Open the canvas to set maturity scores →" (link below). Could be consolidated into one sentence.
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Combine into: "Open the canvas to set maturity scores on steps to enable AI narrative →" as a single linked message.
+
+- [ ] #IMP-081 Tool status dropdown lacks optimistic update — Attempts: 0
+  - **Found:** Iteration 117 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/tool-detail-panel.tsx` (line 159)
+  - **What:** Status dropdown uses `value={tool.status}` from prop instead of local state. Status change has no optimistic update — UI only reflects new status after API round-trip. Other fields (name, category, vendor, url) use local state with debounce for immediate feedback.
+  - **Design principle:** Nielsen H1: Visibility of system status — users should see result of action immediately
+  - **Suggested fix:** Add local `status` state initialized from `tool.status`, reset in useEffect when `tool.id` changes, update optimistically on dropdown change.
+
+- [ ] #IMP-082 Compare view CTA only creates journey tab, not process tab — Attempts: 0
+  - **Found:** Iteration 117 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx`
+  - **What:** When hasNeither is true (no tabs at all), empty state says "Create a process canvas AND a journey canvas" but only shows "Create Journey Tab" button. After clicking, user navigates away and must manually create a process tab.
+  - **Design principle:** Nielsen H6: Recognition rather than recall — guide users with CTAs for all required actions
+  - **Suggested fix:** Show a second "Create Process Tab" button when processTab is also null, or update copy to acknowledge only journey will be created.
+
+- [ ] #IMP-083 Tool section detail panel lacks tool count display — Attempts: 0
+  - **Found:** Iteration 117 (regression tester)
+  - **Category:** Usability
+  - **Where:** `src/components/panels/tool-section-detail-panel.tsx`
+  - **What:** No visual indicator of how many tools are in the selected section. This info is available client-side from the tools array and toolSectionMap.
+  - **Design principle:** Nielsen H7: Flexibility and efficiency of use — expert users benefit from contextual summary
+  - **Suggested fix:** Add a read-only "Tools in section" count to the panel header, passed via an optional `toolCount` prop.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

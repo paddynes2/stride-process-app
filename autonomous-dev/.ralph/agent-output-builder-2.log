@@ -1,14 +1,11 @@
-Task complete. Here's a summary of what was done:
+Done. Here's what was changed:
 
-**Changes to `gap-analysis-view.tsx`:**
-1. Added `import Link from "next/link"` — for the navigable link
-2. Added `import { useWorkspace } from "@/lib/context/workspace-context"` — to get tabs
-3. In the component body: `const { tabs } = useWorkspace()` + `const firstProcessTab = tabs.find(t => t.canvas_type === "process") ?? tabs[0] ?? null`
-4. Wrapped the existing `narrativeState.type === "idle" && narrativeText === null` block in a React fragment
-5. Added a `<p>` with a `<Link>` below the existing container, shown only when `!hasGapData && firstProcessTab` — renders "Open the canvas to set maturity scores →" linking to `/w/{workspaceId}/{firstProcessTab.id}`
+**`handleStatusChange`** in `improvements-view.tsx` (lines 98-107):
 
-All acceptance criteria met:
-- Disabled button has visible guidance text directing to set maturity scores ✓
-- Guidance includes a navigable link to the first process canvas tab ✓
-- When `hasGapData` is true, guidance is hidden ✓
-- TypeScript compiles with zero errors ✓
+1. `const prevIdeas = [...ideas]` — captures state before mutation
+2. `setIdeas(prev => prev.map(...))` — applies optimistic update immediately
+3. `await updateImprovementIdea(...)` — makes API call
+4. On success: syncs with the server-returned object (catches any server-side field normalization)
+5. On error: `setIdeas(prevIdeas)` reverts + `toastError` shows the failure message
+
+Typecheck and lint both pass. 3 lines added, 0 removed.

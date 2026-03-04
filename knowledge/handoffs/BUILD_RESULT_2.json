@@ -1,33 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 116,
+  "iteration": 117,
   "slot": 2,
-  "task_id": "#IMP-077",
+  "task_id": "#IMP-061",
   "status": "completed",
-  "duration_seconds": 120,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
       "action": "modified",
-      "lines_added": 16,
-      "lines_removed": 6
+      "lines_added": 3,
+      "lines_removed": 0
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known/acceptable)" },
+    "lint": { "status": "pass", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
+    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Added Link import from next/link and useWorkspace import. Added firstProcessTab derivation (first tab with canvas_type==='process', fallback to tabs[0]). Added guidance link 'Open the canvas to set maturity scores \u2192' below the disabled Generate Summary button, shown only when !hasGapData && firstProcessTab. Wrapped the idle/null block in a React fragment to accommodate both the existing div and the new hint paragraph.",
+  "notes": "handleStatusChange now saves prevIdeas before the optimistic setIdeas call, updates UI immediately, then on API success syncs with server response. On API failure, reverts to prevIdeas and shows error toast. toastError was already imported.",
 
   "failure_details": null
 }

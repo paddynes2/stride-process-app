@@ -1,19 +1,12 @@
 TEST_RESULT_1.json written. Summary:
 
-**Status: FAILED**
+**Status: `failed`**
 
-**What passed:**
-- Tools canvas UI renders correctly: React Flow canvas, Controls, MiniMap, toolbar ("Add Tool" + "Add Tool Section"), summary sidebar (costs + status counts), empty state overlay
-- IMP-077: Gap analysis guidance link ("Open the canvas to set maturity scores →") visible when button is disabled, links to correct first canvas tab
-- IMP-078: Workspace date shows `2026-03-04` (YYYY-MM-DD format, hydration-safe)
+**Passed (2/10 criteria):**
+- #FEAT-041: IMP-079 fix confirmed — empty state button reads "Add Tool Section" not "Add Group"
+- #IMP-072: "Create Journey Tab" CTA button visible in compare empty state
 
-**Blocking bug (P1):**
-- **Migration 023 not applied** — `position_x` column missing from `tools` table. `POST /api/v1/tools` returns 500. "Add Tool" is completely broken. This blocks testing 4 acceptance criteria for FEAT-040 [2/3] (tool nodes, tool sections, drag/drop, parent grouping).
-
-**Pre-existing bugs (not from this iteration):**
-- Radix DropdownMenu ID hydration mismatch on all pages (P2)
-- `/api/v1/improvement-ideas` returns 500 on all workspace pages (P2)
-
-**Improvements noted:**
-- Empty state CTA says "Add Group" but toolbar says "Add Tool Section" — inconsistent labels
-- Gap analysis has two separate hint messages that could be consolidated
+**Failed/Blocked (8/10 criteria):**
+- **P1 Bug — `POST /api/v1/tools` → 500**: Blocks all tool detail panel testing (select node, edit fields, debounce persistence, delete confirmation). The failure is silent — no error toast shown to user.
+- **P1 Bug (pre-existing) — `GET /api/v1/improvement-ideas` → 500**: Blocks #IMP-061 optimistic update testing. Improvements page can't load ideas at all.
+- **#IMP-072 criterion 2 (navigate on success)**: Action budget exhausted before clicking the button; static presence confirmed but click flow not exercised.

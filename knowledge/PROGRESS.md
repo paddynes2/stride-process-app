@@ -1966,3 +1966,34 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 slots completed, zero merge failures, no reviewer fixes needed
 - Observations: 2 (IMP-079, IMP-080)
 **Notes:** FEAT-040 [2/3] complete. Tools page now shows React Flow canvas with tool nodes, section containers, toolbar, summary sidebar. CRUD blocked on migration push (environment issue). Next: FEAT-040 [3/3] detail panel + integration polish.
+
+## Iteration 117 — 2026-03-04 23:00
+**Tasks:**
+- #FEAT-041 [1/3] tool detail panel + tool section detail panel + IMP-079 fix — slot 1 — completed
+- #IMP-061 improvement status optimistic update — slot 2 — completed
+- #IMP-072 compare view empty state CTA button — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Created: src/components/panels/tool-detail-panel.tsx (262 lines)
+- Created: src/components/panels/tool-section-detail-panel.tsx (143 lines)
+- Modified: src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (+66/-1 — panel imports, 4 handlers, selection derivation, panel rendering, IMP-079 label fix)
+- Modified: src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx (+3/-0 — optimistic update with rollback)
+- Modified: src/app/(app)/w/[workspaceId]/compare/compare-view.tsx (+23/-0 — CTA button with createTab + navigation)
+**Verification:**
+- Type check: pass (all slots + post-merge tsc --noEmit)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A (typecheck + lint sufficient)
+- Unit tests: N/A (no test suite exists)
+- Browser test: partial (acceptance 2/10 pass — tool/improvement API 500s blocked most criteria; both pre-existing env issues)
+- Canary test: skipped (acceptance tester covered available UI paths)
+**Bugs found:** 0 new (2 pre-existing: BUG-028 improvement-ideas 500, tools 500 from unpushed migration)
+**Improvements found:** 3 (tool status dropdown lacks optimistic update, compare CTA only creates journey tab not process, tool section panel lacks tool count display)
+**Self-score:**
+- Code quality: 5 — Both panels follow existing codebase patterns exactly (debounce, dynamic TipTap, Radix Dialog, DialogPrimitive.Title). Clean handlers with useCallback.
+- Test coverage: 2 — Acceptance blocked by pre-existing API 500s. Static regression 19/19 pass. Code patterns verified via review.
+- Confidence: 4 — Code follows proven patterns and passes typecheck/lint, but live browser interaction untested due to migration dependency.
+- Efficiency: 5 — All 3 slots completed, zero merge failures, zero reviewer fixes needed.
+- Observations: 3 (tool status optimistic update, compare dual-CTA, section tool count)
+**Notes:** FEAT-041 [1/3] complete. Detail panels wired into tools-canvas-view with selection-based rendering. Next: FEAT-041 [2/3] step_tools junction table + "Step Usage" section.

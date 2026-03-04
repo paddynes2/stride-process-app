@@ -1,1 +1,16 @@
-Done. Single-line fix: replaced `toLocaleDateString()` with `toISOString().slice(0, 10)` at `workspace-list.tsx:100`. TypeScript and ESLint pass clean. File staged.
+Done. Here's a summary of what was implemented:
+
+**Task #IMP-072 — Complete**
+
+Changes to `src/app/(app)/w/[workspaceId]/compare/compare-view.tsx`:
+
+1. **New imports**: `useRouter` (next/navigation), `Button` (ui/button), `createTab` (api/client), `toastError` (api/toast-helpers)
+
+2. **New state + handler** in `CompareView`:
+   - `const router = useRouter()`
+   - `const [creating, setCreating] = React.useState(false)`
+   - `handleCreateJourneyTab` — calls `createTab({ workspace_id, name: 'Journey', canvas_type: 'journey' })`, navigates to the new tab on success, shows `toastError` and resets loading on failure
+
+3. **Updated empty state**: Added `{journeyTab === null && <Button loading={creating} onClick={handleCreateJourneyTab}>Create Journey Tab</Button>}` — appears for both the "no tabs at all" and "process tab only, no journey" cases
+
+Verification: typecheck ✓ (0 errors), lint ✓ (0 errors, 1 pre-existing warning in unrelated file)

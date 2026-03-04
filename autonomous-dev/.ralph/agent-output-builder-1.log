@@ -1,0 +1,8 @@
+**Build complete.** Summary:
+
+**Files created/modified (3):**
+- `src/components/panels/tool-detail-panel.tsx` — NEW: full detail panel with name, status dropdown (active/considering/cancelled), category, vendor, url, cost_per_month, and description (dynamic TipTap). 500ms debounced persistence via `updateTool`. Radix Dialog delete confirmation with `DialogPrimitive.Title` (BUG-023 pattern).
+- `src/components/panels/tool-section-detail-panel.tsx` — NEW: section detail panel with name and description (dynamic TipTap). 500ms debounced persistence via `updateToolSection`. Same delete confirmation pattern.
+- `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx` — MODIFIED: added imports for both panels; added `handleToolUpdate/Delete/SectionUpdate/SectionDelete` handlers that update source-of-truth state arrays (triggering existing useEffect to rebuild React Flow nodes); added `selectedTool`/`selectedSection` derived vars; added conditional panel rendering (mutually exclusive with summary sidebar); fixed IMP-079 (`Add Group` → `Add Tool Section`).
+
+**Verification:** typecheck ✓ (clean), lint ✓ (0 errors, 1 pre-existing warning in unmodified file).

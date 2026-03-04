@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-116, 2026-03-04 — FEAT-040 [2/3] tools canvas UI -->
+<!-- Updated: iter-117, 2026-03-04 — FEAT-041 [1/3] tool detail panels -->
 
 ## Project
 
@@ -97,7 +97,7 @@ npx supabase db push     # Push migrations
 |-----------|-----------|---------|
 | `src/components/ui/` | button, input, textarea, badge, dialog, dropdown-menu, separator, tabs, skeleton, offline-banner | Design system primitives |
 | `src/components/canvas/` | flow-canvas, step-node, section-node, touchpoint-node, stage-node, tool-node, tool-section-node | React Flow canvas nodes |
-| `src/components/panels/` | step-detail-panel, section-detail-panel, touchpoint-detail-panel, stage-detail-panel, workspace-summary-panel, annotation-panel, comment-panel, task-panel, rich-text-editor, video-embed | Right-side edit panels |
+| `src/components/panels/` | step-detail-panel, section-detail-panel, touchpoint-detail-panel, stage-detail-panel, tool-detail-panel, tool-section-detail-panel, workspace-summary-panel, annotation-panel, comment-panel, task-panel, rich-text-editor, video-embed | Right-side edit panels |
 | `src/components/layout/` | sidebar, header, tab-bar | App shell layout |
 
 ### Lib

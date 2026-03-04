@@ -1,16 +1,18 @@
 Execution plan written. Summary:
 
-**Iteration 116 — Phase 3b: Tools Canvas + Enhanced Export**
+**Iteration 117 — multi_task (3 slots)**
 
 | Slot | Task | Type | Complexity | Files |
-|------|------|------|-----------|-------|
-| 1 | **#FEAT-040 [2/3]** Tools canvas React Flow UI | build | L | tools-canvas-view.tsx, page.tsx, tool-node.tsx, tool-section-node.tsx, canvas.ts |
-| 2 | **#IMP-077** Gap analysis disabled state guidance | improve | S | gap-analysis-view.tsx |
-| 3 | **#IMP-078** Workspace card date hydration fix | fix | S | workspace-list.tsx |
+|------|------|------|------------|-------|
+| 1 | **#FEAT-041 [1/3]** Tool detail panel + tool section detail panel | build | M | tool-detail-panel.tsx (new), tool-section-detail-panel.tsx (new), tools-canvas-view.tsx |
+| 2 | **#IMP-061** Improvement status optimistic update | improve | S | improvements-view.tsx |
+| 3 | **#IMP-072** Compare view empty state CTA button | improve | S | compare-view.tsx |
+
+**Validation:** Last commit valid, compilation passing, no revert needed.
 
 **Key decisions:**
-- Slot 1 creates a new `tools-canvas-view.tsx` replacing the flat table with a React Flow canvas, following the exact patterns from `flow-canvas.tsx` and `section-node.tsx`
-- Tool nodes show name + status badge + cost/mo. Tool sections are resizable containers. No edges (this is a landscape canvas, not a flow)
-- Summary sidebar appears when nothing selected (total cost, annual cost, counts by status)
-- Slots 2-3 are small independent fixes in non-overlapping files
-- Regression recommended for iteration 117 (risk score 3 from iter 115 data model changes)
+- FEAT-040 is complete (all 8 acceptance criteria checked) — reviewer should mark DONE
+- FEAT-041 decomposed into 3 sub-tasks: [1/3] panels with existing fields, [2/3] step_tools junction data layer, [3/3] step detail panel integration + cost
+- Risk score 4 from iter 116 → regression included in testing plan
+- IMP-079 (label fix) bundled into slot 1 since it touches the same file
+- All 3 slots are file-independent (zero overlap)

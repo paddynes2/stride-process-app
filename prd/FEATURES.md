@@ -182,7 +182,7 @@
 **Phase:** 3b
 **Priority:** P0 (critical path)
 **Attempts:** 2
-**Status:** in_progress (2/3 complete — data layer + canvas UI done iteration 115-116)
+**Status:** DONE (all 3 sub-tasks complete — data layer iteration 115, canvas UI iteration 116, detail panels iteration 117)
 **Acceptance criteria:**
 - [x] Upgrade existing tools page to React Flow canvas (reuse canvas infrastructure from process/journey) — DONE iteration 116
 - [x] New `tool_sections` table: id, workspace_id, name, position_x, position_y, width, height — groups tools visually — DONE iteration 115
@@ -197,8 +197,8 @@
 ### #FEAT-041 Tool detail panel + step-tool assignment
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 0
-**Status:** pending
+**Attempts:** 1
+**Status:** in_progress (1/3 complete — tool + tool-section detail panels done iteration 117)
 **Acceptance criteria:**
 - [ ] Click tool on canvas → right sidebar detail panel with: name, vendor, URL, status dropdown, cost type (monthly/annual/one-time), cost amount, renewal date (for monthly/annual only), category, notes (TipTap)
 - [ ] Changes persist on blur/change
