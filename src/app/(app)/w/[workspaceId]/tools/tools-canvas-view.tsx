@@ -27,6 +27,8 @@ import {
 } from "@/lib/api/client";
 import type { Tool, ToolSection } from "@/types/database";
 import type { ToolNodeData, ToolSectionNodeData } from "@/types/canvas";
+import { ToolDetailPanel } from "@/components/panels/tool-detail-panel";
+import { ToolSectionDetailPanel } from "@/components/panels/tool-section-detail-panel";
 
 const nodeTypes = {
   tool: ToolNode,
@@ -327,6 +329,36 @@ export function ToolsCanvasView({
     }
   }, [workspaceId]);
 
+  const handleToolUpdate = React.useCallback((updated: Tool) => {
+    setTools((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+  }, []);
+
+  const handleToolDelete = React.useCallback((id: string) => {
+    setTools((prev) => prev.filter((t) => t.id !== id));
+    setToolSectionMap((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setSelectedToolId(null);
+  }, []);
+
+  const handleToolSectionUpdate = React.useCallback((updated: ToolSection) => {
+    setToolSections((prev) => prev.map((ts) => (ts.id === updated.id ? updated : ts)));
+  }, []);
+
+  const handleToolSectionDelete = React.useCallback((id: string) => {
+    setToolSections((prev) => prev.filter((ts) => ts.id !== id));
+    setToolSectionMap((prev) => {
+      const next = { ...prev };
+      for (const toolId of Object.keys(next)) {
+        if (next[toolId] === id) next[toolId] = null;
+      }
+      return next;
+    });
+    setSelectedSectionId(null);
+  }, []);
+
   // Summary stats
   const totalMonthly = tools.reduce(
     (sum, t) => sum + (t.cost_per_month ?? 0),
@@ -340,6 +372,8 @@ export function ToolsCanvasView({
   const cancelledCount = tools.filter((t) => t.status === "cancelled").length;
 
   const nothingSelected = selectedToolId === null && selectedSectionId === null;
+  const selectedTool = selectedToolId ? (tools.find((t) => t.id === selectedToolId) ?? null) : null;
+  const selectedSection = selectedSectionId ? (toolSections.find((ts) => ts.id === selectedSectionId) ?? null) : null;
 
   return (
     <div className="flex h-full">
@@ -418,13 +452,43 @@ export function ToolsCanvasView({
                   onClick={handleAddToolSection}
                 >
                   <Square className="h-3.5 w-3.5" />
-                  Add Group
+                  Add Tool Section
                 </Button>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Tool detail panel — shown when a tool node is selected */}
+      {selectedTool && (
+        <div
+          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex-shrink-0 flex flex-col"
+          style={{ width: "var(--panel-width)" }}
+        >
+          <ToolDetailPanel
+            tool={selectedTool}
+            onUpdate={handleToolUpdate}
+            onDelete={handleToolDelete}
+            onClose={handlePaneClick}
+          />
+        </div>
+      )}
+
+      {/* Tool section detail panel — shown when a section node is selected */}
+      {selectedSection && (
+        <div
+          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex-shrink-0 flex flex-col"
+          style={{ width: "var(--panel-width)" }}
+        >
+          <ToolSectionDetailPanel
+            toolSection={selectedSection}
+            onUpdate={handleToolSectionUpdate}
+            onDelete={handleToolSectionDelete}
+            onClose={handlePaneClick}
+          />
+        </div>
+      )}
 
       {/* Summary sidebar — shown when nothing selected */}
       {nothingSelected && (
