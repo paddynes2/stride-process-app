@@ -192,6 +192,10 @@ export function ExportPdfDialog({
       ).length
     : 0;
 
+  const unavailableCount = (Object.keys(availability) as (keyof ExportConfig)[]).filter(
+    (k) => !availability[k]
+  ).length;
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!exporting) onOpenChange(o); }}>
       <DialogContent className="max-w-lg" aria-describedby={undefined}>
@@ -234,6 +238,11 @@ export function ExportPdfDialog({
           {activePreset !== "custom" && maskedCount > 0 && (
             <p className="mt-2 text-xs text-white/55">
               {maskedCount} section{maskedCount !== 1 ? "s" : ""} unavailable — add data to unlock them
+            </p>
+          )}
+          {activePreset === "custom" && unavailableCount > 0 && (
+            <p className="mt-2 text-xs text-white/55">
+              Some sections are disabled — required data is not available
             </p>
           )}
         </div>
