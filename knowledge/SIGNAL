@@ -1,1 +1,1 @@
-CONTINUE: #FEAT-040 [2/3] Tools canvas React Flow UI — upgrade tools page to canvas with tool nodes (card with name, status badge, cost), tool section container nodes, Add Tool/Add Tool Section toolbar buttons, drag-and-drop, zoom/pan controls
+CONTINUE: #FEAT-040 [3/3] Tools canvas detail panel — add tool editing sidebar (click tool node to edit name/status/cost/URL/description), delete tool/section, rename section inline, then FEAT-041 tool-step assignments

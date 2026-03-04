@@ -1,5 +1,5 @@
 # AGENTS.md — Stride Codebase Knowledge
-<!-- Updated: iter-112, 2026-03-04 — Phase 3a COMPLETE -->
+<!-- Updated: iter-116, 2026-03-04 — FEAT-040 [2/3] tools canvas UI -->
 
 ## Project
 
@@ -43,7 +43,7 @@ npx supabase db push     # Push migrations
 | `/w/.../gap-analysis` | `src/app/(app)/w/[workspaceId]/gap-analysis/page.tsx` | Gap analysis |
 | `/w/.../teams` | `src/app/(app)/w/[workspaceId]/teams/page.tsx` | Teams management |
 | `/w/.../people` | `src/app/(app)/w/[workspaceId]/people/page.tsx` | People management (flat table CRUD) |
-| `/w/.../tools` | `src/app/(app)/w/[workspaceId]/tools/page.tsx` | Tools management (flat table CRUD) |
+| `/w/.../tools` | `src/app/(app)/w/[workspaceId]/tools/page.tsx` | Tools canvas (React Flow — tool nodes, tool section containers, summary sidebar) |
 | `/w/.../comments` | `src/app/(app)/w/[workspaceId]/comments/page.tsx` | Workspace comments (all comments, category filter, entity nav links) |
 | `/w/.../runbooks` | `src/app/(app)/w/[workspaceId]/runbooks/page.tsx` | Runbook list (name, status, progress, section, date, filter tabs) |
 | `/w/.../runbooks/[id]` | `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/page.tsx` | Runbook view (checklist with 4-state status, progress bar+text, notes, Complete/Cancel via Radix Dialog, read-only mode, metadata footer, Playbook button) |
@@ -96,7 +96,7 @@ npx supabase db push     # Push migrations
 | Directory | Key Files | Purpose |
 |-----------|-----------|---------|
 | `src/components/ui/` | button, input, textarea, badge, dialog, dropdown-menu, separator, tabs, skeleton, offline-banner | Design system primitives |
-| `src/components/canvas/` | flow-canvas, step-node, section-node, touchpoint-node, stage-node | React Flow canvas nodes |
+| `src/components/canvas/` | flow-canvas, step-node, section-node, touchpoint-node, stage-node, tool-node, tool-section-node | React Flow canvas nodes |
 | `src/components/panels/` | step-detail-panel, section-detail-panel, touchpoint-detail-panel, stage-detail-panel, workspace-summary-panel, annotation-panel, comment-panel, task-panel, rich-text-editor, video-embed | Right-side edit panels |
 | `src/components/layout/` | sidebar, header, tab-bar | App shell layout |
 
@@ -124,7 +124,7 @@ npx supabase db push     # Push migrations
 | File | Key Types |
 |------|-----------|
 | `src/types/database.ts` | User, Organization, Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, TouchpointConnection, Team, Role, Person, Tool, ToolSection, StepRole, PublicShare, Perspective, PerspectiveAnnotation, Comment, Task, Runbook, RunbookStep, ActivityLog, ColoringRule, Template, TemplateData, TemplateSectionData, TemplateStepData, TemplateConnectionData, TemplateStepRoleData, ImprovementIdea + enums (CommentCategory, CommentableType, RunbookStatus, RunbookStepStatus, ActivityAction, CriteriaType, ImprovementStatus, ImprovementPriority, ToolStatus) |
-| `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode + data types, CommentCountsContext, TaskCountsContext |
+| `src/types/canvas.ts` | StepNode, SectionNode, StageNode, TouchpointNode, ToolNode, ToolSectionNode + data types, CommentCountsContext, TaskCountsContext |
 | `src/types/index.ts` | Re-exports |
 
 ### Hooks

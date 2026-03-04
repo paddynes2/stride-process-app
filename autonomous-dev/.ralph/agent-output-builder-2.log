@@ -1,7 +1,14 @@
-Done. Here's what was done for task `#IMP-069`:
+Task complete. Here's a summary of what was done:
 
-**Changes:**
-- `stage-node.tsx`: Renamed `export function StageNode` → `function StageNodeComponent`, added `export const StageNode = React.memo(StageNodeComponent);` at the end
-- `touchpoint-node.tsx`: Same pattern — `function TouchpointNodeComponent` + `export const TouchpointNode = React.memo(TouchpointNodeComponent);`
+**Changes to `gap-analysis-view.tsx`:**
+1. Added `import Link from "next/link"` — for the navigable link
+2. Added `import { useWorkspace } from "@/lib/context/workspace-context"` — to get tabs
+3. In the component body: `const { tabs } = useWorkspace()` + `const firstProcessTab = tabs.find(t => t.canvas_type === "process") ?? tabs[0] ?? null`
+4. Wrapped the existing `narrativeState.type === "idle" && narrativeText === null` block in a React fragment
+5. Added a `<p>` with a `<Link>` below the existing container, shown only when `!hasGapData && firstProcessTab` — renders "Open the canvas to set maturity scores →" linking to `/w/{workspaceId}/{firstProcessTab.id}`
 
-**Verification:** TypeScript: ✅ 0 errors | Lint: ✅ 0 errors (1 pre-existing warning in unowned file) | Both files staged.
+All acceptance criteria met:
+- Disabled button has visible guidance text directing to set maturity scores ✓
+- Guidance includes a navigable link to the first process canvas tab ✓
+- When `hasGapData` is true, guidance is hidden ✓
+- TypeScript compiles with zero errors ✓

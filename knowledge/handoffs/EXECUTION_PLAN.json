@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 115,
-  "date": "2026-03-04T19:00:00Z",
+  "iteration": 116,
+  "date": "2026-03-04T20:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "c6b16524e67be183fa702976f82099045e651fdd",
+    "last_commit_hash": "7ba55badc1283ec6c996ca52f6ed974c2de6a17d",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,76 +13,81 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#FEAT-040 [1/3]",
-      "description": "Tools canvas data layer — migration for tool_sections table + ALTER tools with position_x/position_y/status columns, TypeScript types, API routes (tool-sections CRUD), update tools API for new columns, client wrappers",
+      "id": "#FEAT-040 [2/3]",
+      "description": "Tools canvas React Flow UI — replace the flat table tools-view.tsx with an interactive React Flow canvas showing tool nodes (card with name, status badge, cost/mo) and tool section container nodes (resizable groups like process sections). Add 'Add Tool' and 'Add Tool Section' toolbar buttons. Drag tools into/out of tool sections. When nothing selected, show right sidebar summary (total monthly cost, annual cost, tool counts by status). Zoom/pan via React Flow Controls. Keep the existing tools-view.tsx as a fallback reference but create a new tools-canvas-view.tsx as the primary view.",
       "source": "prd/FEATURES.md",
       "type": "build",
       "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "M",
+      "complexity": "L",
       "attempts": 1,
       "risk_score": 3,
       "acceptance_criteria": [
-        "New migration file (023) creates tool_sections table: id UUID PK, workspace_id UUID FK, name TEXT, description TEXT, position_x NUMERIC DEFAULT 0, position_y NUMERIC DEFAULT 0, width NUMERIC DEFAULT 600, height NUMERIC DEFAULT 400, created_at, updated_at. RLS via can_access_workspace(). update_updated_at trigger. Index on workspace_id.",
-        "Same migration ALTERs tools table: ADD COLUMN position_x NUMERIC DEFAULT 0, position_y NUMERIC DEFAULT 0, status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','considering','cancelled'))",
-        "New ToolSection interface in types/database.ts matching all columns. Tool interface updated with position_x, position_y, status fields.",
-        "New API route: POST /api/v1/tool-sections (create) + GET by workspace_id in same route. Follows existing pattern (successResponse/errorResponse envelope). Requires workspace_id.",
-        "New API route: PATCH/DELETE /api/v1/tool-sections/[id]. PATCH supports name, description, position_x, position_y, width, height. DELETE with 0-row detection → 404.",
-        "Existing tools API routes (POST + PATCH) updated to accept position_x, position_y, status in editable fields",
-        "Client wrappers in client.ts: fetchToolSections, createToolSection, updateToolSection, deleteToolSection. All use apiFetch<T>() pattern.",
-        "TypeScript compiles clean (npx tsc --noEmit)"
+        "Tools page renders a React Flow canvas (not the old table view)",
+        "Tool nodes display: name, status badge (active=green, considering=yellow, cancelled=gray), cost/mo",
+        "Tool section nodes are resizable containers (like process section nodes, using NodeResizer)",
+        "Toolbar has 'Add Tool' and 'Add Tool Section' buttons (top-left Panel, same pattern as flow-canvas.tsx)",
+        "Tools can be dragged — position persists via updateTool API (position_x, position_y)",
+        "Tool sections can be dragged/resized — persists via updateToolSection API",
+        "Tools inside a tool section use parentId for grouping (same pattern as steps in sections)",
+        "Zoom/pan controls (React Flow Controls + MiniMap + Background dots)",
+        "Summary sidebar when nothing selected: total monthly cost, annual cost (×12), counts by status (active/considering/cancelled)",
+        "Empty state overlay when no tools exist (same pattern as flow-canvas.tsx)",
+        "page.tsx fetches both tools AND tool_sections and passes them to the canvas view",
+        "TypeScript compiles with zero errors"
       ],
       "files_owned": [
-        "supabase/migrations/023_tool_sections.sql",
-        "src/types/database.ts",
-        "src/app/api/v1/tool-sections/route.ts",
-        "src/app/api/v1/tool-sections/[id]/route.ts",
-        "src/app/api/v1/tools/route.ts",
-        "src/app/api/v1/tools/[id]/route.ts",
-        "src/lib/api/client.ts"
+        "src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx",
+        "src/app/(app)/w/[workspaceId]/tools/page.tsx",
+        "src/components/canvas/tool-node.tsx",
+        "src/components/canvas/tool-section-node.tsx",
+        "src/types/canvas.ts"
       ],
       "files_read_only": [
-        "src/lib/api/response.ts",
-        "src/lib/supabase/server.ts",
-        "src/lib/api/activity.ts",
-        "supabase/migrations/013_tools.sql",
-        "src/app/api/v1/sections/route.ts",
-        "src/app/api/v1/sections/[id]/route.ts"
+        "src/components/canvas/flow-canvas.tsx",
+        "src/components/canvas/section-node.tsx",
+        "src/components/canvas/step-node.tsx",
+        "src/types/database.ts",
+        "src/lib/api/client.ts",
+        "src/components/ui/button.tsx",
+        "src/components/ui/badge.tsx",
+        "src/lib/utils.ts"
       ],
       "context": {
         "similar_files": [
-          "supabase/migrations/013_tools.sql",
-          "src/app/api/v1/sections/route.ts",
-          "src/app/api/v1/sections/[id]/route.ts",
-          "src/app/api/v1/stages/route.ts"
+          "src/components/canvas/flow-canvas.tsx — primary reference for canvas setup, toolbar, node types, buildNodes/buildEdges pattern",
+          "src/components/canvas/section-node.tsx — reference for container/group node with NodeResizer",
+          "src/components/canvas/step-node.tsx — reference for item node with badges and handles",
+          "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx — reference for canvas view wrapper with selection state"
         ],
         "patterns_to_follow": [
-          "Migration pattern: CREATE TABLE + RLS policies + update_updated_at trigger + workspace_id index (see 013_tools.sql)",
-          "API envelope: successResponse(data) / errorResponse(code, message) from lib/api/response.ts",
-          "apiFetch<T>() unwraps envelope — client wrappers return apiFetch<T>(url) directly",
-          "PATCH editable fields: const EDITABLE_FIELDS = [...] then pick from body",
-          "DELETE with 0-row detection: .delete().eq().select().single() → PGRST116 → 404",
-          "logActivity() fire-and-forget with void prefix on all mutations"
+          "nodeTypes object with React.memo'd components at module scope",
+          "buildNodes() constructs Node[] from DB records, with section nodes having style.width/height and item nodes having parentId for grouping",
+          "Tool sections: id prefix 'tool-section-', tools: id prefix 'tool-' (avoids collision with process canvas prefixes)",
+          "useNodesState + useEdgesState for React Flow state, sync from props via useEffect",
+          "handleNodesChange callback persists position on drag end (change.type === 'position' && change.dragging === false)",
+          "Panel position='top-left' for toolbar buttons",
+          "Background variant=Dots, Controls showInteractive=false, MiniMap with nodeColor callback",
+          "Empty state overlay: absolute inset-0 z-10 pointer-events-none container with pointer-events-auto card",
+          "Status badge colors: active=green, considering=yellow, cancelled=gray (like step status pattern in badge.tsx)"
         ],
         "learnings_relevant": [
-          "apiFetch unwraps envelope — do NOT add nested property access",
-          "Supabase RLS silent mutations — check data is null after mutations, return 403",
-          "React 19 useRef requires initial value"
+          "Canvas null guards: (arr ?? []).filter(Boolean) before .map()",
+          "React 19 useRef: useRef(null) not bare useRef()",
+          "Never sort prop arrays directly — use [...arr].sort()",
+          "apiFetch unwraps envelope — return apiFetch<T>() directly"
         ],
         "affected_urls": [
-          "/api/v1/tool-sections",
-          "/api/v1/tool-sections/[id]",
-          "/api/v1/tools",
-          "/api/v1/tools/[id]"
+          "/w/[workspaceId]/tools"
         ]
       },
-      "has_ui_changes": false,
-      "has_data_model_changes": true,
-      "special_instructions": "Existing tools table has: id, workspace_id, name, description, category, vendor, url, cost_per_month, created_at, updated_at. Use ALTER TABLE to add 3 new columns. tool_sections follows the sections/stages pattern (position + size for React Flow container nodes). The tools canvas is workspace-level (NOT tab-based) — tool_sections reference workspace_id directly, not tab_id. Status enum uses TEXT + CHECK constraint (not a pg enum) — simpler for a 3-value column. Follow stages/route.ts as the closest model for tool-sections API routes."
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "1. Create tools-canvas-view.tsx as the new primary view component. The old tools-view.tsx should be kept but no longer imported from page.tsx — page.tsx switches to tools-canvas-view.tsx. 2. page.tsx must fetch tool_sections in addition to tools: add a second Supabase query for tool_sections. 3. Tool nodes do NOT have connection handles (no edges between tools — this is a landscape/grouping canvas, not a flow). 4. Tools have tool_section_id field in the DB but this is NOT on the Tool type yet — tools inside sections can be identified by checking if tool.position is inside a section's bounds, OR we add a tool_section_id concept. For simplicity: tools that are inside a tool section use parentId = 'tool-section-{sectionId}' based on spatial containment check on drag end. Wait — actually, looking at the migration, there's no tool_section_id on tools. So grouping is purely visual via React Flow parentId set on drag-drop. Persist this by checking containment: when a tool is dropped, check if its position falls within any tool section's bounds and set the parent accordingly. 5. Summary sidebar: render OUTSIDE the ReactFlow when no tool or section is selected — right-aligned absolute panel. 6. Do NOT add connections/edges — this canvas has no edges."
     },
     {
       "slot": 2,
-      "id": "#IMP-075",
-      "description": "Gap analysis not_configured message: replace 'redeploy' with SaaS-appropriate language (same fix as IMP-064 in ai-analysis-view.tsx but for gap-analysis-view.tsx)",
+      "id": "#IMP-077",
+      "description": "Gap analysis 'Generate Summary' disabled state guidance — add inline hint directing users to the canvas to set maturity scores when the button is disabled",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
       "phase": "Phase 3a: Analysis Intelligence",
@@ -90,22 +95,25 @@
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "gap-analysis-view.tsx not_configured block no longer contains the word 'redeploy'",
-        "Replacement text is SaaS-appropriate (e.g., 'Contact your administrator to configure the OPENROUTER_API_KEY.' or similar to what IMP-064 used in ai-analysis-view.tsx)",
-        "TypeScript compiles clean"
+        "Disabled 'Generate Summary' button has visible guidance text below or beside it directing users to set maturity scores on steps",
+        "Guidance includes a navigable link to the first process canvas tab",
+        "When hasGapData is true, guidance text is hidden and button is fully functional",
+        "TypeScript compiles with zero errors"
       ],
       "files_owned": [
         "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
       ],
       "files_read_only": [
-        "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
+        "src/lib/context/workspace-context.tsx"
       ],
       "context": {
         "similar_files": [
-          "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
+          "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx — reference for disabled state patterns with guidance text"
         ],
         "patterns_to_follow": [
-          "IMP-064 already fixed this exact text in ai-analysis-view.tsx — read that file's not_configured block and use the same wording"
+          "Use useWorkspace() to get tabs array, find first process tab for link URL",
+          "text-[var(--text-tertiary)] for hint text at 12px",
+          "Link as inline <a> or Next.js Link to /w/{workspaceId}/{firstProcessTabId}"
         ],
         "learnings_relevant": [],
         "affected_urls": [
@@ -114,59 +122,62 @@
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The offending text is at line ~325: 'to your environment variables and redeploy.' Read ai-analysis-view.tsx's not_configured block for the replacement wording used by IMP-064."
+      "special_instructions": "gap-analysis-view.tsx already has the disabled button with 'Score steps to enable AI narrative.' text. Enhance this by adding a small actionable link below it. Use useWorkspace() to get tabs, find the first tab (or first process tab) and link to it. Pattern: 'Open a step on the canvas to set maturity scores →' linking to /w/{workspaceId}/{tabId}."
     },
     {
       "slot": 3,
-      "id": "#BUG-030",
-      "description": "Fix pre-existing hydration mismatch on AI analysis date format — server renders different date string than client. Use consistent formatting.",
-      "source": "prd/BUGS.md",
+      "id": "#IMP-078",
+      "description": "Workspace card date hydration fix — replace toLocaleDateString() with toISOString().slice(0,10) on workspace list card dates to prevent SSR/client hydration mismatch",
+      "source": "prd/IMPROVEMENTS.md",
       "type": "fix",
       "phase": "Phase 3a: Analysis Intelligence",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "ai-analysis-view.tsx 'Last run' date uses a consistent format that produces identical output on server and client (e.g., toISOString().slice(0, 10) for YYYY-MM-DD, or Intl.DateTimeFormat with explicit locale)",
-        "No hydration mismatch warning in browser console for the AI analysis date",
-        "TypeScript compiles clean"
+        "Workspace list card shows creation date in YYYY-MM-DD format (consistent server/client)",
+        "No hydration mismatch warnings in browser console",
+        "TypeScript compiles with zero errors"
       ],
       "files_owned": [
-        "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
+        "src/app/(app)/workspaces/workspace-list.tsx"
       ],
       "files_read_only": [],
       "context": {
-        "similar_files": [],
+        "similar_files": [
+          "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx — BUG-030 fix used same pattern: toISOString().slice(0, 10)"
+        ],
         "patterns_to_follow": [
-          "Use toISOString().slice(0, 10) for deterministic YYYY-MM-DD output, or new Intl.DateTimeFormat('en-US', { ... }) with explicit locale"
+          "Replace toLocaleDateString() with new Date(dateStr).toISOString().slice(0, 10)",
+          "Same fix as BUG-030 — consistent hydration-safe date formatting"
         ],
         "learnings_relevant": [
-          "Hydration mismatch: server renders as YYYY/MM/DD, client as M/D/YYYY due to different locales"
+          "BUG-030 root cause: toLocaleDateString() produces different output on server vs client. toISOString().slice(0, 10) is deterministic."
         ],
         "affected_urls": [
-          "/w/[workspaceId]/ai-analysis"
+          "/workspaces"
         ]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "The bug is at line ~194: `new Date(lastAt).toLocaleDateString()`. This produces locale-dependent output. Replace with `new Date(lastAt).toISOString().slice(0, 10)` for consistent YYYY-MM-DD, or use suppressHydrationWarning on the span if a relative time approach is preferred. The simplest fix is toISOString().slice(0, 10)."
+      "special_instructions": "Find the toLocaleDateString() call in workspace-list.tsx and replace with new Date(date).toISOString().slice(0, 10). There may be multiple date displays — fix all of them."
     }
   ],
   "shared_files": {
     "read_only": ["package.json", "tsconfig.json", "src/lib/utils.ts"],
-    "owner": "#FEAT-040 [1/3]",
-    "note": "Slot 1 owns database.ts and client.ts as they need type + wrapper additions. Slots 2 and 3 do not modify shared files."
+    "owner": null,
+    "note": "types/canvas.ts is owned by slot 1 only. database.ts is read-only for all slots."
   },
-  "merge_order": ["#FEAT-040 [1/3]", "#IMP-075", "#BUG-030"],
+  "merge_order": ["#FEAT-040 [2/3]", "#IMP-077", "#IMP-078"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Last regression was iteration 112 (3 iterations ago). Cadence floor is every 8th — not due until iteration 120.",
+    "regression_reason": "Last regression was iteration 112 (4 iterations ago, within 8-iteration cadence). Risk score 3 from iter 115 suggests regression next iteration (117). This iteration focuses on building FEAT-040 [2/3] with acceptance testing.",
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },
   "status_updates": {
-    "warnings_added": [],
+    "warnings_added": ["Regression recommended for iteration 117 (risk score 3 from iter 115 data model changes)"],
     "diagnoses_written": false,
     "signal_override": null
   }

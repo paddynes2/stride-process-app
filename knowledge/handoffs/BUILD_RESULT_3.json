@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "iteration": 115,
+  "iteration": 116,
   "slot": 3,
-  "task_id": "#BUG-030",
+  "task_id": "#IMP-078",
   "status": "completed",
   "duration_seconds": 45,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx",
+      "path": "src/app/(app)/workspaces/workspace-list.tsx",
       "action": "modified",
       "lines_added": 1,
       "lines_removed": 1
@@ -17,17 +17,15 @@
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (not in owned files)" },
+    "lint": { "status": "pass", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [
-    "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
-  ],
+  "staged_files": ["src/app/(app)/workspaces/workspace-list.tsx"],
   "ownership_violations": [],
-  "notes": "Replaced toLocaleDateString() with toISOString().slice(0, 10) at line 194. This produces deterministic YYYY-MM-DD output regardless of server/client locale, eliminating the hydration mismatch.",
+  "notes": "Replaced toLocaleDateString() with toISOString().slice(0, 10) on line 100 — the only date display in workspace-list.tsx. TypeScript and ESLint both pass with zero errors.",
 
   "failure_details": null
 }

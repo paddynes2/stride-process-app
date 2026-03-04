@@ -1,15 +1,16 @@
-EXECUTION_PLAN.json written. Here's the summary:
+Execution plan written. Summary:
 
-**Iteration 113 — Multi-task (3 slots)**
+**Iteration 116 — Phase 3b: Tools Canvas + Enhanced Export**
 
-| Slot | Task | Files | Complexity |
-|------|------|-------|------------|
-| 1 | **#BUG-027** (P2) + **#IMP-066** | `gap-analysis-view.tsx` | S |
-| 2 | **#IMP-069** | `stage-node.tsx`, `touchpoint-node.tsx` | S |
-| 3 | **#IMP-071** + **#IMP-068** | `sidebar.tsx`, `improvements-view.tsx` | S |
+| Slot | Task | Type | Complexity | Files |
+|------|------|------|-----------|-------|
+| 1 | **#FEAT-040 [2/3]** Tools canvas React Flow UI | build | L | tools-canvas-view.tsx, page.tsx, tool-node.tsx, tool-section-node.tsx, canvas.ts |
+| 2 | **#IMP-077** Gap analysis disabled state guidance | improve | S | gap-analysis-view.tsx |
+| 3 | **#IMP-078** Workspace card date hydration fix | fix | S | workspace-list.tsx |
 
 **Key decisions:**
-- BUG-028/BUG-029 are **not code bugs** — they're caused by unpushed migrations 019/022. Requires human `npx supabase db push`.
-- Phase 3b (FEAT-040) is the natural next phase but first feature is L-XL complexity. Clearing P2 bugs and improvements first.
-- No regression needed — just ran in iter 112 (27/28 PASS). Risk score 0.
-- All 3 slots have zero file overlap.
+- Slot 1 creates a new `tools-canvas-view.tsx` replacing the flat table with a React Flow canvas, following the exact patterns from `flow-canvas.tsx` and `section-node.tsx`
+- Tool nodes show name + status badge + cost/mo. Tool sections are resizable containers. No edges (this is a landscape canvas, not a flow)
+- Summary sidebar appears when nothing selected (total cost, annual cost, counts by status)
+- Slots 2-3 are small independent fixes in non-overlapping files
+- Regression recommended for iteration 117 (risk score 3 from iter 115 data model changes)

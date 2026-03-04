@@ -1,11 +1,1 @@
-Both tasks implemented and verified:
-
-**IMP-071 (sidebar.tsx):** One-line fix — `.catch(() => {})` → `.catch(() => { if (!cancelled) setImprovementsOpenCount(0); })`. Badge now shows `0` on fetch error instead of blank.
-
-**IMP-068 (improvements-view.tsx):**
-- Added `Check` icon import
-- Added `addedIndices: Set<number>` state
-- Updated `handleAddAsImprovement(suggestion, index)` — on success, adds index to set + clears it after 2 seconds via `setTimeout`
-- Button shows `<Check /> Added ✓` in green while confirmed, reverts to `<Plus /> Add as Improvement` after 2s — matches the Copy button pattern from gap-analysis-view.tsx exactly
-
-**Verification:** TypeScript: ✅ 0 errors | Lint: ✅ 0 errors (1 pre-existing warning in flow-canvas.tsx)
+Done. Single-line fix: replaced `toLocaleDateString()` with `toISOString().slice(0, 10)` at `workspace-list.tsx:100`. TypeScript and ESLint pass clean. File staged.

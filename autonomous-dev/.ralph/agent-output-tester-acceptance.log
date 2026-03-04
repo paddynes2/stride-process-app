@@ -1,22 +1,19 @@
-**TEST_RESULT_1.json written.** Here's the summary:
+TEST_RESULT_1.json written. Summary:
 
-**Status: PASSED** — 10/10 criteria pass across all 3 tasks.
+**Status: FAILED**
 
----
+**What passed:**
+- Tools canvas UI renders correctly: React Flow canvas, Controls, MiniMap, toolbar ("Add Tool" + "Add Tool Section"), summary sidebar (costs + status counts), empty state overlay
+- IMP-077: Gap analysis guidance link ("Open the canvas to set maturity scores →") visible when button is disabled, links to correct first canvas tab
+- IMP-078: Workspace date shows `2026-03-04` (YYYY-MM-DD format, hydration-safe)
 
-**BUG-027** (gap-analysis Generate Summary + countdown):
-- **PASS** (browser) — Button visible and `disabled` with "Score steps to enable AI narrative." when no gap data
-- **PASS** (browser) — No regression; button renders unconditionally
-- **PASS** (code) — `formatCountdown()` + `setInterval(1s)` + "Try again in M:SS" display fully implemented
-- **PASS** (code) — Auto-transitions to idle at countdown ≤ 1
-- **PASS** (code) — Regenerate unreachable during `rate_limited` (conditional block gates on `type === "idle"`)
+**Blocking bug (P1):**
+- **Migration 023 not applied** — `position_x` column missing from `tools` table. `POST /api/v1/tools` returns 500. "Add Tool" is completely broken. This blocks testing 4 acceptance criteria for FEAT-040 [2/3] (tool nodes, tool sections, drag/drop, parent grouping).
 
-**IMP-069** (React.memo wrapping): **PASS** — TypeScript clean, no functional changes, matches step-node/section-node pattern.
+**Pre-existing bugs (not from this iteration):**
+- Radix DropdownMenu ID hydration mismatch on all pages (P2)
+- `/api/v1/improvement-ideas` returns 500 on all workspace pages (P2)
 
-**IMP-071/IMP-068** (sidebar badge + Add as Improvement feedback):
-- **PASS** (code) — `.catch()` sets `improvementsOpenCount(0)` vs old empty catch
-- **PASS** (code) — `addedIndices` Set + 2s setTimeout reset + Check icon matches Copy button pattern
-
-**Pre-existing noise:** 1 console error from `/api/v1/improvement-ideas` 500 (BUG-028 — needs `npx supabase db push`, not a code issue).
-
-**2 improvements logged** (not bugs): Regenerate button hidden vs disabled during rate_limited, and missing error state in AI Suggestions panel.
+**Improvements noted:**
+- Empty state CTA says "Add Group" but toolbar says "Add Tool Section" — inconsistent labels
+- Gap analysis has two separate hint messages that could be consolidated

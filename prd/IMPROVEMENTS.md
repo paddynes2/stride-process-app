@@ -550,7 +550,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Show a small badge or "Last generated N min ago" label near the button when cached suggestions exist.
 
-- [ ] #IMP-077 Gap analysis "Generate Summary" disabled state lacks guidance — Attempts: 0
+- [x] #IMP-077 Gap analysis "Generate Summary" disabled state lacks guidance — DONE iteration 116, 2026-03-04
   - **Found:** Iteration 115 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
@@ -558,13 +558,29 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Add a small link or tooltip near the disabled state: "Open a step on the canvas to set maturity scores" with a link to the canvas tab.
 
-- [ ] #IMP-078 Workspace card date uses locale-dependent toLocaleDateString — Attempts: 0
+- [x] #IMP-078 Workspace card date uses locale-dependent toLocaleDateString — DONE iteration 116, 2026-03-04
   - **Found:** Iteration 115 (acceptance tester)
   - **Category:** Visual consistency
   - **Where:** Workspace list card component (workspace-list.tsx or similar)
   - **What:** Workspace card shows "Created 3/4/2026" using toLocaleDateString() — same locale-dependent pattern that BUG-030 fixed on the ai-analysis page. Causes hydration mismatch.
   - **Design principle:** Consistency and standards
   - **Suggested fix:** Apply same toISOString().slice(0, 10) fix to the workspace creation date display.
+
+- [ ] #IMP-079 Tools canvas empty state "Add Group" vs toolbar "Add Tool Section" label inconsistency — Attempts: 0
+  - **Found:** Iteration 116 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx`
+  - **What:** The empty state overlay uses "Add Group" for the secondary button but the toolbar uses "Add Tool Section". Inconsistent labeling could confuse users about what they're creating.
+  - **Design principle:** Nielsen H4: Consistency and standards
+  - **Suggested fix:** Change the empty state button label from "Add Group" to "Add Tool Section" to match the toolbar.
+
+- [ ] #IMP-080 Gap analysis guidance text consolidation — Attempts: 0
+  - **Found:** Iteration 116 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
+  - **What:** Two separate hint messages exist when no maturity data: "Score steps to enable AI narrative." (inline) and "Open the canvas to set maturity scores →" (link below). Could be consolidated into one sentence.
+  - **Design principle:** Nielsen H6: Recognition rather than recall
+  - **Suggested fix:** Combine into: "Open the canvas to set maturity scores on steps to enable AI narrative →" as a single linked message.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

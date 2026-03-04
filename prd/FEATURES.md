@@ -181,17 +181,17 @@
 ### #FEAT-040 Tools canvas upgrade
 **Phase:** 3b
 **Priority:** P0 (critical path)
-**Attempts:** 1
-**Status:** in_progress (1/3 complete — data layer done iteration 115)
+**Attempts:** 2
+**Status:** in_progress (2/3 complete — data layer + canvas UI done iteration 115-116)
 **Acceptance criteria:**
-- [ ] Upgrade existing tools page to React Flow canvas (reuse canvas infrastructure from process/journey)
+- [x] Upgrade existing tools page to React Flow canvas (reuse canvas infrastructure from process/journey) — DONE iteration 116
 - [x] New `tool_sections` table: id, workspace_id, name, position_x, position_y, width, height — groups tools visually — DONE iteration 115
-- [ ] Tool nodes: card with name, status badge (active=green, considering=yellow, cancelled=gray), cost ($/mo)
-- [ ] Tool section nodes: group containers (like process sections)
-- [ ] Drag tools into/out of tool sections
-- [ ] "Add Tool" and "Add Tool Section" buttons in toolbar
-- [ ] Right sidebar summary when nothing selected: total monthly cost, annual cost, counts by status
-- [ ] Canvas zoom/pan controls (reuse existing)
+- [x] Tool nodes: card with name, status badge (active=green, considering=yellow, cancelled=gray), cost ($/mo) — DONE iteration 116
+- [x] Tool section nodes: group containers (like process sections) — DONE iteration 116
+- [x] Drag tools into/out of tool sections — DONE iteration 116
+- [x] "Add Tool" and "Add Tool Section" buttons in toolbar — DONE iteration 116
+- [x] Right sidebar summary when nothing selected: total monthly cost, annual cost, counts by status — DONE iteration 116
+- [x] Canvas zoom/pan controls (reuse existing) — DONE iteration 116
 **Notes:** Builds on top of Ralph's FEAT-030 tools data model (migration 013). Add position_x, position_y columns to tools table if not already there. Tool sections are new table. The canvas is a single view per workspace (not tab-based).
 
 ### #FEAT-041 Tool detail panel + step-tool assignment

@@ -1933,3 +1933,36 @@ Slot 3 (#IMP-029 — 1 file):
 - Efficiency: 5 — All 3 slots completed, zero re-attempts, no reviewer fixes needed
 - Observations: 2 (IMP-077, IMP-078)
 **Notes:** First Phase 3b iteration. FEAT-040 [1/3] data layer complete — tool_sections table and tools canvas columns ready. IMP-075 and BUG-030 were deferred from iteration 114. Next: FEAT-040 [2/3] React Flow UI for tools canvas.
+
+## Iteration 116 — 2026-03-04 21:00
+**Tasks:**
+- #FEAT-040 [2/3] Tools canvas React Flow UI — slot 1 — completed
+- #IMP-077 Gap analysis disabled state guidance link — slot 2 — completed
+- #IMP-078 Workspace card date hydration fix — slot 3 — completed
+**Source:** prd/FEATURES.md, prd/IMPROVEMENTS.md
+**Mode:** multi_task
+**Result:** completed
+**Changes:**
+- Created: src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx (521 lines — full React Flow canvas view)
+- Created: src/components/canvas/tool-node.tsx (55 lines — tool card node with status badge + cost)
+- Created: src/components/canvas/tool-section-node.tsx (59 lines — resizable container node with NodeResizer)
+- Modified: src/app/(app)/w/[workspaceId]/tools/page.tsx (+12/-8 — ToolsView→ToolsCanvasView, fetch tool_sections)
+- Modified: src/types/canvas.ts (+14/-1 — ToolNodeData, ToolSectionNodeData, ToolNode, ToolSectionNode types)
+- Modified: src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx (+16/-6 — Link + useWorkspace, guidance link below disabled button)
+- Modified: src/app/(app)/workspaces/workspace-list.tsx (+1/-1 — toISOString date fix)
+**Verification:**
+- Type check: pass (all slots + post-merge tsc --noEmit)
+- Lint: pass (1 pre-existing warning in flow-canvas.tsx)
+- Build: N/A (typecheck + lint sufficient)
+- Unit tests: N/A (no test suite exists)
+- Browser test: pass (acceptance — canvas renders, controls visible, summary sidebar works, empty state shows, guidance link present, date format correct)
+- Canary test: skipped (acceptance tester covered UI verification)
+**Bugs found:** 1 — P1: migration 023 not applied to local Supabase, tools CRUD returns 500 (environment issue, not code)
+**Improvements found:** 2 (IMP-079 empty state label inconsistency, IMP-080 gap analysis guidance text consolidation)
+**Self-score:**
+- Code quality: 5 — Follows existing canvas patterns exactly (nodeTypes memo, buildNodes, useNodesState, handleNodesChange position persistence, Panel toolbar, Controls/MiniMap/Background). Null guards present. Type-safe node data.
+- Test coverage: 3 — Acceptance verified UI rendering and structure but CRUD untestable without migration push. Gap analysis and workspace list changes fully verified.
+- Confidence: 4 — Canvas UI is correct and well-structured but CRUD path unverified in browser due to migration dependency.
+- Efficiency: 5 — All 3 slots completed, zero merge failures, no reviewer fixes needed
+- Observations: 2 (IMP-079, IMP-080)
+**Notes:** FEAT-040 [2/3] complete. Tools page now shows React Flow canvas with tool nodes, section containers, toolbar, summary sidebar. CRUD blocked on migration push (environment issue). Next: FEAT-040 [3/3] detail panel + integration polish.

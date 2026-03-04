@@ -1,23 +1,23 @@
 {
   "schema_version": "1.0",
-  "iteration": 61,
+  "iteration": 116,
   "slot": 2,
-  "task_id": "#IMP-075",
+  "task_id": "#IMP-077",
   "status": "completed",
-  "duration_seconds": 90,
+  "duration_seconds": 120,
 
   "files_changed": [
     {
       "path": "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
       "action": "modified",
-      "lines_added": 3,
-      "lines_removed": 2
+      "lines_added": 16,
+      "lines_removed": 6
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (known/acceptable)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
@@ -27,7 +27,7 @@
     "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Replaced 'to your environment variables and redeploy.' with SaaS-appropriate wording matching IMP-064's fix in ai-analysis-view.tsx. The not_configured block now reads: 'AI features require configuration. Contact your workspace administrator to enable AI analysis, or if you manage your own deployment, add OPENROUTER_API_KEY to your environment variables.'",
+  "notes": "Added Link import from next/link and useWorkspace import. Added firstProcessTab derivation (first tab with canvas_type==='process', fallback to tabs[0]). Added guidance link 'Open the canvas to set maturity scores \u2192' below the disabled Generate Summary button, shown only when !hasGapData && firstProcessTab. Wrapped the idle/null block in a React fragment to accommodate both the existing div and the new hint paragraph.",
 
   "failure_details": null
 }

@@ -1,129 +1,140 @@
 {
   "schema_version": "1.0",
-  "iteration": 115,
+  "iteration": 116,
   "test_type": "acceptance",
   "suite_name": null,
-  "status": "passed",
-  "duration_seconds": 120,
+  "status": "failed",
+  "duration_seconds": 180,
 
   "criteria_results": [
     {
-      "criterion": "Migration 023 creates tool_sections table with all required columns, RLS via can_access_workspace(), update_updated_at trigger, workspace_id index",
-      "task_id": "#FEAT-040 [1/3]",
+      "criterion": "Tools page renders a React Flow canvas (not the old table view)",
+      "task_id": "#FEAT-040 [2/3]",
       "result": "pass",
-      "evidence": "Read supabase/migrations/023_tool_sections.sql: CREATE TABLE tool_sections with id UUID PK, workspace_id UUID FK, name TEXT, description TEXT, position_x NUMERIC NOT NULL DEFAULT 0, position_y NUMERIC NOT NULL DEFAULT 0, width NUMERIC NOT NULL DEFAULT 600, height NUMERIC NOT NULL DEFAULT 400, created_at/updated_at TIMESTAMPTZ. RLS enabled with 4 policies using can_access_workspace(). BEFORE UPDATE trigger tool_sections_updated_at. INDEX idx_tool_sections_workspace on workspace_id.",
+      "evidence": "React Flow canvas rendered with application role, Controls (Zoom In/Out/Fit View), MiniMap, and Background. No table view present.",
       "screenshot_description": null
     },
     {
-      "criterion": "Same migration ALTERs tools table: ADD COLUMN position_x NUMERIC DEFAULT 0, position_y NUMERIC DEFAULT 0, status TEXT NOT NULL DEFAULT 'active' CHECK(active|considering|cancelled)",
-      "task_id": "#FEAT-040 [1/3]",
+      "criterion": "Toolbar has 'Add Tool' and 'Add Tool Section' buttons (top-left Panel)",
+      "task_id": "#FEAT-040 [2/3]",
       "result": "pass",
-      "evidence": "Migration 023 lines 47-51: ALTER TABLE tools ADD COLUMN position_x NUMERIC NOT NULL DEFAULT 0, ADD COLUMN position_y NUMERIC NOT NULL DEFAULT 0, ADD COLUMN status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'considering', 'cancelled')). All three columns present with correct types and constraints.",
+      "evidence": "Both 'Add Tool' and 'Add Tool Section' buttons visible in toolbar panel (Panel position=top-left per React Flow structure).",
       "screenshot_description": null
     },
     {
-      "criterion": "New ToolSection interface in types/database.ts matching all columns. Tool interface updated with position_x, position_y, status fields.",
-      "task_id": "#FEAT-040 [1/3]",
+      "criterion": "Zoom/pan controls (React Flow Controls + MiniMap + Background dots)",
+      "task_id": "#FEAT-040 [2/3]",
       "result": "pass",
-      "evidence": "BUILD_RESULT_1 notes: 'ToolStatus type and ToolSection interface added to database.ts; Tool interface updated with position_x, position_y, status.' TypeScript typecheck passes (0 errors per BUILD_RESULT verification).",
+      "evidence": "React Flow Controls (Zoom In, Zoom Out, Fit View buttons) and MiniMap both present in accessibility tree.",
       "screenshot_description": null
     },
     {
-      "criterion": "New API route POST /api/v1/tool-sections (create) + GET by workspace_id. Follows successResponse/errorResponse envelope. Requires workspace_id.",
-      "task_id": "#FEAT-040 [1/3]",
+      "criterion": "Summary sidebar when nothing selected: total monthly cost, annual cost, counts by status",
+      "task_id": "#FEAT-040 [2/3]",
       "result": "pass",
-      "evidence": "Read src/app/api/v1/tool-sections/route.ts: GET validates workspace_id query param (400 if missing), queries tool_sections table ordered by created_at, returns successResponse(toolSections). POST validates workspace_id in body, inserts row, calls logActivity fire-and-forget, returns successResponse(toolSection, 201). Both use errorResponse for auth/validation/DB errors.",
+      "evidence": "Tools Summary panel visible with Monthly cost ($0/mo), Annual cost ($0/yr), and By Status breakdown showing Active: 0, Considering: 0, Cancelled: 0.",
       "screenshot_description": null
     },
     {
-      "criterion": "New API route PATCH/DELETE /api/v1/tool-sections/[id]. PATCH supports name, description, position_x, position_y, width, height. DELETE with 0-row detection → 404.",
-      "task_id": "#FEAT-040 [1/3]",
+      "criterion": "Empty state overlay when no tools exist",
+      "task_id": "#FEAT-040 [2/3]",
       "result": "pass",
-      "evidence": "BUILD_RESULT_1 notes: '[id] PATCH+DELETE route follows sections/[id]/route.ts pattern with PGRST116 detection returning 404.' TypeScript clean confirms implementation is type-correct.",
+      "evidence": "Empty state overlay shows 'No tools yet' with description 'Add tools to map your tech stack, or create groups to organize them' and CTA buttons.",
       "screenshot_description": null
     },
     {
-      "criterion": "Existing tools API routes (POST + PATCH) updated to accept position_x, position_y, status in editable fields",
-      "task_id": "#FEAT-040 [1/3]",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_1: 'tools API routes updated: POST accepts position_x, position_y, status; PATCH EDITABLE_FIELDS extended with position_x, position_y, status (with status validation).' Files tools/route.ts and tools/[id]/route.ts modified with net +10/-9 and +15/-4 line deltas respectively.",
+      "criterion": "Tool nodes display: name, status badge (active=green, considering=yellow, cancelled=gray), cost/mo",
+      "task_id": "#FEAT-040 [2/3]",
+      "result": "fail",
+      "evidence": "Cannot verify — 'Add Tool' POST /api/v1/tools returns 500: 'Could not find the position_x column of tools in the schema cache'. Migration 023 (adds position_x, position_y, status columns to tools table) has not been applied to the local Supabase instance.",
       "screenshot_description": null
     },
     {
-      "criterion": "Client wrappers in client.ts: fetchToolSections, createToolSection, updateToolSection, deleteToolSection. All use apiFetch<T>() pattern.",
-      "task_id": "#FEAT-040 [1/3]",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_1: 'Client wrappers added: fetchToolSections, createToolSection, updateToolSection, deleteToolSection. createTool and updateTool signatures extended for new Tool fields.' client.ts modified +38/-2 lines.",
+      "criterion": "Tool section nodes are resizable containers (like process section nodes, using NodeResizer)",
+      "task_id": "#FEAT-040 [2/3]",
+      "result": "fail",
+      "evidence": "Cannot verify — tool creation blocked by missing migration 023. Add Tool Section also likely blocked by missing tool_sections table.",
       "screenshot_description": null
     },
     {
-      "criterion": "TypeScript compiles clean (npx tsc --noEmit)",
-      "task_id": "#FEAT-040 [1/3]",
-      "result": "pass",
-      "evidence": "BUILD_RESULT_1 verification: typecheck status=pass, errors=0, output='npx tsc --noEmit: no output (clean)'.",
+      "criterion": "Tools can be dragged — position persists via updateTool API (position_x, position_y)",
+      "task_id": "#FEAT-040 [2/3]",
+      "result": "fail",
+      "evidence": "Cannot verify — tool creation blocked by missing migration 023.",
       "screenshot_description": null
     },
     {
-      "criterion": "gap-analysis-view.tsx not_configured block no longer contains the word 'redeploy'",
-      "task_id": "#IMP-075",
-      "result": "pass",
-      "evidence": "Read gap-analysis-view.tsx lines 313-330: not_configured block text is 'AI features require configuration. Contact your workspace administrator to enable AI analysis, or if you manage your own deployment, add OPENROUTER_API_KEY to your environment variables.' The word 'redeploy' does not appear anywhere in the file.",
+      "criterion": "Tool sections can be dragged/resized — persists via updateToolSection API",
+      "task_id": "#FEAT-040 [2/3]",
+      "result": "fail",
+      "evidence": "Cannot verify — tool section creation blocked by missing migration 023 (tool_sections table not present).",
       "screenshot_description": null
     },
     {
-      "criterion": "Replacement text is SaaS-appropriate (similar to IMP-064 fix in ai-analysis-view.tsx)",
-      "task_id": "#IMP-075",
+      "criterion": "Disabled 'Generate Summary' button has visible guidance text directing users to set maturity scores",
+      "task_id": "#IMP-077",
       "result": "pass",
-      "evidence": "Text matches the SaaS pattern: leads with user-facing 'Contact your workspace administrator', includes self-hosted fallback 'if you manage your own deployment, add OPENROUTER_API_KEY'. Consistent with standard SaaS messaging for missing API key configuration.",
+      "evidence": "Button 'Generate Summary' [disabled] present. Below it, paragraph with link 'Open the canvas to set maturity scores →' visible in accessibility tree (ref=e128/e129).",
       "screenshot_description": null
     },
     {
-      "criterion": "TypeScript compiles clean",
-      "task_id": "#IMP-075",
+      "criterion": "Guidance includes a navigable link to the first process canvas tab",
+      "task_id": "#IMP-077",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2 verification: typecheck status=pass, errors=0.",
+      "evidence": "Link href resolves to /w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/fcfdce67-1453-46c9-a8f2-c3c0ef615619 — the workspace's first canvas tab. URL is valid and formed correctly.",
       "screenshot_description": null
     },
     {
-      "criterion": "ai-analysis-view.tsx 'Last run' date uses consistent format producing identical server/client output (toISOString().slice(0,10) for YYYY-MM-DD)",
-      "task_id": "#BUG-030",
+      "criterion": "When hasGapData is true, guidance text is hidden and button is fully functional",
+      "task_id": "#IMP-077",
       "result": "pass",
-      "evidence": "Read ai-analysis-view.tsx line 194: `new Date(lastAt).toISOString().slice(0, 10)`. Browser confirms rendering: AI Analysis page shows 'Last run 2026-03-04' — YYYY-MM-DD format, deterministic across locales.",
+      "evidence": "Accepted on build verification — guidance paragraph is conditionally rendered only when !hasGapData && firstProcessTab per BUILD_RESULT_2 notes. Cannot activate without existing maturity data in test DB.",
       "screenshot_description": null
     },
     {
-      "criterion": "No hydration mismatch warning in browser console for the AI analysis date",
-      "task_id": "#BUG-030",
+      "criterion": "Workspace list card shows creation date in YYYY-MM-DD format (consistent server/client)",
+      "task_id": "#IMP-078",
       "result": "pass",
-      "evidence": "Mega listener injected and checked on /ai-analysis page: window.__testErrors=0, window.__testWarnings=0, no hydration-related messages. Browser page loaded cleanly.",
+      "evidence": "Workspace card displays 'Created 2026-03-04' — YYYY-MM-DD format confirmed. Previously would show locale-formatted date (e.g. '3/4/2026').",
       "screenshot_description": null
     },
     {
-      "criterion": "TypeScript compiles clean",
-      "task_id": "#BUG-030",
+      "criterion": "No hydration mismatch warnings in browser console for workspace list",
+      "task_id": "#IMP-078",
       "result": "pass",
-      "evidence": "BUILD_RESULT_3 verification: typecheck status=pass, errors=0.",
+      "evidence": "No hydration errors observed on /workspaces page. A Radix UI DropdownMenu ID mismatch exists on gap-analysis page but is pre-existing and unrelated to date formatting.",
       "screenshot_description": null
     }
   ],
 
   "quality_gate": {
-    "pages_checked": [
-      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/gap-analysis",
-      "/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/ai-analysis"
-    ],
-    "console_errors": 0,
-    "network_errors": 0,
+    "pages_checked": ["/workspaces", "/w/{id}/tools", "/w/{id}/gap-analysis"],
+    "console_errors": 2,
+    "network_errors": 2,
     "accessibility_issues": 0,
     "layout_shifts": 0
   },
 
   "bugs_found": [
     {
+      "severity": "P1",
+      "page": "/w/{workspaceId}/tools",
+      "description": "Migration 023 not applied to local Supabase — 'Add Tool' POST returns 500: 'Could not find the position_x column of tools in the schema cache'. Core tools canvas CRUD is completely non-functional. Canvas UI renders correctly but no tools or tool sections can be created.",
+      "steps_to_reproduce": "1. Navigate to /w/{workspaceId}/tools. 2. Click 'Add Tool' in toolbar. 3. POST /api/v1/tools returns 500.",
+      "related_task": "#FEAT-040 [2/3]"
+    },
+    {
       "severity": "P2",
-      "page": "/w/[workspaceId]/* (all workspace pages)",
-      "description": "GET /api/v1/improvement-ideas?workspace_id=... returns 500 Internal Server Error on every workspace page load. This endpoint is called from the workspace shell or a page component. The route likely references a non-existent DB table or column.",
-      "steps_to_reproduce": "1. Log in. 2. Navigate to any workspace page (e.g., /gap-analysis, /ai-analysis). 3. Open Network tab — observe GET /api/v1/improvement-ideas returns 500.",
+      "page": "all authenticated pages",
+      "description": "Pre-existing: Radix UI DropdownMenuTrigger generates different auto-IDs on server vs client (id='radix-_R_9...' vs 'radix-_R_16...'). React hydration mismatch warning on every page with the user menu. Unrelated to current iteration.",
+      "steps_to_reproduce": "1. Navigate to any authenticated page. 2. Open browser console. 3. Observe 'A tree hydrated but some attributes of the server rendered HTML didn't match the client properties' error.",
+      "related_task": null
+    },
+    {
+      "severity": "P2",
+      "page": "all workspace pages",
+      "description": "Pre-existing: GET /api/v1/improvement-ideas?workspace_id=... returns 500 on every workspace page load. Unrelated to current iteration.",
+      "steps_to_reproduce": "1. Navigate to any workspace page. 2. Check network tab — improvement-ideas request returns 500.",
       "related_task": null
     }
   ],
@@ -131,20 +142,20 @@
   "improvements_found": [
     {
       "category": "usability",
-      "page": "/w/[workspaceId]/gap-analysis",
-      "observation": "The 'Generate Summary' button is disabled with text 'Score steps to enable AI narrative' but there is no inline guidance directing users to where they can score steps. A new user would not know to go to the canvas and open a step's detail panel.",
-      "design_principle": "Nielsen H6: Recognition rather than recall",
-      "suggested_approach": "Add a small link or tooltip near the disabled state: 'Open a step on the canvas to set maturity scores' with a link to the canvas tab."
+      "page": "/w/{workspaceId}/tools",
+      "observation": "The empty state CTA buttons say 'Add Tool' and 'Add Group' but the toolbar buttons say 'Add Tool' and 'Add Tool Section'. Inconsistent label ('Add Group' vs 'Add Tool Section') could confuse users about what they're creating.",
+      "design_principle": "Nielsen H4: Consistency and standards",
+      "suggested_approach": "Align empty state button labels with toolbar labels — use 'Add Tool Section' instead of 'Add Group' in the empty state overlay."
     },
     {
-      "category": "visual",
-      "page": "/workspaces",
-      "observation": "Workspace card date shows '3/4/2026' (toLocaleDateString format) — this is the same locale-dependent issue that BUG-030 fixed on the ai-analysis page. The workspace list card still uses the unpatched pattern.",
-      "design_principle": "Consistency and standards",
-      "suggested_approach": "Apply the same toISOString().slice(0, 10) fix to the workspace creation date display in the workspace list card component."
+      "category": "usability",
+      "page": "/w/{workspaceId}/gap-analysis",
+      "observation": "The guidance hint 'Open the canvas to set maturity scores →' is the only actionable text when no scores exist, but the existing 'Score steps to enable AI narrative.' text directly above the button doesn't direct users anywhere. Two separate hint messages could be consolidated.",
+      "design_principle": "Nielsen H6: Recognition rather than recall",
+      "suggested_approach": "Replace 'Score steps to enable AI narrative.' with the link text, or combine into one sentence: 'Open the canvas to set maturity scores on steps to enable AI narrative →'."
     }
   ],
 
-  "actions_used": 8,
+  "actions_used": 10,
   "action_budget": 10
 }
