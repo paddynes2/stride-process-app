@@ -1,31 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 136,
+  "iteration": 137,
   "slot": 2,
-  "task_id": "#IMP-102",
+  "task_id": "#IMP-076",
   "status": "completed",
-  "duration_seconds": 180,
+  "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/components/panels/tool-detail-panel.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx",
       "action": "modified",
-      "lines_added": 28,
-      "lines_removed": 5
+      "lines_added": 17,
+      "lines_removed": 1
     }
   ],
 
   "verification": {
-    "typecheck": { "status": "pass", "errors": 0, "output": "npx tsc --noEmit exited 0" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated), 0 errors" },
+    "typecheck": { "status": "pass", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": ["src/components/panels/tool-detail-panel.tsx"],
+  "staged_files": [
+    "src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"
+  ],
   "ownership_violations": [],
-  "notes": "Used useWorkspace() context to get workspace.id — avoids adding prop to tools-canvas-view.tsx (outside ownership). Fetches all steps via /api/v1/steps?workspace_id= on workspace mount to build stepId→tabId map. Step names in Step Usage section now render as clickable buttons matching tool-analysis-view.tsx pattern (text-[var(--accent-blue)] hover:underline cursor-pointer). Falls back to plain text span if tab_id not yet loaded.",
+  "notes": "Added formatTimeAgo helper, lastGeneratedAt state (initialized from localStorage on mount), localStorage write on successful suggestion fetch, and 'Last generated X ago' label rendered to the left of the AI Suggestions button. Label hidden during loading. LocalStorage key: stride:ai-suggestions:{workspaceId}:generated-at.",
 
   "failure_details": null
 }

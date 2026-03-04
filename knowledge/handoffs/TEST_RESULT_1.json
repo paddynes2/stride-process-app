@@ -1,82 +1,103 @@
 {
   "schema_version": "1.0",
-  "iteration": 136,
+  "iteration": 137,
   "test_type": "acceptance",
   "suite_name": null,
   "status": "passed",
-  "duration_seconds": 95,
+  "duration_seconds": 180,
 
   "criteria_results": [
     {
-      "criterion": "All 10 handler functions wrapped in React.useCallback",
-      "task_id": "#IMP-034",
+      "criterion": "When a tool has 0 linked steps, the Step Usage section shows a muted hint message instead of being empty",
+      "task_id": "#IMP-117",
       "result": "pass",
-      "evidence": "BUILD_RESULT_1.json confirms 10 lines added / 10 lines removed in canvas-view.tsx. Canvas loads with 1 section and 1 step visible in summary panel. Fit View button responds correctly. TypeScript passed (0 errors). No behavioral regression observed.",
+      "evidence": "Paragraph element found in Step Usage section with text 'No steps linked yet. Open a step on the canvas and assign this tool.' after creating a new tool with no linked steps.",
       "screenshot_description": null
     },
     {
-      "criterion": "Dependency arrays correct — setState stable, state values read inside closures are deps",
-      "task_id": "#IMP-034",
+      "criterion": "Hint text: 'No steps linked yet. Open a step on the canvas and assign this tool.' (or similar)",
+      "task_id": "#IMP-117",
       "result": "pass",
-      "evidence": "Builder notes confirm: handleStepDelete uses [selectedStepId], handleSectionDelete uses [selectedSectionId], remaining 8 handlers use [] with functional update callbacks. Canvas interactive with no errors.",
+      "evidence": "Exact text confirmed: 'No steps linked yet. Open a step on the canvas and assign this tool.'",
       "screenshot_description": null
     },
     {
-      "criterion": "No behavioral regression — handlers still update state correctly",
-      "task_id": "#IMP-034",
+      "criterion": "Hint uses text-white/30 or text-white/55 styling consistent with other empty states in the codebase",
+      "task_id": "#IMP-117",
       "result": "pass",
-      "evidence": "Canvas at /w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/fcfdce67-1453-46c9-a8f2-c3c0ef615619 loaded with 1 section / 1 step. Workspace summary panel reflects state. Fit View button activated and canvas responded. No network errors.",
+      "evidence": "Element className='text-[12px] text-white/30 italic', computed color=oklab(0.999994 ... / 0.3), fontStyle=italic. Matches text-white/30 requirement.",
       "screenshot_description": null
     },
     {
-      "criterion": "Step names in Step Usage section of tool-detail-panel.tsx are clickable",
-      "task_id": "#IMP-102",
+      "criterion": "When steps ARE linked, the existing clickable step list renders as before (no regression)",
+      "task_id": "#IMP-117",
       "result": "pass",
-      "evidence": "Source code verified: line 292-295 renders a <button> with onClick={() => router.push(`/w/${workspace.id}/${tabId}`)} when tabId is resolved. Falls back to <span> if tabId unavailable.",
+      "evidence": "Build diff shows only 1 line changed (replacing old empty-state text with new). Static analysis confirms existing step list render path unchanged. No regression path touched.",
       "screenshot_description": null
     },
     {
-      "criterion": "Clicking step name navigates to canvas tab; cursor pointer, styled as link (blue/underline)",
-      "task_id": "#IMP-102",
+      "criterion": "When AI suggestions have been previously generated, a 'Last generated X ago' or timestamp label appears near the AI Suggestions button",
+      "task_id": "#IMP-076",
       "result": "pass",
-      "evidence": "Source grep confirmed: className includes 'text-[var(--accent-blue)] hover:underline text-left cursor-pointer' at line 295. router.push target is /w/{workspaceId}/{tabId}. Matches tool-analysis-view.tsx pattern as required.",
+      "evidence": "Set localStorage key 'stride:ai-suggestions:c8f6619d-bdd8-4134-b7aa-3a70bcf599ea:generated-at' to 2h ago, reloaded page. Label 'Last generated 2h ago' appeared as a span (ref=e108) to the left of the AI Suggestions button. className='text-[11px] text-white/30'.",
       "screenshot_description": null
     },
     {
-      "criterion": "TypeScript compiles cleanly (#IMP-102)",
-      "task_id": "#IMP-102",
+      "criterion": "When no suggestions have been generated yet, no label is shown",
+      "task_id": "#IMP-076",
       "result": "pass",
-      "evidence": "BUILD_RESULT_2.json: typecheck status=pass, errors=0, npx tsc --noEmit exited 0.",
+      "evidence": "On initial page load with no localStorage value, the AI Suggestions button parent container showed only 'AI Suggestions' text with no sibling label element.",
       "screenshot_description": null
     },
     {
-      "criterion": "When hasSteps is false, Regenerate button shows tooltip: 'Add steps to the canvas before running AI analysis'",
-      "task_id": "#IMP-114",
+      "criterion": "Label uses muted text styling (text-white/30 or text-white/55)",
+      "task_id": "#IMP-076",
       "result": "pass",
-      "evidence": "Source at ai-analysis-view.tsx:201 confirmed: title={!hasSteps ? \"Add steps to the canvas before running AI analysis\" : undefined}. When workspace has steps, title=null (verified via browser evaluate: button.getAttribute('title') === null). Button enabled when steps exist — consistent with conditional.",
+      "evidence": "Label element className='text-[11px] text-white/30', computed color=oklab(0.999994 ... / 0.3).",
       "screenshot_description": null
     },
     {
-      "criterion": "Button remains disabled with cursor-not-allowed styling when !hasSteps",
-      "task_id": "#IMP-114",
+      "criterion": "Existing AI Suggestions button functionality unchanged",
+      "task_id": "#IMP-076",
       "result": "pass",
-      "evidence": "Source at ai-analysis-view.tsx:200,204-205 confirmed: disabled={isLoading || !hasSteps || ...} and className applies cursor-not-allowed when !hasSteps. Button was enabled in test (workspace has steps) — correct conditional behavior.",
+      "evidence": "Button ref=e109 with text 'AI Suggestions' present and clickable. Build diff confirms button markup unchanged; only a label span and state management were added.",
       "screenshot_description": null
     },
     {
-      "criterion": "TypeScript compiles cleanly (#IMP-114)",
-      "task_id": "#IMP-114",
+      "criterion": "When no maturity data exists, a single consolidated hint message appears instead of two separate messages",
+      "task_id": "#IMP-080",
       "result": "pass",
-      "evidence": "BUILD_RESULT_3.json: typecheck status=pass, errors=0.",
+      "evidence": "Page shows one paragraph: 'Open the canvas to set maturity scores on steps to enable gap analysis and AI narrative →'. The two original separate messages are gone. Second paragraph ('Set both current and target maturity on steps to see gap analysis') belongs to the table empty state — a different section.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "The consolidated message includes a link to the canvas (preserving the existing navigation)",
+      "task_id": "#IMP-080",
+      "result": "pass",
+      "evidence": "Link href='/w/c8f6619d-bdd8-4134-b7aa-3a70bcf599ea/fcfdce67-1453-46c9-a8f2-c3c0ef615619' (workflow canvas tab). Link text: 'Open the canvas to set maturity scores on steps'.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "When maturity data exists, the gap analysis table and AI narrative render normally (no regression)",
+      "task_id": "#IMP-080",
+      "result": "pass",
+      "evidence": "Build diff shows the change is inside a conditional block (hasGapData=false branch). The hasGapData=true path and generate-summary text are explicitly noted as unchanged in BUILD_RESULT_3.json notes.",
+      "screenshot_description": null
+    },
+    {
+      "criterion": "Text styling consistent with existing gap analysis page",
+      "task_id": "#IMP-080",
+      "result": "pass",
+      "evidence": "Link color=rgb(59, 130, 246) which is --accent-blue (#3B82F6) from the design system. Consistent with existing link patterns.",
       "screenshot_description": null
     }
   ],
 
   "quality_gate": {
     "pages_checked": [
-      "/w/[id]/tools",
-      "/w/[id]/ai-analysis",
-      "/w/[id]/[tabId] (canvas)"
+      "/w/[workspaceId]/tools",
+      "/w/[workspaceId]/improvements",
+      "/w/[workspaceId]/gap-analysis"
     ],
     "console_errors": 1,
     "network_errors": 0,
@@ -84,15 +105,23 @@
     "layout_shifts": 0
   },
 
-  "bugs_found": [],
+  "bugs_found": [
+    {
+      "severity": "P2",
+      "page": "/w/[workspaceId]/improvements",
+      "description": "Hydration mismatch on Improvements page when localStorage contains a 'last generated' timestamp. React reports server rendered HTML (no label) doesn't match client (span label). Root cause: lastGeneratedAt state is initialized using a typeof window check or similar pattern that causes the client's first render to differ from the server's. React recovers by re-generating the tree client-side, so the page functions correctly, but the error appears in console and causes a flash.",
+      "steps_to_reproduce": "1. Set localStorage key 'stride:ai-suggestions:[workspaceId]:generated-at' to any ISO timestamp. 2. Navigate to /w/[workspaceId]/improvements. 3. Observe console error: 'Hydration failed because the server rendered HTML didn't match the client... <span className=\"text-[11px] text-white/30\"> vs <button ...>'.",
+      "related_task": "#IMP-076"
+    }
+  ],
 
   "improvements_found": [
     {
       "category": "usability",
-      "page": "/w/[id]/tools",
-      "observation": "#IMP-102 clickable step links could not be fully exercised in the browser because the test workspace has no tools with linked steps. The feature relies on step-tool associations being present. An empty Tools canvas is the default state for new workspaces, so most users won't see the Step Usage section until they actively link steps.",
-      "design_principle": "Nielsen H6: Recognition over recall — the feature only becomes discoverable after creating and linking data.",
-      "suggested_approach": "Consider adding an empty-state hint in the Step Usage section of tool-detail-panel when a tool has no linked steps (e.g., 'No steps linked yet. Open a step on the canvas and assign this tool.')."
+      "page": "/w/[workspaceId]/improvements",
+      "observation": "The 'Last generated X ago' label has no tooltip showing the exact datetime. For timestamps like '2h ago', users cannot determine if it was generated today or yesterday without a precise timestamp on hover.",
+      "design_principle": "Nielsen H1: Visibility of system status",
+      "suggested_approach": "Add a title attribute or Tooltip component to the label showing the full ISO datetime formatted in user locale."
     }
   ],
 

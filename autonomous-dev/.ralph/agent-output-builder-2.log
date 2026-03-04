@@ -1,17 +1,13 @@
-Build complete. Here's what was done:
+Done. Here's a summary of what was implemented for `#IMP-076`:
 
-**`src/lib/export/enhanced-pdf-sections.ts`** — Added 4 new render functions:
-- `renderPrioritizationMatrix` — steps with `effort_score`/`impact_score`, classified into quadrants (Quick Win / Major Project / Fill In / Thankless Task), sorted by quadrant priority
-- `renderToolLandscape` — tools grouped by status (active/considering/cancelled), monthly cost summary cards, sorted by status then name
-- `renderImprovements` — improvement ideas sorted by priority (critical→low) then status, with colored status/priority dots
-- `renderAIInsights` — 4 AI insight categories (bottlenecks, redundancies, automation candidates, maturity recommendations) in a flat table with severity dots
+**Changes to `improvements-view.tsx`:**
 
-All follow the exact style of existing render functions: landscape A4, dark background, `drawTableHeader`, `newTablePage` overflow, alternating row shading.
+1. **`formatTimeAgo` helper** — converts an ISO timestamp to "just now / Xm ago / Xh ago / Xd ago"
 
-**`src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`** — Wired all 4 into `handleEnhancedExportPdf` with lazy fetching:
-- `prioritizationMatrix` → uses existing `steps`/`sections` state (no fetch needed)
-- `toolLandscape` → `fetchTools(workspaceId)` 
-- `improvements` → `fetchImprovementIdeas(workspaceId)`
-- `aiInsights` → `workspace.settings.last_analysis` cast as `AIAnalysisResult`
+2. **`lastGeneratedAt` state** — initialized from `localStorage.getItem('stride:ai-suggestions:{workspaceId}:generated-at')` on mount (with SSR guard)
 
-TypeScript: ✅ clean. Lint: ✅ 0 errors (1 pre-existing warning in flow-canvas.tsx unchanged).
+3. **Timestamp write on success** — `handleGenerateSuggestions` now saves `new Date().toISOString()` to localStorage and updates the state when suggestions load
+
+4. **Label in header** — wraps the AI Suggestions button in a flex row; when `lastGeneratedAt` is set and not currently loading, shows `"Last generated Xm ago"` in `text-[11px] text-white/30` — matches the muted styling requirement
+
+Verification: typecheck passes (0 errors), lint passes (0 errors, 1 pre-existing warning unrelated to this file).

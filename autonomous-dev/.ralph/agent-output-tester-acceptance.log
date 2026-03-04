@@ -1,15 +1,14 @@
-**TEST_RESULT_1.json written. Summary:**
+**TEST_RESULT_1.json written.** Summary:
 
-**Status: PASSED** — all 15 acceptance criteria pass across 3 tasks.
+**Status: `passed`** (all 12 acceptance criteria met)
 
-**Key findings:**
+| Task | Result | Notes |
+|------|--------|-------|
+| #IMP-117 | ✅ Pass | Empty state text correct, `text-white/30 italic` styling confirmed |
+| #IMP-076 | ✅ Pass | Label shows/hides correctly from localStorage; `text-white/30` styling confirmed |
+| #IMP-080 | ✅ Pass | Single linked message, accent-blue link, no console errors |
 
-| Criterion | Result |
-|---|---|
-| #BUG-040: executiveSummary/journeyMap/journeySentiment/perspectiveComparison enabled | ✅ Pass |
-| #BUG-040: IMP-096 Executive Summary preset (canvasSnapshot+gapAnalysis+executiveSummary only) | ✅ Pass |
-| #BUG-040: IMP-095 checkbox toggle deactivates preset indicator | ✅ Pass |
-| #FEAT-043: 4 render functions built + wired (TypeScript clean) | ✅ Pass (static) |
-| #IMP-045: aria-labels on both color picker + hex inputs | ✅ Pass (static) |
+**Bug found (P2):**
+- `/improvements` — hydration mismatch when localStorage has a timestamp. The `lastGeneratedAt` state appears to be initialized client-side using a `typeof window` guard, causing the server-rendered tree (no span) to differ from the client's first render (with span). React recovers automatically but logs a console error.
 
-**One improvement logged:** `coming soon` sections render as checked+disabled, which is visually misleading — they appear included but are actually excluded. Suggest rendering them as unchecked+disabled.
+**Improvement noted:** The "Last generated X ago" label has no tooltip showing the exact timestamp.

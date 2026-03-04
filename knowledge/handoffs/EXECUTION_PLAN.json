@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "iteration": 136,
-  "date": "2026-03-06T01:00:00Z",
+  "iteration": 137,
+  "date": "2026-03-06T03:00:00Z",
   "mode": "multi_task",
   "validation": {
-    "last_commit_hash": "c12022783a476849f5b010cca106bd3d106ee021",
+    "last_commit_hash": "2218fea415b0845601b5ff30b852e1212a407578",
     "last_commit_valid": true,
     "compilation_status": "passing",
     "revert_needed": false,
@@ -13,109 +13,99 @@
   "tasks": [
     {
       "slot": 1,
-      "id": "#IMP-034",
-      "description": "Wrap 10 canvas-view.tsx handler functions in React.useCallback to prevent unnecessary FlowCanvas re-renders",
+      "id": "#IMP-117",
+      "description": "Add empty-state hint in tool-detail-panel.tsx Step Usage section when a tool has no linked steps. Show message like 'No steps linked yet. Open a step on the canvas and assign this tool.'",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
-      "complexity": "M",
-      "attempts": 1,
-      "risk_score": 2,
-      "acceptance_criteria": [
-        "All 10 handler functions (handleStepSelect, handleSectionSelect, handleStepUpdate, handleStepCreate, handleStepDelete, handleSectionCreate, handleSectionUpdate, handleSectionDelete, handleConnectionCreate, handleConnectionDelete) wrapped in React.useCallback",
-        "Dependency arrays correct — setState functions are stable, state values that are read inside closures are deps",
-        "TypeScript compiles cleanly (npx tsc --noEmit)",
-        "No behavioral regression — handlers still update state correctly"
-      ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
-      ],
-      "files_read_only": [
-        "src/components/canvas/flow-canvas.tsx"
-      ],
-      "context": {
-        "similar_files": ["src/app/(app)/w/[workspaceId]/[tabId]/journey-canvas-view.tsx"],
-        "patterns_to_follow": ["React 19 useRef requires initial value", "Never sort prop arrays directly"],
-        "learnings_relevant": ["IMP-032 already added React.memo to StepNode/SectionNode in iter 101"],
-        "affected_urls": ["/w/[workspaceId]/[tabId]"]
-      },
-      "has_ui_changes": false,
-      "has_data_model_changes": false,
-      "special_instructions": "Lines 67-100 approximately. Most handlers only use setState (stable reference) so deps arrays will be minimal. handleStepDelete also filters connections and checks selectedStepId — include selectedStepId as dep. handleSectionDelete checks selectedSectionId — include it. Be careful with handleConnectionCreate and handleConnectionDelete which may reference state."
-    },
-    {
-      "slot": 2,
-      "id": "#IMP-102",
-      "description": "Make Step Usage list items in tool-detail-panel.tsx clickable — navigate to step on canvas",
-      "source": "prd/IMPROVEMENTS.md",
-      "type": "improve",
-      "phase": "Phase 3b: Tools Canvas + Enhanced Export",
+      "phase": "Post-Phase 3b: Improvements",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "Step names in Step Usage section of tool-detail-panel.tsx are clickable",
-        "Clicking a step name navigates to the canvas tab containing that step",
-        "Cursor changes to pointer on hover, text styled as link (blue/underline or matching tool-analysis-view.tsx pattern)",
-        "TypeScript compiles cleanly"
+        "When a tool has 0 linked steps, the Step Usage section shows a muted hint message instead of being empty",
+        "Hint text: 'No steps linked yet. Open a step on the canvas and assign this tool.' (or similar)",
+        "Hint uses text-white/30 or text-white/55 styling consistent with other empty states in the codebase",
+        "When steps ARE linked, the existing clickable step list renders as before (no regression)"
       ],
-      "files_owned": [
-        "src/components/panels/tool-detail-panel.tsx"
-      ],
-      "files_read_only": [
-        "src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx"
-      ],
+      "files_owned": ["src/components/panels/tool-detail-panel.tsx"],
+      "files_read_only": [],
       "context": {
-        "similar_files": ["src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx"],
-        "patterns_to_follow": ["tool-analysis-view.tsx already has clickable step links with router.push — match that pattern"],
+        "similar_files": ["src/components/panels/annotation-panel.tsx"],
+        "patterns_to_follow": ["Existing empty state patterns use text-white/30 with italic hint text"],
         "learnings_relevant": [],
         "affected_urls": ["/w/[workspaceId]/tools"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Check tool-analysis-view.tsx for the existing step link pattern (router.push to canvas tab). The tool-detail-panel needs access to workspaceId and the step's tab_id. The step data returned from step-tools API may include tab_id via section join or the step may have section_id which links to a tab. Check the Step type and step-tools API response shape. If tab_id is not available, may need to fetch sections to determine tab_id, or use a simpler approach if steps already carry section_id + sections are available in context."
+      "special_instructions": "The Step Usage section was made clickable in IMP-102 (iter 136). Find the section where steps are listed and add an empty state when the array is empty. Check existing empty states in annotation-panel.tsx or comment-panel.tsx for styling patterns."
     },
     {
-      "slot": 3,
-      "id": "#IMP-114",
-      "description": "Add explanatory tooltip to disabled AI Regenerate button when no steps exist",
+      "slot": 2,
+      "id": "#IMP-076",
+      "description": "Add 'last generated' visual indicator near the AI Suggestions button on the improvements page when cached suggestions exist.",
       "source": "prd/IMPROVEMENTS.md",
       "type": "improve",
-      "phase": "Phase 3a: Analysis Intelligence",
+      "phase": "Post-Phase 3b: Improvements",
       "complexity": "S",
       "attempts": 1,
       "risk_score": 0,
       "acceptance_criteria": [
-        "When hasSteps is false, Regenerate button shows tooltip: 'Add steps to the canvas before running AI analysis'",
-        "Tooltip uses title attribute or Radix Tooltip (match existing pattern in the file)",
-        "Button remains disabled with cursor-not-allowed styling",
-        "TypeScript compiles cleanly"
+        "When AI suggestions have been previously generated, a 'Last generated X ago' or timestamp label appears near the AI Suggestions button",
+        "When no suggestions have been generated yet, no label is shown",
+        "Label uses muted text styling (text-white/30 or text-white/55)",
+        "Existing AI Suggestions button functionality unchanged"
       ],
-      "files_owned": [
-        "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
-      ],
-      "files_read_only": [],
+      "files_owned": ["src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx"],
+      "files_read_only": ["src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"],
       "context": {
-        "similar_files": ["src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"],
-        "patterns_to_follow": ["gap-analysis-view.tsx has similar disabled button with hint text pattern (BUG-027 fix)"],
-        "learnings_relevant": [],
-        "affected_urls": ["/w/[workspaceId]/ai-analysis"]
+        "similar_files": ["src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"],
+        "patterns_to_follow": ["AI analysis page shows 'Last run: X' timestamp. Use similar pattern. Suggestions are cached in localStorage (key likely has workspace ID)."],
+        "learnings_relevant": ["OpenRouter API pattern (FEAT-036) — cached results pattern"],
+        "affected_urls": ["/w/[workspaceId]/improvements"]
       },
       "has_ui_changes": true,
       "has_data_model_changes": false,
-      "special_instructions": "Simple change. Use title attribute on the button wrapper or a hint text below — match the pattern used in gap-analysis-view.tsx for the disabled Generate Summary button."
+      "special_instructions": "Check how the AI suggestions cache works in improvements-view.tsx. The suggestions are likely stored in localStorage with a timestamp. Add a small text element showing the timestamp near the button. Look at ai-analysis-view.tsx for the 'Last run' pattern to follow."
+    },
+    {
+      "slot": 3,
+      "id": "#IMP-080",
+      "description": "Consolidate the two separate gap analysis guidance messages into a single linked sentence when no maturity data exists.",
+      "source": "prd/IMPROVEMENTS.md",
+      "type": "improve",
+      "phase": "Post-Phase 3b: Improvements",
+      "complexity": "S",
+      "attempts": 1,
+      "risk_score": 0,
+      "acceptance_criteria": [
+        "When no maturity data exists, a single consolidated hint message appears instead of two separate messages",
+        "The consolidated message includes a link to the canvas (preserving the existing navigation)",
+        "When maturity data exists, the gap analysis table and AI narrative render normally (no regression)",
+        "Text styling consistent with existing gap analysis page"
+      ],
+      "files_owned": ["src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"],
+      "files_read_only": [],
+      "context": {
+        "similar_files": [],
+        "patterns_to_follow": ["Existing text uses text-white/55 for secondary guidance. Links use text-accent-blue with hover underline."],
+        "learnings_relevant": [],
+        "affected_urls": ["/w/[workspaceId]/gap-analysis"]
+      },
+      "has_ui_changes": true,
+      "has_data_model_changes": false,
+      "special_instructions": "Two messages currently exist: 'Score steps to enable AI narrative.' (inline) and 'Open the canvas to set maturity scores →' (link below). Merge into one sentence with a link. E.g. 'Open the canvas to set maturity scores on steps to enable gap analysis and AI narrative →'."
     }
   ],
   "shared_files": {
-    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts", "src/types/canvas.ts"],
+    "read_only": ["package.json", "tsconfig.json", "src/types/database.ts"],
     "owner": null,
-    "note": "No shared file modifications needed for any task"
+    "note": "No shared file modifications needed — all tasks are isolated UI improvements"
   },
-  "merge_order": ["#IMP-034", "#IMP-102", "#IMP-114"],
+  "merge_order": ["#IMP-117", "#IMP-076", "#IMP-080"],
   "testing_plan": {
     "run_acceptance": true,
     "run_regression": false,
-    "regression_reason": "Last regression was iter 134 (2 iterations ago). Risk score 2. Not due per 8-iteration cadence.",
+    "regression_reason": null,
     "suites_to_run": ["acceptance"],
     "cadence_trigger": null
   },

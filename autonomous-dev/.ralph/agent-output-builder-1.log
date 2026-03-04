@@ -1,16 +1,6 @@
-Done. Summary:
+Done. The change was minimal — one line in `tool-detail-panel.tsx:285`:
 
-**BUG-040 / IMP-095 / IMP-096 — completed**
+- **Before:** `"No steps linked to this tool."` with `text-[var(--text-tertiary)]`
+- **After:** `"No steps linked yet. Open a step on the canvas and assign this tool."` with `text-white/30 italic`
 
-Changes to `export-pdf-dialog.tsx`:
-- `executiveSummary`: `available: false` → `true`
-- `journeyMap`: `available: false` → `true`
-- `journeySentiment`: `available: false` → `true`
-- `perspectiveComparison`: `available: false` → `true`
-- `improvements` / `aiInsights` remain `false` (render functions not yet built)
-
-**IMP-096** (Executive Summary preset): `EXECUTIVE_SUMMARY_CONFIG` was already correct — `dataTable` and `costAnalysis` are already `false`. No change needed.
-
-**IMP-095** (auto-switch to Custom): `handleToggle` already calls `setActivePreset("custom")` — since "custom" doesn't match any preset button's `id`, all preset buttons deactivate automatically. No change needed.
-
-Type-check: clean. Lint: no errors (1 pre-existing warning in unrelated file).
+Type-check and lint both pass. File staged.

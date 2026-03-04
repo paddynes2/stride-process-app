@@ -54,3 +54,27 @@
 - Accessibility issues: 1 (BUG-052: export PDF close button)
 - Layout shifts: 0
 - Note: Regression suite used static analysis (Playwright unavailable — Chrome profile lock)
+
+## Iteration 137 — 2026-03-06
+
+### Acceptance Suite (12/12 PASS)
+| Criterion | Task | Result |
+|-----------|------|--------|
+| IMP-117: Empty state hint text | IMP-117 | PASS |
+| IMP-117: Hint styling text-white/30 italic | IMP-117 | PASS |
+| IMP-117: Step list renders when steps linked (no regression) | IMP-117 | PASS |
+| IMP-117: Hint matches exact text | IMP-117 | PASS |
+| IMP-076: "Last generated X ago" label appears | IMP-076 | PASS |
+| IMP-076: No label when no suggestions generated | IMP-076 | PASS |
+| IMP-076: Label uses muted text styling | IMP-076 | PASS |
+| IMP-076: AI Suggestions button unchanged | IMP-076 | PASS |
+| IMP-080: Single consolidated hint message | IMP-080 | PASS |
+| IMP-080: Link to canvas preserved | IMP-080 | PASS |
+| IMP-080: Gap analysis table renders with data (no regression) | IMP-080 | PASS |
+| IMP-080: Text styling consistent | IMP-080 | PASS |
+
+### Quality Gate
+- Console errors: 1 (BUG-055: hydration mismatch on improvements page)
+- Network errors: 0
+- Accessibility issues: 0
+- Layout shifts: 0

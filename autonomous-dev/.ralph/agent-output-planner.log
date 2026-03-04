@@ -1,18 +1,13 @@
-**Iteration 126 — Execution Plan Summary**
+**Iteration 137 — EXECUTION_PLAN produced.**
 
-**Validation:** Last commit f9035f8 is valid, TypeScript compiles cleanly. No revert needed.
+**Validation:** Last commit (2218fea) valid, tsc clean, no revert needed.
 
-**3 tasks selected (multi_task mode):**
+**Selected 3 independent S-complexity improvements (zero file overlap):**
 
-| Slot | ID | Description | Complexity | Files |
-|------|----|-------------|------------|-------|
-| 1 | **#BUG-040** + IMP-096 + IMP-095 | Enable 4 built PDF sections (available:true), fix Executive Summary preset config, auto-switch preset on manual toggle | S | `export-pdf-dialog.tsx` |
-| 2 | **#FEAT-043 [3/4]** | Build 4 new PDF render functions (prioritization matrix, tool landscape, improvements, AI insights) + wire into canvas-view.tsx | M | `enhanced-pdf-sections.ts`, `canvas-view.tsx` |
-| 3 | **#IMP-045** | Add aria-label to coloring panel color picker input | S | `coloring-panel.tsx` |
+| Slot | Task | File | Description |
+|------|------|------|-------------|
+| 1 | #IMP-117 | `tool-detail-panel.tsx` | Step Usage empty state hint |
+| 2 | #IMP-076 | `improvements-view.tsx` | AI Suggestions "last generated" indicator |
+| 3 | #IMP-080 | `gap-analysis-view.tsx` | Consolidate guidance text |
 
-**Key decisions:**
-- BUG-040 is P1 and highest priority — enables the 4 sections built in iter 125
-- FEAT-043 [3/4] continues the phase roadmap — builds the remaining 4 render functions
-- The 4 NEW sections (improvements, aiInsights, prioritizationMatrix, toolLandscape) stay `available: false` until next iteration to verify render functions work
-- `export-pdf-dialog.tsx` owned exclusively by slot 1 — slot 2 reads only
-- IMP-045 is fully independent (different file, zero overlap)
+**No bugs open** (BUG-035/032 blocked on Supabase CLI auth — out of scope). No cadence triggers. Acceptance testing after build.

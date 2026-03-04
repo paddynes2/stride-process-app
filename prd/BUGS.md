@@ -287,3 +287,10 @@
   - **Steps to reproduce:** 1. Navigate to /w/[workspaceId]/tools. 2. Click 'Analysis' button. 3. Use a screen reader — table has no accessible name.
   - **Suggested fix:** Add `aria-label="Tool cost breakdown"` to the `<table>` element.
   - **Fix applied:** Added `aria-label="Tool cost breakdown"` to `<table>` element at line 288.
+
+- [ ] #BUG-055 Hydration mismatch on Improvements page when localStorage has AI suggestions timestamp (P2) — Attempts: 0
+  - **Found:** Iteration 137 (acceptance tester)
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` — `lastGeneratedAt` useState initializer
+  - **What:** `useState` initializer reads `localStorage` via `typeof window === "undefined"` check. Server renders `null` (no label), client first render returns stored timestamp (renders label span). React reports hydration mismatch. Page functions correctly after client-side recovery but console error appears.
+  - **Steps to reproduce:** 1. Set localStorage key `stride:ai-suggestions:[workspaceId]:generated-at` to any ISO timestamp. 2. Navigate to /w/[workspaceId]/improvements. 3. Observe console error about hydration mismatch.
+  - **Suggested fix:** Initialize `lastGeneratedAt` as `null`, then read from localStorage in a `useEffect` on mount. This ensures server and client first render match (both `null`), and the label appears after hydration.

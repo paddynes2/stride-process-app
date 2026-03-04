@@ -1,33 +1,33 @@
 {
   "schema_version": "1.0",
-  "iteration": 136,
+  "iteration": 137,
   "slot": 3,
-  "task_id": "#IMP-114",
+  "task_id": "#IMP-080",
   "status": "completed",
-  "duration_seconds": 45,
+  "duration_seconds": 90,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx",
+      "path": "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx",
       "action": "modified",
-      "lines_added": 1,
-      "lines_removed": 0
+      "lines_added": 14,
+      "lines_removed": 13
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "skipped", "errors": 0, "output": "" },
+    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (unrelated)" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
   "staged_files": [
-    "src/app/(app)/w/[workspaceId]/ai-analysis/ai-analysis-view.tsx"
+    "src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx"
   ],
   "ownership_violations": [],
-  "notes": "Added title attribute to the Regenerate button: title={!hasSteps ? 'Add steps to the canvas before running AI analysis' : undefined}. Native browser tooltip via title attribute. Button remains disabled with cursor-not-allowed styling when !hasSteps.",
+  "notes": "Removed the separate <p> link block below the AI narrative card. Replaced the inline 'Score steps to enable AI narrative.' text with a conditional: when firstProcessTab exists, renders a linked sentence 'Open the canvas to set maturity scores on steps to enable gap analysis and AI narrative →'; when firstProcessTab is null, renders plain text fallback. When hasGapData is true, existing generate-summary text unchanged.",
 
   "failure_details": null
 }

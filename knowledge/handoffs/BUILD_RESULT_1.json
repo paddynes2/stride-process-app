@@ -1,33 +1,31 @@
 {
   "schema_version": "1.0",
-  "iteration": 136,
+  "iteration": 137,
   "slot": 1,
-  "task_id": "#IMP-034",
+  "task_id": "#IMP-117",
   "status": "completed",
   "duration_seconds": 120,
 
   "files_changed": [
     {
-      "path": "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx",
+      "path": "src/components/panels/tool-detail-panel.tsx",
       "action": "modified",
-      "lines_added": 10,
-      "lines_removed": 10
+      "lines_added": 1,
+      "lines_removed": 1
     }
   ],
 
   "verification": {
     "typecheck": { "status": "pass", "errors": 0, "output": "" },
-    "lint": { "status": "pass", "errors": 0, "output": "1 pre-existing warning in flow-canvas.tsx (read-only file, not owned by this task)" },
+    "lint": { "status": "pass", "errors": 0, "output": "" },
     "build": { "status": "not_applicable", "output": "" },
     "unit_tests": { "status": "not_applicable", "passed": 0, "failed": 0, "output": "" }
   },
 
   "dependencies_added": [],
-  "staged_files": [
-    "src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx"
-  ],
+  "staged_files": ["src/components/panels/tool-detail-panel.tsx"],
   "ownership_violations": [],
-  "notes": "Wrapped all 10 handler functions in React.useCallback. Dependency arrays: handleStepDelete uses [selectedStepId] (reads it directly for conditional setSelectedStepId(null)); handleSectionDelete uses [selectedSectionId] (same reason). All other 8 handlers use [] because they only invoke stable setState functions inside functional update callbacks.",
+  "notes": "Updated the Step Usage empty state from 'No steps linked to this tool.' (text-[var(--text-tertiary)]) to 'No steps linked yet. Open a step on the canvas and assign this tool.' (text-white/30 italic), matching the codebase empty-state pattern.",
 
   "failure_details": null
 }

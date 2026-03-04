@@ -542,7 +542,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Apply same text update as IMP-064 (ai-analysis-view.tsx). Replace "redeploy" with SaaS-appropriate language.
 
-- [ ] #IMP-076 AI Suggestions button lacks "last generated" visual indicator — Attempts: 0
+- [x] #IMP-076 AI Suggestions button lacks "last generated" visual indicator — Attempts: 1 — DONE iteration 137, 2026-03-06
   - **Found:** Iteration 114 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx`
@@ -574,7 +574,7 @@
   - **Design principle:** Nielsen H4: Consistency and standards
   - **Suggested fix:** Change the empty state button label from "Add Group" to "Add Tool Section" to match the toolbar.
 
-- [ ] #IMP-080 Gap analysis guidance text consolidation — Attempts: 0
+- [x] #IMP-080 Gap analysis guidance text consolidation — Attempts: 1 — DONE iteration 137, 2026-03-06
   - **Found:** Iteration 116 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/gap-analysis/gap-analysis-view.tsx`
@@ -858,13 +858,21 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Verify individual disabled tooltips are visible on hover/focus in browser. If so, no change needed.
 
-- [ ] #IMP-117 Tool detail panel Step Usage empty state hint — Attempts: 0
+- [x] #IMP-117 Tool detail panel Step Usage empty state hint — Attempts: 1 — DONE iteration 137, 2026-03-06
   - **Found:** Iteration 136 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/tool-detail-panel.tsx` — Step Usage section
   - **What:** The Step Usage clickable links (#IMP-102) only become discoverable after steps are linked to a tool. Empty Tools canvas is the default state, so most users won't see Step Usage until they actively link steps.
   - **Design principle:** Nielsen H6: Recognition over recall
   - **Suggested fix:** Add empty-state hint in Step Usage section when a tool has no linked steps (e.g., 'No steps linked yet. Open a step on the canvas and assign this tool.').
+
+- [ ] #IMP-118 AI Suggestions "last generated" label lacks exact datetime tooltip — Attempts: 0
+  - **Found:** Iteration 137 (acceptance tester)
+  - **Category:** Usability
+  - **Where:** `src/app/(app)/w/[workspaceId]/improvements/improvements-view.tsx` — "Last generated X ago" label
+  - **What:** The relative time label (e.g., "2h ago") has no tooltip showing the exact datetime. Users cannot determine the precise generation time.
+  - **Design principle:** Nielsen H1: Visibility of system status
+  - **Suggested fix:** Add a `title` attribute or Tooltip component showing the full ISO datetime in user locale.
 
 ## Logged
 <!-- Processed improvements with iteration and resolution -->

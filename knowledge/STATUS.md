@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 136
-- **Date:** 2026-03-06 02:00
+- **Iteration:** 137
+- **Date:** 2026-03-06 03:30
 - **Phase:** Post-Phase 3b — Improvements
 - **Branch:** ralph/init-stride
-- **Last task(s):** #IMP-034 (useCallback memoization), #IMP-102 (tool detail panel clickable steps), #IMP-114 (AI Regenerate disabled tooltip)
+- **Last task(s):** #IMP-117 (tool detail empty state hint), #IMP-076 (AI suggestions "last generated" label), #IMP-080 (gap analysis guidance consolidation)
 - **Result:** completed
-- **Next task:** Continue improvements — #IMP-005 (orphaned annotations), #IMP-010 (collapsible panels), #IMP-088 (if exists), or other medium/high priority improvements
+- **Next task:** Fix BUG-055 (hydration mismatch on improvements page — introduced by IMP-076), then continue improvements from backlog (IMP-005, IMP-010, IMP-118, or other medium/high priority)
 - **Blockers:** BUG-035 + BUG-032 blocked on Supabase CLI authentication — `npx supabase login` required before migration 024 can be pushed.
 
 ## Context
 
-Iteration 136 completed 3 independent improvements across non-overlapping files. IMP-034 wrapped all 10 handler functions in canvas-view.tsx with React.useCallback (correct dependency arrays). IMP-102 made Step Usage list items in tool-detail-panel.tsx clickable — navigates to the canvas tab containing the step, using useRouter + a workspace-scoped step→tabId map. IMP-114 added a native title tooltip to the disabled AI Regenerate button. All 3 builders passed typecheck and lint. Post-merge tsc passed. Acceptance testing passed 9/9 criteria.
+Iteration 137 completed 3 small improvements across 3 non-overlapping files. IMP-117 updated the empty state text in tool-detail-panel.tsx Step Usage section to a more helpful hint with text-white/30 italic styling. IMP-076 added a "Last generated X ago" label next to the AI Suggestions button on the improvements page, reading/writing to localStorage. IMP-080 consolidated the two separate gap analysis guidance messages into a single linked sentence when no maturity data exists. All 3 builders passed typecheck and lint. Post-merge tsc passed. Acceptance tester found a P2 hydration bug (BUG-055) in IMP-076 — the useState initializer reads localStorage during SSR check, causing server/client mismatch.
 
 ## Dev Server
 
@@ -21,10 +21,11 @@ Iteration 136 completed 3 independent improvements across non-overlapping files.
 
 ## Warnings
 
+- **P2 BUG-055:** Hydration mismatch on improvements page when localStorage has AI suggestions timestamp (introduced by IMP-076 this iteration). Fix: move localStorage read to useEffect.
 - **P1 BUG-035:** step-tools API returns 500 (migration 024 not pushed — Supabase CLI unauthenticated).
 - **CRITICAL:** OPENROUTER_API_KEY not set — AI analysis route returns 503.
-- Production (origin/main) is behind ralph/init-stride by 109+ commits
+- Production (origin/main) is behind ralph/init-stride by 110+ commits
 - 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
 - No unit test suite exists (#DEBT-001)
 - step-detail-panel.tsx ~770 lines — exceeding complexity threshold
-- IMP-102 uses raw `fetch()` instead of `apiFetch()` — minor pattern inconsistency (no `fetchSteps` function exists in client.ts)
+- IMP-102 uses raw `fetch()` instead of `apiFetch()` — minor pattern inconsistency

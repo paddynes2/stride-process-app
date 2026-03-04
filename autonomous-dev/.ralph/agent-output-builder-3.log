@@ -1,7 +1,8 @@
-Done. Task `#IMP-045` completed:
+Done. The change consolidates the two messages into one:
 
-- Added `aria-label="Rule color picker"` to both `input[type="color"]` elements (add form + edit form)
-- Added `aria-label="Rule color hex value"` to both associated hex text inputs
-- TypeScript compiles cleanly (0 errors)
-- File staged: `src/components/canvas/coloring-panel.tsx`
-- BUILD_RESULT_3.json written
+- **Removed:** Separate `<p>` link block below the card ("Open the canvas to set maturity scores →")
+- **Changed:** Inline card text "Score steps to enable AI narrative." → linked sentence "Open the canvas to set maturity scores on steps to enable gap analysis and AI narrative →" (link on the canvas text, using `text-[var(--accent-blue)] hover:underline`)
+- **Fallback:** If `firstProcessTab` is null, plain text without a link
+- **No regression:** When `hasGapData` is true, the generate-summary text is unchanged
+
+Typecheck: pass, Lint: pass (0 errors).
