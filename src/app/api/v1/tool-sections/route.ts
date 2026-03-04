@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     return errorResponse("validation", "workspace_id is required", 400);
   }
 
-  const { data: tools, error } = await supabase
-    .from("tools")
+  const { data: toolSections, error } = await supabase
+    .from("tool_sections")
     .select("*")
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: true });
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     return errorResponse("fetch_failed", error.message, 500);
   }
 
-  return successResponse(tools);
+  return successResponse(toolSections);
 }
 
 export async function POST(request: NextRequest) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { workspace_id, name, description, category, vendor, url, cost_per_month, position_x, position_y, status } = body;
+  const { workspace_id, name, position_x, position_y } = body;
 
   if (!workspace_id) {
     return errorResponse("validation", "workspace_id is required", 400);
@@ -46,20 +46,17 @@ export async function POST(request: NextRequest) {
 
   const insert: Record<string, unknown> = {
     workspace_id,
-    name: name?.trim() || "New Tool",
-    description: description?.trim() || null,
-    category: category?.trim() || null,
-    vendor: vendor?.trim() || null,
-    url: url?.trim() || null,
-    cost_per_month: cost_per_month != null ? Number(cost_per_month) : null,
-    position_x: position_x != null ? Number(position_x) : 0,
-    position_y: position_y != null ? Number(position_y) : 0,
+    name: name?.trim() || "New Tool Section",
+    position_x: position_x ?? 0,
+    position_y: position_y ?? 0,
   };
 
-  if (status !== undefined) insert.status = status;
+  if (body.description !== undefined) insert.description = body.description;
+  if (body.width !== undefined) insert.width = body.width;
+  if (body.height !== undefined) insert.height = body.height;
 
-  const { data: tool, error } = await supabase
-    .from("tools")
+  const { data: toolSection, error } = await supabase
+    .from("tool_sections")
     .insert(insert)
     .select()
     .single();
@@ -68,7 +65,15 @@ export async function POST(request: NextRequest) {
     return errorResponse("create_failed", error.message, 500);
   }
 
-  void logActivity({ supabase, workspace_id: tool.workspace_id, user_id: user.id, action: "created", entity_type: "tools", entity_id: tool.id, entity_name: tool.name });
+  void logActivity({
+    supabase,
+    workspace_id,
+    user_id: user.id,
+    action: "created",
+    entity_type: "tool_sections",
+    entity_id: toolSection.id,
+    entity_name: toolSection.name,
+  });
 
-  return successResponse(tool, 201);
+  return successResponse(toolSection, 201);
 }
