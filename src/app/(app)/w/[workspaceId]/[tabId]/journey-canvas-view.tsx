@@ -578,10 +578,9 @@ export function JourneyCanvasView({
 
         {/* Side panel — stage detail or journey summary */}
         <div
-          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
+          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-y-auto"
           style={{ width: "var(--panel-width)" }}
         >
-          <div className="flex-1 min-h-0 overflow-y-auto">
             {selectedStage ? (
               <StageDetailPanel
                 stage={selectedStage}
@@ -598,7 +597,7 @@ export function JourneyCanvasView({
                 onClose={() => setSelectedTouchpointId(null)}
               />
             ) : (
-              <div className="overflow-y-auto p-4 h-full">
+              <div className="p-4">
                 <h2 className="text-base font-semibold text-[var(--text-primary)] mb-3">Journey Summary</h2>
                 <div className="space-y-2 text-[var(--text-sm)]">
                   <div className="flex justify-between">
@@ -616,7 +615,6 @@ export function JourneyCanvasView({
                 </div>
               </div>
             )}
-          </div>
           {selectedStage && (
             activePerspective ? (
               <AnnotationPanel

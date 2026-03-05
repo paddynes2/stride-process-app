@@ -332,7 +332,7 @@ export function CommentPanel({ commentableType, commentableId }: CommentPanelPro
   }
 
   return (
-    <div className="border-t border-[var(--border-subtle)] flex flex-col max-h-[320px] overflow-hidden shrink-0">
+    <div className="border-t border-[var(--border-subtle)] flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2 shrink-0">
         <MessageSquare className="h-3.5 w-3.5 text-[var(--text-tertiary)]" />
@@ -345,7 +345,7 @@ export function CommentPanel({ commentableType, commentableId }: CommentPanelPro
       </div>
 
       {/* Comment list */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-2">
+      <div className="px-4 pb-2">
         {topLevel.length === 0 ? (
           <p className="text-[12px] text-[var(--text-tertiary)] py-1">No comments yet</p>
         ) : (

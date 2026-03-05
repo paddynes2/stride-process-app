@@ -678,10 +678,9 @@ export function CanvasView({
 
         {/* Detail Panel / Summary Panel */}
         <div
-          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden"
+          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-y-auto"
           style={{ width: "var(--panel-width)" }}
         >
-          <div className="flex-1 min-h-0 overflow-y-auto">
             {selectedStep && (
               <StepDetailPanel
                 step={selectedStep}
@@ -707,7 +706,6 @@ export function CanvasView({
                 connections={connections}
               />
             )}
-          </div>
           {selectedStep && (
             activePerspective ? (
               <AnnotationPanel

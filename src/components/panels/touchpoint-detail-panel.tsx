@@ -127,7 +127,7 @@ export function TouchpointDetailPanel({ touchpoint, onUpdate, onDelete, onClose 
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)]">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
           Touchpoint Details
@@ -137,7 +137,7 @@ export function TouchpointDetailPanel({ touchpoint, onUpdate, onDelete, onClose 
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-5">
+      <div className="p-4 space-y-5">
         <div>
           <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
             Name

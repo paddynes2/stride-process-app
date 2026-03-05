@@ -149,7 +149,7 @@ export function AnnotationPanel({
 
   return (
     <div
-      className="border-t-2 flex flex-col max-h-[280px] overflow-y-auto shrink-0"
+      className="border-t-2 flex flex-col"
       style={{ borderColor: perspectiveColor }}
     >
       {/* Header */}

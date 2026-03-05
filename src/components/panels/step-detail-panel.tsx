@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb, Wrench } from "lucide-react";
+import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb, Wrench, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -242,7 +242,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)]">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
@@ -253,7 +253,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-5">
+      <div className="p-4 space-y-5">
         {/* Name */}
         <div>
           <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
@@ -323,374 +323,417 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
           </div>
         </div>
 
-        {/* Assigned Roles */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-            <Users className="h-3 w-3" />
-            Assigned Roles
-          </label>
-          {stepRoles.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {stepRoles.map((sr) => (
-                <Badge key={sr.id} variant="outline" className="gap-1 max-w-none">
-                  <span className="truncate">{sr.role.name}</span>
-                  <span className="text-[var(--text-quaternary)]">·</span>
-                  <span className="text-[var(--text-quaternary)] truncate">{sr.role.team.name}</span>
-                  <button
-                    onClick={() => handleRemoveRole(sr.id)}
-                    className="ml-0.5 hover:text-[var(--error)] transition-colors"
-                    aria-label={`Remove ${sr.role.name} role`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
-              >
-                <Plus className="h-3 w-3" />
-                Assign Role
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
-              {teams.length === 0 && (
-                <DropdownMenuLabel>No teams — create teams first</DropdownMenuLabel>
-              )}
-              {teams.map((team, teamIdx) => (
-                <React.Fragment key={team.id}>
-                  {teamIdx > 0 && <DropdownMenuSeparator />}
-                  <DropdownMenuLabel>{team.name}</DropdownMenuLabel>
-                  {team.roles.length === 0 && (
-                    <DropdownMenuItem disabled>No roles in this team</DropdownMenuItem>
-                  )}
-                  {team.roles.map((role) => {
-                    const isAssigned = assignedRoleIds.has(role.id);
-                    return (
-                      <DropdownMenuItem
-                        key={role.id}
-                        disabled={isAssigned}
-                        onSelect={() => { if (!isAssigned) handleAssignRole(role.id); }}
-                      >
-                        <span className="flex-1 truncate">{role.name}</span>
-                        {role.hourly_rate != null && (
-                          <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
-                            ${role.hourly_rate}/hr
-                          </span>
-                        )}
-                        {isAssigned && (
-                          <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
-                        )}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Assigned Tools */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-            <Wrench className="h-3 w-3" />
-            Assigned Tools
-          </label>
-          {allTools.length === 0 ? (
-            <p className="text-[12px] text-[var(--text-tertiary)]">
-              No tools assigned.{" "}
-              <Link href={`/w/${workspaceId}/tools`} className="text-[var(--accent-blue)] hover:underline">
-                Assign from Tools page →
-              </Link>
-            </p>
-          ) : (
-            <>
-              {stepTools.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {stepTools.map((st) => (
-                    <Badge key={st.id} variant="outline" className="gap-1 max-w-none">
-                      <span className="truncate">{st.tool.name}</span>
-                      {st.tool.cost_per_month != null && (
-                        <>
-                          <span className="text-[var(--text-quaternary)]">·</span>
-                          <span className="text-[var(--text-quaternary)] truncate">${st.tool.cost_per_month}/mo</span>
-                        </>
-                      )}
-                      <button
-                        onClick={() => handleRemoveTool(st.id)}
-                        className="ml-0.5 hover:text-[var(--error)] transition-colors"
-                        aria-label={`Remove ${st.tool.name} tool`}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
-                  >
-                    <Plus className="h-3 w-3" />
-                    Assign Tool
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
-                  {allTools.map((tool) => {
-                    const isAssigned = assignedToolIds.has(tool.id);
-                    return (
-                      <DropdownMenuItem
-                        key={tool.id}
-                        disabled={isAssigned}
-                        onSelect={() => { if (!isAssigned) handleAssignTool(tool.id); }}
-                      >
-                        <span className="flex-1 truncate">{tool.name}</span>
-                        {tool.cost_per_month != null && (
-                          <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
-                            ${tool.cost_per_month}/mo
-                          </span>
-                        )}
-                        {isAssigned && (
-                          <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
-                        )}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          )}
-        </div>
-
-        <Separator />
-
-        {/* Time & Frequency */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Collapsible Sections */}
+        <CollapsibleSection
+          title="Assignments"
+          icon={Users}
+          badge={(() => {
+            const parts: string[] = [];
+            if (stepRoles.length > 0) parts.push(`${stepRoles.length} role${stepRoles.length !== 1 ? "s" : ""}`);
+            if (stepTools.length > 0) parts.push(`${stepTools.length} tool${stepTools.length !== 1 ? "s" : ""}`);
+            return parts.join(" · ") || undefined;
+          })()}
+        >
+          {/* Assigned Roles */}
           <div>
             <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-              <Clock className="h-3 w-3" />
-              Minutes
+              Assigned Roles
             </label>
-            <Input
-              type="number"
-              min={0}
-              value={step.time_minutes ?? ""}
-              onChange={(e) => handleFieldUpdate("time_minutes", e.target.value ? parseInt(e.target.value) : null)}
-              placeholder="0"
-            />
+            {stepRoles.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {stepRoles.map((sr) => (
+                  <Badge key={sr.id} variant="outline" className="gap-1 max-w-none">
+                    <span className="truncate">{sr.role.name}</span>
+                    <span className="text-[var(--text-quaternary)]">·</span>
+                    <span className="text-[var(--text-quaternary)] truncate">{sr.role.team.name}</span>
+                    <button
+                      onClick={() => handleRemoveRole(sr.id)}
+                      className="ml-0.5 hover:text-[var(--error)] transition-colors"
+                      aria-label={`Remove ${sr.role.name} role`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
+                >
+                  <Plus className="h-3 w-3" />
+                  Assign Role
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
+                {teams.length === 0 && (
+                  <DropdownMenuLabel>No teams — create teams first</DropdownMenuLabel>
+                )}
+                {teams.map((team, teamIdx) => (
+                  <React.Fragment key={team.id}>
+                    {teamIdx > 0 && <DropdownMenuSeparator />}
+                    <DropdownMenuLabel>{team.name}</DropdownMenuLabel>
+                    {team.roles.length === 0 && (
+                      <DropdownMenuItem disabled>No roles in this team</DropdownMenuItem>
+                    )}
+                    {team.roles.map((role) => {
+                      const isAssigned = assignedRoleIds.has(role.id);
+                      return (
+                        <DropdownMenuItem
+                          key={role.id}
+                          disabled={isAssigned}
+                          onSelect={() => { if (!isAssigned) handleAssignRole(role.id); }}
+                        >
+                          <span className="flex-1 truncate">{role.name}</span>
+                          {role.hourly_rate != null && (
+                            <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
+                              ${role.hourly_rate}/hr
+                            </span>
+                          )}
+                          {isAssigned && (
+                            <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+
+          {/* Assigned Tools */}
           <div>
             <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-              <Repeat className="h-3 w-3" />
-              Per Month
+              Assigned Tools
             </label>
-            <Input
-              type="number"
-              min={0}
-              value={step.frequency_per_month ?? ""}
-              onChange={(e) => handleFieldUpdate("frequency_per_month", e.target.value ? parseInt(e.target.value) : null)}
-              placeholder="0"
+            {allTools.length === 0 ? (
+              <p className="text-[12px] text-[var(--text-tertiary)]">
+                No tools assigned.{" "}
+                <Link href={`/w/${workspaceId}/tools`} className="text-[var(--accent-blue)] hover:underline">
+                  Assign from Tools page →
+                </Link>
+              </p>
+            ) : (
+              <>
+                {stepTools.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {stepTools.map((st) => (
+                      <Badge key={st.id} variant="outline" className="gap-1 max-w-none">
+                        <span className="truncate">{st.tool.name}</span>
+                        {st.tool.cost_per_month != null && (
+                          <>
+                            <span className="text-[var(--text-quaternary)]">·</span>
+                            <span className="text-[var(--text-quaternary)] truncate">${st.tool.cost_per_month}/mo</span>
+                          </>
+                        )}
+                        <button
+                          onClick={() => handleRemoveTool(st.id)}
+                          className="ml-0.5 hover:text-[var(--error)] transition-colors"
+                          aria-label={`Remove ${st.tool.name} tool`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-sm)] text-[11px] font-medium border border-dashed border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:border-[var(--border-default)] transition-all"
+                    >
+                      <Plus className="h-3 w-3" />
+                      Assign Tool
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="max-h-[240px] overflow-y-auto">
+                    {allTools.map((tool) => {
+                      const isAssigned = assignedToolIds.has(tool.id);
+                      return (
+                        <DropdownMenuItem
+                          key={tool.id}
+                          disabled={isAssigned}
+                          onSelect={() => { if (!isAssigned) handleAssignTool(tool.id); }}
+                        >
+                          <span className="flex-1 truncate">{tool.name}</span>
+                          {tool.cost_per_month != null && (
+                            <span className="text-[var(--text-quaternary)] text-[10px] ml-2">
+                              ${tool.cost_per_month}/mo
+                            </span>
+                          )}
+                          {isAssigned && (
+                            <span className="text-[var(--text-quaternary)] text-[10px] ml-1">✓</span>
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Time & Cost"
+          icon={Clock}
+          badge={(() => {
+            const toolMonthlyCost = stepTools.reduce((sum, st) => sum + (st.tool.cost_per_month ?? 0), 0);
+            const hasTimeFreq = !!(step.time_minutes && step.frequency_per_month);
+            const rolesWithRate = stepRoles.filter((sr) => sr.role.hourly_rate != null);
+            const avgRate = rolesWithRate.length > 0
+              ? rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length
+              : null;
+            const monthlyHours = hasTimeFreq ? (step.time_minutes! * step.frequency_per_month!) / 60 : 0;
+            const laborCost = (hasTimeFreq && avgRate != null) ? monthlyHours * avgRate : null;
+            const totalCost = (laborCost ?? 0) + toolMonthlyCost;
+            if (totalCost > 0) return `$${totalCost.toFixed(0)}/mo`;
+            if (hasTimeFreq) return `${monthlyHours.toFixed(1)}h/mo`;
+            return undefined;
+          })()}
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+                <Clock className="h-3 w-3" />
+                Minutes
+              </label>
+              <Input
+                type="number"
+                min={0}
+                value={step.time_minutes ?? ""}
+                onChange={(e) => handleFieldUpdate("time_minutes", e.target.value ? parseInt(e.target.value) : null)}
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+                <Repeat className="h-3 w-3" />
+                Per Month
+              </label>
+              <Input
+                type="number"
+                min={0}
+                value={step.frequency_per_month ?? ""}
+                onChange={(e) => handleFieldUpdate("frequency_per_month", e.target.value ? parseInt(e.target.value) : null)}
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          {(() => {
+            const hasTimeFreq = !!(step.time_minutes && step.frequency_per_month);
+            const toolMonthlyCost = stepTools.reduce((sum, st) => sum + (st.tool.cost_per_month ?? 0), 0);
+            const hasToolCost = toolMonthlyCost > 0;
+
+            if (!hasTimeFreq && !hasToolCost) return null;
+
+            const monthlyHours = hasTimeFreq ? (step.time_minutes! * step.frequency_per_month!) / 60 : 0;
+            const rolesWithRate = stepRoles.filter((sr) => sr.role.hourly_rate != null);
+            const avgRate = rolesWithRate.length > 0
+              ? rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length
+              : null;
+            const laborCost = (hasTimeFreq && avgRate != null) ? monthlyHours * avgRate : null;
+            const totalCost = (laborCost ?? 0) + toolMonthlyCost;
+
+            return (
+              <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2 space-y-1">
+                {hasTimeFreq && (
+                  <div>
+                    Monthly time: <strong className="text-[var(--text-secondary)]">{monthlyHours.toFixed(1)}h</strong> / month
+                  </div>
+                )}
+                {laborCost != null && (
+                  <div>
+                    Labor cost: <strong className="text-[var(--text-secondary)]">${laborCost.toFixed(2)}</strong> / month
+                    <span className="text-[var(--text-quaternary)] ml-1">(avg ${avgRate!.toFixed(2)}/hr)</span>
+                  </div>
+                )}
+                {hasToolCost && (
+                  <div>
+                    Tool cost: <strong className="text-[var(--text-secondary)]">${toolMonthlyCost.toFixed(2)}</strong> / month
+                  </div>
+                )}
+                {(laborCost != null || hasToolCost) && (
+                  <div className="border-t border-[var(--border-subtle)] pt-1 mt-1">
+                    Total: <strong className="text-[var(--text-secondary)]">${totalCost.toFixed(2)}</strong> / month
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Maturity"
+          icon={Gauge}
+          badge={(() => {
+            if (step.maturity_score && step.target_maturity) return `${step.maturity_score} → ${step.target_maturity}`;
+            if (step.maturity_score) return `${step.maturity_score}`;
+            return undefined;
+          })()}
+        >
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+              <Gauge className="h-3 w-3" />
+              Current Maturity
+            </label>
+            <div className="flex gap-1">
+              {MATURITY_OPTIONS.map((m) => (
+                <button
+                  key={m.value}
+                  onClick={() => handleFieldUpdate("maturity_score", step.maturity_score === m.value ? null : m.value)}
+                  title={m.label}
+                  className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                    step.maturity_score === m.value
+                      ? "border-[var(--border-default)] text-white"
+                      : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                  }`}
+                  style={step.maturity_score === m.value ? { backgroundColor: m.color } : undefined}
+                >
+                  {m.value}
+                </button>
+              ))}
+            </div>
+            {step.maturity_score && (
+              <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
+                {MATURITY_OPTIONS.find((m) => m.value === step.maturity_score)?.label}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+              <Target className="h-3 w-3" />
+              Target Maturity
+            </label>
+            <div className="flex gap-1">
+              {MATURITY_OPTIONS.map((m) => (
+                <button
+                  key={m.value}
+                  onClick={() => handleFieldUpdate("target_maturity", step.target_maturity === m.value ? null : m.value)}
+                  title={m.label}
+                  className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                    step.target_maturity === m.value
+                      ? "border-[var(--border-default)] text-white"
+                      : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                  }`}
+                  style={step.target_maturity === m.value ? { backgroundColor: m.color } : undefined}
+                >
+                  {m.value}
+                </button>
+              ))}
+            </div>
+            {step.target_maturity && (
+              <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
+                {MATURITY_OPTIONS.find((m) => m.value === step.target_maturity)?.label}
+              </p>
+            )}
+          </div>
+
+          {step.maturity_score && step.target_maturity && (
+            <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2">
+              Gap: <strong className={step.target_maturity - step.maturity_score > 0 ? "text-[#F97316]" : "text-[#22C55E]"}>
+                {step.target_maturity - step.maturity_score > 0 ? `+${step.target_maturity - step.maturity_score}` : step.target_maturity - step.maturity_score === 0 ? "On target" : String(step.target_maturity - step.maturity_score)}
+              </strong>
+              {step.target_maturity - step.maturity_score > 0 && " levels to improve"}
+            </div>
+          )}
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Prioritization"
+          icon={TrendingUp}
+          badge={(() => {
+            const parts: string[] = [];
+            if (step.effort_score) parts.push(`E:${step.effort_score}`);
+            if (step.impact_score) parts.push(`I:${step.impact_score}`);
+            return parts.join(" ") || undefined;
+          })()}
+        >
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+              <Zap className="h-3 w-3" />
+              Effort Score
+            </label>
+            <div className="flex gap-1">
+              {SCORE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleFieldUpdate("effort_score", step.effort_score === opt.value ? null : opt.value)}
+                  title={opt.label}
+                  className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                    step.effort_score === opt.value
+                      ? "border-[#F97316] text-white"
+                      : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                  }`}
+                  style={step.effort_score === opt.value ? { backgroundColor: "#F97316" } : undefined}
+                >
+                  {opt.value}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low effort, 5 = high effort</p>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+              <TrendingUp className="h-3 w-3" />
+              Impact Score
+            </label>
+            <div className="flex gap-1">
+              {SCORE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleFieldUpdate("impact_score", step.impact_score === opt.value ? null : opt.value)}
+                  title={opt.label}
+                  className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
+                    step.impact_score === opt.value
+                      ? "border-[var(--brand)] text-white"
+                      : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                  }`}
+                  style={step.impact_score === opt.value ? { backgroundColor: "var(--brand)" } : undefined}
+                >
+                  {opt.value}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low impact, 5 = high impact</p>
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Notes & Media"
+          icon={FileText}
+          badge={(() => {
+            const parts: string[] = [];
+            if (step.notes) parts.push("Has notes");
+            if (step.video_url) parts.push("Has video");
+            return parts.join(" · ") || undefined;
+          })()}
+        >
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+              Notes
+            </label>
+            <RichTextEditor
+              content={step.notes ?? ""}
+              onChange={(html) => handleFieldUpdate("notes", html)}
             />
           </div>
-        </div>
 
-        {(() => {
-          const hasTimeFreq = !!(step.time_minutes && step.frequency_per_month);
-          const toolMonthlyCost = stepTools.reduce((sum, st) => sum + (st.tool.cost_per_month ?? 0), 0);
-          const hasToolCost = toolMonthlyCost > 0;
-
-          if (!hasTimeFreq && !hasToolCost) return null;
-
-          const monthlyHours = hasTimeFreq ? (step.time_minutes! * step.frequency_per_month!) / 60 : 0;
-          const rolesWithRate = stepRoles.filter((sr) => sr.role.hourly_rate != null);
-          const avgRate = rolesWithRate.length > 0
-            ? rolesWithRate.reduce((sum, sr) => sum + Number(sr.role.hourly_rate), 0) / rolesWithRate.length
-            : null;
-          const laborCost = (hasTimeFreq && avgRate != null) ? monthlyHours * avgRate : null;
-          const totalCost = (laborCost ?? 0) + toolMonthlyCost;
-
-          return (
-            <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2 space-y-1">
-              {hasTimeFreq && (
-                <div>
-                  Monthly time: <strong className="text-[var(--text-secondary)]">{monthlyHours.toFixed(1)}h</strong> / month
-                </div>
-              )}
-              {laborCost != null && (
-                <div>
-                  Labor cost: <strong className="text-[var(--text-secondary)]">${laborCost.toFixed(2)}</strong> / month
-                  <span className="text-[var(--text-quaternary)] ml-1">(avg ${avgRate!.toFixed(2)}/hr)</span>
-                </div>
-              )}
-              {hasToolCost && (
-                <div>
-                  Tool cost: <strong className="text-[var(--text-secondary)]">${toolMonthlyCost.toFixed(2)}</strong> / month
-                </div>
-              )}
-              {(laborCost != null || hasToolCost) && (
-                <div className="border-t border-[var(--border-subtle)] pt-1 mt-1">
-                  Total: <strong className="text-[var(--text-secondary)]">${totalCost.toFixed(2)}</strong> / month
-                </div>
-              )}
-            </div>
-          );
-        })()}
-
-        <Separator />
-
-        {/* Maturity Score */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-            <Gauge className="h-3 w-3" />
-            Current Maturity
-          </label>
-          <div className="flex gap-1">
-            {MATURITY_OPTIONS.map((m) => (
-              <button
-                key={m.value}
-                onClick={() => handleFieldUpdate("maturity_score", step.maturity_score === m.value ? null : m.value)}
-                title={m.label}
-                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
-                  step.maturity_score === m.value
-                    ? "border-[var(--border-default)] text-white"
-                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
-                }`}
-                style={step.maturity_score === m.value ? { backgroundColor: m.color } : undefined}
-              >
-                {m.value}
-              </button>
-            ))}
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+              Video
+            </label>
+            <VideoEmbed
+              url={step.video_url}
+              onChange={(url) => handleFieldUpdate("video_url", url)}
+            />
           </div>
-          {step.maturity_score && (
-            <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
-              {MATURITY_OPTIONS.find((m) => m.value === step.maturity_score)?.label}
-            </p>
-          )}
-        </div>
-
-        {/* Target Maturity */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-            <Target className="h-3 w-3" />
-            Target Maturity
-          </label>
-          <div className="flex gap-1">
-            {MATURITY_OPTIONS.map((m) => (
-              <button
-                key={m.value}
-                onClick={() => handleFieldUpdate("target_maturity", step.target_maturity === m.value ? null : m.value)}
-                title={m.label}
-                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
-                  step.target_maturity === m.value
-                    ? "border-[var(--border-default)] text-white"
-                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
-                }`}
-                style={step.target_maturity === m.value ? { backgroundColor: m.color } : undefined}
-              >
-                {m.value}
-              </button>
-            ))}
-          </div>
-          {step.target_maturity && (
-            <p className="text-[10px] text-[var(--text-quaternary)] mt-1">
-              {MATURITY_OPTIONS.find((m) => m.value === step.target_maturity)?.label}
-            </p>
-          )}
-        </div>
-
-        {/* Gap indicator */}
-        {step.maturity_score && step.target_maturity && (
-          <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--bg-surface-hover)] rounded-[var(--radius-sm)] p-2">
-            Gap: <strong className={step.target_maturity - step.maturity_score > 0 ? "text-[#F97316]" : "text-[#22C55E]"}>
-              {step.target_maturity - step.maturity_score > 0 ? `+${step.target_maturity - step.maturity_score}` : step.target_maturity - step.maturity_score === 0 ? "On target" : String(step.target_maturity - step.maturity_score)}
-            </strong>
-            {step.target_maturity - step.maturity_score > 0 && " levels to improve"}
-          </div>
-        )}
-
-        <Separator />
-
-        {/* Effort Score */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-            <Zap className="h-3 w-3" />
-            Effort Score
-          </label>
-          <div className="flex gap-1">
-            {SCORE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => handleFieldUpdate("effort_score", step.effort_score === opt.value ? null : opt.value)}
-                title={opt.label}
-                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
-                  step.effort_score === opt.value
-                    ? "border-[#F97316] text-white"
-                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
-                }`}
-                style={step.effort_score === opt.value ? { backgroundColor: "#F97316" } : undefined}
-              >
-                {opt.value}
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low effort, 5 = high effort</p>
-        </div>
-
-        {/* Impact Score */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
-            <TrendingUp className="h-3 w-3" />
-            Impact Score
-          </label>
-          <div className="flex gap-1">
-            {SCORE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => handleFieldUpdate("impact_score", step.impact_score === opt.value ? null : opt.value)}
-                title={opt.label}
-                className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[12px] font-semibold border transition-all ${
-                  step.impact_score === opt.value
-                    ? "border-[var(--brand)] text-white"
-                    : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
-                }`}
-                style={step.impact_score === opt.value ? { backgroundColor: "var(--brand)" } : undefined}
-              >
-                {opt.value}
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low impact, 5 = high impact</p>
-        </div>
-
-        <Separator />
-
-        {/* Notes */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
-            Notes
-          </label>
-          <RichTextEditor
-            content={step.notes ?? ""}
-            onChange={(html) => handleFieldUpdate("notes", html)}
-          />
-        </div>
-
-        <Separator />
-
-        {/* Video */}
-        <div>
-          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
-            Video
-          </label>
-          <VideoEmbed
-            url={step.video_url}
-            onChange={(url) => handleFieldUpdate("video_url", url)}
-          />
-        </div>
+        </CollapsibleSection>
       </div>
 
       {/* Footer */}
