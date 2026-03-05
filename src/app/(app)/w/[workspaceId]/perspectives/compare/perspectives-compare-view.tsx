@@ -225,11 +225,16 @@ export function PerspectivesCompareView({
             <Loader2 className="w-6 h-6 text-[var(--text-tertiary)] animate-spin" />
           </div>
         ) : comparisonRows.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-8">
             <Eye className="w-8 h-8 text-[var(--text-tertiary)]" />
-            <p className="text-sm text-[var(--text-secondary)]">
-              No annotations found in the selected perspectives.
-            </p>
+            <div>
+              <p className="text-sm font-medium text-[var(--text-primary)] mb-1">
+                No annotations found for the selected perspectives
+              </p>
+              <p className="text-sm text-[var(--text-tertiary)] max-w-sm">
+                Try selecting different perspectives or add annotations from the canvas.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="p-6 flex flex-col gap-6">
@@ -316,7 +321,7 @@ function SummaryStatsPanel({
                 return tabId ? (
                   <Link
                     key={row.id}
-                    href={`/w/${workspaceId}/${tabId}`}
+                    href={`/w/${workspaceId}/${tabId}?focusNode=${row.id}`}
                     className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-[rgba(245,158,11,0.12)] border border-[rgba(245,158,11,0.25)] text-[var(--text-primary)] hover:bg-[rgba(245,158,11,0.2)] transition-colors"
                   >
                     {name}
@@ -424,7 +429,7 @@ function ComparisonTable({
               <td className="px-4 py-2.5">
                 {row.element?.tab_id ? (
                   <Link
-                    href={`/w/${workspaceId}/${row.element.tab_id}`}
+                    href={`/w/${workspaceId}/${row.element.tab_id}?focusNode=${row.id}`}
                     className="font-medium text-[var(--accent-blue)] hover:underline"
                   >
                     {row.element.name}

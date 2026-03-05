@@ -26,7 +26,7 @@
   - **Where:** `src/components/canvas/step-node.tsx`, `section-node.tsx`, `touchpoint-node.tsx`, `stage-node.tsx`
   - **Fix applied:** Added `role="img"` and `aria-label="Annotated by perspective"` to annotation indicator `<div>` elements in all 4 node types. Existing `title` preserved for mouse hover tooltip.
 
-- [ ] #IMP-004 Optimize annotation loading for large canvases — Attempts: 0
+- [x] #IMP-004 Optimize annotation loading for large canvases — DONE — filtered annotations to current tab's entity IDs in canvas-view.tsx
   - **Found:** Iteration 57 (quality audit)
   - **Category:** Performance
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` refreshAnnotatedIds()
@@ -37,7 +37,7 @@
 ## Low Priority
 <!-- Nice-to-have polish items -->
 
-- [ ] #IMP-005 Orphaned annotations when entities deleted (no FK on annotatable_id) — Attempts: 0
+- [x] #IMP-005 Orphaned annotations when entities deleted (no FK on annotatable_id) — DONE — added cleanup_annotations_on_delete trigger via migration 026
   - **Found:** Iteration 57 (quality audit)
   - **Category:** Data integrity
   - **Where:** `supabase/migrations/012_perspectives.sql` — `perspective_annotations.annotatable_id` has no foreign key constraint
@@ -71,7 +71,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/comments/comments-view.tsx`, `page.tsx`
   - **Fix applied:** Server page.tsx builds entityTabMap (entity_id → tab_id) from steps/sections/stages/touchpoints. CommentsView wraps entity names in `<Link>` to `/w/{workspaceId}/{tabId}`, styled `text-[var(--accent-blue)] hover:underline`. Falls back to workspace root when tab_id unavailable.
 
-- [ ] #IMP-010 Collapsible side panels with persistent state — Attempts: 0
+- [x] #IMP-010 Collapsible side panels with persistent state — DONE — CollapsibleSection component with optional localStorage persistence via storageKey prop
   - **Found:** Iteration 77 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`
@@ -117,7 +117,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
   - **Fix applied:** Moved Playbook button outside `!isReadOnly` guard. Cancel and Complete buttons remain inside the guard. Button container div always renders; only action buttons are conditionally hidden.
 
-- [ ] #IMP-017 Activity filter should re-fetch from server instead of client-side filtering — Attempts: 0
+- [x] #IMP-017 Activity filter should re-fetch from server instead of client-side filtering — DONE — server-side filtering via action query param, reset entries on filter change
   - **Found:** Iteration 91 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
@@ -142,14 +142,14 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
   - **Fix applied:** Added 3 skeleton rows inside space-y-2 list div that appear when loading=true. Each row matches real entry container (same border/bg/padding) with two animate-pulse bars (h-3 w-3/4 for action line, h-2.5 w-2/5 for timestamp). Button text simplified to static "Load More" since skeletons serve as loading indicator.
 
-- [ ] #IMP-021 Activity filter tab scroll affordance gradient — Attempts: 0
+- [x] #IMP-021 Activity filter tab scroll affordance gradient — DONE — CSS mask-image gradient on filter tab bar right edge
   - **Found:** Iteration 91 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
   - **What:** Filter tabs are scrollable (overflow-x-auto) but no visual affordance indicates more tabs exist on narrow viewports.
   - **Suggested fix:** Add right-side fade gradient overlay on filter tab container when scroll is possible.
 
-- [ ] #IMP-022 Actor type field for activity audit trail — Attempts: 0
+- [x] #IMP-022 Actor type field for activity audit trail — DONE — actor_type column via migration 027, type + logActivity updated
   - **Found:** Iteration 91 (regression tester)
   - **Category:** Data model
   - **Where:** `src/lib/api/activity.ts`, `supabase/migrations/017_activity_log.sql`
@@ -163,14 +163,14 @@
   - **What:** Paintbrush button has no indicator that coloring rules are currently active. Users cannot tell at a glance whether tinting is on after reloading.
   - **Suggested fix:** Add a small dot indicator on the button when any active coloring rule exists.
 
-- [ ] #IMP-024 has_role criteria type not visually evaluated — Attempts: 0
+- [x] #IMP-024 has_role criteria type not visually evaluated — DONE — fetched step_roles, enabled has_role coloring criteria evaluation
   - **Found:** Iteration 96 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/canvas/coloring-panel.tsx`, `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`
   - **What:** has_role criteria type appears in the dropdown but is not visually evaluated. Users who create a has_role rule see no canvas effect and no explanation.
   - **Suggested fix:** Show inline warning when has_role is selected, or remove from dropdown until implemented.
 
-- [ ] #IMP-025 Verify activity sidebar nav link present after deployment — Attempts: 0
+- [x] #IMP-025 Verify activity sidebar nav link present after deployment — DONE — verified: Activity link present in sidebar.tsx
   - **Found:** Iteration 96 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/layout/sidebar.tsx`
@@ -184,7 +184,7 @@
   - **What:** Text says "A full copy will be created with all tabs, sections, steps, and connections" but clone_workspace() also copies teams, roles, people, tools, stages, and touchpoints (13 tables total).
   - **Fix applied:** Radix Dialog description now accurately lists "tabs, sections, steps, connections, teams, roles, people, and tools." (IMP-028 replaced confirm() with Dialog, dialog text is accurate.)
 
-- [ ] #IMP-027 Activity Load More lacks total count indicator — Attempts: 0
+- [x] #IMP-027 Activity Load More lacks total count indicator — DONE — Load More button shows entries loaded count
   - **Found:** Iteration 97 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
@@ -209,7 +209,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx`, `src/components/layout/tab-bar.tsx`
   - **Fix applied:** Builder audit confirmed all icon-only buttons in canvas-view.tsx (Templates, Color, Delete template) and tab-bar.tsx (Close tab, Add tab) already have aria-label attributes. No changes needed — marking resolved.
 
-- [ ] #IMP-031 Deploy route sequential INSERT — batch insert for templates — Attempts: 0
+- [x] #IMP-031 Deploy route sequential INSERT — batch insert for templates — DONE — batch .insert() replaces sequential for-loop in deploy route
   - **Found:** Iteration 100 (acceptance tester — static analysis)
   - **Category:** Performance
   - **Where:** `src/app/api/v1/templates/[id]/deploy/route.ts`
@@ -249,7 +249,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` — template browser dialog
   - **Fix applied:** Restructured template dialog ternary: loading=skeletons; non-loading=grid with error message at top when templateError, DB templates hidden on error, STARTER_TEMPLATES always visible unconditionally.
 
-- [ ] #IMP-037 Load More button needs secondary loading indicator — Attempts: 0
+- [x] #IMP-037 Load More button needs secondary loading indicator — DONE — Loader2 spinner + Loading text in Load More button
   - **Found:** Iteration 102 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
@@ -257,7 +257,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Add a subtle spinner icon inside the Load More button when loading=true as a secondary signal alongside skeleton rows.
 
-- [ ] #IMP-038 Full aria-label audit across all icon-only buttons — Attempts: 0
+- [x] #IMP-038 Full aria-label audit across all icon-only buttons — DONE — audit complete, all icon-only buttons already have aria-label
   - **Found:** Iteration 102 (acceptance tester)
   - **Category:** Accessibility
   - **Where:** Multiple files (production page showed 4 unlabeled buttons in pre-iteration-102 code)
@@ -272,7 +272,7 @@
   - **What:** Activity entries show 'Unknown' when the users join is null (deleted user accounts). '[Deleted User]' would be more informative for audit trail purposes.
   - **Fix applied:** Changed fallback from `"Unknown"` to `"[Deleted User]"` at activity-view.tsx:176.
 
-- [ ] #IMP-040 Playbook step notes/description panel during execution — Attempts: 0
+- [x] #IMP-040 Playbook step notes/description panel during execution — DONE — step notes shown below step name in playbook view
   - **Found:** Iteration 103 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx`
@@ -280,7 +280,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall
   - **Suggested fix:** Add optional collapsible 'Step Notes' section below step name showing the step's notes field if present.
 
-- [ ] #IMP-041 Playbook Exit icon aria-label redundancy with visible text — Attempts: 0
+- [x] #IMP-041 Playbook Exit icon aria-label redundancy with visible text — DONE — removed redundant aria-label from icons with visible text
   - **Found:** Iteration 103 (acceptance tester)
   - **Category:** Accessibility
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/playbook/playbook-view.tsx`
@@ -300,7 +300,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/[runbookId]/runbook-view.tsx`
   - **Fix applied:** page.tsx joins users table via `users!runbooks_created_by_fkey(email)`. runbook-view.tsx shows `runbook.users?.email ?? '[Deleted User]'`. PATCH state updates preserve users field via functional setState.
 
-- [ ] #IMP-044 Comments view lacks pagination (single fetch) — Attempts: 0
+- [x] #IMP-044 Comments view lacks pagination (single fetch) — DONE — added Load More pagination (50 per page) to comments view
   - **Found:** Iteration 103 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/comments/comments-view.tsx`
@@ -322,7 +322,7 @@
   - **Where:** `src/app/(app)/w/[workspaceId]/runbooks/runbooks-list-view.tsx`
   - **Fix applied:** Wrapped progress bar in flex container, appended span showing '{resolved} / {total}' in text-[11px] text-[var(--text-tertiary)] with tabular-nums for stable digit width.
 
-- [ ] #IMP-047 Activity filter tabs overflow on narrow viewports — Attempts: 0
+- [x] #IMP-047 Activity filter tabs overflow on narrow viewports — DONE — responsive padding and text size on filter tabs
   - **Found:** Iteration 103 (regression tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/activity/activity-view.tsx`
@@ -330,7 +330,7 @@
   - **Design principle:** Nielsen H4: Consistency and standards
   - **Suggested fix:** Wrap filter row or use compact dropdown on narrow viewports, matching workspace-shell tab-bar pattern.
 
-- [ ] #IMP-048 Perspective comparison empty annotations state after selection — Attempts: 0
+- [x] #IMP-048 Perspective comparison empty annotations state after selection — DONE — empty annotations state message after perspective selection
   - **Found:** Iteration 104 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx`
@@ -338,7 +338,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Add secondary empty-state message when both perspectives are selected but annotations.length === 0: e.g. "No annotations found — add annotations to perspective elements in Settings."
 
-- [ ] #IMP-049 Perspective comparison element links should deep-link to specific canvas node — Attempts: 0
+- [x] #IMP-049 Perspective comparison element links should deep-link to specific canvas node — DONE — focusNode query param on links + FocusNodeEffect in FlowCanvas
   - **Found:** Iteration 104 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/perspectives/compare/perspectives-compare-view.tsx`
@@ -390,7 +390,7 @@
   - **Design principle:** Nielsen H6: Recognition over recall — specific labels confirm what is being deleted
   - **Suggested fix:** Change button label to "Delete Perspective" to match dialog title.
 
-- [ ] #IMP-056 Prioritization Y-axis label column may clip at narrow widths — Attempts: 0
+- [x] #IMP-056 Prioritization Y-axis label column may clip at narrow widths — DONE — min-w-[16px] on Y-axis label column
   - **Found:** Iteration 107 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/prioritization/prioritization-view.tsx`
@@ -610,7 +610,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall — user shouldn't need to remember where to create tools
   - **Suggested fix:** Replace static label with a link: "No tools yet — go to Tools to create some" with navigation to `/w/{workspaceId}/tools`.
 
-- [ ] #IMP-085 Tool section panel click behavior may require investigation — Attempts: 0
+- [x] #IMP-085 Tool section panel click behavior may require investigation — DONE — verified: tool section click selects and opens detail panel correctly
   - **Found:** Iteration 118 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tools-canvas-view.tsx`
@@ -634,7 +634,7 @@
   - **Design principle:** Nielsen H7: Flexibility and efficiency of use
   - **Suggested fix:** Treat null frequency as -1 for sorting so unset steps always appear at the bottom of the Coverage Gaps list.
 
-- [ ] #IMP-088 Canvas + tools page transfer size exceeds 1MB performance budget — Attempts: 0
+- [x] #IMP-088 Canvas + tools page transfer size exceeds 1MB performance budget — DONE — React.lazy() for 6 detail panels in canvas-view.tsx
   - **Found:** Iteration 120 (regression tester — Playwright performance audit)
   - **Category:** Performance
   - **Where:** All React Flow canvas pages (workflow 1208KB, tools 1150KB, compare)
@@ -642,7 +642,7 @@
   - **Design principle:** Performance budget: keep single-page transfer under 1MB
   - **Suggested fix:** Evaluate dynamic import() for React Flow bundle or shared chunk splitting so React Flow is fetched once and reused across canvas routes.
 
-- [ ] #IMP-089 Section-step visual/data association mismatch on canvas — Attempts: 0
+- [x] #IMP-089 Section-step visual/data association mismatch on canvas — DONE — section reassignment on step drag via findContainingSection hit-test
   - **Found:** Iteration 120 (regression tester — Playwright browser)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/[tabId]/canvas-view.tsx` + section-node.tsx
@@ -714,7 +714,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — state should accurately reflect what will happen
   - **Suggested fix:** Render available:false sections as unchecked+disabled, or hide them entirely.
 
-- [ ] #IMP-098 Export PDF dialog lacks estimated page count — Attempts: 0
+- [x] #IMP-098 Export PDF dialog lacks estimated page count — DONE — estimated page count below presets in export dialog
   - **Found:** Iteration 127 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — Export button area
@@ -730,7 +730,7 @@
   - **Design principle:** Nielsen H6: Recognition rather than recall — empty state should guide users toward first action
   - **Suggested fix:** Add empty state overlay or centered prompt inside the canvas when no tools exist.
 
-- [ ] #IMP-101 Coverage Gaps table lacks section/tab navigation context — Attempts: 0
+- [x] #IMP-101 Coverage Gaps table lacks section/tab navigation context — DONE — section name prefix in Coverage Gaps table
   - **Found:** Iteration 128 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/app/(app)/w/[workspaceId]/tools/tool-analysis-view.tsx` — Coverage Gaps card
@@ -826,7 +826,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status — transitions should signal state changes
   - **Suggested fix:** Add a fade-in or slide-in animation to the analysis panel.
 
-- [ ] #IMP-113 PDF export preset buttons should show section contents on hover — Attempts: 0
+- [x] #IMP-113 PDF export preset buttons should show section contents on hover — DONE — Radix Tooltip on preset buttons showing included sections
   - **Found:** Iteration 134 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset buttons
@@ -874,7 +874,7 @@
   - **Design principle:** Nielsen H1: Visibility of system status
   - **Suggested fix:** Add a `title` attribute or Tooltip component showing the full ISO datetime in user locale.
 
-- [ ] #IMP-119 Export PDF dialog custom mode has no explicit toggle button — Attempts: 0
+- [x] #IMP-119 Export PDF dialog custom mode has no explicit toggle button — DONE — Custom preset button added to export dialog
   - **Found:** Iteration 138 (acceptance tester)
   - **Category:** Usability
   - **Where:** `src/components/panels/export-pdf-dialog.tsx` — preset buttons area

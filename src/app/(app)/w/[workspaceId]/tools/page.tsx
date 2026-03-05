@@ -15,7 +15,7 @@ export default async function ToolsPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: tools }, { data: toolSections }, { data: steps }] = await Promise.all([
+  const [{ data: tools }, { data: toolSections }, { data: steps }, { data: processSections }] = await Promise.all([
     supabase
       .from("tools")
       .select("*")
@@ -29,6 +29,10 @@ export default async function ToolsPage({
     supabase
       .from("steps")
       .select("id, name, section_id, tab_id, frequency_per_month")
+      .eq("workspace_id", workspaceId),
+    supabase
+      .from("sections")
+      .select("id, name")
       .eq("workspace_id", workspaceId),
   ]);
 
@@ -49,6 +53,7 @@ export default async function ToolsPage({
       initialToolSections={toolSections ?? []}
       initialSteps={steps ?? []}
       initialStepTools={stepTools}
+      initialSections={processSections ?? []}
     />
   );
 }

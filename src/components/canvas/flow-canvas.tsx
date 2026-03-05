@@ -8,7 +8,6 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
   useReactFlow,
   type Connection as FlowConnection,
   type NodeChange,
@@ -84,6 +83,7 @@ interface FlowCanvasProps {
   onExportPdf?: (canvasElement: HTMLElement, config: ExportConfig) => Promise<void> | void;
   onExportPng?: (canvasElement: HTMLElement) => Promise<void>;
   sectionAvailability?: Record<keyof ExportConfig, boolean>;
+  focusNodeId?: string | null;
 }
 
 function computeSectionMaturity(sectionId: string, steps: Step[]): { avg: number | null; avgTarget: number | null } {
@@ -97,6 +97,23 @@ function computeSectionMaturity(sectionId: string, steps: Step[]): { avg: number
     ? withTarget.reduce((sum, s) => sum + s.target_maturity!, 0) / withTarget.length
     : null;
   return { avg, avgTarget };
+}
+
+function FocusNodeEffect({ nodeId }: { nodeId?: string | null }) {
+  const { fitView } = useReactFlow();
+  const appliedRef = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    if (!nodeId || appliedRef.current === nodeId) return;
+    appliedRef.current = nodeId;
+    // Small delay to ensure nodes are rendered
+    const timer = setTimeout(() => {
+      fitView({ nodes: [{ id: `step-${nodeId}` }, { id: `section-${nodeId}` }], duration: 500, padding: 0.5 });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [nodeId, fitView]);
+
+  return null;
 }
 
 function buildNodes(sections: Section[], steps: Step[], selectedStepId: string | null, selectedSectionId: string | null, heatMapMode: boolean, annotatedIds?: Set<string>, annotationColor?: string | null): Node[] {
@@ -130,6 +147,8 @@ function buildEdges(connections: Connection[]): Edge[] {
     id: `edge-${conn.id}`,
     source: `step-${conn.source_step_id}`,
     target: `step-${conn.target_step_id}`,
+    ...(conn.source_handle ? { sourceHandle: conn.source_handle } : {}),
+    ...(conn.target_handle ? { targetHandle: conn.target_handle } : {}),
     type: "default",
   }));
 }
@@ -205,6 +224,7 @@ export function FlowCanvas({
   onExportPdf,
   onExportPng,
   sectionAvailability,
+  focusNodeId,
 }: FlowCanvasProps) {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const [heatMapMode, setHeatMapMode] = React.useState(false);
@@ -229,6 +249,26 @@ export function FlowCanvas({
     setEdges(buildEdges(connections));
   }, [connections, setEdges]);
 
+  // Determine which section (if any) contains an absolute canvas point
+  const findContainingSection = React.useCallback(
+    (absX: number, absY: number): string | null => {
+      for (const section of sections) {
+        const sx = section.position_x;
+        const sy = section.position_y;
+        if (
+          absX >= sx &&
+          absX <= sx + section.width &&
+          absY >= sy &&
+          absY <= sy + section.height
+        ) {
+          return section.id;
+        }
+      }
+      return null;
+    },
+    [sections]
+  );
+
   // Handle node position changes (drag end → persist)
   const handleNodesChange = React.useCallback(
     (changes: NodeChange[]) => {
@@ -239,10 +279,48 @@ export function FlowCanvas({
           const nodeId = change.id;
           if (nodeId.startsWith("step-")) {
             const stepId = nodeId.replace("step-", "");
-            updateStep(stepId, {
-              position_x: change.position.x,
-              position_y: change.position.y,
-            }).then((updated) => onStepUpdate(updated)).catch(() => {});
+            const step = steps.find((s) => s.id === stepId);
+            if (!step) continue;
+
+            // Compute absolute position for section hit-testing
+            const currentSectionId = step.section_id;
+            let absX = change.position.x;
+            let absY = change.position.y;
+            if (currentSectionId) {
+              const parentSection = sections.find((s) => s.id === currentSectionId);
+              if (parentSection) {
+                absX += parentSection.position_x;
+                absY += parentSection.position_y;
+              }
+            }
+
+            // Check if the step now falls inside a different section
+            const newSectionId = findContainingSection(absX, absY);
+            const sectionChanged = newSectionId !== currentSectionId;
+
+            if (sectionChanged) {
+              // Convert absolute position to be relative to the new parent (or keep absolute if no parent)
+              let newPosX = absX;
+              let newPosY = absY;
+              if (newSectionId) {
+                const newParent = sections.find((s) => s.id === newSectionId);
+                if (newParent) {
+                  newPosX = absX - newParent.position_x;
+                  newPosY = absY - newParent.position_y;
+                }
+              }
+
+              updateStep(stepId, {
+                position_x: newPosX,
+                position_y: newPosY,
+                section_id: newSectionId,
+              }).then((updated) => onStepUpdate(updated)).catch(() => {});
+            } else {
+              updateStep(stepId, {
+                position_x: change.position.x,
+                position_y: change.position.y,
+              }).then((updated) => onStepUpdate(updated)).catch(() => {});
+            }
           } else if (nodeId.startsWith("section-")) {
             const sectionId = nodeId.replace("section-", "");
             updateSection(sectionId, {
@@ -253,7 +331,7 @@ export function FlowCanvas({
         }
       }
     },
-    [onNodesChange, onStepUpdate, onSectionUpdate]
+    [onNodesChange, onStepUpdate, onSectionUpdate, steps, sections, findContainingSection]
   );
 
   // Handle edge changes (delete)
@@ -290,6 +368,8 @@ export function FlowCanvas({
           tab_id: tabId,
           source_step_id: sourceStepId,
           target_step_id: targetStepId,
+          source_handle: connection.sourceHandle,
+          target_handle: connection.targetHandle,
         });
         onConnectionCreate(conn);
       } catch (err) {
@@ -430,6 +510,7 @@ export function FlowCanvas({
       deleteKeyCode={null} // We handle delete ourselves
       className="bg-[var(--bg-app)]"
     >
+      <FocusNodeEffect nodeId={focusNodeId} />
       <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.04)" />
       <Controls
         showInteractive={false}

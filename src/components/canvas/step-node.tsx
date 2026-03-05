@@ -69,11 +69,13 @@ function StepNodeComponent({ data, selected }: NodeProps) {
       <Handle
         type="target"
         position={Position.Top}
+        id="top"
         className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)]"
       />
       <Handle
         type="source"
         position={Position.Bottom}
+        id="bottom"
         className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)]"
       />
       <Handle

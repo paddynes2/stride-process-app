@@ -188,7 +188,7 @@ export function PrioritizationView({
               </div>
 
               {/* Y-axis numeric labels (5 at top → 1 at bottom) */}
-              <div className="relative w-4 shrink-0" style={{ height: "480px" }}>
+              <div className="relative w-4 shrink-0 min-w-[16px]" style={{ height: "480px" }}>
                 {Y_AXIS_SCORES.map((score, i) => (
                   <span
                     key={score}

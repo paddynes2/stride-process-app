@@ -107,12 +107,18 @@ function buildToolNodes(
   return [...sectionNodes, ...toolNodes];
 }
 
+interface SectionLookup {
+  id: string;
+  name: string;
+}
+
 interface ToolsCanvasViewProps {
   workspaceId: string;
   initialTools: Tool[];
   initialToolSections: ToolSection[];
   initialSteps: AnalysisStep[];
   initialStepTools: StepToolData[];
+  initialSections?: SectionLookup[];
 }
 
 export function ToolsCanvasView({
@@ -121,6 +127,7 @@ export function ToolsCanvasView({
   initialToolSections,
   initialSteps,
   initialStepTools,
+  initialSections = [],
 }: ToolsCanvasViewProps) {
   const [tools, setTools] = React.useState<Tool[]>(initialTools);
   const [toolSections, setToolSections] =
@@ -443,6 +450,7 @@ export function ToolsCanvasView({
               tools={tools}
               steps={steps}
               stepTools={stepTools}
+              sections={initialSections}
               onSelectTool={handleSelectToolFromAnalysis}
             />
           </div>

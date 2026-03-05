@@ -160,6 +160,8 @@ export async function createConnection(data: {
   tab_id: string;
   source_step_id: string;
   target_step_id: string;
+  source_handle?: string | null;
+  target_handle?: string | null;
 }): Promise<Connection> {
   return apiFetch<Connection>("/api/v1/connections", {
     method: "POST",
@@ -587,12 +589,16 @@ export async function fetchComments(workspaceId: string, filters?: {
   commentable_id?: string;
   category?: CommentCategory;
   is_resolved?: boolean;
+  limit?: number;
+  offset?: number;
 }): Promise<Comment[]> {
   const params = new URLSearchParams({ workspace_id: workspaceId });
   if (filters?.commentable_type) params.set("commentable_type", filters.commentable_type);
   if (filters?.commentable_id) params.set("commentable_id", filters.commentable_id);
   if (filters?.category) params.set("category", filters.category);
   if (filters?.is_resolved !== undefined) params.set("is_resolved", String(filters.is_resolved));
+  if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
+  if (filters?.offset !== undefined) params.set("offset", String(filters.offset));
   return apiFetch<Comment[]>(`/api/v1/comments?${params}`);
 }
 

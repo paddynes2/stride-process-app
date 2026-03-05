@@ -25,12 +25,18 @@ export async function GET(request: NextRequest) {
   const commentableId = request.nextUrl.searchParams.get("commentable_id");
   const category = request.nextUrl.searchParams.get("category");
   const isResolvedParam = request.nextUrl.searchParams.get("is_resolved");
+  const limitParam = request.nextUrl.searchParams.get("limit");
+  const offsetParam = request.nextUrl.searchParams.get("offset");
+
+  const limit = limitParam ? Math.max(1, parseInt(limitParam, 10) || 50) : 50;
+  const offset = offsetParam ? Math.max(0, parseInt(offsetParam, 10) || 0) : 0;
 
   let query = supabase
     .from("comments")
     .select("*")
     .eq("workspace_id", workspaceId)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (commentableType) {
     query = query.eq("commentable_type", commentableType);

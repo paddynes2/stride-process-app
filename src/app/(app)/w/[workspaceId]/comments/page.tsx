@@ -27,7 +27,8 @@ export default async function CommentsPage({
       .from("comments")
       .select("*")
       .eq("workspace_id", workspaceId)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .range(0, 49),
     supabase.from("steps").select("id, name, tab_id").eq("workspace_id", workspaceId),
     supabase.from("sections").select("id, name, tab_id").eq("workspace_id", workspaceId),
     supabase.from("stages").select("id, name, tab_id").eq("workspace_id", workspaceId),
@@ -51,6 +52,7 @@ export default async function CommentsPage({
   return (
     <CommentsView
       initialComments={(comments ?? []) as Comment[]}
+      initialHasMore={(comments ?? []).length === 50}
       entityNames={entityNames}
       workspaceId={workspaceId}
       entityTabMap={entityTabMap}

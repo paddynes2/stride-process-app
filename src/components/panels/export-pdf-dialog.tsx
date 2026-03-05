@@ -11,8 +11,17 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+const PAGES_PER_SECTION = 2;
+
+const PRESET_SECTIONS: Record<string, string[]> = {
+  executive: ["Canvas Snapshot", "Executive Summary", "Gap Analysis"],
+  full: ["All available sections"],
+  gap: ["Canvas Snapshot", "Gap Analysis", "Perspective Comparison", "Improvements"],
+};
 
 export interface ExportConfig {
   canvasSnapshot: boolean;
@@ -127,6 +136,64 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
 
 type Preset = "executive" | "full" | "gap" | "custom";
 
+function PresetButton({
+  id,
+  label,
+  active,
+  onClick,
+}: {
+  id: Preset;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const sections = PRESET_SECTIONS[id];
+  if (!sections) {
+    return (
+      <button
+        onClick={onClick}
+        className={cn(
+          "px-3 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium transition-colors",
+          active
+            ? "bg-[var(--accent-blue)] border-[var(--accent-blue)] text-white"
+            : "bg-transparent border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+        )}
+      >
+        {label}
+      </button>
+    );
+  }
+
+  return (
+    <TooltipPrimitive.Root>
+      <TooltipPrimitive.Trigger asChild>
+        <button
+          onClick={onClick}
+          className={cn(
+            "px-3 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium transition-colors",
+            active
+              ? "bg-[var(--accent-blue)] border-[var(--accent-blue)] text-white"
+              : "bg-transparent border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
+          )}
+        >
+          {label}
+        </button>
+      </TooltipPrimitive.Trigger>
+      <TooltipPrimitive.Portal>
+        <TooltipPrimitive.Content
+          className="z-50 rounded-[var(--radius-sm)] bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] px-2.5 py-2 text-[11px] text-[var(--text-primary)] shadow-lg max-w-[200px]"
+          sideOffset={5}
+        >
+          <p className="font-medium mb-1">Includes:</p>
+          {sections.map((s) => (
+            <div key={s} className="text-[var(--text-tertiary)]">• {s}</div>
+          ))}
+        </TooltipPrimitive.Content>
+      </TooltipPrimitive.Portal>
+    </TooltipPrimitive.Root>
+  );
+}
+
 interface ExportPdfDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -168,6 +235,7 @@ export function ExportPdfDialog({
     } else if (preset === "gap") {
       setConfig(maskWithAvailability(GAP_REPORT_CONFIG, availability));
     }
+    // "custom" keeps current checkbox state
   };
 
   const handleToggle = (key: keyof ExportConfig) => {
@@ -213,28 +281,29 @@ export function ExportPdfDialog({
           <p className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide mb-2">
             Preset
           </p>
-          <div className="flex gap-2">
-            {(
-              [
-                { id: "executive", label: "Executive Summary" },
-                { id: "full", label: "Full Audit" },
-                { id: "gap", label: "Gap Report" },
-              ] as { id: Preset; label: string }[]
-            ).map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => handlePreset(id)}
-                className={cn(
-                  "px-3 py-1.5 rounded-[var(--radius-md)] border text-[12px] font-medium transition-colors",
-                  activePreset === id
-                    ? "bg-[var(--accent-blue)] border-[var(--accent-blue)] text-white"
-                    : "bg-transparent border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)]"
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <TooltipPrimitive.Provider delayDuration={300}>
+            <div className="flex gap-2 flex-wrap">
+              {(
+                [
+                  { id: "executive", label: "Executive Summary" },
+                  { id: "full", label: "Full Audit" },
+                  { id: "gap", label: "Gap Report" },
+                  { id: "custom", label: "Custom" },
+                ] as { id: Preset; label: string }[]
+              ).map(({ id, label }) => (
+                <PresetButton
+                  key={id}
+                  id={id}
+                  label={label}
+                  active={activePreset === id}
+                  onClick={() => handlePreset(id)}
+                />
+              ))}
+            </div>
+          </TooltipPrimitive.Provider>
+          <p className="mt-2 text-[11px] text-[var(--text-tertiary)]">
+            ~{1 + selectedCount * PAGES_PER_SECTION} pages
+          </p>
           {activePreset !== "custom" && maskedCount > 0 && (
             <p className="mt-2 text-xs text-white/55">
               {maskedCount} section{maskedCount !== 1 ? "s" : ""} unavailable — add data to unlock them

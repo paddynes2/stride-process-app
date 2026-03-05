@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { workspace_id, tab_id, source_step_id, target_step_id } = body;
+  const { workspace_id, tab_id, source_step_id, target_step_id, source_handle, target_handle } = body;
 
   if (!workspace_id) {
     return errorResponse("validation", "workspace_id is required", 400);
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   const { data: connection, error } = await supabase
     .from("connections")
-    .insert({ workspace_id, tab_id, source_step_id, target_step_id })
+    .insert({ workspace_id, tab_id, source_step_id, target_step_id, source_handle: source_handle ?? null, target_handle: target_handle ?? null })
     .select()
     .single();
 

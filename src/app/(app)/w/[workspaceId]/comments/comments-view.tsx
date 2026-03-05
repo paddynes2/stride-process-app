@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { MessageSquare, CheckCircle2, Circle } from "lucide-react";
+import { MessageSquare, CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { fetchComments } from "@/lib/api/client";
 import type { Comment, CommentCategory, CommentableType } from "@/types/database";
 
 const CATEGORY_CONFIG: Record<CommentCategory, { variant: React.ComponentProps<typeof Badge>["variant"]; label: string }> = {
@@ -36,23 +37,41 @@ function formatRelativeTime(dateString: string): string {
 
 interface CommentsViewProps {
   initialComments: Comment[];
+  initialHasMore: boolean;
   entityNames: Record<string, string>;
   workspaceId: string;
   entityTabMap: Record<string, string>;
 }
 
-export function CommentsView({ initialComments, entityNames, workspaceId, entityTabMap }: CommentsViewProps) {
+export function CommentsView({ initialComments, initialHasMore, entityNames, workspaceId, entityTabMap }: CommentsViewProps) {
   const [activeFilter, setActiveFilter] = React.useState<FilterTab>("all");
+  const [comments, setComments] = React.useState<Comment[]>(initialComments);
+  const [hasMore, setHasMore] = React.useState(initialHasMore);
+  const [loading, setLoading] = React.useState(false);
 
   const topLevel = React.useMemo(
-    () => initialComments.filter((c) => c.parent_id === null),
-    [initialComments]
+    () => comments.filter((c) => c.parent_id === null),
+    [comments]
   );
 
   const filtered = React.useMemo(
     () => activeFilter === "all" ? topLevel : topLevel.filter((c) => c.category === activeFilter),
     [topLevel, activeFilter]
   );
+
+  async function loadMore() {
+    setLoading(true);
+    try {
+      const more = await fetchComments(workspaceId, {
+        limit: 50,
+        offset: comments.length,
+      });
+      setComments((prev) => [...prev, ...more]);
+      setHasMore(more.length === 50);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -157,6 +176,26 @@ export function CommentsView({ initialComments, entityNames, workspaceId, entity
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Load More */}
+        {hasMore && (
+          <div className="pt-4 flex justify-center">
+            <button
+              onClick={loadMore}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--bg-surface-active)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] hover:border-[var(--border-default)] transition-colors disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Loading…
+                </>
+              ) : (
+                `Load More (${comments.length} loaded)`
+              )}
+            </button>
           </div>
         )}
       </div>

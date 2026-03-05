@@ -110,7 +110,7 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
         <p className="text-[14px] text-[var(--text-secondary)]">No steps in this runbook.</p>
         <Button variant="secondary" size="sm" asChild>
           <Link href={`/w/${workspaceId}/runbooks/${runbook.id}`}>
-            <ArrowLeft className="h-4 w-4" aria-label="Back" />
+            <ArrowLeft className="h-4 w-4" />
             Back to Runbook
           </Link>
         </Button>
@@ -126,7 +126,7 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
           href={`/w/${workspaceId}/runbooks/${runbook.id}`}
           className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-[13px] shrink-0"
         >
-          <ArrowLeft className="h-4 w-4" aria-label="Back" />
+          <ArrowLeft className="h-4 w-4" />
           Exit
         </Link>
         <span className="text-[13px] font-medium text-[var(--text-primary)] truncate mx-4 text-center">
@@ -177,7 +177,7 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
           {/* Step name — large and centered */}
           <h2
             className={cn(
-              "text-[28px] font-semibold leading-tight mb-8",
+              "text-[28px] font-semibold leading-tight",
               isCompleted
                 ? "line-through text-[var(--text-tertiary)]"
                 : "text-[var(--text-primary)]"
@@ -185,6 +185,15 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
           >
             {stepName}
           </h2>
+
+          {/* Step notes */}
+          {currentStep?.notes && (
+            <p className="mt-3 text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
+              {currentStep.notes}
+            </p>
+          )}
+
+          <div className="mb-8" />
 
           {/* Primary action */}
           {!isCompleted && currentStep?.status !== "skipped" && !isReadOnly && (
@@ -219,7 +228,7 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
               disabled={currentIndex === 0}
               aria-label="Previous step"
             >
-              <ChevronLeft className="h-4 w-4" aria-label="Previous" />
+              <ChevronLeft className="h-4 w-4" />
               Prev
             </Button>
             <Button
@@ -230,7 +239,7 @@ export function PlaybookView({ runbook, initialSteps, workspaceId }: PlaybookVie
               aria-label="Next step"
             >
               Next
-              <ChevronRight className="h-4 w-4" aria-label="Next" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>

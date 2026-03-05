@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Clock } from "lucide-react";
+import { Clock, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fetchActivityLog } from "@/lib/api/client";
 import type { ActivityLog, ActivityAction } from "@/types/database";
@@ -73,10 +73,28 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
   const [loading, setLoading] = React.useState(false);
   const [hasMore, setHasMore] = React.useState(initialEntries.length === 50);
 
-  const filtered = React.useMemo(
-    () => activeFilter === "all" ? entries : entries.filter((e) => e.action === activeFilter),
-    [entries, activeFilter]
-  );
+  const filtered = entries;
+
+  async function fetchFiltered(action: FilterTab) {
+    setLoading(true);
+    try {
+      const result = await fetchActivityLog(workspaceId, {
+        limit: 50,
+        offset: 0,
+        ...(action !== "all" && { action }),
+      });
+      setEntries(result);
+      setHasMore(result.length === 50);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleFilterChange(action: FilterTab) {
+    setActiveFilter(action);
+    setEntries([]);
+    fetchFiltered(action);
+  }
 
   async function loadMore() {
     setLoading(true);
@@ -84,6 +102,7 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
       const more = await fetchActivityLog(workspaceId, {
         limit: 50,
         offset: entries.length,
+        ...(activeFilter !== "all" && { action: activeFilter }),
       });
       setEntries((prev) => [...prev, ...more]);
       setHasMore(more.length === 50);
@@ -104,11 +123,11 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
       </div>
 
       {/* Action filter tabs */}
-      <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[var(--border-subtle)] overflow-x-auto shrink-0">
+      <div className="relative flex items-center gap-0.5 px-2 md:px-4 py-2 border-b border-[var(--border-subtle)] overflow-x-auto shrink-0" style={{ maskImage: "linear-gradient(to right, black 90%, transparent 100%)", WebkitMaskImage: "linear-gradient(to right, black 90%, transparent 100%)" }}>
         <button
-          onClick={() => setActiveFilter("all")}
+          onClick={() => handleFilterChange("all")}
           className={cn(
-            "px-3 py-1 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors whitespace-nowrap",
+            "px-2 md:px-3 py-1 rounded-[var(--radius-sm)] text-[11px] md:text-[12px] font-medium transition-colors whitespace-nowrap",
             activeFilter === "all"
               ? "bg-[var(--signal-subtle)] text-[var(--text-primary)]"
               : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
@@ -119,9 +138,9 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
         {ALL_ACTIONS.map((action) => (
           <button
             key={action}
-            onClick={() => setActiveFilter(action)}
+            onClick={() => handleFilterChange(action)}
             className={cn(
-              "px-3 py-1 rounded-[var(--radius-sm)] text-[12px] font-medium transition-colors whitespace-nowrap",
+              "px-2 md:px-3 py-1 rounded-[var(--radius-sm)] text-[11px] md:text-[12px] font-medium transition-colors whitespace-nowrap",
               activeFilter === action
                 ? "bg-[var(--signal-subtle)] text-[var(--text-primary)]"
                 : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
@@ -198,9 +217,16 @@ export function ActivityView({ initialEntries, workspaceId, entityTabMap }: Acti
             <button
               onClick={loadMore}
               disabled={loading}
-              className="px-4 py-2 text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--bg-surface-active)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] hover:border-[var(--border-default)] transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--bg-surface-active)] border border-[var(--border-subtle)] rounded-[var(--radius-sm)] hover:border-[var(--border-default)] transition-colors disabled:opacity-50"
             >
-              Load More
+              {loading ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Loading…
+                </>
+              ) : (
+                `Load More (${entries.length} loaded)`
+              )}
             </button>
           </div>
         )}

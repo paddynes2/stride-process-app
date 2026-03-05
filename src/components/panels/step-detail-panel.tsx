@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb, Wrench, FileText } from "lucide-react";
+import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

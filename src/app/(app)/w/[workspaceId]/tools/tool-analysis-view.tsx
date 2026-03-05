@@ -19,11 +19,17 @@ export interface StepToolData {
   tool_id: string;
 }
 
+interface SectionLookup {
+  id: string;
+  name: string;
+}
+
 interface ToolAnalysisViewProps {
   workspaceId: string;
   tools: Tool[];
   steps: AnalysisStep[];
   stepTools: StepToolData[];
+  sections?: SectionLookup[];
   onSelectTool: (toolId: string) => void;
 }
 
@@ -32,6 +38,7 @@ export function ToolAnalysisView({
   tools,
   steps,
   stepTools,
+  sections = [],
   onSelectTool,
 }: ToolAnalysisViewProps) {
   const router = useRouter();
@@ -39,6 +46,11 @@ export function ToolAnalysisView({
   const toolMap = React.useMemo(
     () => new Map(tools.map((t) => [t.id, t])),
     [tools]
+  );
+
+  const sectionMap = React.useMemo(
+    () => new Map(sections.map((s) => [s.id, s.name])),
+    [sections]
   );
 
   // Overlapping Tools: steps assigned 2+ tools
@@ -311,6 +323,9 @@ export function ToolAnalysisView({
                             }
                             className="text-[12px] text-[var(--accent-blue)] hover:underline text-left"
                           >
+                            {step.section_id && sectionMap.get(step.section_id)
+                              ? `${sectionMap.get(step.section_id)} › `
+                              : ""}
                             {step.name}
                           </button>
                         </td>

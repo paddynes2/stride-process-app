@@ -1,14 +1,26 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FlowCanvas } from "@/components/canvas/flow-canvas";
-import { StepDetailPanel } from "@/components/panels/step-detail-panel";
-import { SectionDetailPanel } from "@/components/panels/section-detail-panel";
-import { WorkspaceSummaryPanel } from "@/components/panels/workspace-summary-panel";
-import { AnnotationPanel } from "@/components/panels/annotation-panel";
-import { CommentPanel } from "@/components/panels/comment-panel";
-import { TaskPanel } from "@/components/panels/task-panel";
+const StepDetailPanel = React.lazy(() =>
+  import("@/components/panels/step-detail-panel").then((m) => ({ default: m.StepDetailPanel }))
+);
+const SectionDetailPanel = React.lazy(() =>
+  import("@/components/panels/section-detail-panel").then((m) => ({ default: m.SectionDetailPanel }))
+);
+const WorkspaceSummaryPanel = React.lazy(() =>
+  import("@/components/panels/workspace-summary-panel").then((m) => ({ default: m.WorkspaceSummaryPanel }))
+);
+const AnnotationPanel = React.lazy(() =>
+  import("@/components/panels/annotation-panel").then((m) => ({ default: m.AnnotationPanel }))
+);
+const CommentPanel = React.lazy(() =>
+  import("@/components/panels/comment-panel").then((m) => ({ default: m.CommentPanel }))
+);
+const TaskPanel = React.lazy(() =>
+  import("@/components/panels/task-panel").then((m) => ({ default: m.TaskPanel }))
+);
 import { ColoringPanel } from "@/components/canvas/coloring-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
@@ -51,6 +63,8 @@ export function CanvasView({
   initialSteps,
   initialConnections,
 }: CanvasViewProps) {
+  const searchParams = useSearchParams();
+  const focusNodeId = searchParams.get("focusNode");
   const [sections, setSections] = React.useState(initialSections);
   const [steps, setSteps] = React.useState(initialSteps);
   const [connections, setConnections] = React.useState(initialConnections);
@@ -120,16 +134,25 @@ export function CanvasView({
     connections,
   });
 
-  // Fetch annotated element IDs for the active perspective
+  // Compute the set of entity IDs on this tab so we can filter annotations
+  const tabEntityIds = React.useMemo(() => {
+    const ids = new Set<string>();
+    for (const s of sections) ids.add(s.id);
+    for (const s of steps) ids.add(s.id);
+    return ids;
+  }, [sections, steps]);
+
+  // Fetch annotated element IDs for the active perspective, filtered to current tab
   const [annotatedIds, setAnnotatedIds] = React.useState<Set<string>>(new Set());
   const refreshAnnotatedIds = React.useCallback(() => {
     if (!activePerspective) return;
     fetchAnnotations(activePerspective.id)
       .then((annotations) => {
-        setAnnotatedIds(new Set(annotations.map((a) => a.annotatable_id)));
+        const filtered = annotations.filter((a) => tabEntityIds.has(a.annotatable_id));
+        setAnnotatedIds(new Set(filtered.map((a) => a.annotatable_id)));
       })
       .catch(() => {});
-  }, [activePerspective]);
+  }, [activePerspective, tabEntityIds]);
 
   React.useEffect(() => {
     if (!activePerspective) {
@@ -238,6 +261,24 @@ export function CanvasView({
     }
   };
 
+  // Fetch step-role assignments to determine which steps have roles (for coloring rules)
+  const [stepsWithRoles, setStepsWithRoles] = React.useState<Set<string>>(new Set());
+  React.useEffect(() => {
+    const stepIds = steps.map((s) => s.id);
+    if (stepIds.length === 0) {
+      setStepsWithRoles(new Set());
+      return;
+    }
+    let cancelled = false;
+    fetchStepRolesBatch(stepIds)
+      .then((stepRoles) => {
+        if (cancelled) return;
+        setStepsWithRoles(new Set(stepRoles.map((sr) => sr.step_id)));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [steps]);
+
   // Fetch workspace coloring rules for step background tint
   const [coloringRules, setColoringRules] = React.useState<ColoringRule[]>([]);
   const [showColoringPanel, setShowColoringPanel] = React.useState(false);
@@ -282,7 +323,7 @@ export function CanvasView({
               step.maturity_score > parseInt(rule.criteria_value, 10);
             break;
           case "has_role":
-            // Requires additional data fetch — skip visual evaluation for now
+            matches = stepsWithRoles.has(step.id);
             break;
         }
         if (matches) {
@@ -291,7 +332,7 @@ export function CanvasView({
       }
     }
     return map;
-  }, [coloringRules, steps]);
+  }, [coloringRules, steps, stepsWithRoles]);
 
   // Availability flags for export dialog sections
   const [hasTools, setHasTools] = React.useState(false);
@@ -561,6 +602,7 @@ export function CanvasView({
             onExportPdf={handleEnhancedExportPdf}
             onExportPng={handleExportPng}
             sectionAvailability={sectionAvailability}
+            focusNodeId={focusNodeId}
           />
 
           {/* Coloring rules + Templates buttons — top-right overlay */}
@@ -681,6 +723,7 @@ export function CanvasView({
           className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-y-auto"
           style={{ width: "var(--panel-width)" }}
         >
+          <React.Suspense fallback={null}>
             {selectedStep && (
               <StepDetailPanel
                 step={selectedStep}
@@ -706,47 +749,48 @@ export function CanvasView({
                 connections={connections}
               />
             )}
-          {selectedStep && (
-            activePerspective ? (
-              <AnnotationPanel
-                perspectiveId={activePerspective.id}
-                perspectiveName={activePerspective.name}
-                perspectiveColor={activePerspective.color}
-                annotatableType="step"
-                annotatableId={selectedStep.id}
-                onAnnotationChange={refreshAnnotatedIds}
-              />
-            ) : (
-              <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
-                Select a perspective to add annotations
-              </div>
-            )
-          )}
-          {selectedSection && !selectedStep && (
-            activePerspective ? (
-              <AnnotationPanel
-                perspectiveId={activePerspective.id}
-                perspectiveName={activePerspective.name}
-                perspectiveColor={activePerspective.color}
-                annotatableType="section"
-                annotatableId={selectedSection.id}
-                onAnnotationChange={refreshAnnotatedIds}
-              />
-            ) : (
-              <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
-                Select a perspective to add annotations
-              </div>
-            )
-          )}
-          {selectedStep && (
-            <TaskPanel workspaceId={workspaceId} stepId={selectedStep.id} />
-          )}
-          {selectedStep && (
-            <CommentPanel commentableType="step" commentableId={selectedStep.id} />
-          )}
-          {selectedSection && !selectedStep && (
-            <CommentPanel commentableType="section" commentableId={selectedSection.id} />
-          )}
+            {selectedStep && (
+              activePerspective ? (
+                <AnnotationPanel
+                  perspectiveId={activePerspective.id}
+                  perspectiveName={activePerspective.name}
+                  perspectiveColor={activePerspective.color}
+                  annotatableType="step"
+                  annotatableId={selectedStep.id}
+                  onAnnotationChange={refreshAnnotatedIds}
+                />
+              ) : (
+                <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
+                  Select a perspective to add annotations
+                </div>
+              )
+            )}
+            {selectedSection && !selectedStep && (
+              activePerspective ? (
+                <AnnotationPanel
+                  perspectiveId={activePerspective.id}
+                  perspectiveName={activePerspective.name}
+                  perspectiveColor={activePerspective.color}
+                  annotatableType="section"
+                  annotatableId={selectedSection.id}
+                  onAnnotationChange={refreshAnnotatedIds}
+                />
+              ) : (
+                <div className="border-t border-[var(--border-subtle)] px-4 py-3 text-sm text-white/55 text-center">
+                  Select a perspective to add annotations
+                </div>
+              )
+            )}
+            {selectedStep && (
+              <TaskPanel workspaceId={workspaceId} stepId={selectedStep.id} />
+            )}
+            {selectedStep && (
+              <CommentPanel commentableType="step" commentableId={selectedStep.id} />
+            )}
+            {selectedSection && !selectedStep && (
+              <CommentPanel commentableType="section" commentableId={selectedSection.id} />
+            )}
+          </React.Suspense>
         </div>
       </div>
     </CommentCountsContext.Provider>

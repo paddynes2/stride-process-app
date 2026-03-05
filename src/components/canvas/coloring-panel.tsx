@@ -21,14 +21,14 @@ const CRITERIA_OPTIONS: { value: CriteriaType; label: string; disabled?: boolean
   { value: "step_type", label: "Step Type" },
   { value: "maturity_below", label: "Maturity Below" },
   { value: "maturity_above", label: "Maturity Above" },
-  { value: "has_role", label: "Has Role (coming soon)", disabled: true },
+  { value: "has_role", label: "Has Role" },
 ];
 
 const CRITERIA_VALUE_HINTS: Record<CriteriaType, string> = {
   status: "draft, in_progress, testing, live, archived",
   executor: "person, automation, ai_agent",
   step_type: "any step type value",
-  has_role: "role ID (not evaluated visually)",
+  has_role: "any (matches steps with roles)",
   maturity_below: "1–5",
   maturity_above: "1–5",
 };

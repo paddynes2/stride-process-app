@@ -176,7 +176,7 @@
 
 ---
 
-## Phase 3b: Tools Canvas + Enhanced Export — DEFERRED (Phase 4 prioritized)
+## Phase 3b: Tools Canvas + Enhanced Export — DONE
 
 ### #FEAT-040 Tools canvas upgrade
 **Phase:** 3b

@@ -1,7 +1,7 @@
 # Stride — CLAUDE.md
 
 ## What This Is
-Process mapping & continuous improvement SaaS (Puzzle.io clone). Currently completing **Phase 3b — Tools Canvas + Enhanced Export** (iteration 127). All core features through Phase 4 are built. Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, applies conditional step coloring, manages tools with cost analysis, and exports enhanced multi-section PDF reports.
+Process mapping & continuous improvement SaaS (Puzzle.io clone). **All phases complete** (Phase 0–4 + Phase 3a/3b). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, applies conditional step coloring, manages tools with cost analysis, runs AI analysis, and exports enhanced multi-section PDF reports.
 
 ## Tech Stack
 - Next.js 16.1.6 + React 19.2 + TypeScript 5 + Tailwind CSS 4
@@ -88,7 +88,7 @@ src/
     public/shares/[shareId]/ — GET public read-only data
   app/auth/callback/       — OAuth callback route
   components/
-    ui/                    — button, input, badge, dialog, dropdown-menu, separator, skeleton, tabs, textarea, offline-banner
+    ui/                    — button, input, badge, dialog, dropdown-menu, separator, skeleton, tabs, textarea, offline-banner, collapsible-section
     canvas/                — flow-canvas, step-node, section-node, stage-node, touchpoint-node
     panels/                — step-detail-panel, section-detail-panel, stage-detail-panel, touchpoint-detail-panel, tool-detail-panel, tool-section-detail-panel, annotation-panel, comment-panel, task-panel, export-pdf-dialog, workspace-summary-panel, rich-text-editor, video-embed
     layout/                — sidebar (grouped nav: Core, Analysis, Collaborate, Manage), header, tab-bar
@@ -113,6 +113,8 @@ src/
 npm run dev              # Start dev server (http://localhost:3000)
 npm run build            # Production build
 npm run lint             # ESLint
+npm run test             # Run unit tests (vitest)
+npm run test:watch       # Run tests in watch mode
 npx vercel --prod        # Deploy to production
 npx supabase db push     # Push migrations to remote DB
 npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
@@ -127,7 +129,7 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - Step status badges: draft (gray), in_progress (blue), testing (yellow), live (green), archived (dim)
 
 ## Database
-24 migration files in `supabase/migrations/`:
+27 migration files in `supabase/migrations/`:
 - 001: extensions (uuid-ossp, pg_trgm)
 - 002: enums (step_status, executor_type, workspace_role)
 - 003: core tables (users, organizations, organization_members, workspaces)
@@ -152,6 +154,9 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - 022: improvement_ideas (status & priority tracking)
 - 023: tool_sections (tool grouping with position/status)
 - 024: step_tools (many-to-many step↔tool junction table)
+- 025: connection_handles (source_handle + target_handle on connections)
+- 026: annotation_cleanup_triggers (cascade delete annotations on entity delete)
+- 027: activity_actor_type (actor_type column on activity_log)
 
 ## Gotchas & Learnings
 - **NEXT_PUBLIC_ static replacement:** Never use dynamic property access for these vars. Browser has no `process.env`.

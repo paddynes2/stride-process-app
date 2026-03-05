@@ -102,6 +102,8 @@ export interface Connection {
   tab_id: string;
   source_step_id: string;
   target_step_id: string;
+  source_handle?: string | null;
+  target_handle?: string | null;
   created_at: string;
 }
 
@@ -338,6 +340,8 @@ export interface RunbookStep {
 
 export type ActivityAction = "created" | "updated" | "deleted" | "completed" | "assigned" | "commented" | "exported" | "shared";
 
+export type ActivityActorType = "user" | "system" | "automation" | "api";
+
 export interface ActivityLog {
   id: string;
   workspace_id: string;
@@ -347,6 +351,7 @@ export interface ActivityLog {
   entity_id: string;
   entity_name: string;
   details: Record<string, unknown> | null;
+  actor_type: ActivityActorType;
   created_at: string;
   users?: { email: string } | null;
 }

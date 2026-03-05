@@ -72,39 +72,39 @@ export async function POST(
     return errorResponse("create_failed", sectionError?.message ?? "Failed to create section", 500);
   }
 
-  // 4. Insert steps with new UUIDs, building oldStepId → newStepId map
+  // 4. Batch-insert steps, building oldStepId → newStepId map
   const stepIdMap = new Map<string, string>();
 
-  for (const templateStep of templateData.steps) {
-    const { data: newStep, error: stepError } = await supabase
+  const stepsWithTemplateIds = templateData.steps.filter((s): s is typeof s & { id: string } => !!s.id);
+  const stepInserts = stepsWithTemplateIds.map((templateStep) => ({
+    workspace_id: targetWorkspaceId,
+    tab_id,
+    section_id: newSection.id,
+    name: templateStep.name,
+    position_x: sectionPosX + (templateStep.position_x ?? 0),
+    position_y: sectionPosY + (templateStep.position_y ?? 0),
+    status: templateStep.status ?? "draft",
+    step_type: templateStep.step_type ?? null,
+    executor: templateStep.executor ?? "empty",
+    notes: templateStep.notes ?? null,
+    video_url: templateStep.video_url ?? null,
+    attributes: templateStep.attributes ?? {},
+    time_minutes: templateStep.time_minutes ?? null,
+    frequency_per_month: templateStep.frequency_per_month ?? null,
+    maturity_score: templateStep.maturity_score ?? null,
+    target_maturity: templateStep.target_maturity ?? null,
+  }));
+
+  if (stepInserts.length > 0) {
+    const { data: newSteps } = await supabase
       .from("steps")
-      .insert({
-        workspace_id: targetWorkspaceId,
-        tab_id,
-        section_id: newSection.id,
-        name: templateStep.name,
-        position_x: sectionPosX + (templateStep.position_x ?? 0),
-        position_y: sectionPosY + (templateStep.position_y ?? 0),
-        status: templateStep.status ?? "draft",
-        step_type: templateStep.step_type ?? null,
-        executor: templateStep.executor ?? "empty",
-        notes: templateStep.notes ?? null,
-        video_url: templateStep.video_url ?? null,
-        attributes: templateStep.attributes ?? {},
-        time_minutes: templateStep.time_minutes ?? null,
-        frequency_per_month: templateStep.frequency_per_month ?? null,
-        maturity_score: templateStep.maturity_score ?? null,
-        target_maturity: templateStep.target_maturity ?? null,
-      })
-      .select("id")
-      .single();
+      .insert(stepInserts)
+      .select("id");
 
-    if (stepError || !newStep) {
-      continue;
-    }
-
-    if (templateStep.id) {
-      stepIdMap.set(templateStep.id, newStep.id);
+    if (newSteps) {
+      for (let i = 0; i < newSteps.length; i++) {
+        stepIdMap.set(stepsWithTemplateIds[i].id, newSteps[i].id);
+      }
     }
   }
 
