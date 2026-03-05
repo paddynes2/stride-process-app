@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import { MessageSquare, ListTodo } from "lucide-react";
+import { MessageSquare, ListTodo, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { StepNodeData } from "@/types/canvas";
-import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
+import { CommentCountsContext, TaskCountsContext, ColoringTintContext, PortalNavigateContext } from "@/types/canvas";
 import { MATURITY_COLORS, MATURITY_FALLBACK_COLOR } from "@/lib/maturity";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -34,11 +34,12 @@ function StepNodeComponent({ data, selected }: NodeProps) {
   const taskCount = taskCounts.get(step.id);
   const coloringTints = React.useContext(ColoringTintContext);
   const coloringTint = coloringTints.get(step.id) ?? null;
+  const portalNavigate = React.useContext(PortalNavigateContext);
 
   return (
     <div
       className={cn(
-        "relative px-3 py-2.5 rounded-[var(--radius-md)] border min-w-[180px] max-w-[240px]",
+        "group relative px-3 py-2.5 rounded-[var(--radius-md)] border min-w-[180px] max-w-[240px]",
         "shadow-[var(--shadow-sm)]",
         "transition-all duration-[var(--duration-fast)]",
         "hover:shadow-[var(--shadow-md)] hover:border-[var(--border-default)]",
@@ -48,9 +49,9 @@ function StepNodeComponent({ data, selected }: NodeProps) {
       )}
       style={
         heatMapMode && maturityColor
-          ? { backgroundColor: `${maturityColor}15`, borderColor: selected ? undefined : `${maturityColor}60` }
+          ? { backgroundColor: `${maturityColor}30`, borderColor: selected ? undefined : `${maturityColor}80` }
           : coloringTint
-          ? { backgroundColor: `${coloringTint}26` }
+          ? { backgroundColor: `${coloringTint}40` }
           : { backgroundColor: "var(--bg-surface)" }
       }
     >
@@ -65,30 +66,44 @@ function StepNodeComponent({ data, selected }: NodeProps) {
         />
       )}
 
+      {/* Portal link indicator */}
+      {step.link_to_tab_id && (
+        <div
+          className="absolute top-1 right-1 w-4 h-4 flex items-center justify-center rounded bg-[var(--accent-blue)]/20 text-[var(--accent-blue)] cursor-pointer hover:bg-[var(--accent-blue)]/40 transition-colors"
+          title="Links to another flow"
+          onClick={(e) => {
+            e.stopPropagation();
+            portalNavigate?.(step.link_to_tab_id!, step.link_to_step_id);
+          }}
+        >
+          <ExternalLink className="h-2.5 w-2.5" />
+        </div>
+      )}
+
       {/* Handles */}
       <Handle
         type="target"
         position={Position.Top}
         id="top"
-        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)]"
+        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)] opacity-0 group-hover:opacity-100 transition-opacity"
       />
       <Handle
         type="source"
         position={Position.Bottom}
         id="bottom"
-        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)]"
+        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)] opacity-0 group-hover:opacity-100 transition-opacity"
       />
       <Handle
         type="target"
         position={Position.Left}
         id="left"
-        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)]"
+        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)] opacity-0 group-hover:opacity-100 transition-opacity"
       />
       <Handle
         type="source"
         position={Position.Right}
         id="right"
-        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)]"
+        className="!bg-[var(--bg-surface)] !border-[var(--border-strong)] !w-2 !h-2 hover:!bg-[var(--accent-blue)] hover:!border-[var(--accent-blue)] opacity-0 group-hover:opacity-100 transition-opacity"
       />
 
       {/* Content */}

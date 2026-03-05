@@ -421,3 +421,55 @@
 - [ ] Templates: save → browse → deploy
 - [ ] Type check, lint, build pass
 **Notes:** Largest testing gate. Test full chain: section with tasks → create runbook → execute in playbook → activity log captures all.
+
+---
+
+## UX Polish — 5 improvements (post Phase 4) — DONE
+
+### #FEAT-054 Heatmap visibility — DONE (manual, 2026-03-05)
+**Priority:** P1
+**Status:** done
+**Changes:**
+- step-node.tsx: bg opacity `#15` → `#30`, border opacity `#60` → `#80`, coloring tint `#26` → `#40`
+- section-node.tsx: bg opacity `#08` → `#20`, border opacity `#40` → `#60`
+**Notes:** Prior hex suffix values (8-15% opacity) were nearly invisible on dark backgrounds.
+
+### #FEAT-055 Handle discoverability — DONE (manual, 2026-03-05)
+**Priority:** P1
+**Status:** done
+**Changes:**
+- step-node.tsx: Added `group` class to container, `opacity-0 group-hover:opacity-100 transition-opacity` to all 4 handles
+- globals.css: Added `transform: scale(1.5)` on `.react-flow__handle:hover`
+**Notes:** Handles existed on all 4 sides but were invisible (same color as node background). Now appear on node hover.
+
+### #FEAT-056 Edge interaction & deletion — DONE (manual, 2026-03-05)
+**Priority:** P1
+**Status:** done
+**Changes:**
+- globals.css: Added `.react-flow__edge-path:hover` (blue highlight, stroke-width 3) + `.react-flow__edge-interaction` (20px click target)
+- flow-canvas.tsx: Added edge deletion in keyboard handler (Delete/Backspace deletes selected edges), `defaultEdgeOptions={{ interactionWidth: 20 }}`, `edgesReconnectable`
+**Notes:** Prior state: no hover feedback on edges, Delete key only worked for nodes.
+
+### #FEAT-057 PDF export overhaul — DONE (manual, 2026-03-05)
+**Priority:** P2
+**Status:** done
+**Changes:**
+- pdf.ts title page: Added workspace description (step counts, status breakdown, avg maturity)
+- pdf.ts gap analysis: Added narrative paragraph summarizing gap counts and top gap names
+- pdf.ts cost summary: Added narrative paragraph with total hours, cost, highest-cost section
+- enhanced-pdf-sections.ts executive summary: Added narrative overview before KPI cards
+- enhanced-pdf-sections.ts journey map: Added data-driven stage→touchpoint table when canvas is unavailable
+**Notes:** Prior state: title page 80% empty, gap/cost summary were stat cards with no narrative, journey map blank from process view.
+
+### #FEAT-058 Cross-flow portal links — DONE (manual, 2026-03-05)
+**Priority:** P2
+**Status:** done
+**Changes:**
+- Migration 028: `link_to_tab_id` and `link_to_step_id` columns on steps table
+- database.ts: Added fields to Step interface
+- steps/[id]/route.ts: Added fields to EDITABLE_FIELDS
+- canvas.ts: Added `PortalNavigateContext`
+- step-node.tsx: Portal indicator icon (ExternalLink) with click-to-navigate
+- step-detail-panel.tsx: "Portal Link" CollapsibleSection with tab/step dropdowns
+- canvas-view.tsx: Provided `PortalNavigateContext` with router navigation using `focusNode` query param
+**Notes:** Steps can now link to steps in other tabs/flows. Click portal icon → navigate to target tab.

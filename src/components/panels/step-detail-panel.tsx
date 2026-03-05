@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb, FileText } from "lucide-react";
+import { X, Trash2, Clock, Repeat, Gauge, Target, Plus, Users, Zap, TrendingUp, Lightbulb, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,6 +51,7 @@ import {
 } from "@/lib/api/client";
 import type { TeamWithRoles, StepRoleWithDetails, StepToolWithTool } from "@/lib/api/client";
 import type { Step, StepStatus, ExecutorType, ImprovementPriority, Tool } from "@/types/database";
+import { useWorkspace } from "@/lib/context/workspace-context";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
 import { MATURITY_LEVELS } from "@/lib/maturity";
@@ -104,10 +105,26 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
   const [improvDesc, setImprovDesc] = React.useState("");
   const [improvPriority, setImprovPriority] = React.useState<ImprovementPriority>("medium");
   const [improvSaving, setImprovSaving] = React.useState(false);
+  const [portalSteps, setPortalSteps] = React.useState<Step[]>([]);
+  const { tabs } = useWorkspace();
 
   React.useEffect(() => {
     setName(step.name);
   }, [step.id, step.name]);
+
+  // Fetch steps for the linked tab (portal link target dropdown)
+  React.useEffect(() => {
+    if (!step.link_to_tab_id) {
+      setPortalSteps([]);
+      return;
+    }
+    let cancelled = false;
+    fetch(`/api/v1/steps?workspace_id=${workspaceId}&tab_id=${step.link_to_tab_id}`)
+      .then((res) => res.json())
+      .then((json) => { if (!cancelled && json.data) setPortalSteps(json.data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [step.link_to_tab_id, workspaceId]);
 
   // Fetch assigned roles when step changes
   React.useEffect(() => {
@@ -702,6 +719,62 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
             </div>
             <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low impact, 5 = high impact</p>
           </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Portal Link"
+          icon={ExternalLink}
+          badge={step.link_to_tab_id ? tabs.find((t) => t.id === step.link_to_tab_id)?.name : undefined}
+        >
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+              Target Flow (Tab)
+            </label>
+            <select
+              value={step.link_to_tab_id ?? ""}
+              onChange={(e) => {
+                const val = e.target.value || null;
+                handleFieldUpdate("link_to_tab_id", val);
+                if (!val) handleFieldUpdate("link_to_step_id", null);
+              }}
+              className="w-full h-8 px-2 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-primary)] focus:border-[var(--border-focus)] outline-none"
+            >
+              <option value="">None</option>
+              {tabs.filter((t) => t.id !== step.tab_id).map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+          {step.link_to_tab_id && (
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+                Target Step (optional)
+              </label>
+              <select
+                value={step.link_to_step_id ?? ""}
+                onChange={(e) => handleFieldUpdate("link_to_step_id", e.target.value || null)}
+                className="w-full h-8 px-2 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-primary)] focus:border-[var(--border-focus)] outline-none"
+              >
+                <option value="">Any step</option>
+                {portalSteps.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {step.link_to_tab_id && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                handleFieldUpdate("link_to_tab_id", null);
+                handleFieldUpdate("link_to_step_id", null);
+              }}
+              className="w-full"
+            >
+              Clear Link
+            </Button>
+          )}
         </CollapsibleSection>
 
         <CollapsibleSection

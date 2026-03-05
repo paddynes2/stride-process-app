@@ -1,17 +1,17 @@
 ## Handoff
 
-- **Iteration:** 138
-- **Date:** 2026-03-06 04:30
-- **Phase:** Post-Phase 3b — Improvements
-- **Branch:** ralph/init-stride
-- **Last task(s):** #BUG-055 (hydration mismatch fix), #IMP-111 (tools analysis back button), #IMP-116 (export custom mode guidance), #IMP-118 (datetime tooltip — bundled with BUG-055)
+- **Iteration:** manual (post-138)
+- **Date:** 2026-03-05
+- **Phase:** Post-Phase 4 — UX Polish
+- **Branch:** main
+- **Last task(s):** FEAT-054 (heatmap visibility), FEAT-055 (handle discoverability), FEAT-056 (edge deletion), FEAT-057 (PDF overhaul), FEAT-058 (portal links)
 - **Result:** completed
-- **Next task:** Continue improvement backlog — pick from remaining items (IMP-005, IMP-010, IMP-038, IMP-119, or other medium/high priority)
-- **Blockers:** BUG-035 + BUG-032 blocked on Supabase CLI authentication — `npx supabase login` required before migration 024 can be pushed.
+- **Next task:** Deploy to production, visual testing, or continue improvement backlog
+- **Blockers:** OPENROUTER_API_KEY not configured (AI analysis returns 503)
 
 ## Context
 
-Iteration 138 completed 3 builder tasks across 3 non-overlapping files. BUG-055 fixed the hydration mismatch introduced by IMP-076 (moved localStorage read from useState initializer to useEffect). IMP-118 was bundled with BUG-055 (added title tooltip to "last generated" span). IMP-111 added a "Canvas" back-button in the tools analysis view header. IMP-116 added guidance text in the export PDF dialog custom mode when sections are unavailable. All 3 builders passed typecheck. Post-merge tsc passed. Acceptance tester verified 10/11 criteria (1 fail was action budget exhaustion on IMP-116 custom mode — reviewer confirmed code is correct via diff review).
+5 UX improvements implemented in a single session: (1) heatmap colors made visible by increasing hex opacity suffixes, (2) connection handles now appear on node hover via Tailwind group/opacity classes, (3) edges can be deleted with Delete key and have hover feedback + wider click targets, (4) PDF export overhauled with narrative summaries on title/gap/cost pages and data-driven journey map table, (5) cross-flow portal links via new DB columns + PortalNavigateContext + step-detail-panel dropdowns. Migration 028 pushed to remote DB. All checks pass (tsc, lint, build).
 
 ## Dev Server
 
@@ -21,10 +21,5 @@ Iteration 138 completed 3 builder tasks across 3 non-overlapping files. BUG-055 
 
 ## Warnings
 
-- **P1 BUG-035:** step-tools API returns 500 (migration 024 not pushed — Supabase CLI unauthenticated).
 - **CRITICAL:** OPENROUTER_API_KEY not set — AI analysis route returns 503.
-- Production (origin/main) is behind ralph/init-stride by 110+ commits
-- 1 pre-existing lint warning: flow-canvas.tsx (addEdge unused import)
-- No unit test suite exists (#DEBT-001)
-- step-detail-panel.tsx ~770 lines — exceeding complexity threshold
-- IMP-102 uses raw `fetch()` instead of `apiFetch()` — minor pattern inconsistency
+- step-detail-panel.tsx ~820 lines — exceeding complexity threshold (portal link section added)

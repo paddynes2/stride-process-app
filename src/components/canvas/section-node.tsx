@@ -35,8 +35,8 @@ function SectionNodeComponent({ data, selected }: NodeProps) {
         style={
           heatMapMode && averageMaturity != null
             ? {
-                backgroundColor: `${maturityColor}08`,
-                borderColor: selected ? undefined : `${maturityColor}40`,
+                backgroundColor: `${maturityColor}20`,
+                borderColor: selected ? undefined : `${maturityColor}60`,
                 pointerEvents: "none",
               }
             : {

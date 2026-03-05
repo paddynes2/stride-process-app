@@ -454,6 +454,15 @@ export function FlowCanvas({
           } catch (err) {
             toastError("Failed to delete section", { error: err });
           }
+        } else {
+          // Delete selected edges
+          const selectedEdges = edges.filter((e) => e.selected);
+          for (const edge of selectedEdges) {
+            const connId = edge.id.replace("edge-", "");
+            apiDeleteConnection(connId)
+              .then(() => onConnectionDelete(connId))
+              .catch((err) => toastError("Failed to delete connection", { error: err }));
+          }
         }
       }
 
@@ -472,7 +481,7 @@ export function FlowCanvas({
         handleAddSection();
       }
     },
-    [selectedStepId, selectedSectionId, onStepDelete, onSectionDelete, handleAddStep, handleAddSection]
+    [selectedStepId, selectedSectionId, onStepDelete, onSectionDelete, handleAddStep, handleAddSection, edges, onConnectionDelete]
   );
 
   React.useEffect(() => {
@@ -508,6 +517,8 @@ export function FlowCanvas({
       fitView
       fitViewOptions={{ padding: 0.2 }}
       deleteKeyCode={null} // We handle delete ourselves
+      defaultEdgeOptions={{ interactionWidth: 20 }}
+      edgesReconnectable
       className="bg-[var(--bg-app)]"
     >
       <FocusNodeEffect nodeId={focusNodeId} />

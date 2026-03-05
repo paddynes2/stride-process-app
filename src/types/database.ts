@@ -92,6 +92,8 @@ export interface Step {
   target_maturity: number | null;
   effort_score: number | null;
   impact_score: number | null;
+  link_to_tab_id: string | null;
+  link_to_step_id: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -20,6 +20,8 @@ const EDITABLE_FIELDS = [
   "target_maturity",
   "effort_score",
   "impact_score",
+  "link_to_tab_id",
+  "link_to_step_id",
 ] as const;
 
 export async function PATCH(

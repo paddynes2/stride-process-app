@@ -140,7 +140,7 @@ export function renderExecutiveSummary(pdf: jsPDF, data: ExecutiveSummaryData): 
   pdf.setFontSize(14);
   pdf.setTextColor(255, 255, 255);
   pdf.text("Executive Summary", margin, y);
-  y += 12;
+  y += 10;
 
   // Compute metrics
   const scoredSteps = data.steps.filter((s) => s.maturity_score != null);
@@ -161,6 +161,24 @@ export function renderExecutiveSummary(pdf: jsPDF, data: ExecutiveSummaryData): 
   }, 0);
   const rolesMap = buildRolesMap(data.stepRoles);
   const totalMonthlyCost = data.steps.reduce((sum, s) => sum + computeStepCost(s, rolesMap), 0);
+
+  // Narrative overview
+  {
+    const overviewParts: string[] = [];
+    overviewParts.push(`This process contains ${data.sections.length} section${data.sections.length !== 1 ? "s" : ""} and ${data.steps.length} step${data.steps.length !== 1 ? "s" : ""}.`);
+    if (avgMaturity != null) {
+      overviewParts.push(`Average maturity is ${avgMaturity.toFixed(1)}/5 with ${stepsBelowTarget} step${stepsBelowTarget !== 1 ? "s" : ""} below target.`);
+    }
+    if (totalMonthlyHours > 0) {
+      overviewParts.push(`Total monthly effort is ${totalMonthlyHours.toFixed(1)} hours${totalMonthlyCost > 0 ? ` costing $${formatCurrency(totalMonthlyCost)}` : ""}.`);
+    }
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(255, 255, 255, 140);
+    const overviewLines = pdf.splitTextToSize(overviewParts.join(" "), contentWidth);
+    pdf.text(overviewLines, margin, y);
+    y += overviewLines.length * 3.5 + 6;
+  }
 
   const metrics = [
     { label: "TOTAL SECTIONS", value: String(data.sections.length) },
@@ -318,14 +336,71 @@ export async function renderJourneyMap(pdf: jsPDF, data: JourneyMapData): Promis
       pdf.setTextColor(255, 255, 255, 140);
       pdf.text("Canvas snapshot unavailable", margin, y + 10);
     }
+  } else if (data.stages.length > 0) {
+    // No canvas element available — render a data-driven stage→touchpoint table
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(255, 255, 255, 100);
+    pdf.text("Journey canvas snapshot not available. Showing stage overview from data.", margin, y);
+    y += 6;
+
+    const stageOverviewCols = [
+      { label: "Stage", width: 65 },
+      { label: "Owner", width: 45 },
+      { label: "Channel", width: 45 },
+      { label: "Touchpoints", width: 30 },
+      { label: "Avg Pain", width: 30 },
+      { label: "Touchpoint Names", width: contentWidth - 65 - 45 - 45 - 30 - 30 },
+    ];
+
+    y = drawTableHeader(pdf, stageOverviewCols, margin, contentWidth, y);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+
+    const sortedStages = [...data.stages].sort((a, b) => a.position_x - b.position_x);
+    for (let si = 0; si < sortedStages.length; si++) {
+      const stage = sortedStages[si];
+      if (y > pageHeight - margin - 5) {
+        y = newTablePage(pdf, "Journey Map — Stages", stageOverviewCols, margin, contentWidth, pageWidth, pageHeight);
+      }
+      if (si % 2 === 0) {
+        pdf.setFillColor(14, 14, 15);
+        pdf.rect(margin, y - 1, contentWidth, 6, "F");
+      }
+      const stageTps = data.touchpoints.filter((tp) => tp.stage_id === stage.id);
+      const avgPain = stageTps.filter((tp) => tp.pain_score != null).length > 0
+        ? (stageTps.filter((tp) => tp.pain_score != null).reduce((sum, tp) => sum + tp.pain_score!, 0) / stageTps.filter((tp) => tp.pain_score != null).length).toFixed(1)
+        : "\u2014";
+
+      let colX = margin + 2;
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(truncate(stage.name, 38), colX, y + 3);
+      colX += stageOverviewCols[0].width;
+
+      pdf.setTextColor(255, 255, 255, 140);
+      pdf.text(truncate(stage.owner ?? "\u2014", 25), colX, y + 3);
+      colX += stageOverviewCols[1].width;
+
+      pdf.text(truncate(stage.channel ?? "\u2014", 25), colX, y + 3);
+      colX += stageOverviewCols[2].width;
+
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(String(stageTps.length), colX, y + 3);
+      colX += stageOverviewCols[3].width;
+
+      pdf.setTextColor(255, 255, 255, 140);
+      pdf.text(avgPain, colX, y + 3);
+      colX += stageOverviewCols[4].width;
+
+      pdf.setTextColor(255, 255, 255, 76);
+      pdf.text(truncate(stageTps.map((tp) => tp.name).join(", ") || "\u2014", 50), colX, y + 3);
+
+      y += 6;
+    }
   } else {
     pdf.setFontSize(9);
     pdf.setTextColor(255, 255, 255, 76);
-    pdf.text(
-      "Journey canvas snapshot not available from process view.",
-      margin,
-      y + 10,
-    );
+    pdf.text("No journey data available.", margin, y + 10);
   }
 
   if (data.touchpoints.length === 0) return;

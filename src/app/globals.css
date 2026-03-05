@@ -223,4 +223,15 @@ body {
 .react-flow__handle:hover {
   background: var(--accent-blue) !important;
   border-color: var(--accent-blue) !important;
+  transform: scale(1.5);
+}
+
+.react-flow__edge-path:hover {
+  stroke: var(--accent-blue) !important;
+  stroke-width: 3 !important;
+  cursor: pointer;
+}
+
+.react-flow__edge-interaction {
+  stroke-width: 20 !important;
 }

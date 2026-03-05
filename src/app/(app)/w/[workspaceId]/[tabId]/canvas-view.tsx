@@ -27,7 +27,7 @@ import { useCanvasExport } from "@/hooks/use-canvas-export";
 import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch, fetchStepToolsByStep, fetchTools, fetchImprovementIdeas } from "@/lib/api/client";
 import type { ExportConfig } from "@/components/panels/export-pdf-dialog";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
-import { CommentCountsContext, TaskCountsContext, ColoringTintContext } from "@/types/canvas";
+import { CommentCountsContext, TaskCountsContext, ColoringTintContext, PortalNavigateContext } from "@/types/canvas";
 import type { Section, Step, Connection, ColoringRule, Template, AIAnalysisResult } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -204,6 +204,12 @@ export function CanvasView({
 
   // Template browser state
   const router = useRouter();
+
+  const handlePortalNavigate = React.useCallback((targetTabId: string, targetStepId?: string | null) => {
+    const url = `/w/${workspaceId}/${targetTabId}${targetStepId ? `?focusNode=${targetStepId}` : ""}`;
+    router.push(url);
+  }, [workspaceId, router]);
+
   const [showTemplateDialog, setShowTemplateDialog] = React.useState(false);
   const [dbTemplates, setDbTemplates] = React.useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = React.useState(false);
@@ -572,6 +578,7 @@ export function CanvasView({
   );
 
   return (
+    <PortalNavigateContext.Provider value={handlePortalNavigate}>
     <ColoringTintContext.Provider value={coloringTints}>
     <TaskCountsContext.Provider value={taskCounts}>
     <CommentCountsContext.Provider value={commentCounts}>
@@ -796,5 +803,6 @@ export function CanvasView({
     </CommentCountsContext.Provider>
     </TaskCountsContext.Provider>
     </ColoringTintContext.Provider>
+    </PortalNavigateContext.Provider>
   );
 }

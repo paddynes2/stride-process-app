@@ -16,6 +16,9 @@ export const TaskCountsContext = createContext<Map<string, { completed: number; 
 // avoiding prop-drilling through FlowCanvas (same pattern as CommentCountsContext).
 export const ColoringTintContext = createContext<Map<string, string>>(new Map());
 
+// Context for portal link navigation — step nodes call this to navigate to a linked tab/step.
+export const PortalNavigateContext = createContext<((tabId: string, stepId?: string | null) => void) | null>(null);
+
 // Custom node data types for React Flow — Process canvas
 export interface StepNodeData extends Record<string, unknown> {
   step: Step;

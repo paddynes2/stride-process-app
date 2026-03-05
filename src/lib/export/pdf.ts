@@ -97,8 +97,31 @@ export async function createWorkspacePdf(
   });
   pdf.text(`Generated ${dateStr}`, margin, y);
 
+  // Workspace description area
+  y += 12;
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.setTextColor(255, 255, 255, 100);
+  const liveSteps = steps.filter((s) => s.status === "live").length;
+  const draftSteps = steps.filter((s) => s.status === "draft").length;
+  const scoredSteps = steps.filter((s) => s.maturity_score != null);
+  const avgMat = scoredSteps.length > 0
+    ? (scoredSteps.reduce((sum, s) => sum + s.maturity_score!, 0) / scoredSteps.length).toFixed(1)
+    : null;
+  const descParts: string[] = [];
+  descParts.push(`This workspace contains ${sections.length} section${sections.length !== 1 ? "s" : ""} and ${steps.length} step${steps.length !== 1 ? "s" : ""} connected by ${connections.length} connection${connections.length !== 1 ? "s" : ""}.`);
+  if (liveSteps > 0 || draftSteps > 0) {
+    descParts.push(`${liveSteps} step${liveSteps !== 1 ? "s are" : " is"} live, ${draftSteps} in draft.`);
+  }
+  if (avgMat) {
+    descParts.push(`Average maturity score: ${avgMat}/5.`);
+  }
+  const descText = descParts.join(" ");
+  const descLines = pdf.splitTextToSize(descText, contentWidth);
+  pdf.text(descLines, margin, y);
+  y += descLines.length * 4 + 6;
+
   // Summary stats on title page
-  y += 14;
   const statsBoxWidth = 40;
   const statsGap = 5;
   const stats = [
@@ -345,6 +368,21 @@ export async function createWorkspacePdf(
     pdf.text("Gap Analysis", margin, y);
     y += 8;
 
+    // Narrative summary
+    const belowTargetCount = gapSteps.filter((s) => s.gap > 0).length;
+    const topGapNames = gapSteps.filter((s) => s.gap > 0).slice(0, 3).map((s) => s.name);
+    const narrativeParts: string[] = [];
+    narrativeParts.push(`${belowTargetCount} of ${gapSteps.length} scored step${gapSteps.length !== 1 ? "s" : ""} ${belowTargetCount === 1 ? "has a" : "have"} maturity gap${belowTargetCount !== 1 ? "s" : ""}.`);
+    if (topGapNames.length > 0) {
+      narrativeParts.push(`The largest gaps are in: ${topGapNames.join(", ")}.`);
+    }
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(255, 255, 255, 140);
+    const narrativeLines = pdf.splitTextToSize(narrativeParts.join(" "), contentWidth);
+    pdf.text(narrativeLines, margin, y);
+    y += narrativeLines.length * 3.5 + 4;
+
     // Summary cards
     const scoredCount = gapSteps.length;
     const belowTarget = gapSteps.filter((s) => s.gap > 0).length;
@@ -476,6 +514,35 @@ export async function createWorkspacePdf(
     pdf.setTextColor(255, 255, 255);
     pdf.text("Cost Summary", margin, y);
     y += 8;
+
+    // Narrative summary
+    {
+      const costNarrative: string[] = [];
+      costNarrative.push(`Total monthly effort across all sections is ${totalMonthlyHours.toFixed(1)} hours.`);
+      if (totalMonthlyCost > 0) {
+        costNarrative.push(`Estimated monthly cost is $${formatCurrency(totalMonthlyCost)} ($${formatCurrency(totalMonthlyCost * 12)} annually).`);
+      }
+      // Find highest-cost section
+      const sectionCostsPre = sections.map((section) => {
+        const sSteps = steps.filter((s) => s.section_id === section.id);
+        const cost = sSteps.reduce((sum, s) => sum + computeStepMonthlyCost(s, stepRolesMap, stepToolsMap), 0);
+        const hrs = sSteps.reduce((sum, s) => {
+          if (s.time_minutes && s.frequency_per_month) return sum + (s.time_minutes * s.frequency_per_month) / 60;
+          return sum;
+        }, 0);
+        return { name: section.name, cost, hours: hrs };
+      }).filter((s) => s.cost > 0 || s.hours > 0);
+      const topSection = [...sectionCostsPre].sort((a, b) => (b.cost || b.hours) - (a.cost || a.hours))[0];
+      if (topSection) {
+        costNarrative.push(`The highest-cost section is "${topSection.name}".`);
+      }
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(8);
+      pdf.setTextColor(255, 255, 255, 140);
+      const costNarrLines = pdf.splitTextToSize(costNarrative.join(" "), contentWidth);
+      pdf.text(costNarrLines, margin, y);
+      y += costNarrLines.length * 3.5 + 4;
+    }
 
     // Total cards
     const costCardItems = [

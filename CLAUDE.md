@@ -1,7 +1,7 @@
 # Stride — CLAUDE.md
 
 ## What This Is
-Process mapping & continuous improvement SaaS (Puzzle.io clone). **All phases complete** (Phase 0–4 + Phase 3a/3b). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, applies conditional step coloring, manages tools with cost analysis, runs AI analysis, and exports enhanced multi-section PDF reports.
+Process mapping & continuous improvement SaaS (Puzzle.io clone). **All phases complete** (Phase 0–4 + Phase 3a/3b). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, applies conditional step coloring, manages tools with cost analysis, runs AI analysis, exports enhanced multi-section PDF reports, and links steps across flows via portal links.
 
 ## Tech Stack
 - Next.js 16.1.6 + React 19.2 + TypeScript 5 + Tailwind CSS 4
@@ -102,7 +102,7 @@ src/
     utils.ts               — cn() (clsx + tailwind-merge)
   types/
     database.ts            — entity types (Workspace, Tab, Section, Step, Connection, Stage, Touchpoint, Team, Role, Person, Tool, Comment, Task, Runbook, Activity, etc.)
-    canvas.ts              — React Flow custom node data types
+    canvas.ts              — React Flow custom node data types + context providers (CommentCounts, TaskCounts, ColoringTint, PortalNavigate)
     export.ts              — PDF export types (ExportConfig, section toggles)
     index.ts               — re-exports
   middleware.ts            — auth guard (redirects unauthenticated to /login)
@@ -129,7 +129,7 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - Step status badges: draft (gray), in_progress (blue), testing (yellow), live (green), archived (dim)
 
 ## Database
-27 migration files in `supabase/migrations/`:
+28 migration files in `supabase/migrations/`:
 - 001: extensions (uuid-ossp, pg_trgm)
 - 002: enums (step_status, executor_type, workspace_role)
 - 003: core tables (users, organizations, organization_members, workspaces)
@@ -157,6 +157,7 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - 025: connection_handles (source_handle + target_handle on connections)
 - 026: annotation_cleanup_triggers (cascade delete annotations on entity delete)
 - 027: activity_actor_type (actor_type column on activity_log)
+- 028: portal_links (link_to_tab_id + link_to_step_id on steps for cross-flow navigation)
 
 ## Gotchas & Learnings
 - **NEXT_PUBLIC_ static replacement:** Never use dynamic property access for these vars. Browser has no `process.env`.
@@ -166,3 +167,6 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - **Canvas null guards:** `buildNodes`/`buildEdges` defensively handle null/undefined with `(arr ?? []).filter(Boolean)` before `.map()`.
 - **Supabase RLS + INSERT...RETURNING:** `.insert().select()` triggers RETURNING checked against SELECT policies. Use SECURITY DEFINER functions for bootstrap operations where policies can't be satisfied yet.
 - **React 19 useRef:** Requires initial value argument — `useRef(undefined)` or `useRef(null)`, not bare `useRef()`.
+- **Canvas context pattern:** Node-level data (comment counts, task counts, coloring tints, portal navigation) is passed via React contexts (defined in `types/canvas.ts`) to avoid prop-drilling through FlowCanvas. Canvas views provide these contexts; node components consume them.
+- **Edge deletion:** React Flow's `deleteKeyCode={null}` disables built-in deletion. Custom keyboard handler in FlowCanvas checks selected edges via `edges.filter(e => e.selected)` and calls `apiDeleteConnection`.
+- **Portal links:** Steps can link to other tabs via `link_to_tab_id`/`link_to_step_id`. Navigation uses `PortalNavigateContext` provided by canvas-view, which calls `router.push()` with `?focusNode=` query param.
