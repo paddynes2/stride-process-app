@@ -491,8 +491,8 @@ export default function SeedPage() {
           pain_score: tp.pain,
           gain_score: tp.gain,
           customer_emotion: tp.emotion,
-          effort_score: Math.ceil(tp.pain * 1.2),
-          impact_score: tp.gain,
+          effort_score: Math.min(5, Math.ceil(tp.pain * 1.2)),
+          impact_score: Math.min(5, tp.gain),
         });
         touchpointIds.push(touchpoint.id);
       }
