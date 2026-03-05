@@ -91,7 +91,7 @@ src/
     ui/                    — button, input, badge, dialog, dropdown-menu, separator, skeleton, tabs, textarea, offline-banner
     canvas/                — flow-canvas, step-node, section-node, stage-node, touchpoint-node
     panels/                — step-detail-panel, section-detail-panel, stage-detail-panel, touchpoint-detail-panel, tool-detail-panel, tool-section-detail-panel, annotation-panel, comment-panel, task-panel, export-pdf-dialog, workspace-summary-panel, rich-text-editor, video-embed
-    layout/                — sidebar, header, tab-bar
+    layout/                — sidebar (grouped nav: Core, Analysis, Collaborate, Manage), header, tab-bar
   lib/
     supabase/              — client.ts, server.ts, middleware.ts (3-client pattern)
     api/                   — client.ts (apiFetch wrappers), response.ts (envelope helpers)
