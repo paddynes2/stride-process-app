@@ -373,6 +373,8 @@ export function CanvasView({
       gapAnalysis: true,
       costAnalysis: true,
       executiveSummary: true,
+      processNarrative: true,
+      keyFindings: true,
       journeyMap: hasJourneyTab,
       journeySentiment: hasJourneyTab,
       perspectiveComparison: hasPerspectives,
@@ -387,7 +389,7 @@ export function CanvasView({
   const handleEnhancedExportPdf = React.useCallback(
     async (canvasElement: HTMLElement, config: ExportConfig) => {
       try {
-        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison, renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights, renderTableOfContents }] = await Promise.all([
+        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison, renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights, renderProcessNarrative, renderKeyFindings, renderTableOfContents }] = await Promise.all([
           import("@/lib/export/pdf"),
           import("@/lib/export/enhanced-pdf-sections"),
         ]);
@@ -404,6 +406,11 @@ export function CanvasView({
             ? (await Promise.allSettled(stepIds.map((id) => fetchStepToolsByStep(id))))
                 .flatMap((r) => r.status === "fulfilled" ? r.value : [])
             : [];
+
+        // Fetch comments for process narrative and key findings sections
+        const allComments = (config.processNarrative || config.keyFindings)
+          ? await fetchComments(workspaceId)
+          : [];
 
         // Mask step data for disabled base sections (matches use-canvas-export.ts logic)
         let exportSteps = steps;
@@ -452,6 +459,25 @@ export function CanvasView({
           const sectionPage = pdf.getNumberOfPages() + 1;
           renderExecutiveSummary(pdf, { sections, steps, stepRoles });
           tocEntries.push({ name: "Executive Summary", page: sectionPage });
+        }
+
+        // Process Narrative
+        if (config.processNarrative) {
+          const sectionPage = pdf.getNumberOfPages() + 1;
+          renderProcessNarrative(pdf, { sections, steps, comments: allComments });
+          tocEntries.push({ name: "Process Walkthrough", page: sectionPage });
+        }
+
+        // Key Findings & Decisions
+        if (config.keyFindings) {
+          const hasRelevant = allComments.some(
+            (c) => c.category === "decision" || c.category === "pain_point",
+          );
+          if (hasRelevant) {
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderKeyFindings(pdf, { comments: allComments, steps, sections });
+            tocEntries.push({ name: "Key Findings & Decisions", page: sectionPage });
+          }
         }
 
         // Journey Map and/or Journey Sentiment — fetch data once for both

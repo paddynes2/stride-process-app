@@ -241,12 +241,20 @@ export async function createWorkspacePdf(
 
     y = drawTableHeader(pdf, cols, margin, contentWidth, y);
 
-    // Sort steps by section, then name
+    // Sort steps by section position, then step position (flow order)
+    const sectionPositionMap = new Map(sections.map((s) => [s.id, { y: s.position_y, x: s.position_x }]));
     const sortedSteps = [...steps].sort((a, b) => {
-      const secA = a.section_id ? sectionMap.get(a.section_id) ?? "" : "";
-      const secB = b.section_id ? sectionMap.get(b.section_id) ?? "" : "";
-      if (secA !== secB) return secA.localeCompare(secB);
-      return a.name.localeCompare(b.name);
+      const secPosA = a.section_id ? sectionPositionMap.get(a.section_id) : null;
+      const secPosB = b.section_id ? sectionPositionMap.get(b.section_id) : null;
+      const secYA = secPosA?.y ?? Number.MAX_SAFE_INTEGER;
+      const secYB = secPosB?.y ?? Number.MAX_SAFE_INTEGER;
+      if (secYA !== secYB) return secYA - secYB;
+      const secXA = secPosA?.x ?? Number.MAX_SAFE_INTEGER;
+      const secXB = secPosB?.x ?? Number.MAX_SAFE_INTEGER;
+      if (secXA !== secXB) return secXA - secXB;
+      // Within same section: sort by step position
+      if (a.position_y !== b.position_y) return a.position_y - b.position_y;
+      return a.position_x - b.position_x;
     });
 
     pdf.setFont("helvetica", "normal");
@@ -254,8 +262,9 @@ export async function createWorkspacePdf(
 
     for (let rowIndex = 0; rowIndex < sortedSteps.length; rowIndex++) {
       const step = sortedSteps[rowIndex];
+      const remainingRows = sortedSteps.length - rowIndex;
 
-      if (y > pageHeight - margin - 5) {
+      if (y > pageHeight - margin - 5 && remainingRows > 3) {
         y = newTablePage(pdf, "Step Details", cols, margin, contentWidth, pageWidth, pageHeight);
       }
 
@@ -267,7 +276,7 @@ export async function createWorkspacePdf(
 
       let colX = margin + 2;
       pdf.setTextColor(255, 255, 255);
-      pdf.text(truncate(step.name, 35), colX, y + 3);
+      pdf.text(truncate(step.name, 42), colX, y + 3);
       colX += cols[0].width;
 
       pdf.setTextColor(255, 255, 255, 140);
@@ -430,8 +439,9 @@ export async function createWorkspacePdf(
 
     for (let rowIndex = 0; rowIndex < gapSteps.length; rowIndex++) {
       const step = gapSteps[rowIndex];
+      const remainingGapRows = gapSteps.length - rowIndex;
 
-      if (y > pageHeight - margin - 5) {
+      if (y > pageHeight - margin - 5 && remainingGapRows > 3) {
         y = newTablePage(pdf, "Gap Analysis", gapCols, margin, contentWidth, pageWidth, pageHeight);
       }
 

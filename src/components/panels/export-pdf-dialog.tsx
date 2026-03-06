@@ -18,9 +18,9 @@ import { cn } from "@/lib/utils";
 const PAGES_PER_SECTION = 2;
 
 const PRESET_SECTIONS: Record<string, string[]> = {
-  executive: ["Canvas Snapshot", "Executive Summary", "Gap Analysis"],
+  executive: ["Canvas Snapshot", "Executive Summary", "Key Findings", "Gap Analysis"],
   full: ["All available sections"],
-  gap: ["Canvas Snapshot", "Gap Analysis", "Perspective Comparison", "Improvements"],
+  gap: ["Canvas Snapshot", "Gap Analysis", "Key Findings", "Perspective Comparison", "Improvements"],
 };
 
 export interface ExportConfig {
@@ -29,6 +29,8 @@ export interface ExportConfig {
   gapAnalysis: boolean;
   costAnalysis: boolean;
   executiveSummary: boolean;
+  processNarrative: boolean;
+  keyFindings: boolean;
   journeyMap: boolean;
   journeySentiment: boolean;
   perspectiveComparison: boolean;
@@ -44,6 +46,8 @@ const EXECUTIVE_SUMMARY_CONFIG: ExportConfig = {
   gapAnalysis: true,
   costAnalysis: false,
   executiveSummary: true,
+  processNarrative: false,
+  keyFindings: true,
   journeyMap: false,
   journeySentiment: false,
   perspectiveComparison: false,
@@ -59,6 +63,8 @@ const FULL_AUDIT_CONFIG: ExportConfig = {
   gapAnalysis: true,
   costAnalysis: true,
   executiveSummary: true,
+  processNarrative: true,
+  keyFindings: true,
   journeyMap: true,
   journeySentiment: true,
   perspectiveComparison: true,
@@ -74,6 +80,8 @@ const GAP_REPORT_CONFIG: ExportConfig = {
   gapAnalysis: true,
   costAnalysis: false,
   executiveSummary: false,
+  processNarrative: false,
+  keyFindings: true,
   journeyMap: false,
   journeySentiment: false,
   perspectiveComparison: true,
@@ -118,6 +126,8 @@ const SECTION_GROUPS: { group: string; sections: SectionDef[] }[] = [
     group: "Insights",
     sections: [
       { key: "executiveSummary", label: "Executive Summary" },
+      { key: "processNarrative", label: "Process Walkthrough" },
+      { key: "keyFindings", label: "Key Findings & Decisions" },
       { key: "improvements", label: "Improvements", disabledTooltip: "Requires improvement ideas" },
       { key: "aiInsights", label: "AI Insights", disabledTooltip: "Requires AI analysis to be run" },
     ],

@@ -30,6 +30,8 @@ const ALL_AVAILABLE: Record<keyof ExportConfig, boolean> = {
   gapAnalysis: true,
   costAnalysis: true,
   executiveSummary: true,
+  processNarrative: true,
+  keyFindings: true,
   journeyMap: true,
   journeySentiment: true,
   perspectiveComparison: true,
