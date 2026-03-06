@@ -292,6 +292,24 @@ export async function createWorkspacePdf(
     y = drawSectionTitle(pdf, "Process Map", margin, y);
 
     try {
+      // Inject light-theme overrides so dark-themed nodes render white for PDF
+      const lightStyle = document.createElement("style");
+      lightStyle.setAttribute("data-pdf-export", "true");
+      lightStyle.textContent = `
+        .react-flow .react-flow__node,
+        .react-flow .react-flow__node *,
+        .react-flow [class*="group-node"],
+        .react-flow [class*="section-node"],
+        .react-flow [class*="step-node"] {
+          background-color: #ffffff !important;
+          color: #1e293b !important;
+          border-color: #e2e8f0 !important;
+        }
+        .react-flow .react-flow__edge-path { stroke: #64748b !important; }
+        .react-flow .react-flow__background { background-color: #ffffff !important; }
+      `;
+      document.head.appendChild(lightStyle);
+
       const dataUrl = await toPng(canvasElement, {
         backgroundColor: "#ffffff",
         pixelRatio: 2,
@@ -309,6 +327,9 @@ export async function createWorkspacePdf(
           return true;
         },
       });
+
+      // Remove light-theme overrides
+      lightStyle.remove();
 
       const canvasAvailHeight = pageHeight - y - margin;
       const canvasAvailWidth = contentWidth;
@@ -339,6 +360,8 @@ export async function createWorkspacePdf(
       pdf.rect(margin, y, imgW, imgH, "S");
       pdf.addImage(dataUrl, "PNG", margin, y, imgW, imgH);
     } catch {
+      // Ensure light-theme style is cleaned up on error
+      document.querySelector('style[data-pdf-export]')?.remove();
       pdf.setFontSize(T.bodySize);
       pdf.setTextColor(...T.muted);
       pdf.text("Canvas snapshot unavailable", margin, y + 10);

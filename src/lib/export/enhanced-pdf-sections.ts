@@ -457,6 +457,9 @@ export function renderProcessNarrative(pdf: jsPDF, data: ProcessNarrativeData): 
     for (const step of sectionSteps) {
       const comments = stepComments.get(step.id) ?? [];
       const notes = step.notes ? stripHtml(step.notes) : "";
+      // Split notes at the RENDER font size (bodySize 9.5pt) — not the current font
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(T.bodySize);
       const noteLines = notes ? pdf.splitTextToSize(notes, contentWidth - 8) : [];
       const commentBlocks = comments
         .filter((c) => !c.is_resolved)
@@ -467,6 +470,9 @@ export function renderProcessNarrative(pdf: jsPDF, data: ProcessNarrativeData): 
       let blockH = 6; // name
       blockH += 4; // status line
       if (noteLines.length > 0) blockH += noteLines.length * 3.8 + 3;
+      // Split comments at the RENDER font size (small 8pt)
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(T.small);
       for (const c of commentBlocks) {
         const cText = stripHtml(c.content);
         const cLines = pdf.splitTextToSize(cText, contentWidth - 14);
@@ -774,7 +780,14 @@ export async function renderJourneyMap(pdf: jsPDF, data: JourneyMapData): Promis
       pdf.text(avgPain, colX, y + 3);
       colX += cols[4].width;
       pdf.setTextColor(...T.faint);
-      pdf.text(truncate(stageTps.map((tp) => tp.name).join(", ") || "\u2014", 50), colX, y + 3);
+      const tpNames = stageTps.map((tp) => tp.name).join(", ") || "\u2014";
+      // Truncate based on actual column pixel width, not character count
+      const lastColW = cols[5].width - 4;
+      let displayNames = tpNames;
+      while (pdf.getTextWidth(displayNames) > lastColW && displayNames.length > 10) {
+        displayNames = displayNames.slice(0, displayNames.length - 4) + "\u2026";
+      }
+      pdf.text(displayNames, colX, y + 3);
       y += 6.5;
     }
   } else {
@@ -1081,11 +1094,14 @@ export function renderPerspectiveComparison(pdf: jsPDF, data: PerspectiveCompari
 
   for (const ann of data.annotations) {
     const key = `${ann.annotatable_type}:${ann.annotatable_id}`;
-    const existing = byElement.get(key) ?? {
-      stepName: ann.annotatable_type === "step"
-        ? stepMap.get(ann.annotatable_id)?.name ?? ann.annotatable_id
-        : ann.annotatable_id,
-    };
+    // Resolve name: steps by lookup, other types by their ID
+    let resolvedName: string | undefined;
+    if (ann.annotatable_type === "step") {
+      resolvedName = stepMap.get(ann.annotatable_id)?.name;
+    }
+    // Skip annotations we can't resolve to a human-readable name
+    if (!resolvedName) continue;
+    const existing = byElement.get(key) ?? { stepName: resolvedName };
 
     if (ann.perspective_id === pA.id) {
       existing.ratingA = ann.rating ?? undefined;
@@ -1464,8 +1480,11 @@ export function renderImprovements(pdf: jsPDF, data: { ideas: ImprovementIdea[] 
 
   for (const idea of data.ideas) {
     const desc = idea.description ? stripHtml(idea.description) : "";
+    // Split description at the RENDER font size (bodySize 9.5pt)
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(T.bodySize);
     const descLines = desc ? pdf.splitTextToSize(desc, contentWidth - 8) : [];
-    const blockH = 8 + (descLines.length > 0 ? descLines.length * 3.8 + 3 : 0);
+    const blockH = 10 + (descLines.length > 0 ? descLines.length * 3.8 + 3 : 0);
 
     if (y + blockH > pageHeight - margin) {
       ({ y, pageWidth, pageHeight, margin, contentWidth } = addCleanPage(pdf));
@@ -1479,9 +1498,10 @@ export function renderImprovements(pdf: jsPDF, data: { ideas: ImprovementIdea[] 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(T.h3);
     pdf.setTextColor(...T.navy);
-    pdf.text(idea.title, margin + 6, y + 3);
+    pdf.text(truncate(idea.title, 80), margin + 6, y + 3);
+    y += 5;
 
-    // Priority + status metadata
+    // Priority + status metadata on its own line
     const meta: string[] = [];
     if (idea.priority) meta.push(capitalize(idea.priority));
     if (idea.status) meta.push(formatStatus(idea.status));
@@ -1489,10 +1509,9 @@ export function renderImprovements(pdf: jsPDF, data: { ideas: ImprovementIdea[] 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(T.small);
       pdf.setTextColor(...T.muted);
-      const titleW = pdf.getTextWidth(idea.title);
-      pdf.text(meta.join(" \u00B7 "), margin + 6 + titleW + 4, y + 3);
+      pdf.text(meta.join(" \u00B7 "), margin + 6, y + 2);
     }
-    y += 6;
+    y += 4;
 
     // Description
     if (descLines.length > 0) {
