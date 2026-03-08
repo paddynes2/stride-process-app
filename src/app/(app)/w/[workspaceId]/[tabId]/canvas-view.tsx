@@ -419,6 +419,12 @@ export function CanvasView({
                 .flatMap((r) => r.status === "fulfilled" ? r.value : [])
             : [];
 
+        // Fetch improvements for cost summary, roadmap, and improvements sections
+        const needsImprovements = config.costAnalysis || config.prioritizationMatrix || config.improvements;
+        const allImprovements = needsImprovements
+          ? await fetchImprovementIdeas(workspaceId).catch(() => [] as Awaited<ReturnType<typeof fetchImprovementIdeas>>)
+          : [];
+
         // Fetch comments for process narrative, key findings, and decisions sections
         const allComments = (config.processNarrative || config.keyFindings)
           ? await fetchComments(workspaceId)
@@ -431,9 +437,10 @@ export function CanvasView({
         const reviewNumber = (settings.review_number as number) ?? 0;
         const reviewIntervalDays = (settings.review_interval_days as number) ?? 90;
 
+        const today = new Date().toISOString().slice(0, 10);
         const baselineData = (baselineDate && previousScores && previousScores.length > 0)
           ? { baseline_date: baselineDate, review_interval_days: reviewIntervalDays, previous_scores: previousScores, review_number: reviewNumber }
-          : null;
+          : { baseline_date: today, review_interval_days: reviewIntervalDays, previous_scores: [] as Array<{ step_id: string; maturity: number; date: string }>, review_number: 0 };
 
         // Build base PDF (title page only) without footer (skipFooter=true)
         // skipFooter=true also skips internal section rendering — we call them individually below
@@ -500,7 +507,7 @@ export function CanvasView({
         if (config.prioritizationMatrix) {
           await safeRender("Phased Roadmap", () => {
             const sectionPage = pdf.getNumberOfPages() + 1;
-            renderPhasedRoadmap(pdf, { steps, sections });
+            renderPhasedRoadmap(pdf, { steps, sections, improvements: allImprovements.length > 0 ? allImprovements : null });
             tocEntries.push({ name: "Phased Roadmap", page: sectionPage });
           });
         }
@@ -540,7 +547,7 @@ export function CanvasView({
           const revConfig = (workspace.avg_order_value || workspace.monthly_inquiries || workspace.close_rate || workspace.reorder_rate)
             ? { avg_order_value: workspace.avg_order_value ?? 0, monthly_inquiries: workspace.monthly_inquiries ?? 0, close_rate: workspace.close_rate ?? 0, reorder_rate: workspace.reorder_rate ?? 0 }
             : null;
-          await safeRender("Cost Summary", () => renderBaseCostSummary(pdf, steps, sections, stepRoles, stepToolsRaw, tocEntries, revConfig));
+          await safeRender("Cost Summary", () => renderBaseCostSummary(pdf, steps, sections, stepRoles, stepToolsRaw, tocEntries, revConfig, allImprovements.length > 0 ? allImprovements : null));
         }
 
         // 9. Journey Map and/or Journey Sentiment
@@ -600,10 +607,9 @@ export function CanvasView({
 
         // 12. Improvements
         if (config.improvements) {
-          await safeRender("Improvements", async () => {
-            const ideas = await fetchImprovementIdeas(workspaceId);
+          await safeRender("Improvements", () => {
             const sectionPage = pdf.getNumberOfPages() + 1;
-            renderImprovements(pdf, { ideas });
+            renderImprovements(pdf, { ideas: allImprovements });
             tocEntries.push({ name: "Improvements", page: sectionPage });
           });
         }
@@ -667,7 +673,6 @@ export function CanvasView({
         // R8: Auto-save current maturity scores as baseline for next review
         const scoredSteps = steps.filter((s) => s.maturity_score != null);
         if (scoredSteps.length > 0) {
-          const today = new Date().toISOString().slice(0, 10);
           const newPreviousScores = scoredSteps.map((s) => ({
             step_id: s.id,
             maturity: s.maturity_score!,
@@ -677,7 +682,7 @@ export function CanvasView({
             ...settings,
             previous_scores: newPreviousScores,
             baseline_date: settings.baseline_date ?? today,
-            review_number: baselineData ? (baselineData.review_number + 1) : 0,
+            review_number: baselineData.previous_scores.length > 0 ? (baselineData.review_number + 1) : 0,
             review_interval_days: settings.review_interval_days ?? 90,
           };
           updateWorkspace(workspaceId, { settings: newSettings }).catch((err) => {

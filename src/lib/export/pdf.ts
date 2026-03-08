@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 import { toPng } from "html-to-image";
-import type { Section, Step, Connection } from "@/types/database";
+import type { Section, Step, Connection, ImprovementIdea } from "@/types/database";
 import { MATURITY_COLORS } from "@/lib/maturity";
 import {
   T,
@@ -30,6 +30,7 @@ import {
   getRevenueTier,
   buildPreviousScoreMap,
   formatDelta,
+  stripHtml,
 } from "./pdf-theme";
 import type { RevenueConfig, BaselineData } from "./pdf-theme";
 import type { StepRoleForExport, StepToolForExport, PdfSectionEntry } from "./pdf-theme";
@@ -742,6 +743,7 @@ export function renderBaseCostSummary(
   stepTools: StepToolForExport[],
   sectionEntries: PdfSectionEntry[],
   revenueConfig?: RevenueConfig | null,
+  improvements?: ImprovementIdea[] | null,
 ): void {
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin: number = T.margin;
@@ -1168,6 +1170,63 @@ export function renderBaseCostSummary(
       const contextLines = pdf.splitTextToSize(contextText, contentWidth);
       pdf.text(contextLines, margin, y);
       y += contextLines.length * T.lineH + T.paraGap;
+    }
+  }
+
+  // ── Potential Savings from Improvements ──
+  const ideas = improvements?.filter((idea) => idea.description && idea.status !== "rejected") ?? [];
+  if (ideas.length > 0 && totalMonthlyCost > 0) {
+    y += 8;
+
+    if (y > pageHeight - margin - 40) {
+      pdf.addPage("a4", "landscape");
+      setPageBg(pdf);
+      y = margin;
+    }
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(T.h2);
+    pdf.setTextColor(...T.navy);
+    pdf.text("Potential Savings from Improvements", margin, y);
+    y += 6;
+
+    // Sort by priority: critical > high > medium > low
+    const priorityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+    const sorted = [...ideas].sort((a, b) => (priorityOrder[a.priority] ?? 4) - (priorityOrder[b.priority] ?? 4));
+    const top = sorted.slice(0, 5);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(T.bodySize);
+    pdf.setTextColor(...T.body);
+    const savingsNarr = `${ideas.length} improvement${ideas.length !== 1 ? "s" : ""} identified. The highest-priority items below represent concrete opportunities to reduce the $${formatCurrency(totalMonthlyCost)}/month operating cost. See the Improvements section for full detail.`;
+    const savingsLines = pdf.splitTextToSize(savingsNarr, contentWidth);
+    pdf.text(savingsLines, margin, y);
+    y += savingsLines.length * T.lineH + T.paraGap;
+
+    for (const idea of top) {
+      if (y + 12 > pageHeight - margin) {
+        pdf.addPage("a4", "landscape");
+        setPageBg(pdf);
+        y = margin;
+      }
+
+      // Priority color bar
+      const pColor = idea.priority === "critical" ? T.red : idea.priority === "high" ? T.amber : T.teal;
+      pdf.setFillColor(pColor[0], pColor[1], pColor[2]);
+      pdf.rect(margin, y, 2, 8, "F");
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(T.small);
+      pdf.setTextColor(...T.navy);
+      pdf.text(truncate(idea.title, 60), margin + 5, y + 3);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(T.tiny);
+      pdf.setTextColor(...T.muted);
+      const desc = idea.description ? truncate(stripHtml(idea.description), 90) : "";
+      if (desc) pdf.text(desc, margin + 5, y + 7);
+
+      y += 10;
     }
   }
 }

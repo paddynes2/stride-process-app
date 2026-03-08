@@ -1177,100 +1177,7 @@ export function renderJourneySentiment(pdf: jsPDF, data: JourneySentimentData): 
     }
   }
 
-  // ── Condensed sentiment table — top 8 by pain only (R7: full table to appendix) ──
-  const sortedByPain = [...tps].sort((a, b) => (b.pain_score ?? 0) - (a.pain_score ?? 0));
-  const condensedRows = sortedByPain.slice(0, 8);
-
-  if (condensedRows.length > 0) {
-    y += 4;
-
-    const sentCols = [
-      { label: "Touchpoint", width: 70 },
-      { label: "Stage", width: 55 },
-      { label: "Pain", width: 22 },
-      { label: "Sentiment", width: 30 },
-      { label: "Emotion", width: 55 },
-      { label: "", width: contentWidth - 70 - 55 - 22 - 30 - 55 },
-    ];
-
-    if (y + 20 > pageHeight - margin) {
-      ({ y, pageHeight, margin, contentWidth } = addCleanPage(pdf));
-    }
-
-    if (sortedByPain.length > 8) {
-      pdf.setFont("helvetica", "italic");
-      pdf.setFontSize(T.small);
-      pdf.setTextColor(...T.muted);
-      pdf.text(`Showing top 8 of ${sortedByPain.length} touchpoints by pain score.`, margin, y);
-      y += 4;
-    }
-
-    y = drawTableHeaderRow(pdf, sentCols, margin, contentWidth, y);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(T.tableSize);
-
-    for (let ri = 0; ri < condensedRows.length; ri++) {
-      const tp = condensedRows[ri];
-      if (shouldBreakTable(y, pageHeight, margin, condensedRows.length - ri)) {
-        y = newTablePageClean(pdf, "Journey Sentiment", sentCols, margin, contentWidth);
-      }
-      drawStripeRow(pdf, ri, margin, y, contentWidth);
-
-      let colX = margin + 2;
-      pdf.setTextColor(...T.navy);
-      pdf.text(truncate(tp.name, 40), colX, y + 3);
-      colX += sentCols[0].width;
-
-      pdf.setTextColor(...T.muted);
-      pdf.text(truncate(tp.stage_id ? stageMap.get(tp.stage_id) ?? "\u2014" : "\u2014", 32), colX, y + 3);
-      colX += sentCols[1].width;
-
-      if (tp.pain_score != null) {
-        const painColor = PAIN_COLORS[tp.pain_score];
-        if (painColor) {
-          const [r, g, b] = hexToRgb(painColor);
-          pdf.setFillColor(r, g, b);
-          pdf.circle(colX + 1.5, y + 2, 1.2, "F");
-        }
-        pdf.setTextColor(...T.navy);
-        pdf.text(String(tp.pain_score), colX + 5, y + 3);
-      } else {
-        pdf.setTextColor(...T.faint);
-        pdf.text("\u2014", colX, y + 3);
-      }
-      colX += sentCols[2].width;
-
-      if (tp.sentiment) {
-        const sColor = SENTIMENT_COLORS[tp.sentiment] ?? "#6B7280";
-        const [r, g, b] = hexToRgb(sColor);
-        pdf.setFillColor(r, g, b);
-        pdf.circle(colX + 1.5, y + 2, 1.2, "F");
-        pdf.setTextColor(...T.navy);
-        pdf.text(capitalize(tp.sentiment), colX + 5, y + 3);
-      } else {
-        pdf.setTextColor(...T.faint);
-        pdf.text("\u2014", colX, y + 3);
-      }
-      colX += sentCols[3].width;
-
-      pdf.setTextColor(...T.body);
-      const emotionText = tp.customer_emotion ? tp.customer_emotion : "\u2014";
-      pdf.text(truncate(emotionText, 32), colX, y + 3);
-      colX += sentCols[4].width;
-
-      // Sentiment bar
-      if (tp.pain_score != null && maxPain > 0) {
-        const barMaxW = sentCols[5].width - 4;
-        const barW = safeDivide(tp.pain_score, maxPain) * barMaxW;
-        const sColor = SENTIMENT_COLORS[tp.sentiment ?? "neutral"] ?? "#6B7280";
-        const [r, g, b] = hexToRgb(sColor);
-        pdf.setFillColor(r, g, b);
-        pdf.roundedRect(colX, y + 0.5, barW, 3, 1, 1, "F");
-      }
-
-      y += 6.5;
-    }
-  }
+  // R7 condensed: table removed from main body — arc + callouts are the insight
 }
 
 // ── Perspective Comparison ──────────────────────────────────────────────────
@@ -1321,7 +1228,7 @@ export function renderPerspectiveComparison(pdf: jsPDF, data: PerspectiveCompari
   const totalCells = allEntries.length * 2; // two perspectives per element
   const populatedCells = allEntries.reduce((sum, e) => sum + (e.ratingA != null ? 1 : 0) + (e.ratingB != null ? 1 : 0), 0);
   const populationRatio = totalCells > 0 ? safeDivide(populatedCells, totalCells) : 0;
-  const isCondensed = populationRatio < 0.6;
+  const isCondensed = populationRatio < 0.65;
 
   if (isCondensed) {
     pdf.setFont("helvetica", "italic");
@@ -2095,10 +2002,24 @@ export function renderTableOfContents(
 export interface RoadmapData {
   steps: Step[];
   sections: Section[];
+  improvements?: ImprovementIdea[] | null;
 }
 
 export function renderPhasedRoadmap(pdf: jsPDF, data: RoadmapData): void {
   const sectionMap = new Map(data.sections.map((s) => [s.id, s.name]));
+
+  // Build step → improvement map for specific outcomes
+  const stepImprovementMap = new Map<string, ImprovementIdea>();
+  if (data.improvements) {
+    for (const idea of data.improvements) {
+      if (idea.linked_step_id && idea.description && idea.status !== "rejected") {
+        // First match per step wins (improvements are typically priority-sorted)
+        if (!stepImprovementMap.has(idea.linked_step_id)) {
+          stepImprovementMap.set(idea.linked_step_id, idea);
+        }
+      }
+    }
+  }
 
   // Collect steps with gaps and assign phases
   const roadmapItems = data.steps
@@ -2107,6 +2028,7 @@ export function renderPhasedRoadmap(pdf: jsPDF, data: RoadmapData): void {
       if (phase == null) return null;
       const gapType = deriveGapType(s);
       return {
+        id: s.id,
         name: s.name,
         section: s.section_id ? sectionMap.get(s.section_id) ?? "" : "",
         phase,
@@ -2242,13 +2164,19 @@ export function renderPhasedRoadmap(pdf: jsPDF, data: RoadmapData): void {
       }
       colX += cols[3].width;
 
-      // Expected outcome
+      // Expected outcome — use linked improvement if available, else generic
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(T.tiny);
       pdf.setTextColor(...T.body);
-      const outcome = item.gapType === "discipline"
-        ? `Process/training fix — close +${item.gap} gap with existing tools`
-        : `Tooling/redesign — reduce gap from +${item.gap} via integration or automation`;
+      const linkedIdea = stepImprovementMap.get(item.id);
+      let outcome: string;
+      if (linkedIdea?.description) {
+        outcome = stripHtml(linkedIdea.description);
+      } else if (item.gapType === "discipline") {
+        outcome = `Process/training fix — close +${item.gap} gap with existing tools`;
+      } else {
+        outcome = `Tooling/redesign — reduce gap from +${item.gap} via integration or automation`;
+      }
       pdf.text(truncate(outcome, 60), colX, y + 3);
 
       y += 6.5;

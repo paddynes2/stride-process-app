@@ -177,7 +177,7 @@ Premium consulting-grade PDF output via jsPDF (client-side). White background, n
 ### Architecture
 - **`pdf-theme.ts`** — Single source of truth for theme (`T`), shared types (`StepRoleForExport`, `StepToolForExport`, `PdfSectionEntry`), all shared helpers (layout, data, formatting, `resetFontState`, `withTimeout`, `renderFooter`, `safeMax`, `safeDivide`). Both `pdf.ts` and `enhanced-pdf-sections.ts` import from here.
 - **`pdf.ts`** — Title page + 4 exported base section renderers (`renderBaseCanvasSnapshot`, `renderBaseStepDetails`, `renderBaseGapAnalysis`, `renderBaseCostSummary`). `renderBaseCanvasSnapshot` accepts optional `sections`/`steps` params to render a "Process Structure" summary table below the canvas image. Re-exports shared types for backward compatibility.
-- **`enhanced-pdf-sections.ts`** — 11 enhanced section renderers (exec summary, walkthrough, findings, journey map, sentiment, perspectives, prioritization, tools, improvements, AI insights, TOC).
+- **`enhanced-pdf-sections.ts`** — 13 enhanced section renderers (exec summary, walkthrough, findings, journey map, sentiment, perspectives, prioritization, tools, improvements, AI insights, TOC, phased roadmap, decisions block).
 - **`canvas-view.tsx`** orchestrator — imports all three modules via dynamic `import()`. Calls sections individually based on `ExportConfig` toggles via `safeRender()` (per-section try/catch with font state reset). Renders TOC last, moves to page 2 via `pdf.movePage()`. Footer via shared `renderFooter()`.
 
 ### Theme (Single T Object in pdf-theme.ts)
@@ -203,11 +203,14 @@ One unified theme object with consistent property names (`h1`, `small`, `tiny`, 
 - **Prioritization matrix:** 2×2 scatter plot with quadrant backgrounds (green/blue/amber/red tints), color-coded points with radial spiral jitter (prevents overlap), and a legend sidebar listing steps by quadrant with "E = Effort, I = Impact" key.
 - **Sentiment curve:** Line chart plotting pain scores across touchpoints in stage order, with sentiment-colored points.
 - **Process walkthrough:** Hero cards for decisions/pain points (tinted backgrounds, thicker accent bars, body-size text, icon badges). Standard callouts for other comment types.
-- **Perspective comparison:** Side-by-side annotation layout with colored column headers and dual cards.
+- **Perspective comparison:** Side-by-side annotation layout with colored column headers and dual cards. R7 condensed mode (population < 65%) filters to dual-observation rows only and skips annotation details.
 - **Improvements:** Numbered priority-colored badge circles + card backgrounds with accent stripes.
 - **Phase banners:** Navy rect + teal underline for process walkthrough sections.
 - **TOC:** 10pt font, teal page numbers, alternating stripe backgrounds.
-- **Footer:** Teal accent line, bold "Stride" branding, page N of M. Skips page 1 (title page has own footer).
+- **Footer:** Teal accent line, bold "Stride" branding, page N of M. Skips page 1 (title page has own footer). R8 baseline mode: first export shows "Baseline Assessment — Next Review: [date + 90 days]"; subsequent exports show "Review #N — Baseline: [original date]".
+- **Sentiment (condensed):** Arc (sentiment curve) + top 3 pain / top 2 gain callouts only. Table removed from main body to save ~2 pages.
+- **Cost summary — improvements cross-ref:** Optional `improvements` param adds "Potential Savings from Improvements" subsection with top 5 ideas and narrative linking to total cost.
+- **Phased roadmap — improvement outcomes:** When a step has a linked improvement idea, its description is used as the "Expected Outcome" instead of the generic template.
 - **Canvas snapshot (Process Map):** Intro line + canvas image (capped to ~55% height when sections/steps available) + "Process Structure" summary table below (per-section stats: step count, live/draft, avg maturity, hrs/mo, effort bar). Temporary `<style>` element injected for light-theme override (white backgrounds, slate text, slate borders on all React Flow nodes).
 
 ### Gotchas
@@ -223,3 +226,6 @@ One unified theme object with consistent property names (`h1`, `small`, `tiny`, 
 - **Empty-array spread guard:** Never use `Math.max(...arr)` on potentially empty arrays (returns `-Infinity`). Use `safeMax(arr)` from `pdf-theme.ts` instead.
 - **TOC leader loop guard:** Dotted leader rendering skipped when `leaderStart >= leaderEnd` (very long section names). Text-width truncation loops capped at 200 iterations.
 - **Footer single source:** `renderFooter()` in `pdf-theme.ts` is the only footer renderer — both `pdf.ts` and `canvas-view.tsx` call it (no hardcoded color values).
+- **Baseline always-on:** `baselineData` is always constructed in the orchestrator (never null). First export uses today's date with `review_number: 0`. Auto-save writes scores to `workspace.settings.previous_scores` after export; `review_number` only increments when previous scores already exist.
+- **Improvements fetched once:** Improvements are fetched once at the top of the export handler and shared across cost summary, roadmap, and improvements sections (no duplicate API calls).
+- **ImprovementStatus values:** `"proposed" | "approved" | "in_progress" | "completed" | "rejected"` — there is no "dismissed" status.
