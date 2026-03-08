@@ -85,6 +85,7 @@ export function WorkspaceShell({
         <Sidebar
           workspaceId={workspace.id}
           workspaceName={workspace.name}
+          workspaceImageUrl={workspace.image_url}
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />

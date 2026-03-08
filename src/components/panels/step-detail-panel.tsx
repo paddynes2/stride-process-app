@@ -50,7 +50,7 @@ import {
   fetchTools,
 } from "@/lib/api/client";
 import type { TeamWithRoles, StepRoleWithDetails, StepToolWithTool } from "@/lib/api/client";
-import type { Step, StepStatus, ExecutorType, ImprovementPriority, Tool } from "@/types/database";
+import type { Step, StepStatus, ExecutorType, ValueType, ImprovementPriority, Tool } from "@/types/database";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
@@ -719,6 +719,73 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
             </div>
             <p className="text-[10px] text-[var(--text-quaternary)] mt-1">1 = low impact, 5 = high impact</p>
           </div>
+
+          <div>
+            <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+              <Lightbulb className="h-3 w-3" />
+              Value Type
+            </label>
+            <div className="flex gap-1">
+              {([
+                { value: "value_adding" as ValueType, label: "Value Adding", color: "#16A34A" },
+                { value: "necessary_waste" as ValueType, label: "Necessary", color: "#D97706" },
+                { value: "pure_waste" as ValueType, label: "Waste", color: "#DC2626" },
+              ]).map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleFieldUpdate("value_type", step.value_type === opt.value ? null : opt.value)}
+                  title={opt.label}
+                  className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[10px] font-semibold border transition-all ${
+                    step.value_type === opt.value
+                      ? "text-white"
+                      : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                  }`}
+                  style={step.value_type === opt.value ? { backgroundColor: opt.color, borderColor: opt.color } : undefined}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-[var(--text-quaternary)] mt-1">Lean classification for cost analysis</p>
+          </div>
+
+          {/* Phase Override (P4) — only show when step has a gap */}
+          {step.maturity_score != null && step.target_maturity != null && step.target_maturity > step.maturity_score && (
+            <div>
+              <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide flex items-center gap-1 mb-1.5">
+                <Target className="h-3 w-3" />
+                Roadmap Phase
+                {step.phase_override != null && (
+                  <span className="ml-1 px-1 py-0.5 text-[9px] rounded bg-[var(--accent-blue)]/20 text-[var(--accent-blue)]">override</span>
+                )}
+              </label>
+              <div className="flex gap-1">
+                {([
+                  { value: 0, label: "Phase 0", sublabel: "Wk 1–2", color: "#16A34A" },
+                  { value: 1, label: "Phase 1", sublabel: "Mo 1–3", color: "#3B82F6" },
+                  { value: 2, label: "Phase 2", sublabel: "Mo 3–6", color: "#D97706" },
+                ]).map((opt) => {
+                  const isActive = step.phase_override === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      onClick={() => handleFieldUpdate("phase_override", isActive ? null : opt.value)}
+                      title={`${opt.label} (${opt.sublabel})`}
+                      className={`flex-1 h-8 rounded-[var(--radius-sm)] text-[10px] font-semibold border transition-all ${
+                        isActive
+                          ? "text-white"
+                          : "border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-default)]"
+                      }`}
+                      style={isActive ? { backgroundColor: opt.color, borderColor: opt.color } : undefined}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-[var(--text-quaternary)] mt-1">Override derived phase for the roadmap</p>
+            </div>
+          )}
         </CollapsibleSection>
 
         <CollapsibleSection
@@ -740,7 +807,7 @@ export function StepDetailPanel({ step, workspaceId, onUpdate, onDelete, onClose
               className="w-full h-8 px-2 text-[12px] bg-[var(--input-bg)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-primary)] focus:border-[var(--border-focus)] outline-none"
             >
               <option value="">None</option>
-              {tabs.filter((t) => t.id !== step.tab_id).map((t) => (
+              {tabs.map((t) => (
                 <option key={t.id} value={t.id}>{t.name}</option>
               ))}
             </select>

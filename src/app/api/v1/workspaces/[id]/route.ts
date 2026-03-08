@@ -45,6 +45,12 @@ export async function PATCH(
 
   if (body.name !== undefined) updates.name = body.name;
   if (body.is_active !== undefined) updates.is_active = body.is_active;
+  if (body.image_url !== undefined) updates.image_url = typeof body.image_url === "string" ? body.image_url.trim() || null : null;
+  if (body.avg_order_value !== undefined) updates.avg_order_value = body.avg_order_value;
+  if (body.monthly_inquiries !== undefined) updates.monthly_inquiries = body.monthly_inquiries;
+  if (body.close_rate !== undefined) updates.close_rate = body.close_rate;
+  if (body.reorder_rate !== undefined) updates.reorder_rate = body.reorder_rate;
+  if (body.settings !== undefined && typeof body.settings === "object" && body.settings !== null) updates.settings = body.settings;
 
   if (Object.keys(updates).length === 0) {
     return errorResponse("validation", "No valid fields to update", 400);

@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 interface SidebarProps {
   workspaceId: string;
   workspaceName: string;
+  workspaceImageUrl?: string | null;
   collapsed?: boolean;
   onToggle?: () => void;
 }
@@ -86,7 +87,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
 ];
 
-export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ workspaceId, workspaceName, workspaceImageUrl, collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const basePath = `/w/${workspaceId}`;
   const [improvementsOpenCount, setImprovementsOpenCount] = React.useState<number | null>(null);
@@ -131,12 +132,22 @@ export function Sidebar({ workspaceId, workspaceName, collapsed, onToggle }: Sid
       {/* Header */}
       <div className="flex items-center gap-2 px-3 h-[var(--header-height)] border-b border-[var(--border-subtle)]">
         <Link href="/workspaces" aria-label="Back to workspaces" className="flex items-center gap-2 min-w-0 flex-1">
-          <div
-            className="flex items-center justify-center shrink-0"
-            style={{ width: 24, height: 24, borderRadius: 6, background: "var(--brand)" }}
-          >
-            <span className="text-white text-[11px] font-bold leading-none">S</span>
-          </div>
+          {workspaceImageUrl ? (
+            <img
+              src={workspaceImageUrl}
+              alt=""
+              className="shrink-0 rounded-[6px] object-contain"
+              style={{ width: 24, height: 24 }}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            />
+          ) : (
+            <div
+              className="flex items-center justify-center shrink-0"
+              style={{ width: 24, height: 24, borderRadius: 6, background: "var(--brand)" }}
+            >
+              <span className="text-white text-[11px] font-bold leading-none">S</span>
+            </div>
+          )}
           {!collapsed && (
             <span className="text-[13px] font-semibold text-[var(--text-primary)] truncate">
               {workspaceName}

@@ -35,9 +35,25 @@ function ToolNodeComponent({ data, selected }: NodeProps) {
       )}
       style={{ backgroundColor: "var(--bg-surface)" }}
     >
-      <p className="text-[13px] font-medium text-[var(--text-primary)] truncate leading-tight mb-1.5">
-        {tool.name}
-      </p>
+      <div className="flex items-center gap-2 mb-1.5">
+        {tool.logo_url ? (
+          <img
+            src={tool.logo_url}
+            alt=""
+            className="w-5 h-5 rounded-[3px] object-contain shrink-0"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+          />
+        ) : (
+          <div className="w-5 h-5 rounded-[3px] bg-[var(--bg-surface-hover)] flex items-center justify-center shrink-0">
+            <span className="text-[9px] font-bold text-[var(--text-tertiary)] leading-none">
+              {tool.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
+        <p className="text-[13px] font-medium text-[var(--text-primary)] truncate leading-tight">
+          {tool.name}
+        </p>
+      </div>
       <div className="flex items-center justify-between gap-1.5">
         <Badge variant={STATUS_VARIANTS[tool.status] ?? "secondary"}>
           {STATUS_LABELS[tool.status] ?? tool.status}

@@ -1,7 +1,7 @@
 # Stride — CLAUDE.md
 
 ## What This Is
-Process mapping & continuous improvement SaaS (Puzzle.io clone). **All phases complete** (Phase 0–4 + Phase 3a/3b). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, applies conditional step coloring, manages tools with cost analysis, runs AI analysis, exports enhanced multi-section PDF reports, and links steps across flows via portal links.
+Process mapping & continuous improvement SaaS (Puzzle.io clone). **All phases complete** (Phase 0–4 + Phase 3a/3b). Consultant maps processes on a dark-themed infinite canvas, runs journey analysis, executes runbook playbooks, tracks activity, clones workspaces, applies conditional step coloring, manages tools with cost analysis, runs AI analysis, exports premium McKinsey-style PDF reports (white background, navy/teal theme, editorial typography), and links steps across flows via portal links.
 
 ## Tech Stack
 - Next.js 16.1.6 + React 19.2 + TypeScript 5 + Tailwind CSS 4
@@ -96,7 +96,7 @@ src/
     supabase/              — client.ts, server.ts, middleware.ts (3-client pattern)
     api/                   — client.ts (apiFetch wrappers), response.ts (envelope helpers)
     context/               — workspace-context.tsx (user + workspace + tabs)
-    export/                — pdf.ts, enhanced-pdf-sections.ts, journey-pdf.ts, comparison-pdf.ts, png.ts
+    export/                — pdf-theme.ts (shared theme, types, helpers), pdf.ts (title page + 4 base renderers), enhanced-pdf-sections.ts (11 enhanced renderers + TOC), journey-pdf.ts, comparison-pdf.ts, png.ts
     maturity.ts            — maturity scoring constants + helpers
     pain.ts                — pain score constants + helpers
     utils.ts               — cn() (clsx + tailwind-merge)
@@ -170,3 +170,56 @@ npx supabase link --project-ref tkcyxtxkmveipnwgrddd  # Link CLI to project
 - **Canvas context pattern:** Node-level data (comment counts, task counts, coloring tints, portal navigation) is passed via React contexts (defined in `types/canvas.ts`) to avoid prop-drilling through FlowCanvas. Canvas views provide these contexts; node components consume them.
 - **Edge deletion:** React Flow's `deleteKeyCode={null}` disables built-in deletion. Custom keyboard handler in FlowCanvas checks selected edges via `edges.filter(e => e.selected)` and calls `apiDeleteConnection`.
 - **Portal links:** Steps can link to other tabs via `link_to_tab_id`/`link_to_step_id`. Navigation uses `PortalNavigateContext` provided by canvas-view, which calls `router.push()` with `?focusNode=` query param.
+
+## PDF Export Design System
+Premium consulting-grade PDF output via jsPDF (client-side). White background, navy/teal Swiss editorial theme.
+
+### Architecture
+- **`pdf-theme.ts`** — Single source of truth for theme (`T`), shared types (`StepRoleForExport`, `StepToolForExport`, `PdfSectionEntry`), all shared helpers (layout, data, formatting, `resetFontState`, `withTimeout`, `renderFooter`, `safeMax`, `safeDivide`). Both `pdf.ts` and `enhanced-pdf-sections.ts` import from here.
+- **`pdf.ts`** — Title page + 4 exported base section renderers (`renderBaseCanvasSnapshot`, `renderBaseStepDetails`, `renderBaseGapAnalysis`, `renderBaseCostSummary`). `renderBaseCanvasSnapshot` accepts optional `sections`/`steps` params to render a "Process Structure" summary table below the canvas image. Re-exports shared types for backward compatibility.
+- **`enhanced-pdf-sections.ts`** — 11 enhanced section renderers (exec summary, walkthrough, findings, journey map, sentiment, perspectives, prioritization, tools, improvements, AI insights, TOC).
+- **`canvas-view.tsx`** orchestrator — imports all three modules via dynamic `import()`. Calls sections individually based on `ExportConfig` toggles via `safeRender()` (per-section try/catch with font state reset). Renders TOC last, moves to page 2 via `pdf.movePage()`. Footer via shared `renderFooter()`.
+
+### Theme (Single T Object in pdf-theme.ts)
+One unified theme object with consistent property names (`h1`, `small`, `tiny`, etc.). Both consumer files import `T` from `pdf-theme.ts`. Theme changes only need to be made in one place.
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `navy` | `[23, 37, 84]` | Title page hero banner, table headers, stat cards, phase banners |
+| `teal` | `[13, 148, 136]` | Accent lines, page numbers, stat card variant, teal strip under banner |
+| `tealBg` | `[240, 253, 250]` | Light teal fill for stat cards |
+| `surface` | `[248, 250, 252]` | Default stat card fill, alternating table rows |
+| `body` | `[51, 65, 85]` | Primary body text |
+| `muted` | `[100, 116, 139]` | Secondary text, labels |
+| `bodySize` | `10` | Body text (bumped from 9.5) |
+| `lineH` | `4.5` | Line spacing (bumped from 4.2) |
+| `paraGap` | `7` | Paragraph spacing (bumped from 6) |
+
+### Key Components
+- **Title page:** Navy hero banner (top 38%) + teal accent strip + white title text. Metadata below on white.
+- **Stat cards:** 3 variants — `navy` (white text on navy fill), `teal` (dark text on teal-tinted fill), `default` (dark text on light gray fill).
+- **Table headers:** Navy background with white text. Alternating `surface` row stripes. Pagination via `shouldBreakTable()` — anti-orphan logic with threshold `> 8` remaining rows.
+- **Gap analysis:** Horizontal bar chart (top 10 gaps, teal current + color-coded gap overlay) above the detail table.
+- **Prioritization matrix:** 2×2 scatter plot with quadrant backgrounds (green/blue/amber/red tints), color-coded points with radial spiral jitter (prevents overlap), and a legend sidebar listing steps by quadrant with "E = Effort, I = Impact" key.
+- **Sentiment curve:** Line chart plotting pain scores across touchpoints in stage order, with sentiment-colored points.
+- **Process walkthrough:** Hero cards for decisions/pain points (tinted backgrounds, thicker accent bars, body-size text, icon badges). Standard callouts for other comment types.
+- **Perspective comparison:** Side-by-side annotation layout with colored column headers and dual cards.
+- **Improvements:** Numbered priority-colored badge circles + card backgrounds with accent stripes.
+- **Phase banners:** Navy rect + teal underline for process walkthrough sections.
+- **TOC:** 10pt font, teal page numbers, alternating stripe backgrounds.
+- **Footer:** Teal accent line, bold "Stride" branding, page N of M. Skips page 1 (title page has own footer).
+- **Canvas snapshot (Process Map):** Intro line + canvas image (capped to ~55% height when sections/steps available) + "Process Structure" summary table below (per-section stats: step count, live/draft, avg maturity, hrs/mo, effort bar). Temporary `<style>` element injected for light-theme override (white backgrounds, slate text, slate borders on all React Flow nodes).
+
+### Gotchas
+- **jsPDF font state bug:** `splitTextToSize()` uses CURRENT font settings. Must set correct font/size BEFORE calling split.
+- **Single theme in `pdf-theme.ts`:** All theme values, shared types, and helpers live in `pdf-theme.ts`. Both `pdf.ts` and `enhanced-pdf-sections.ts` import from it.
+- **`const margin` type narrowing:** `const margin = T.margin` infers literal type `20`. Use `const margin: number = T.margin` to avoid TS errors when passing to functions expecting `number`.
+- **Canvas CSS overrides:** Must target `.react-flow`, `.react-flow__node *`, `[class*="section-node"] *`, badges, pills, and `svg rect` to fully override dark theme for PDF capture.
+- **Improvements sorting:** `[...data.ideas].sort()` by priority (Critical→High→Medium→Low) — never mutate props directly.
+- **Base section independence:** Each `renderBase*` function builds its own `sectionMap`, `stepRolesMap`, etc. from params — no shared state with `createWorkspacePdf()`.
+- **Pagination overflow:** `shouldBreakTable()` uses threshold `remainingRows > 8`. Tail-end rows (≤8) either extend into footer gap zone if they fit, or force-break immediately to push all remaining rows to next page together — prevents 2-3 row orphan pages.
+- **Per-section isolation:** `canvas-view.tsx` wraps every section render in `safeRender()` — catches errors, calls `resetFontState(pdf)` to prevent state leakage, logs failed section names, and continues rendering remaining sections.
+- **Canvas capture timeout:** `toPng()` calls are wrapped in `withTimeout(…, 30_000)` to prevent indefinite hangs on large or complex canvases.
+- **Empty-array spread guard:** Never use `Math.max(...arr)` on potentially empty arrays (returns `-Infinity`). Use `safeMax(arr)` from `pdf-theme.ts` instead.
+- **TOC leader loop guard:** Dotted leader rendering skipped when `leaderStart >= leaderEnd` (very long section names). Text-width truncation loops capped at 200 iterations.
+- **Footer single source:** `renderFooter()` in `pdf-theme.ts` is the only footer renderer — both `pdf.ts` and `canvas-view.tsx` call it (no hardcoded color values).

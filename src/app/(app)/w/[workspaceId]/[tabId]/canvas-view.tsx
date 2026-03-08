@@ -24,7 +24,7 @@ const TaskPanel = React.lazy(() =>
 import { ColoringPanel } from "@/components/canvas/coloring-panel";
 import { useWorkspace } from "@/lib/context/workspace-context";
 import { useCanvasExport } from "@/hooks/use-canvas-export";
-import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch, fetchStepToolsByStep, fetchTools, fetchImprovementIdeas } from "@/lib/api/client";
+import { fetchAnnotations, fetchComments, fetchAllTasks, fetchColoringRules, fetchTemplates, deployTemplate, deleteTemplate, createSection, createStep, fetchTouchpoints, fetchPerspectives, fetchStepRolesBatch, fetchStepToolsByStep, fetchTools, fetchImprovementIdeas, updateWorkspace } from "@/lib/api/client";
 import type { ExportConfig } from "@/components/panels/export-pdf-dialog";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { CommentCountsContext, TaskCountsContext, ColoringTintContext, PortalNavigateContext } from "@/types/canvas";
@@ -43,7 +43,7 @@ import {
 // DialogPrimitive.Title directly here to fix the console.error in this dialog.
 // section-detail-panel.tsx has the same underlying issue but is not owned by this task.
 import { STARTER_TEMPLATES } from "@/lib/templates";
-import { Paintbrush, LayoutTemplate, Trash2 } from "lucide-react";
+import { Paintbrush, LayoutTemplate, Trash2, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { toast } from "sonner";
 import { toastError } from "@/lib/api/toast-helpers";
 import { cn } from "@/lib/utils";
@@ -76,12 +76,18 @@ export function CanvasView({
 
   const handleStepSelect = React.useCallback((stepId: string | null) => {
     setSelectedStepId(stepId);
-    if (stepId) setSelectedSectionId(null);
+    if (stepId) {
+      setSelectedSectionId(null);
+      setPanelCollapsed(false);
+    }
   }, []);
 
   const handleSectionSelect = React.useCallback((sectionId: string | null) => {
     setSelectedSectionId(sectionId);
-    if (sectionId) setSelectedStepId(null);
+    if (sectionId) {
+      setSelectedStepId(null);
+      setPanelCollapsed(false);
+    }
   }, []);
 
   const handleStepUpdate = React.useCallback((updated: Step) => {
@@ -288,6 +294,7 @@ export function CanvasView({
   // Fetch workspace coloring rules for step background tint
   const [coloringRules, setColoringRules] = React.useState<ColoringRule[]>([]);
   const [showColoringPanel, setShowColoringPanel] = React.useState(false);
+  const [panelCollapsed, setPanelCollapsed] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -389,10 +396,14 @@ export function CanvasView({
   const handleEnhancedExportPdf = React.useCallback(
     async (canvasElement: HTMLElement, config: ExportConfig) => {
       try {
-        const [{ createWorkspacePdf }, { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison, renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights, renderProcessNarrative, renderKeyFindings, renderTableOfContents }] = await Promise.all([
+        const [pdfMod, enhancedMod, themeMod] = await Promise.all([
           import("@/lib/export/pdf"),
           import("@/lib/export/enhanced-pdf-sections"),
+          import("@/lib/export/pdf-theme"),
         ]);
+        const { createWorkspacePdf, renderBaseCanvasSnapshot, renderBaseStepDetails, renderBaseGapAnalysis, renderBaseCostSummary } = pdfMod;
+        const { renderExecutiveSummary, renderJourneyMap, renderJourneySentiment, renderPerspectiveComparison, renderPrioritizationMatrix, renderToolLandscape, renderImprovements, renderAIInsights, renderProcessNarrative, renderKeyFindings, renderTableOfContents, renderPhasedRoadmap, renderDecisionsBlock } = enhancedMod;
+        const { resetFontState, renderFooter } = themeMod;
 
         // Fetch step roles if needed for cost or executive summary sections
         const stepIds = steps.map((s) => s.id);
@@ -400,87 +411,139 @@ export function CanvasView({
         const stepRoles =
           needsRoles && stepIds.length > 0 ? await fetchStepRolesBatch(stepIds) : [];
 
-        // Fetch step tools for cost analysis (parallel fetch, ignore per-step failures)
+        // Fetch step tools for cost analysis, executive summary, and tool landscape (parallel fetch, ignore per-step failures)
+        const needsTools = config.costAnalysis || config.executiveSummary || config.toolLandscape;
         const stepToolsRaw =
-          config.costAnalysis && stepIds.length > 0
+          needsTools && stepIds.length > 0
             ? (await Promise.allSettled(stepIds.map((id) => fetchStepToolsByStep(id))))
                 .flatMap((r) => r.status === "fulfilled" ? r.value : [])
             : [];
 
-        // Fetch comments for process narrative and key findings sections
+        // Fetch comments for process narrative, key findings, and decisions sections
         const allComments = (config.processNarrative || config.keyFindings)
           ? await fetchComments(workspaceId)
           : [];
 
-        // Mask step data for disabled base sections (matches use-canvas-export.ts logic)
-        let exportSteps = steps;
-        let exportStepRoles = stepRoles;
-        let exportStepTools = stepToolsRaw;
-        if (!config.dataTable && !config.gapAnalysis && !config.costAnalysis) {
-          exportSteps = [];
-        } else {
-          if (!config.gapAnalysis) {
-            exportSteps = exportSteps.map((s) => ({
-              ...s,
-              maturity_score: null,
-              target_maturity: null,
-            }));
-          }
-          if (!config.costAnalysis) {
-            exportStepRoles = [];
-            exportStepTools = [];
-            exportSteps = exportSteps.map((s) => ({
-              ...s,
-              time_minutes: null,
-              frequency_per_month: null,
-            }));
-          }
-        }
+        // R8: Detect baseline/review mode from workspace.settings
+        const settings = workspace.settings as Record<string, unknown>;
+        const previousScores = settings.previous_scores as Array<{ step_id: string; maturity: number; date: string }> | undefined;
+        const baselineDate = settings.baseline_date as string | undefined;
+        const reviewNumber = (settings.review_number as number) ?? 0;
+        const reviewIntervalDays = (settings.review_interval_days as number) ?? 90;
 
-        // Build base PDF without footer (skipFooter=true)
+        const baselineData = (baselineDate && previousScores && previousScores.length > 0)
+          ? { baseline_date: baselineDate, review_interval_days: reviewIntervalDays, previous_scores: previousScores, review_number: reviewNumber }
+          : null;
+
+        // Build base PDF (title page only) without footer (skipFooter=true)
+        // skipFooter=true also skips internal section rendering — we call them individually below
         const { pdf, sections: basePdfSections } = await createWorkspacePdf(
           {
             workspaceName: workspace.name,
             sections,
-            steps: exportSteps,
+            steps,
             connections,
-            canvasElement: config.canvasSnapshot ? canvasElement : null,
-            stepRoles: exportStepRoles,
-            stepTools: exportStepTools,
+            canvasElement,
           },
           true,
         );
 
+        // Safely render a section — catches errors so one failure doesn't kill the export
+        const sectionErrors: string[] = [];
+        const safeRender = async (name: string, fn: () => void | Promise<void>) => {
+          try {
+            await fn();
+          } catch (err) {
+            console.error(`[PDF] Section "${name}" failed:`, err);
+            sectionErrors.push(name);
+            resetFontState(pdf);
+          }
+        };
+
         // Collect TOC entries (base sections + enhanced sections)
         const tocEntries = [...basePdfSections];
 
-        // Executive Summary
+        // ══════════════════════════════════════════════════════════════════
+        // R3: Report section order — actionable content first, reference last
+        // ══════════════════════════════════════════════════════════════════
+
+        // ── FRONT MATTER (what to do) ──
+
+        // 1. Executive Summary + Rubric (R1) + Composite Score (P1)
         if (config.executiveSummary) {
-          const sectionPage = pdf.getNumberOfPages() + 1;
-          renderExecutiveSummary(pdf, { sections, steps, stepRoles });
-          tocEntries.push({ name: "Executive Summary", page: sectionPage });
-        }
-
-        // Process Narrative
-        if (config.processNarrative) {
-          const sectionPage = pdf.getNumberOfPages() + 1;
-          renderProcessNarrative(pdf, { sections, steps, comments: allComments });
-          tocEntries.push({ name: "Process Walkthrough", page: sectionPage });
-        }
-
-        // Key Findings & Decisions
-        if (config.keyFindings) {
-          const hasRelevant = allComments.some(
-            (c) => c.category === "decision" || c.category === "pain_point",
-          );
-          if (hasRelevant) {
+          await safeRender("Executive Summary", () => {
             const sectionPage = pdf.getNumberOfPages() + 1;
-            renderKeyFindings(pdf, { comments: allComments, steps, sections });
-            tocEntries.push({ name: "Key Findings & Decisions", page: sectionPage });
+            renderExecutiveSummary(pdf, { sections, steps, stepRoles, stepTools: stepToolsRaw, baselineData });
+            tocEntries.push({ name: "Executive Summary", page: sectionPage });
+          });
+        }
+
+        // 2. Decisions & Actions (R3 — moved forward from Key Findings, P5 first action, P7 zero-state)
+        if (config.keyFindings && allComments.some((c) => c.category === "decision" && !c.is_resolved)) {
+          await safeRender("Decisions & Actions", () => {
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderDecisionsBlock(pdf, { comments: allComments, steps, sections });
+            tocEntries.push({ name: "Decisions & Actions", page: sectionPage });
+          });
+        }
+
+        // 3. Prioritization Matrix (moved forward)
+        if (config.prioritizationMatrix) {
+          await safeRender("Prioritization Matrix", () => {
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderPrioritizationMatrix(pdf, { steps, sections });
+            tocEntries.push({ name: "Prioritization Matrix", page: sectionPage });
+          });
+        }
+
+        // 4. Phased Roadmap (R5 — new, after prioritization matrix)
+        if (config.prioritizationMatrix) {
+          await safeRender("Phased Roadmap", () => {
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderPhasedRoadmap(pdf, { steps, sections });
+            tocEntries.push({ name: "Phased Roadmap", page: sectionPage });
+          });
+        }
+
+        // ── NARRATIVE (the client's voice) ──
+
+        // 5. Process Walkthrough
+        if (config.processNarrative) {
+          await safeRender("Process Walkthrough", () => {
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderProcessNarrative(pdf, { sections, steps, comments: allComments });
+            tocEntries.push({ name: "Process Walkthrough", page: sectionPage });
+          });
+        }
+
+        // 6. Key Findings — pain points (decisions already rendered on page 2)
+        if (config.keyFindings) {
+          const hasPainPoints = allComments.some((c) => c.category === "pain_point" && !c.is_resolved);
+          if (hasPainPoints) {
+            await safeRender("Key Findings", () => {
+              const sectionPage = pdf.getNumberOfPages() + 1;
+              renderKeyFindings(pdf, { comments: allComments, steps, sections });
+              tocEntries.push({ name: "Key Findings & Decisions", page: sectionPage });
+            });
           }
         }
 
-        // Journey Map and/or Journey Sentiment — fetch data once for both
+        // ── ANALYSIS (supporting evidence) ──
+
+        // 7. Gap Analysis
+        if (config.gapAnalysis) {
+          await safeRender("Gap Analysis", () => renderBaseGapAnalysis(pdf, steps, sections, tocEntries, baselineData));
+        }
+
+        // 8. Cost Summary
+        if (config.costAnalysis) {
+          const revConfig = (workspace.avg_order_value || workspace.monthly_inquiries || workspace.close_rate || workspace.reorder_rate)
+            ? { avg_order_value: workspace.avg_order_value ?? 0, monthly_inquiries: workspace.monthly_inquiries ?? 0, close_rate: workspace.close_rate ?? 0, reorder_rate: workspace.reorder_rate ?? 0 }
+            : null;
+          await safeRender("Cost Summary", () => renderBaseCostSummary(pdf, steps, sections, stepRoles, stepToolsRaw, tocEntries, revConfig));
+        }
+
+        // 9. Journey Map and/or Journey Sentiment
         if (config.journeyMap || config.journeySentiment) {
           const supabase = createSupabaseClient();
           const [touchpoints, stagesResult] = await Promise.all([
@@ -494,78 +557,93 @@ export function CanvasView({
           const stages = stagesResult.data ?? [];
 
           if (config.journeyMap) {
-            const sectionPage = pdf.getNumberOfPages() + 1;
-            await renderJourneyMap(pdf, { stages, touchpoints, canvasElement: null });
-            tocEntries.push({ name: "Journey Map", page: sectionPage });
+            await safeRender("Journey Map", async () => {
+              const sectionPage = pdf.getNumberOfPages() + 1;
+              await renderJourneyMap(pdf, { stages, touchpoints, canvasElement: null });
+              tocEntries.push({ name: "Journey Map", page: sectionPage });
+            });
           }
           if (config.journeySentiment) {
-            const sectionPage = pdf.getNumberOfPages() + 1;
-            renderJourneySentiment(pdf, { stages, touchpoints });
-            tocEntries.push({ name: "Journey Sentiment", page: sectionPage });
+            await safeRender("Journey Sentiment", () => {
+              const sectionPage = pdf.getNumberOfPages() + 1;
+              renderJourneySentiment(pdf, { stages, touchpoints });
+              tocEntries.push({ name: "Journey Sentiment", page: sectionPage });
+            });
           }
         }
 
-        // Perspective Comparison
+        // 10. Perspective Comparison
         if (config.perspectiveComparison) {
-          const perspectives = await fetchPerspectives(workspaceId);
-          const allAnnotations =
-            perspectives.length > 0
-              ? (await Promise.all(perspectives.map((p) => fetchAnnotations(p.id)))).flat()
-              : [];
-          if (perspectives.length > 0) {
-            const sectionPage = pdf.getNumberOfPages() + 1;
-            renderPerspectiveComparison(pdf, {
-              perspectives,
-              annotations: allAnnotations,
-              steps,
-              sections,
-            });
-            tocEntries.push({ name: "Perspective Comparison", page: sectionPage });
-          } else {
-            renderPerspectiveComparison(pdf, {
-              perspectives,
-              annotations: allAnnotations,
-              steps,
-              sections,
-            });
-          }
+          await safeRender("Perspective Comparison", async () => {
+            const perspectives = await fetchPerspectives(workspaceId);
+            const allAnnotations =
+              perspectives.length > 0
+                ? (await Promise.all(perspectives.map((p) => fetchAnnotations(p.id)))).flat()
+                : [];
+            if (perspectives.length >= 2) {
+              const sectionPage = pdf.getNumberOfPages() + 1;
+              renderPerspectiveComparison(pdf, {
+                perspectives,
+                annotations: allAnnotations,
+                steps,
+                sections,
+              });
+              tocEntries.push({ name: "Perspective Comparison", page: sectionPage });
+            }
+          });
         }
 
-        // Prioritization Matrix
-        if (config.prioritizationMatrix) {
-          const sectionPage = pdf.getNumberOfPages() + 1;
-          renderPrioritizationMatrix(pdf, { steps, sections });
-          tocEntries.push({ name: "Prioritization Matrix", page: sectionPage });
+        // 11. Process Map (visual reference)
+        if (config.canvasSnapshot) {
+          await safeRender("Process Map", () => renderBaseCanvasSnapshot(pdf, canvasElement, tocEntries, sections, steps));
         }
 
-        // Tool Landscape
-        if (config.toolLandscape) {
-          const tools = await fetchTools(workspaceId);
-          const sectionPage = pdf.getNumberOfPages() + 1;
-          renderToolLandscape(pdf, { tools });
-          tocEntries.push({ name: "Tool Landscape", page: sectionPage });
-        }
-
-        // Improvements
+        // 12. Improvements
         if (config.improvements) {
-          const ideas = await fetchImprovementIdeas(workspaceId);
-          const sectionPage = pdf.getNumberOfPages() + 1;
-          renderImprovements(pdf, { ideas });
-          tocEntries.push({ name: "Improvements", page: sectionPage });
+          await safeRender("Improvements", async () => {
+            const ideas = await fetchImprovementIdeas(workspaceId);
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderImprovements(pdf, { ideas });
+            tocEntries.push({ name: "Improvements", page: sectionPage });
+          });
         }
 
-        // AI Insights — cached in workspace.settings.last_analysis
+        // 13. AI Insights
         if (config.aiInsights) {
           const analysis = workspace.settings.last_analysis as AIAnalysisResult | undefined;
           if (analysis) {
-            const sectionPage = pdf.getNumberOfPages() + 1;
-            renderAIInsights(pdf, { analysis });
-            tocEntries.push({ name: "AI Insights", page: sectionPage });
+            await safeRender("AI Insights", () => {
+              const sectionPage = pdf.getNumberOfPages() + 1;
+              renderAIInsights(pdf, { analysis });
+              tocEntries.push({ name: "AI Insights", page: sectionPage });
+            });
           }
         }
 
+        // ── APPENDIX (reference data — moved to back per R3) ──
+
+        // APP-A: Step Details (full table)
+        if (config.dataTable) {
+          await safeRender("Step Details", () => renderBaseStepDetails(pdf, steps, sections, tocEntries));
+        }
+
+        // APP-B: Tool Landscape (R7: with step mapping)
+        if (config.toolLandscape) {
+          await safeRender("Tool Landscape", async () => {
+            const tools = await fetchTools(workspaceId);
+            // R7: Build step-tool counts from already-fetched step tools
+            const stepToolCounts = new Map<string, number>();
+            for (const st of stepToolsRaw) {
+              const toolId = st.tool?.id;
+              if (toolId) stepToolCounts.set(toolId, (stepToolCounts.get(toolId) ?? 0) + 1);
+            }
+            const sectionPage = pdf.getNumberOfPages() + 1;
+            renderToolLandscape(pdf, { tools, stepToolCounts: stepToolCounts.size > 0 ? stepToolCounts : undefined, totalSteps: steps.length });
+            tocEntries.push({ name: "Tool Landscape", page: sectionPage });
+          });
+        }
+
         // Table of Contents — render last, move to page 2
-        // All current section pages (at 2+) will shift to 3+ when TOC is inserted at 2
         if (tocEntries.length > 0) {
           const adjustedEntries = tocEntries.map((e) => ({ name: e.name, page: e.page + 1 }));
           renderTableOfContents(pdf, adjustedEntries);
@@ -573,28 +651,40 @@ export function CanvasView({
           pdf.movePage(tocPage, 2);
         }
 
-        // Add footer to all pages except title page (page 1)
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const totalPages = pdf.getNumberOfPages();
-        for (let i = 2; i <= totalPages; i++) {
-          pdf.setPage(i);
-          pdf.setFontSize(7);
-          pdf.setTextColor(255, 255, 255, 50);
-          pdf.text(
-            `${workspace.name} \u2014 Page ${i} of ${totalPages}`,
-            pageWidth / 2,
-            pageHeight - 5,
-            { align: "center" },
-          );
-          pdf.setTextColor(20, 184, 166, 80);
-          pdf.text("Stride", pageWidth - 15, pageHeight - 5, { align: "right" });
+        // Footer — uses shared theme function (no hardcoded color values)
+        renderFooter(pdf, workspace.name, baselineData);
+
+        // Warn about failed sections
+        if (sectionErrors.length > 0) {
+          console.warn(`[PDF] ${sectionErrors.length} section(s) failed: ${sectionErrors.join(", ")}`);
         }
 
         const safeFilename = workspace.name
           .replace(/[^a-zA-Z0-9-_ ]/g, "")
           .replace(/\s+/g, "-");
         pdf.save(`${safeFilename}-process-report.pdf`);
+
+        // R8: Auto-save current maturity scores as baseline for next review
+        const scoredSteps = steps.filter((s) => s.maturity_score != null);
+        if (scoredSteps.length > 0) {
+          const today = new Date().toISOString().slice(0, 10);
+          const newPreviousScores = scoredSteps.map((s) => ({
+            step_id: s.id,
+            maturity: s.maturity_score!,
+            date: today,
+          }));
+          const newSettings = {
+            ...settings,
+            previous_scores: newPreviousScores,
+            baseline_date: settings.baseline_date ?? today,
+            review_number: baselineData ? (baselineData.review_number + 1) : 0,
+            review_interval_days: settings.review_interval_days ?? 90,
+          };
+          updateWorkspace(workspaceId, { settings: newSettings }).catch((err) => {
+            console.warn("[PDF] Failed to save baseline scores:", err);
+          });
+        }
+
         toast.success("PDF exported successfully");
       } catch (err) {
         toastError("Failed to export PDF", { error: err });
@@ -751,10 +841,23 @@ export function CanvasView({
           </Dialog>
         </div>
 
+        {/* Panel collapse toggle */}
+        <button
+          onClick={() => setPanelCollapsed((p) => !p)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-5 h-10 bg-[var(--bg-surface)] border border-r-0 border-[var(--border-subtle)] rounded-l-md text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-all"
+          style={{ right: panelCollapsed ? 0 : "var(--panel-width)" }}
+          aria-label={panelCollapsed ? "Expand panel" : "Collapse panel"}
+        >
+          {panelCollapsed ? <PanelRightOpen className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
+        </button>
+
         {/* Detail Panel / Summary Panel */}
         <div
-          className="border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-y-auto"
-          style={{ width: "var(--panel-width)" }}
+          className={cn(
+            "border-l border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-y-auto transition-[width,min-width] duration-200 ease-in-out",
+            panelCollapsed && "border-l-0"
+          )}
+          style={{ width: panelCollapsed ? 0 : "var(--panel-width)", minWidth: panelCollapsed ? 0 : "var(--panel-width)", overflow: panelCollapsed ? "hidden" : undefined }}
         >
           <React.Suspense fallback={null}>
             {selectedStep && (

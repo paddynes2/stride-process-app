@@ -50,7 +50,7 @@ export async function createWorkspace(data: { name: string }): Promise<Workspace
   });
 }
 
-export async function updateWorkspace(id: string, data: Partial<Pick<Workspace, "name" | "is_active">>): Promise<Workspace> {
+export async function updateWorkspace(id: string, data: Partial<Pick<Workspace, "name" | "is_active" | "image_url" | "avg_order_value" | "monthly_inquiries" | "close_rate" | "reorder_rate" | "settings">>): Promise<Workspace> {
   return apiFetch<Workspace>(`/api/v1/workspaces/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -261,7 +261,7 @@ export async function fetchTools(workspaceId: string): Promise<Tool[]> {
   return apiFetch<Tool[]>(`/api/v1/tools?workspace_id=${workspaceId}`);
 }
 
-export async function createTool(data: { workspace_id: string; name?: string; description?: string; category?: string; vendor?: string; url?: string; cost_per_month?: number; position_x?: number; position_y?: number; status?: ToolStatus }): Promise<Tool> {
+export async function createTool(data: { workspace_id: string; name?: string; description?: string; category?: string; vendor?: string; url?: string; logo_url?: string | null; cost_per_month?: number; position_x?: number; position_y?: number; status?: ToolStatus }): Promise<Tool> {
   return apiFetch<Tool>("/api/v1/tools", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -269,7 +269,7 @@ export async function createTool(data: { workspace_id: string; name?: string; de
   });
 }
 
-export async function updateTool(id: string, data: Partial<Pick<Tool, "name" | "description" | "category" | "vendor" | "url" | "cost_per_month" | "position_x" | "position_y" | "status">>): Promise<Tool> {
+export async function updateTool(id: string, data: Partial<Pick<Tool, "name" | "description" | "category" | "vendor" | "url" | "logo_url" | "cost_per_month" | "position_x" | "position_y" | "status">>): Promise<Tool> {
   return apiFetch<Tool>(`/api/v1/tools/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { successResponse, errorResponse } from "@/lib/api/response";
 import { logActivity } from "@/lib/api/activity";
 
-const EDITABLE_FIELDS = ["name", "description", "category", "vendor", "url", "cost_per_month", "position_x", "position_y", "status"] as const;
+const EDITABLE_FIELDS = ["name", "description", "category", "vendor", "url", "logo_url", "cost_per_month", "position_x", "position_y", "status"] as const;
 const VALID_STATUSES = ["active", "considering", "cancelled"] as const;
 
 export async function PATCH(

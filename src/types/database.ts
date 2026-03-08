@@ -4,6 +4,7 @@
 
 export type StepStatus = "draft" | "in_progress" | "testing" | "live" | "archived";
 export type ExecutorType = "person" | "automation" | "ai_agent" | "empty";
+export type ValueType = "value_adding" | "necessary_waste" | "pure_waste";
 export type WorkspaceRole = "viewer" | "member" | "admin" | "owner";
 export type CanvasType = "process" | "journey";
 export type TouchpointSentiment = "positive" | "neutral" | "negative";
@@ -42,6 +43,10 @@ export interface Workspace {
   image_url: string | null;
   is_active: boolean;
   settings: Record<string, unknown>;
+  avg_order_value: number | null;
+  monthly_inquiries: number | null;
+  close_rate: number | null;
+  reorder_rate: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -92,6 +97,8 @@ export interface Step {
   target_maturity: number | null;
   effort_score: number | null;
   impact_score: number | null;
+  value_type: ValueType | null;
+  phase_override: number | null;
   link_to_tab_id: string | null;
   link_to_step_id: string | null;
   created_at: string;
@@ -145,6 +152,7 @@ export interface Tool {
   category: string | null;
   vendor: string | null;
   url: string | null;
+  logo_url: string | null;
   cost_per_month: number | null;
   position_x: number;
   position_y: number;

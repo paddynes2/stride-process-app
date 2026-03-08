@@ -22,6 +22,8 @@ const EDITABLE_FIELDS = [
   "impact_score",
   "link_to_tab_id",
   "link_to_step_id",
+  "value_type",
+  "phase_override",
 ] as const;
 
 export async function PATCH(

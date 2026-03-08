@@ -53,6 +53,7 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
   const [category, setCategory] = React.useState(tool.category ?? "");
   const [vendor, setVendor] = React.useState(tool.vendor ?? "");
   const [url, setUrl] = React.useState(tool.url ?? "");
+  const [logoUrl, setLogoUrl] = React.useState(tool.logo_url ?? "");
   const [costPerMonth, setCostPerMonth] = React.useState(
     tool.cost_per_month != null ? String(tool.cost_per_month) : ""
   );
@@ -65,6 +66,7 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
   const categoryTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   const vendorTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   const urlTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  const logoUrlTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   const costTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
   React.useEffect(() => {
@@ -73,8 +75,9 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
     setCategory(tool.category ?? "");
     setVendor(tool.vendor ?? "");
     setUrl(tool.url ?? "");
+    setLogoUrl(tool.logo_url ?? "");
     setCostPerMonth(tool.cost_per_month != null ? String(tool.cost_per_month) : "");
-  }, [tool.id, tool.name, tool.status, tool.category, tool.vendor, tool.url, tool.cost_per_month]);
+  }, [tool.id, tool.name, tool.status, tool.category, tool.vendor, tool.url, tool.logo_url, tool.cost_per_month]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -152,6 +155,14 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
     clearTimeout(urlTimeoutRef.current);
     urlTimeoutRef.current = setTimeout(() => {
       handleFieldUpdate("url", newUrl.trim() || null);
+    }, 500);
+  };
+
+  const handleLogoUrlChange = (newLogoUrl: string) => {
+    setLogoUrl(newLogoUrl);
+    clearTimeout(logoUrlTimeoutRef.current);
+    logoUrlTimeoutRef.current = setTimeout(() => {
+      handleFieldUpdate("logo_url", newLogoUrl.trim() || null);
     }, 500);
   };
 
@@ -247,6 +258,29 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
             placeholder="https://..."
             type="url"
           />
+        </div>
+
+        <div>
+          <label className="text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide block mb-1.5">
+            Logo URL
+          </label>
+          <div className="flex items-center gap-2">
+            {logoUrl && (
+              <img
+                src={logoUrl}
+                alt=""
+                className="w-8 h-8 rounded-[4px] object-contain shrink-0 border border-[var(--border-subtle)]"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
+            <Input
+              value={logoUrl}
+              onChange={(e) => handleLogoUrlChange(e.target.value)}
+              placeholder="https://logo.clearbit.com/example.com"
+              type="url"
+              className="flex-1"
+            />
+          </div>
         </div>
 
         <div>

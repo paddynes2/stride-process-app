@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
     return errorResponse("validation", "workspace_id is required", 400);
   }
 
+  const { logo_url } = body;
   const insert: Record<string, unknown> = {
     workspace_id,
     name: name?.trim() || "New Tool",
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
     category: category?.trim() || null,
     vendor: vendor?.trim() || null,
     url: url?.trim() || null,
+    logo_url: logo_url?.trim() || null,
     cost_per_month: cost_per_month != null ? Number(cost_per_month) : null,
     position_x: position_x != null ? Number(position_x) : 0,
     position_y: position_y != null ? Number(position_y) : 0,
