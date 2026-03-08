@@ -491,7 +491,7 @@ export function renderBaseGapAnalysis(
 
   // R8: Delta summary when in review mode
   const prevMap = baselineData ? buildPreviousScoreMap(baselineData.previous_scores) : null;
-  const isReviewMode = prevMap != null && prevMap.size > 0;
+  const isReviewMode = baselineData != null && baselineData.review_number > 0 && prevMap != null && prevMap.size > 0;
   let improved = 0;
   let unchanged = 0;
   let regressed = 0;

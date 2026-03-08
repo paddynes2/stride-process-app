@@ -107,7 +107,7 @@ export function renderExecutiveSummary(pdf: jsPDF, data: ExecutiveSummaryData): 
   // ── P1: Composite Score (headline metric) + R8 delta ──
   const composite = computeCompositeScore(data.steps);
   const prevMap = data.baselineData ? buildPreviousScoreMap(data.baselineData.previous_scores) : null;
-  const isReviewMode = prevMap != null && prevMap.size > 0;
+  const isReviewMode = data.baselineData != null && data.baselineData.review_number > 0 && prevMap != null && prevMap.size > 0;
 
   // Compute previous composite for delta
   let prevComposite: { score: number } | null = null;
@@ -847,114 +847,7 @@ export async function renderJourneyMap(pdf: jsPDF, data: JourneyMapData): Promis
     pdf.text("No journey data available.", margin, y + 10);
   }
 
-  if (data.touchpoints.length === 0) return;
-
-  // Touchpoint details page
-  ({ y, pageHeight, margin, contentWidth } = addCleanPage(pdf));
-  y = drawSectionTitle(pdf, "Touchpoint Details", margin, y);
-
-  y = drawBodyText(pdf, "Each touchpoint represents a moment where the customer interacts with the business. Pain scores (1\u20135) indicate friction level, gain scores indicate perceived value.", margin, y, contentWidth);
-
-  const hasNotes = data.touchpoints.some((tp) => tp.notes && tp.notes.trim());
-  const tpCols = hasNotes
-    ? [
-        { label: "Touchpoint", width: 65 },
-        { label: "Stage", width: 50 },
-        { label: "Sentiment", width: 30 },
-        { label: "Pain", width: 22 },
-        { label: "Gain", width: 22 },
-        { label: "Emotion", width: 45 },
-        { label: "Notes", width: contentWidth - 65 - 50 - 30 - 22 - 22 - 45 },
-      ]
-    : [
-        { label: "Touchpoint", width: 75 },
-        { label: "Stage", width: 55 },
-        { label: "Sentiment", width: 30 },
-        { label: "Pain", width: 22 },
-        { label: "Gain", width: 22 },
-        { label: "Emotion", width: contentWidth - 75 - 55 - 30 - 22 - 22 },
-      ];
-
-  y = drawTableHeaderRow(pdf, tpCols, margin, contentWidth, y);
-
-  const sortedTps = [...data.touchpoints].sort((a, b) => {
-    const sa = a.stage_id ? stageMap.get(a.stage_id) ?? "" : "";
-    const sb = b.stage_id ? stageMap.get(b.stage_id) ?? "" : "";
-    if (sa !== sb) return sa.localeCompare(sb);
-    return a.name.localeCompare(b.name);
-  });
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(T.tableSize);
-
-  for (let rowIndex = 0; rowIndex < sortedTps.length; rowIndex++) {
-    const tp = sortedTps[rowIndex];
-    if (shouldBreakTable(y, pageHeight, margin, sortedTps.length - rowIndex)) {
-      y = newTablePageClean(pdf, "Touchpoint Details", tpCols, margin, contentWidth);
-    }
-    drawStripeRow(pdf, rowIndex, margin, y, contentWidth);
-    let colX = margin + 2;
-
-    pdf.setTextColor(...T.navy);
-    pdf.text(truncate(tp.name, 38), colX, y + 3);
-    colX += tpCols[0].width;
-
-    pdf.setTextColor(...T.muted);
-    pdf.text(truncate(tp.stage_id ? stageMap.get(tp.stage_id) ?? "\u2014" : "\u2014", 28), colX, y + 3);
-    colX += tpCols[1].width;
-
-    if (tp.sentiment) {
-      const sColor = SENTIMENT_COLORS[tp.sentiment] ?? "#6B7280";
-      const [r, g, b] = hexToRgb(sColor);
-      pdf.setFillColor(r, g, b);
-      pdf.circle(colX + 1.5, y + 2, 1.2, "F");
-      pdf.setTextColor(...T.navy);
-      pdf.text(capitalize(tp.sentiment), colX + 5, y + 3);
-    } else {
-      pdf.setTextColor(...T.faint);
-      pdf.text("\u2014", colX, y + 3);
-    }
-    colX += tpCols[2].width;
-
-    if (tp.pain_score != null) {
-      const painColor = PAIN_COLORS[tp.pain_score];
-      if (painColor) {
-        const [r, g, b] = hexToRgb(painColor);
-        pdf.setFillColor(r, g, b);
-        pdf.circle(colX + 1.5, y + 2, 1.2, "F");
-      }
-      pdf.setTextColor(...T.navy);
-      pdf.text(String(tp.pain_score), colX + 5, y + 3);
-    } else {
-      pdf.setTextColor(...T.faint);
-      pdf.text("\u2014", colX, y + 3);
-    }
-    colX += tpCols[3].width;
-
-    if (tp.gain_score != null) {
-      pdf.setTextColor(...T.green);
-      pdf.text(String(tp.gain_score), colX, y + 3);
-    } else {
-      pdf.setTextColor(...T.faint);
-      pdf.text("\u2014", colX, y + 3);
-    }
-    colX += tpCols[4].width;
-
-    pdf.setTextColor(...T.body);
-    const emotionParts: string[] = [];
-    if (tp.customer_emotion) emotionParts.push(tp.customer_emotion);
-    const emotionText = emotionParts.join(" \u2014 ") || "\u2014";
-    const emotionTrunc = hasNotes ? 26 : 36;
-    pdf.text(truncate(emotionText, emotionTrunc), colX, y + 3);
-
-    if (hasNotes) {
-      colX += tpCols[5].width;
-      pdf.setTextColor(...T.faint);
-      pdf.text(truncate(tp.notes ?? "\u2014", 18), colX, y + 3);
-    }
-
-    y += 6.5;
-  }
+  // Touchpoint details table removed — sentiment section surfaces key insights via arc + callouts
 }
 
 // ── Journey Sentiment ───────────────────────────────────────────────────────
@@ -2009,14 +1902,16 @@ export function renderPhasedRoadmap(pdf: jsPDF, data: RoadmapData): void {
   const sectionMap = new Map(data.sections.map((s) => [s.id, s.name]));
 
   // Build step → improvement map for specific outcomes
+  // Sort by priority (critical first) so highest-priority improvement wins per step
   const stepImprovementMap = new Map<string, ImprovementIdea>();
   if (data.improvements) {
-    for (const idea of data.improvements) {
-      if (idea.linked_step_id && idea.description && idea.status !== "rejected") {
-        // First match per step wins (improvements are typically priority-sorted)
-        if (!stepImprovementMap.has(idea.linked_step_id)) {
-          stepImprovementMap.set(idea.linked_step_id, idea);
-        }
+    const priorityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+    const sorted = [...data.improvements]
+      .filter((idea) => idea.linked_step_id && idea.description && idea.status !== "rejected")
+      .sort((a, b) => (priorityOrder[a.priority] ?? 4) - (priorityOrder[b.priority] ?? 4));
+    for (const idea of sorted) {
+      if (!stepImprovementMap.has(idea.linked_step_id!)) {
+        stepImprovementMap.set(idea.linked_step_id!, idea);
       }
     }
   }
