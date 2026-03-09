@@ -200,7 +200,7 @@ export function PublicCanvasView({ shareData }: PublicCanvasViewProps) {
       )}
 
       {/* Canvas */}
-      <div className="flex-1">
+      <div className="flex-1 w-full h-full">
         <ReactFlow
           nodes={nodes}
           edges={edges}

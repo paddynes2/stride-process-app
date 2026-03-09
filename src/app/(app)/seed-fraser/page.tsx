@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import {
   createWorkspace,
+  deleteTab,
   createTab,
   createSection,
   createStep,
@@ -599,6 +600,18 @@ export default function SeedFraserPage() {
       const ws = await createWorkspace({ name: WORKSPACE_NAME });
       setWorkspaceId(ws.id);
       updateLastLog("done");
+
+      // =====================================================================
+      // 1b. Delete bootstrap "Getting Started" tab
+      // =====================================================================
+      const bootstrapTabs = (ws as Record<string, unknown>).tabs as Array<{ id: string }> | undefined;
+      if (bootstrapTabs?.length) {
+        log("Removing default Getting Started tab...");
+        for (const bt of bootstrapTabs) {
+          await deleteTab(bt.id);
+        }
+        updateLastLog("done");
+      }
 
       // =====================================================================
       // 2. Process tab
