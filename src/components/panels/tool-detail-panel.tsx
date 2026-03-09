@@ -266,6 +266,7 @@ export function ToolDetailPanel({ tool, onUpdate, onDelete, onClose }: ToolDetai
           </label>
           <div className="flex items-center gap-2">
             {logoUrl && (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={logoUrl}
                 alt=""

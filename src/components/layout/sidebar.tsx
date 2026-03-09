@@ -133,6 +133,7 @@ export function Sidebar({ workspaceId, workspaceName, workspaceImageUrl, collaps
       <div className="flex items-center gap-2 px-3 h-[var(--header-height)] border-b border-[var(--border-subtle)]">
         <Link href="/workspaces" aria-label="Back to workspaces" className="flex items-center gap-2 min-w-0 flex-1">
           {workspaceImageUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={workspaceImageUrl}
               alt=""

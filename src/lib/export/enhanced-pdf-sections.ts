@@ -1,7 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { Section, Step, Stage, Touchpoint, Perspective, PerspectiveAnnotation, Tool, ImprovementIdea, AIAnalysisResult, Comment } from "@/types/database";
 import { MATURITY_COLORS } from "@/lib/maturity";
-import { PAIN_COLORS } from "@/lib/pain";
 import {
   T,
   SENTIMENT_COLORS,
@@ -28,7 +27,6 @@ import {
   buildStepToolsMap,
   computeStepMonthlyCost,
   shouldBreakTable,
-  resetFontState,
   withTimeout,
   computeCompositeScore,
   deriveGapType,
@@ -744,9 +742,8 @@ export function renderKeyFindings(pdf: jsPDF, data: KeyFindingsData): void {
 // ── Journey Map ─────────────────────────────────────────────────────────────
 
 export async function renderJourneyMap(pdf: jsPDF, data: JourneyMapData): Promise<void> {
-  let { y, pageHeight, margin, contentWidth } = addCleanPage(pdf);
-  y = drawSectionTitle(pdf, "Journey Map", margin, y);
-  const stageMap = new Map(data.stages.map((s) => [s.id, s.name]));
+  const { y: initY, pageHeight, margin, contentWidth } = addCleanPage(pdf);
+  let y = drawSectionTitle(pdf, "Journey Map", margin, initY);
 
   if (data.canvasElement) {
     try {
@@ -1504,8 +1501,8 @@ export function renderPrioritizationMatrix(pdf: jsPDF, data: { steps: Step[]; se
 // ── Tool Landscape ──────────────────────────────────────────────────────────
 
 export function renderToolLandscape(pdf: jsPDF, data: { tools: Tool[]; stepToolCounts?: Map<string, number>; totalSteps?: number }): void {
-  let { y, pageHeight, margin, contentWidth } = addCleanPage(pdf);
-  y = drawSectionTitle(pdf, "Tool Landscape", margin, y);
+  const { y: initY, pageHeight, margin, contentWidth } = addCleanPage(pdf);
+  let y = drawSectionTitle(pdf, "Tool Landscape", margin, initY);
 
   if (data.tools.length === 0) {
     y = drawBodyText(pdf, "No tools have been added to this workspace.", margin, y, contentWidth);
@@ -1604,7 +1601,6 @@ export function renderToolLandscape(pdf: jsPDF, data: { tools: Tool[]; stepToolC
     }
 
     const statusColIdx = hasStepMapping ? 4 : 3;
-    const costColIdx = hasStepMapping ? 5 : 4;
 
     const statusColor = tool.status === "active" ? T.green : tool.status === "considering" ? T.amber : T.muted;
     pdf.setFillColor(statusColor[0], statusColor[1], statusColor[2]);

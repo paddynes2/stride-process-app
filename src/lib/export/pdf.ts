@@ -4,7 +4,6 @@ import type { Section, Step, Connection, ImprovementIdea } from "@/types/databas
 import { MATURITY_COLORS } from "@/lib/maturity";
 import {
   T,
-  GAP_COLORS,
   hexToRgb,
   truncate,
   formatStatus,
