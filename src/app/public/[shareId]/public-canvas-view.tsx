@@ -167,7 +167,7 @@ export function PublicCanvasView({ shareData }: PublicCanvasViewProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-app)] flex flex-col">
+    <div className="h-screen bg-[var(--bg-app)] flex flex-col overflow-hidden">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div className="flex items-center gap-3">
@@ -200,7 +200,7 @@ export function PublicCanvasView({ shareData }: PublicCanvasViewProps) {
       )}
 
       {/* Canvas */}
-      <div className="flex-1 w-full h-full">
+      <div className="flex-1 min-h-0">
         <ReactFlow
           nodes={nodes}
           edges={edges}
