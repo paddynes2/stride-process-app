@@ -604,7 +604,7 @@ export default function SeedFraserPage() {
       // =====================================================================
       // 1b. Delete bootstrap "Getting Started" tab
       // =====================================================================
-      const bootstrapTabs = (ws as Record<string, unknown>).tabs as Array<{ id: string }> | undefined;
+      const bootstrapTabs = (ws as unknown as Record<string, unknown>).tabs as Array<{ id: string }> | undefined;
       if (bootstrapTabs?.length) {
         log("Removing default Getting Started tab...");
         for (const bt of bootstrapTabs) {
